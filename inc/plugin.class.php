@@ -135,7 +135,16 @@ class Plugin extends CommonDBTM {
    static function load($name, $withhook = false) {
       global $LOADED_PLUGINS;
 
-      if (file_exists(GLPI_ROOT . "/plugins/$name/setup.php")) {
+      if (file_exists(GLPI_ROOT . "/plugins/$name/inc/$name.php")) {
+         //v2 plugins
+         if (!isset($LOADED_PLUGINS[$name])) {
+            include_once(GLPI_ROOT . "/plugins/$name/inc/$name.php");
+            $class = "\GlpiPlugin\\" . ucwords($name);
+            $plugin = new $class;
+            $plugin->init();
+         }
+      } else if (file_exists(GLPI_ROOT . "/plugins/$name/setup.php")) {
+         //v1 plugins
          include_once(GLPI_ROOT . "/plugins/$name/setup.php");
          if (!isset($LOADED_PLUGINS[$name])) {
             self::loadLang($name);
