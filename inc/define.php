@@ -426,6 +426,8 @@ $CFG_GLPI["certificate_types"]     = ['Computer',
                                       'Phone', 'Printer',
                                       'SoftwareLicense', 'User'];
 
+$CFG_GLPI["rackable_types"]        = ['Computer', 'Monitor', 'NetworkEquipment', 'Peripheral'];
+
 $CFG_GLPI['javascript'] = [
    'central'   => [
       'central'   => ['fullcalendar']
@@ -441,6 +443,10 @@ $CFG_GLPI['javascript'] = [
       'project'      => ['gantt'],
       'knowbaseitem' => ['tinymce'],
       'reminder'     => ['tinymce']
+   ],
+   'management' => [
+      'dcroom'       => ['slickgrid'],
+      'rack'         => ['colorpicker', 'slickgrid'],
    ],
    'config'    => [
       'config'    => ['colorpicker'],

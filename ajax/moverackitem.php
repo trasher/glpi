@@ -30,18 +30,28 @@
  * ---------------------------------------------------------------------
  */
 
-/** @file
-* @brief
-*/
+include ('../inc/includes.php');
+header("Content-Type: application/json; charset=UTF-8");
+Html::header_nocache();
 
-if (!defined('GLPI_ROOT')) {
-   die("Sorry. You can't access this file directly");
+Session::checkLoginUser();
+
+$success = false;
+if (!isset($_POST['id']) || !isset($_POST['position']) || !isset($_POST['hpos']) || !isset($_POST['orientation'])) {
+   Session::addMessageAfterRedirect(
+      __('A required data is missing'),
+      true,
+      ERROR
+   );
+} else {
+   $id = $_POST['id'];
+   $itemrack = new Item_Rack();
+   $itemrack->getFromDB($id);
+   $success = $itemrack->update([
+      'id'           => $id,
+      'position'     => $_POST['position'],
+      'hpos'         => $_POST['hpos'],
+      'orientation'  => $_POST['orientation']
+   ]);
 }
-
-/// Class ComputerModel
-class ComputerModel extends CommonDCModelDropdown {
-
-   static function getTypeName($nb = 0) {
-      return _n('Computer model', 'Computer models', $nb);
-   }
-}
+echo json_encode(['success' => $success]);

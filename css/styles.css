@@ -4671,6 +4671,39 @@ tr.linked-template td:not(.top) {
    color: green;
 }
 
+#switchview {
+   font-size: 2em;
+   text-align: right;
+}
+
+#switchview i {
+   margin-left: .5em;
+}
+#switchview i.selected {
+   color: green;
+}
+
+#viewlist {
+   display: none;
+}
+
+#viewgraph table {
+   width: 100%;
+   table-layout: fixed
+}
+
+#viewgraph .tipcontent {
+   display: none;
+}
+
+#viewgraph a.fa, #viewgraph a.fa:link, #viewgraph a .fa {
+   color: white;
+   position: absolute;
+   right: 0;
+   top: 0;
+   padding: .5em;
+}
+
 @media screen and (max-width: 900px) {
    .documentation {
       margin-left: 0 !important;

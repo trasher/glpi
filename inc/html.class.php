@@ -1193,6 +1193,11 @@ class Html {
             echo Html::css('lib/chartist-plugin-tooltip-0.0.17/chartist-plugin-tooltip.css');
             Html::requireJs('charts');
          }
+
+         if (in_array('slickgrid', $jslibs)) {
+            echo Html::css('lib/REDIPS_drag/glpi.css');
+            Html::requireJs('slickgrid');
+         }
       }
 
       if ($_SESSION["glpiactiveprofile"]["interface"] == "helpdesk") {
@@ -1294,7 +1299,8 @@ class Html {
 
       $menu['management']['title']   = __('Management');
       $menu['management']['types']   = ['SoftwareLicense','Budget', 'Supplier', 'Contact', 'Contract',
-                                        'Document', 'Line', 'Certificate'];
+                                        'Document', 'Line', 'Certificate', 'Datacenter', 'DCRoom',
+                                        'Rack'];
 
       $menu['tools']['title']        = __('Tools');
       $menu['tools']['types']        = ['Project', 'Reminder', 'RSSFeed', 'KnowbaseItem',
@@ -5576,6 +5582,9 @@ class Html {
             $_SESSION['glpi_js_toload'][$name][] = 'lib/fuzzy/fuzzy-min.js';
             $_SESSION['glpi_js_toload'][$name][] = 'lib/jqueryplugins/jquery.hotkeys.js';
             $_SESSION['glpi_js_toload'][$name][] = 'js/fuzzysearch.js';
+            break;
+         case 'slickgrid':
+            $_SESSION['glpi_js_toload'][$name][] = 'lib/REDIPS_drag/redips-drag-source.js';
             break;
          default:
             $found = false;

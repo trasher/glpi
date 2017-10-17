@@ -1028,7 +1028,7 @@ class Session {
                                            $reset = false) {
 
       if (!empty($msg)) {
-         if (self::isCron()) {
+         if (self::isCron() && !defined('TU_USER')) {
             // We are in cron mode
             // Do not display message in user interface, but record error
             if ($message_type == ERROR) {
@@ -1036,19 +1036,24 @@ class Session {
             }
 
          } else {
-
-            if ($reset) {
-               $_SESSION["MESSAGE_AFTER_REDIRECT"] = [];
+            $array = &$_SESSION['MESSAGE_AFTER_REDIRECT'];
+            if (defined('TU_USER')) {
+               global $TEST_ERRORS;
+               $array = &$TEST_ERRORS['MESSAGE_AFTER_REDIRECT'];
             }
 
-            if (!isset($_SESSION["MESSAGE_AFTER_REDIRECT"][$message_type])) {
-               $_SESSION["MESSAGE_AFTER_REDIRECT"][$message_type] = [];
+            if ($reset) {
+               $array = [];
+            }
+
+            if (!isset($array[$message_type])) {
+               $array[$message_type] = [];
             }
 
             if (!$check_once
-                || !isset($_SESSION["MESSAGE_AFTER_REDIRECT"][$message_type])
-                || in_array($msg, $_SESSION["MESSAGE_AFTER_REDIRECT"][$message_type]) === false) {
-               array_push($_SESSION["MESSAGE_AFTER_REDIRECT"][$message_type], $msg);
+                || !isset($array[$message_type])
+                || in_array($msg, $array[$message_type]) === false) {
+               array_push($array[$message_type], $msg);
             }
          }
       }

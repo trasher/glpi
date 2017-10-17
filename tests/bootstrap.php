@@ -37,6 +37,7 @@ define('GLPI_LOG_DIR', __DIR__ . '/files/_log');
 define('GLPI_URI', (getenv('GLPI_URI') ?: 'http://localhost:8088'));
 define('TU_USER', '_test_user');
 define('TU_PASS', 'PhpUnit_4');
+$TEST_ERRORS = [];
 
 if (!file_exists(GLPI_CONFIG_DIR . '/config_db.php')) {
    die("\nConfiguration file for tests not found\n\nrun: php tools/cliinstall.php --tests ...\n\n");

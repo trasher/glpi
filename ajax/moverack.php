@@ -30,18 +30,27 @@
  * ---------------------------------------------------------------------
  */
 
-/** @file
-* @brief
-*/
+include ('../inc/includes.php');
+header("Content-Type: application/json; charset=UTF-8");
+Html::header_nocache();
 
-if (!defined('GLPI_ROOT')) {
-   die("Sorry. You can't access this file directly");
+Session::checkLoginUser();
+
+if (!isset($_POST['id']) || !isset($_POST['pos'])) {
+   throw new \RuntimeException('Required argument missing!');
 }
 
-/// Class ComputerModel
-class ComputerModel extends CommonDCModelDropdown {
+$id = $_POST['id'];
+$position = $_POST['pos'];
 
-   static function getTypeName($nb = 0) {
-      return _n('Computer model', 'Computer models', $nb);
-   }
-}
+$rack = new Rack();
+$rack->getFromDB($id);
+
+$rack->update([
+   'id'        => $id,
+   'position'  => implode(',', $position)
+]);
+
+echo json_encode([
+   'name'  => $rack->getName()
+]);
