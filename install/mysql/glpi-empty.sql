@@ -9283,6 +9283,7 @@ CREATE TABLE `glpi_items_racks` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- /Datacenters
+
 ### Dump table glpi_assettypes
 
 DROP TABLE IF EXISTS `glpi_assettypes`;

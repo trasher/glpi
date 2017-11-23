@@ -420,6 +420,7 @@ abstract class CommonDropdown extends CommonDBTM {
 
 
    function displaySpecificTypeField($ID, $field = []) {
+      Toolbox::logDebug("Unable to render {$field['type']}!");
    }
 
 
