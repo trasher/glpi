@@ -97,6 +97,22 @@ function isPluginItemType($classname) {
 
 
 /**
+ * Is a class an asset
+ *
+ * @param string $classname Class name
+ *
+ * @return AssetType|false
+ */
+function isAssetItemType($classname) {
+   $assettype = new AssetType();
+   if ($assettype->getFromDBByCrit(['name' => $classname])) {
+      return $assettype;
+   } else {
+      return false;
+   }
+}
+
+/**
  * Translate a string
  *
  * @since 0.84

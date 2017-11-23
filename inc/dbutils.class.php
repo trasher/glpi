@@ -188,8 +188,11 @@ final class DbUtils {
             /* GlpiPlugin\Foo\Bar => glpi_plugin_foos_bars */
             $prefix .= "plugin_".strtolower($plug['plugin'])."_";
             $table   = strtolower($plug['class']);
-
          } else {
+            if ($itemtype != 'AssetType' && isAssetItemType($itemtype)) {
+               $itemtype = 'Asset';
+            }
+
             $table = strtolower($itemtype);
             if (substr($itemtype, 0, \strlen(NS_GLPI)) === NS_GLPI) {
                $table = substr($table, \strlen(NS_GLPI));
@@ -223,11 +226,42 @@ final class DbUtils {
     * @return string itemtype corresponding to a table name parameter
     */
    public function getItemTypeForTable($table) {
-      global $CFG_GLPI;
+      global $DB, $CFG_GLPI;
 
-      if (isset($CFG_GLPI['glpiitemtypetables'][$table])) {
+      if ($table == 'glpi_computers') {
+         Toolbox::deprecated('glpi_computers table no longer exists!');
+         $table = 'glpi_assets';
+      }
+
+      if ($table == 'glpi_assets') {
+         $iterator = $DB->request(['SELECT' => 'name', 'FROM' => 'glpi_assettypes']);
+         while ($row = $iterator->next()) {
+            $name = $row['name'];
+            $prefix = "glpi_";
+
+            $assettable = strtolower($name);
+            if (substr($name, 0, \strlen(NS_GLPI)) === NS_GLPI) {
+               $assettable = substr($assettable, \strlen(NS_GLPI));
+            }
+            $assettable = str_replace('\\', '_', $assettable);
+            if (strstr($assettable, '_')) {
+               $split = explode('_', $assettable);
+
+               foreach ($split as $key => $part) {
+                  $split[$key] = $this->getPlural($part);
+               }
+               $assettabletable = implode('_', $split);
+
+            } else {
+               $assettable = $this->getPlural($assettable);
+            }
+
+            if ($prefix.$assettable == $table) {
+               return $name;
+            }
+         }
+      } else if (isset($CFG_GLPI['glpiitemtypetables'][$table])) {
          return $CFG_GLPI['glpiitemtypetables'][$table];
-
       } else {
          $inittable = $table;
          $table     = str_replace("glpi_", "", $table);
@@ -284,7 +318,14 @@ final class DbUtils {
       if ($itemtype === 'Event') {
          //to avoid issues when pecl-event is installed...
          $itemtype = 'Glpi\\Event';
+      } else {
+         $assettype = new AssetType();
+         $is_asset = $assettype->getFromDBByCrit(['name' => $itemtype]);
+         if ($is_asset) {
+            return new Asset($itemtype);
+         }
       }
+
       if (class_exists($itemtype)) {
          return new $itemtype();
       }

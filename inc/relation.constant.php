@@ -47,7 +47,7 @@ $RELATION = ["glpi_authldaps"
                                  'glpi_entities'           => 'authldaps_id',],
 
                         "glpi_autoupdatesystems"
-                        => ['glpi_computers' => 'autoupdatesystems_id'],
+                        => ['glpi_assets' => 'autoupdatesystems_id'],
 
                         "glpi_savedsearches"
                         => ['glpi_savedsearches_users' => 'savedsearches_id'],
@@ -82,9 +82,9 @@ $RELATION = ["glpi_authldaps"
                         => ['glpi_changetasks'   => 'changetasks_id'],
 
                         "glpi_computermodels"
-                        => ['glpi_computers' => 'computermodels_id'],
+                        => ['glpi_assets' => 'computermodels_id'],
 
-                        "glpi_computers"
+                        "glpi_assets"
                         => ['glpi_computers_items'                => 'computers_id',
                                  'glpi_computers_softwarelicenses'     => 'computers_id',
                                  'glpi_computers_softwareversions'     => 'computers_id',
@@ -92,7 +92,7 @@ $RELATION = ["glpi_authldaps"
                                  'glpi_computervirtualmachines'        => 'computers_id'],
 
                         "glpi_computertypes"
-                        => ['glpi_computers' => 'computertypes_id'],
+                        => ['glpi_assets' => 'computertypes_id'],
 
                         "glpi_certificatetypes"
                         => ['glpi_certificatetypes' => 'certificatetypes_id'],
@@ -182,7 +182,7 @@ $RELATION = ["glpi_authldaps"
                         => ['glpi_documents_items' => 'documents_id'],
 
                         "glpi_domains"
-                        => ['glpi_computers'         => 'domains_id',
+                        => ['glpi_assets'         => 'domains_id',
                                  'glpi_printers'          => 'domains_id',
                                  'glpi_networkequipments' => 'domains_id'],
 
@@ -194,7 +194,7 @@ $RELATION = ["glpi_authldaps"
                                  'glpi_cartridgeitems'                  => 'entities_id',
                                  '_glpi_cartridges'                     => 'entities_id',
                                  'glpi_changes'                         => 'entities_id',
-                                 'glpi_computers'                       => 'entities_id',
+                                 'glpi_assets'                          => 'entities_id',
                                  '_glpi_computerdisks'                  => 'entities_id',
                                  '_glpi_computervirtualmachines'        => 'entities_id',
                                  'glpi_consumableitems'                 => 'entities_id',
@@ -268,7 +268,7 @@ $RELATION = ["glpi_authldaps"
                         "glpi_groups"
                         => ['glpi_cartridgeitems'       => 'groups_id_tech',
                                  'glpi_changes_groups'       => 'groups_id',
-                                 'glpi_computers'            => ['groups_id_tech', 'groups_id'],
+                                 'glpi_assets'            => ['groups_id_tech', 'groups_id'],
                                  'glpi_consumableitems'      => 'groups_id_tech',
                                  'glpi_groups'               => 'groups_id',
                                  'glpi_groups_knowbaseitems' => 'groups_id',
@@ -322,7 +322,7 @@ $RELATION = ["glpi_authldaps"
                         => ['glpi_budgets'           => 'locations_id',
                                  'glpi_cartridgeitems'    => 'locations_id',
                                  'glpi_consumableitems'   => 'locations_id',
-                                 'glpi_computers'         => 'locations_id',
+                                 'glpi_assets'         => 'locations_id',
                                  'glpi_locations'         => 'locations_id',
                                  'glpi_monitors'          => 'locations_id',
                                  'glpi_netpoints'         => 'locations_id',
@@ -338,7 +338,7 @@ $RELATION = ["glpi_authldaps"
 
                         "glpi_manufacturers"
                         => ['glpi_cartridgeitems'      => 'manufacturers_id',
-                                 'glpi_computers'           => 'manufacturers_id',
+                                 'glpi_assets'           => 'manufacturers_id',
                                  'glpi_consumableitems'     => 'manufacturers_id',
                                  'glpi_devicecases'         => 'manufacturers_id',
                                  'glpi_devicecontrols'      => 'manufacturers_id',
@@ -400,7 +400,7 @@ $RELATION = ["glpi_authldaps"
                         => ['glpi_networkportwifis' => 'networkportwifis_id'],
 
                         "glpi_networks"
-                        => ['glpi_computers'         => 'networks_id',
+                        => ['glpi_assets'         => 'networks_id',
                                  'glpi_printers'          => 'networks_id',
                                  'glpi_networkequipments' => 'networks_id'],
 
@@ -546,7 +546,7 @@ $RELATION = ["glpi_authldaps"
                             'glpi_solutiontemplates' => 'solutiontypes_id'],
 
                         "glpi_states"
-                        => ['glpi_computers'         => 'states_id',
+                        => ['glpi_assets'         => 'states_id',
                                  'glpi_monitors'          => 'states_id',
                                  'glpi_networkequipments' => 'states_id',
                                  'glpi_peripherals'       => 'states_id',
@@ -631,7 +631,7 @@ $RELATION = ["glpi_authldaps"
                                                                            'users_id_lastupdater'],
                                  'glpi_changes_users'             => 'users_id',
                                  'glpi_changetasks'               => ['users_id', 'users_id_tech'],
-                                 'glpi_computers'                 => ['users_id_tech', 'users_id'],
+                                 'glpi_assets'                    => ['users_id_tech', 'users_id'],
                                  'glpi_consumableitems'           => 'users_id_tech',
                                  'glpi_displaypreferences'        => 'users_id',
                                  'glpi_documents'                 => 'users_id',

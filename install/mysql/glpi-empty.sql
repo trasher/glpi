@@ -920,10 +920,10 @@ CREATE TABLE `glpi_computermodels` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_computers
+### Dump table glpi_assets
 
-DROP TABLE IF EXISTS `glpi_computers`;
-CREATE TABLE `glpi_computers` (
+DROP TABLE IF EXISTS `glpi_assets`;
+CREATE TABLE `glpi_assets` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `entities_id` int(11) NOT NULL DEFAULT '0',
   `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -953,6 +953,7 @@ CREATE TABLE `glpi_computers` (
   `uuid` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `date_creation` datetime DEFAULT NULL,
   `is_recursive` tinyint(1) NOT NULL DEFAULT '0',
+  `assettypes_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `date_mod` (`date_mod`),
   KEY `name` (`name`),
@@ -976,7 +977,8 @@ CREATE TABLE `glpi_computers` (
   KEY `otherserial` (`otherserial`),
   KEY `uuid` (`uuid`),
   KEY `date_creation` (`date_creation`),
-  KEY `is_recursive` (`is_recursive`)
+  KEY `is_recursive` (`is_recursivee`),
+  KEY `assettypes_id` (`assettypes_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 

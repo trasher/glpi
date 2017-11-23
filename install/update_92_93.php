@@ -273,6 +273,25 @@ function update92to93() {
             ON DUPLICATE KEY UPDATE `name`='$assettype'"
       );
    }
+
+   if (!$DB->tableExists('glpi_assets')) {
+      $migration->renameTable('glpi_computers', 'glpi_assets');
+      $migration->migrationOneTable('glpi_computers');
+   } else if ($DB->tableExists('glpi_computers')) {
+      die('Your database is partially migrated. Please drop it, restore a backup, and migrate again.²');
+   }
+
+   if (!$DB->fieldExists('glpi_assets', 'assettypes_id')) {
+      $migration->addField("glpi_assets", "assettypes_id", "integer");
+      $migration->migrationOneTable('glpi_assets');
+      $migration->addKey("glpi_assets", "assettypes_id");
+
+      $migration->addPostQuery(
+         "UPDATE `glpi_assets` SET `assettypes_id`=
+            (SELECT `id` FROM `glpi_assettypes` WHERE `name`='Computer')"
+      );
+   }
+
    // ************ Keep it at the end **************
    $migration->executeMigration();
 

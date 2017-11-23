@@ -36,10 +36,16 @@
 
 include ('../inc/includes.php');
 
+if (!isset($_GET['assettype'])) {
+   throw new \RuntimeException('Missing asset type');
+}
+
+$assettype = $_GET['assettype'];
+
 Session::checkRight("computer", READ);
 
-Html::header(Computer::getTypeName(Session::getPluralNumber()), $_SERVER['PHP_SELF'], "assets", "computer");
+Html::header($assettype::getTypeName(Session::getPluralNumber()), $_SERVER['PHP_SELF'], "assets", "asset");
 
-Search::show('Computer');
+Search::show($assettype);
 
 Html::footer();

@@ -39,9 +39,9 @@ if (!defined('GLPI_ROOT')) {
 }
 
 /**
- *  Computer class
+ *  Asset class
 **/
-class Computer extends CommonDBTM {
+class Asset extends CommonDBTM {
 
    // From CommonDBTM
    public $dohistory                   = true;
@@ -57,6 +57,18 @@ class Computer extends CommonDBTM {
    static $rightname                   = 'computer';
    protected $usenotepad               = true;
 
+   function __construct ($typename) {
+      $assettype = new AssetType();
+      if ($assettype->getFromDBByCrit(['name' => $typename])) {
+         $this->assettype = $assettype;
+      } else {
+         throw new \RuntimeException("Unknown asset type $typename");
+      }
+   }
+
+   static function getTable($classname = null) {
+      return 'glpi_assets';
+   }
 
    /**
     * Name of the type
@@ -600,6 +612,7 @@ class Computer extends CommonDBTM {
 
       $tab[] = [
          'id'                 => '1',
+         'assettype'          => $this->assettype->fields['name'],
          'table'              => $this->getTable(),
          'field'              => 'name',
          'name'               => __('Name'),
@@ -609,6 +622,7 @@ class Computer extends CommonDBTM {
 
       $tab[] = [
          'id'                 => '2',
+         'assettype'          => $this->assettype->fields['name'],
          'table'              => $this->getTable(),
          'field'              => 'id',
          'name'               => __('ID'),
@@ -653,7 +667,8 @@ class Computer extends CommonDBTM {
 
       $tab[] = [
          'id'                 => '47',
-         'table'              => 'glpi_computers',
+         'assettype'          => $this->assettype->fields['name'],
+         'table'              => $this->getTable(),
          'field'              => 'uuid',
          'name'               => __('UUID'),
          'datatype'           => 'string'
@@ -661,7 +676,9 @@ class Computer extends CommonDBTM {
 
       $tab[] = [
          'id'                 => '5',
-         'table'              => 'glpi_computers',
+         'assettype'          => $this->assettype->fields['name'],
+         'table'              => $this->getTable(),
+         'table'              => $this->getTable(),
          'field'              => 'serial',
          'name'               => __('Serial number'),
          'datatype'           => 'string'
@@ -669,7 +686,8 @@ class Computer extends CommonDBTM {
 
       $tab[] = [
          'id'                 => '6',
-         'table'              => 'glpi_computers',
+         'assettype'          => $this->assettype->fields['name'],
+         'table'              => $this->getTable(),
          'field'              => 'otherserial',
          'name'               => __('Inventory number'),
          'datatype'           => 'string'
@@ -677,7 +695,8 @@ class Computer extends CommonDBTM {
 
       $tab[] = [
          'id'                 => '16',
-         'table'              => 'glpi_computers',
+         'assettype'          => $this->assettype->fields['name'],
+         'table'              => $this->getTable(),
          'field'              => 'comment',
          'name'               => __('Comments'),
          'datatype'           => 'text'
@@ -685,7 +704,8 @@ class Computer extends CommonDBTM {
 
       $tab[] = [
          'id'                 => '7',
-         'table'              => 'glpi_computers',
+         'assettype'          => $this->assettype->fields['name'],
+         'table'              => $this->getTable(),
          'field'              => 'contact',
          'name'               => __('Alternate username'),
          'datatype'           => 'string'
@@ -693,7 +713,8 @@ class Computer extends CommonDBTM {
 
       $tab[] = [
          'id'                 => '8',
-         'table'              => 'glpi_computers',
+         'assettype'          => $this->assettype->fields['name'],
+         'table'              => $this->getTable(),
          'field'              => 'contact_num',
          'name'               => __('Alternate username number'),
          'datatype'           => 'string'
@@ -719,7 +740,8 @@ class Computer extends CommonDBTM {
 
       $tab[] = [
          'id'                 => '19',
-         'table'              => 'glpi_computers',
+         'assettype'          => $this->assettype->fields['name'],
+         'table'              => $this->getTable(),
          'field'              => 'date_mod',
          'name'               => __('Last update'),
          'datatype'           => 'datetime',
@@ -728,7 +750,8 @@ class Computer extends CommonDBTM {
 
       $tab[] = [
          'id'                 => '121',
-         'table'              => 'glpi_computers',
+         'assettype'          => $this->assettype->fields['name'],
+         'table'              => $this->getTable(),
          'field'              => 'date_creation',
          'name'               => __('Creation date'),
          'datatype'           => 'datetime',
@@ -801,7 +824,7 @@ class Computer extends CommonDBTM {
       ];
 
       $items_device_joinparams   = ['jointype'          => 'itemtype_item',
-                                         'specific_itemtype' => 'Computer'];
+                                    'specific_itemtype' => 'Computer'];
 
       $tab[] = [
          'id'                 => '17',

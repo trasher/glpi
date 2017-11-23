@@ -1423,20 +1423,24 @@ class Toolbox {
       global $CFG_GLPI;
 
       $dir = ($full ? $CFG_GLPI['root_doc'] : '');
+      $add = '';
 
       if ($plug = isPluginItemType($itemtype)) {
          /* PluginFooBar => /plugins/foo/front/bar */
          $dir .= "/plugins/".strtolower($plug['plugin']);
          $item = str_replace('\\', '/', strtolower($plug['class']));
-
       } else { // Standard case
+         if ($itemtype != 'AssetType' && isAssetItemType($itemtype)) {
+            $add = '?assettype=' . $itemtype;
+            $itemtype = 'Asset';
+         }
          $item = strtolower($itemtype);
          if (substr($itemtype, 0, \strlen(NS_GLPI)) === NS_GLPI) {
             $item = str_replace('\\', '/', substr($item, \strlen(NS_GLPI)));
          }
       }
 
-      return "$dir/front/$item.form.php";
+      return "$dir/front/$item.form.php$add";
    }
 
 
@@ -1452,6 +1456,7 @@ class Toolbox {
       global $CFG_GLPI;
 
       $dir = ($full ? $CFG_GLPI['root_doc'] : '');
+      $add = '';
 
       if ($plug = isPluginItemType($itemtype)) {
          $dir .=  "/plugins/".strtolower($plug['plugin']);
@@ -1464,13 +1469,17 @@ class Toolbox {
          if ($itemtype == 'Consumable') {
             $itemtype = 'ConsumableItem';
          }
+         if ($itemtype != 'AssetType' && isAssetItemType($itemtype)) {
+            $add = '?assettype=' . $itemtype;
+            $itemtype = 'Asset';
+         }
          $item = strtolower($itemtype);
          if (substr($itemtype, 0, \strlen(NS_GLPI)) === NS_GLPI) {
             $item = str_replace('\\', '/', substr($item, \strlen(NS_GLPI)));
          }
       }
 
-      return "$dir/front/$item.php";
+      return "$dir/front/$item.php$add";
    }
 
 

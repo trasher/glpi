@@ -1958,6 +1958,10 @@ class Search {
       // Reset to start when submit new search
       echo Html::hidden('start', ['value'    => 0]);
 
+      if (isset($_GET['assettype'])) {
+         echo Html::hidden('assettype', ['value' => $_GET['assettype']]);
+      }
+
       echo "</div>";
       Html::closeForm();
    }
@@ -3903,7 +3907,7 @@ class Search {
                   array_push($already_link_tables2, "glpi_computers_items_$to_type");
                   return " $LINK `glpi_computers_items` AS `glpi_computers_items_$to_type`
                               ON (`glpi_computers_items_$to_type`.`computers_id`
-                                       = `glpi_computers`.`id`
+                                       = `glpi_assets`.`id`
                                   AND `glpi_computers_items_$to_type`.`itemtype` = '$to_type'
                                   AND NOT `glpi_computers_items_$to_type`.`is_deleted`)
                            $LINK `glpi_printers`
@@ -3914,7 +3918,7 @@ class Search {
                   array_push($already_link_tables2, "glpi_computers_items_$to_type");
                   return " $LINK `glpi_computers_items` AS `glpi_computers_items_$to_type`
                               ON (`glpi_computers_items_$to_type`.`computers_id`
-                                       = `glpi_computers`.`id`
+                                       = `glpi_assets`.`id`
                                   AND `glpi_computers_items_$to_type`.`itemtype` = '$to_type'
                                   AND NOT `glpi_computers_items_$to_type`.`is_deleted`)
                            $LINK `glpi_monitors`
@@ -3925,7 +3929,7 @@ class Search {
                   array_push($already_link_tables2, "glpi_computers_items_$to_type");
                   return " $LINK `glpi_computers_items` AS `glpi_computers_items_$to_type`
                               ON (`glpi_computers_items_$to_type`.`computers_id`
-                                       = `glpi_computers`.`id`
+                                       = `glpi_assets`.`id`
                                   AND `glpi_computers_items_$to_type`.`itemtype` = '$to_type'
                                   AND NOT `glpi_computers_items_$to_type`.`is_deleted`)
                            $LINK `glpi_peripherals`
@@ -3937,7 +3941,7 @@ class Search {
                   array_push($already_link_tables2, "glpi_computers_items_$to_type");
                   return " $LINK `glpi_computers_items` AS `glpi_computers_items_$to_type`
                               ON (`glpi_computers_items_$to_type`.`computers_id`
-                                       = `glpi_computers`.`id`
+                                       = `glpi_assets`.`id`
                                   AND `glpi_computers_items_$to_type`.`itemtype` = '$to_type'
                                   AND NOT `glpi_computers_items_$to_type`.`is_deleted`)
                            $LINK `glpi_phones`
@@ -3950,7 +3954,7 @@ class Search {
                   return " $LINK `glpi_computers_softwareversions`
                                     AS `glpi_computers_softwareversions_$complexjoin$to_type`
                               ON (`glpi_computers_softwareversions_$complexjoin$to_type`.`computers_id`
-                                       = `glpi_computers`.`id`
+                                       = `glpi_assets`.`id`
                                   AND `glpi_computers_softwareversions_$complexjoin$to_type`.`is_deleted` = '0')
                            $LINK `glpi_softwareversions` AS `glpi_softwareversions_$complexjoin$to_type`
                               ON (`glpi_computers_softwareversions_$complexjoin$to_type`.`softwareversions_id`
@@ -3976,9 +3980,9 @@ class Search {
                               ON (`glpi_computers_items_$to_type`.`items_id` = `glpi_monitors`.`id`
                                   AND `glpi_computers_items_$to_type`.`itemtype` = '$from_type'
                                   AND NOT `glpi_computers_items_$to_type`.`is_deleted`)
-                           $LINK `glpi_computers`
+                           $LINK `glpi_assets`
                               ON (`glpi_computers_items_$to_type`.`computers_id`
-                                       = `glpi_computers`.`id`) ";
+                                       = `glpi_assets`.`id`) ";
             }
             break;
 
@@ -3991,9 +3995,9 @@ class Search {
                               ON (`glpi_computers_items_$to_type`.`items_id` = `glpi_printers`.`id`
                                   AND `glpi_computers_items_$to_type`.`itemtype` = '$from_type'
                                   AND NOT `glpi_computers_items_$to_type`.`is_deleted`)
-                           $LINK `glpi_computers`
+                           $LINK `glpi_assets`
                               ON (`glpi_computers_items_$to_type`.`computers_id`
-                                       = `glpi_computers`.`id` ".
+                                       = `glpi_assets`.`id` ".
                                   getEntitiesRestrictRequest("AND", 'glpi_computers').") ";
             }
             break;
@@ -4008,9 +4012,9 @@ class Search {
                                        = `glpi_peripherals`.`id`
                                   AND `glpi_computers_items_$to_type`.`itemtype` = '$from_type'
                                   AND NOT `glpi_computers_items_$to_type`.`is_deleted`)
-                           $LINK `glpi_computers`
+                           $LINK `glpi_assets`
                               ON (`glpi_computers_items_$to_type`.`computers_id`
-                                       = `glpi_computers`.`id`) ";
+                                       = `glpi_assets`.`id`) ";
             }
             break;
 
@@ -4023,9 +4027,9 @@ class Search {
                               ON (`glpi_computers_items_$to_type`.`items_id` = `glpi_phones`.`id`
                                   AND `glpi_computers_items_$to_type`.`itemtype` = '$from_type'
                                   AND NOT `glpi_computers_items_$to_type`.`is_deleted`)
-                           $LINK `glpi_computers`
+                           $LINK `glpi_assets`
                               ON (`glpi_computers_items_$to_type`.`computers_id`
-                                       = `glpi_computers.id`) ";
+                                       = `glpi_assets`.`id`) ";
             }
             break;
 
@@ -4043,9 +4047,9 @@ class Search {
                               ON (`glpi_computers_softwareversions_$to_type`.`softwareversions_id`
                                        = `glpi_softwareversions_$to_type`.`id`
                                   AND `glpi_computers_softwareversions_$to_type`.`is_deleted` = '0')
-                           $LINK `glpi_computers`
+                           $LINK `glpi_assets`
                               ON (`glpi_computers_softwareversions_$to_type`.`computers_id`
-                                       = `glpi_computers`.`id` ".
+                                       = `glpi_assets`.`id` ".
                                   getEntitiesRestrictRequest("AND", 'glpi_computers').") ";
             }
             break;
@@ -4806,7 +4810,11 @@ class Search {
       if (isset($searchopt[$ID]["datatype"])) {
          switch ($searchopt[$ID]["datatype"]) {
             case "itemlink" :
-               $linkitemtype  = getItemTypeForTable($searchopt[$ID]["table"]);
+               if (isset($searchopt[$ID]['assettype'])) {
+                  $linkitemtype = $searchopt[$ID]['assettype'];
+               } else {
+                  $linkitemtype  = getItemTypeForTable($searchopt[$ID]["table"]);
+               }
 
                $out           = "";
                $count_display = 0;
