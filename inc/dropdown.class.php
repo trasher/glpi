@@ -771,6 +771,8 @@ class Dropdown {
       if (is_null($optgroup)) {
          $optgroup = [
              __('Common') => [
+                 'AssetType'              => _n('Asset type', 'Asset types',
+                                                Session::getPluralNumber()),
                  'Location'               => _n('Location', 'Locations',
                                                 Session::getPluralNumber()),
                  'State'                  => _n('Status of items',

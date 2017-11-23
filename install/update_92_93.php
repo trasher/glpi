@@ -250,6 +250,29 @@ function update92to93() {
 
    /** /Datacenters */
 
+   if (!$DB->tableExists('glpi_assettypes')) {
+      $query = "CREATE TABLE `glpi_assettypes` (
+                  `id` int(11) NOT NULL AUTO_INCREMENT,
+                  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+                  `comment` text COLLATE utf8_unicode_ci,
+                  `is_rackable` tinyint(1) NOT NULL DEFAULT '0',
+                  `date_mod` datetime DEFAULT NULL,
+                  `date_creation` datetime DEFAULT NULL,
+                  PRIMARY KEY (`id`),
+                  UNIQUE KEY `name` (`name`),
+                  KEY `date_mod` (`date_mod`),
+                  KEY `date_creation` (`date_creation`)
+                  ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
+      $DB->queryOrDie($query, "9.3 add table glpi_assettypes");
+   }
+
+   $assettypes = ['Computer' => '1'];
+   foreach ($assettypes as $assettype => $rack) {
+      $migration->addPostQuery(
+         "INSERT INTO `glpi_assettypes` (`name`, `is_rackable`) VALUES ('$assettype', '$rack')
+            ON DUPLICATE KEY UPDATE `name`='$assettype'"
+      );
+   }
    // ************ Keep it at the end **************
    $migration->executeMigration();
 
