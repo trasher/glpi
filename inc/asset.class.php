@@ -57,14 +57,36 @@ class Asset extends CommonDBTM {
    static $rightname                   = 'computer';
    protected $usenotepad               = true;
 
+   protected $assettype;
+
+   /**
+    * Constructor
+    *
+    * @param string|AssetType $typename Asset type instance or name
+    */
    function __construct ($typename) {
-      $assettype = new AssetType();
-      if ($assettype->getFromDBByCrit(['name' => $typename])) {
-         $this->assettype = $assettype;
+      if ($typename instanceof AssetType) {
+         if ($typename->isNewItem()) {
+            throw new \RuntimeException("Unknown asset type");
+         }
+         $this->assettype = $typename;
       } else {
-         throw new \RuntimeException("Unknown asset type $typename");
+         $assettype = new AssetType();
+         if ($assettype->getFromDBByCrit(['name' => $typename])) {
+            $this->assettype = $assettype;
+         } else {
+            throw new \RuntimeException("Unknown asset type $typename");
+         }
       }
    }
+
+   public function getAssetTypeName() {
+      if (!$this->assettype instanceof AssetType) {
+         throw new RuntimeException('Asset type has not been set');
+      }
+      return $this->assettype->getName();
+   }
+
 
    static function getTable($classname = null) {
       return 'glpi_assets';
