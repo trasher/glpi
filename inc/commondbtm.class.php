@@ -2266,6 +2266,9 @@ class CommonDBTM extends CommonGLPI {
       if (!$this->isNewID($ID)) {
          echo "<input type='hidden' name='id' value='$ID'>";
       }
+      if (property_exists($this, 'instance_type')) {
+         echo Html::hidden('assettype', ['value' => $this->instance_type]);
+      }
       echo "</td>";
       echo "</tr>\n";
 
