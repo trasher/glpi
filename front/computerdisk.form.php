@@ -56,7 +56,7 @@ if (isset($_POST["add"])) {
                  //TRANS: %s is the user login
                  sprintf(__('%s adds a volume'), $_SESSION["glpiname"]));
       if ($_SESSION['glpibackcreated']) {
-         Html::redirect($disk->getFormURL());
+         Html::redirect($disk->getFormURLWithID($disk->getID()));
       }
    }
    Html::back();
@@ -69,10 +69,10 @@ if (isset($_POST["add"])) {
                  //TRANS: %s is the user login
                  sprintf(__('%s purges a volume'), $_SESSION["glpiname"]));
    }
-   $computer = new Computer();
-   $computer->getFromDB($disk->fields['computers_id']);
-   Html::redirect(Toolbox::getItemTypeFormURL('Computer').'?id='.$disk->fields['computers_id'].
-                  ($computer->fields['is_template']?"&withtemplate=1":""));
+   $asset = new Asset('Computer');
+   $asset->getFromDB($disk->fields['computers_id']);
+   Html::redirect($asset->getFormURLWithID($disk->fields['computers_id']).
+                 ($computer->fields['is_template']?"&withtemplate=1":""));
 
 } else if (isset($_POST["update"])) {
    $disk->check($_POST["id"], UPDATE);
@@ -87,7 +87,7 @@ if (isset($_POST["add"])) {
 } else {
    Html::header(Computer::getTypeName(Session::getPluralNumber()), $_SERVER['PHP_SELF'], "assets", "computer");
    $disk->display(['id'           => $_GET["id"],
-                        'computers_id' => $_GET["computers_id"]]);
+                   'computers_id' => $_GET["computers_id"]]);
    Html::footer();
 }
 
