@@ -89,7 +89,7 @@ class Item_Project extends CommonDBRelation{
 
       $restrict = "`glpi_items_projects`.`projects_id` = `glpi_projects`.`id`
                    AND `glpi_items_projects`.`items_id` = '".$item->getField('id')."'
-                   AND `glpi_items_projects`.`itemtype` = '".$item->getType()."'".
+                   AND `glpi_items_projects`.`itemtype` = '".$item->getInstanceType()."'".
                    getEntitiesRestrictRequest(" AND ", "glpi_projects", '', '', true);
 
       $nb = countElementsInTable(['glpi_items_projects', 'glpi_projects'], $restrict);
@@ -262,7 +262,7 @@ class Item_Project extends CommonDBRelation{
 
       if (!$withtemplate) {
          $nb = 0;
-         switch ($item->getType()) {
+         switch ($item->getInstanceType()) {
             case 'Project' :
                if ($_SESSION['glpishow_count_on_tabs']) {
                   $nb = countElementsInTable('glpi_items_projects',
@@ -276,7 +276,7 @@ class Item_Project extends CommonDBRelation{
                   if ($_SESSION['glpishow_count_on_tabs']) {
                      // Direct one
                      $nb = countElementsInTable('glpi_items_projects',
-                                                ['itemtype' => $item->getType(),
+                                                ['itemtype' => $item->getInstanceType(),
                                                  'items_id' => $item->getID()]);
                      // Linked items
                      $linkeditems = $item->getLinkedItems();
@@ -301,7 +301,7 @@ class Item_Project extends CommonDBRelation{
 
    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
 
-      switch ($item->getType()) {
+      switch ($item->getInstanceType()) {
          case 'Project' :
             self::showForProject($item);
             break;

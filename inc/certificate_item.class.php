@@ -68,7 +68,7 @@ class Certificate_Item extends CommonDBRelation {
     */
    static function cleanForItem(CommonDBTM $item) {
       $temp = new self();
-      $temp->deleteByCriteria(['itemtype' => $item->getType(),
+      $temp->deleteByCriteria(['itemtype' => $item->getInstanceType(),
                                'items_id' => $item->getField('id')]);
    }
 
@@ -80,7 +80,7 @@ class Certificate_Item extends CommonDBRelation {
    function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
 
       if (!$withtemplate) {
-         if ($item->getType() == 'Certificate'
+         if ($item->getInstanceType() == 'Certificate'
             && count(Certificate::getTypes(false))) {
             if ($_SESSION['glpishow_count_on_tabs']) {
                return self::createTabEntry(_n('Associated item', 'Associated items', 2),
@@ -88,7 +88,7 @@ class Certificate_Item extends CommonDBRelation {
             }
             return _n('Associated item', 'Associated items', 2);
 
-         } else if (in_array($item->getType(), Certificate::getTypes(true))
+         } else if (in_array($item->getInstanceType(), Certificate::getTypes(true))
             && Certificate::canView() ) {
             if ($_SESSION['glpishow_count_on_tabs']) {
                return self::createTabEntry(Certificate::getTypeName(2),
@@ -110,9 +110,9 @@ class Certificate_Item extends CommonDBRelation {
    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1,
                                             $withtemplate = 0) {
 
-      if ($item->getType() == 'Certificate') {
+      if ($item->getInstanceType() == 'Certificate') {
          self::showForCertificate($item);
-      } else if (in_array($item->getType(), Certificate::getTypes(true))) {
+      } else if (in_array($item->getInstanceType(), Certificate::getTypes(true))) {
          self::showForItem($item);
       }
       return true;
@@ -142,7 +142,7 @@ class Certificate_Item extends CommonDBRelation {
     */
    static function countForItem(CommonDBTM $item) {
       return countElementsInTable('glpi_certificates_items',
-                                  [ 'itemtype' => $item->getType(),
+                                  [ 'itemtype' => $item->getInstanceType(),
                                     'items_id' => $item->getID()
                                   ]);
    }
@@ -404,7 +404,7 @@ class Certificate_Item extends CommonDBRelation {
                  ON (`glpi_certificates_items`.`certificates_id`=`glpi_certificates`.`id`)
                 LEFT JOIN `glpi_entities` ON (`glpi_certificates`.`entities_id`=`glpi_entities`.`id`)
                 WHERE `glpi_certificates_items`.`items_id` = '$ID'
-                      AND `glpi_certificates_items`.`itemtype` = '" . $item->getType() . "' ";
+                      AND `glpi_certificates_items`.`itemtype` = '" . $item->getInstanceType() . "' ";
 
       $query   .= getEntitiesRestrictRequest(" AND", "glpi_certificates", '', '', true);
       $query   .= " ORDER BY `assocName`";
@@ -453,10 +453,10 @@ class Certificate_Item extends CommonDBRelation {
             echo Html::hidden('is_recursive',
                               ['value' => $is_recursive]);
             echo Html::hidden('itemtype',
-                              ['value' => $item->getType()]);
+                              ['value' => $item->getInstanceType()]);
             echo Html::hidden('items_id',
                               ['value' => $ID]);
-            if ($item->getType() == 'Ticket') {
+            if ($item->getInstanceType() == 'Ticket') {
                echo Html::hidden('tickets_id', ['value' => $ID]);
             }
             Dropdown::show('Certificate', ['entity' => $item->fields['entities_id'],

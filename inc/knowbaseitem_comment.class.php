@@ -50,7 +50,7 @@ class KnowbaseItem_Comment extends CommonDBTM {
       $nb = 0;
       if ($_SESSION['glpishow_count_on_tabs']) {
          $where = [];
-         if ($item->getType() == KnowbaseItem::getType()) {
+         if ($item->getInstanceType() == KnowbaseItem::getType()) {
             $where = [
                'knowbaseitems_id' => $item->getID(),
                'language'         => null
@@ -86,7 +86,7 @@ class KnowbaseItem_Comment extends CommonDBTM {
 
       $kbitem_id = null;
       $item_id = $item->getID();
-      $item_type = $item::getType();
+      $item_type = $item->getInstanceType();
       if (isset($_GET["start"])) {
          $start = intval($_GET["start"]);
       } else {
@@ -94,7 +94,7 @@ class KnowbaseItem_Comment extends CommonDBTM {
       }
 
       // Total Number of comments
-      if ($item->getType() == KnowbaseItem::getType()) {
+      if ($item->getInstanceType() == KnowbaseItem::getType()) {
          $where = [
             'knowbaseitems_id' => $item->getID(),
             'language'         => null
@@ -119,7 +119,7 @@ class KnowbaseItem_Comment extends CommonDBTM {
          echo "<div class='firstbloc'>";
 
          $lang = null;
-         if ($item->getType() == KnowbaseItemTranslation::getType()) {
+         if ($item->getInstanceType() == KnowbaseItemTranslation::getType()) {
             $lang = $item->fields['language'];
          }
 

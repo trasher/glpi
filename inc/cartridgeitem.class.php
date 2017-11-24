@@ -86,13 +86,13 @@ class CartridgeItem extends CommonDBTM {
    function cleanDBonPurge() {
 
       $class = new Cartridge();
-      $class->cleanDBonItemDelete($this->getType(), $this->fields['id']);
+      $class->cleanDBonItemDelete($this->getInstanceType(), $this->fields['id']);
 
       $class = new CartridgeItem_PrinterModel();
-      $class->cleanDBonItemDelete($this->getType(), $this->fields['id']);
+      $class->cleanDBonItemDelete($this->getInstanceType(), $this->fields['id']);
 
       $class = new Alert();
-      $class->cleanDBonItemDelete($this->getType(), $this->fields['id']);
+      $class->cleanDBonItemDelete($this->getInstanceType(), $this->fields['id']);
    }
 
 

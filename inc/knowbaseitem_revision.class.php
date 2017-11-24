@@ -50,7 +50,7 @@ class KnowbaseItem_Revision extends CommonDBTM {
       $nb = 0;
       if ($_SESSION['glpishow_count_on_tabs']) {
          $where = [];
-         if ($item->getType() == KnowbaseItem::getType()) {
+         if ($item->getInstanceType() == KnowbaseItem::getType()) {
             $where = [
                'knowbaseitems_id' => $item->getID(),
                'language'         => ''
@@ -85,7 +85,7 @@ class KnowbaseItem_Revision extends CommonDBTM {
       global $DB, $CFG_GLPI;
 
       $item_id = $item->getID();
-      $item_type = $item::getType();
+      $item_type = $item->getInstanceType();
       if (isset($_GET["start"])) {
          $start = intval($_GET["start"]);
       } else {
@@ -93,7 +93,7 @@ class KnowbaseItem_Revision extends CommonDBTM {
       }
 
       // Total Number of revisions
-      if ($item->getType() == KnowbaseItem::getType()) {
+      if ($item->getInstanceType() == KnowbaseItem::getType()) {
          $where = [
             'knowbaseitems_id' => $item->getID(),
             'language'         => ''
@@ -172,7 +172,7 @@ class KnowbaseItem_Revision extends CommonDBTM {
              "<td class='tab_date'>". $revision['date_creation'] . "</td>";
 
          $form = null;
-         if ($item->getType() == KnowbaseItem::getType()) {
+         if ($item->getInstanceType() == KnowbaseItem::getType()) {
             $form = 'knowbaseitem.form.php';
          } else {
             $form = 'knowbaseitemtranslation.form.php';

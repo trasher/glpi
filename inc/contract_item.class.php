@@ -188,7 +188,7 @@ class Contract_Item extends CommonDBRelation{
    static function countForItem(CommonDBTM $item) {
 
       return countElementsInTable('glpi_contracts_items',
-                                  ['itemtype' => $item->getType(),
+                                  ['itemtype' => $item->getInstanceType(),
                                    'items_id' => $item->getField('id')]);
    }
 
@@ -296,7 +296,7 @@ class Contract_Item extends CommonDBRelation{
       // Can exists on template
       if (Contract::canView()) {
          $nb = 0;
-         switch ($item->getType()) {
+         switch ($item->getInstanceType()) {
             case 'Contract' :
                if ($_SESSION['glpishow_count_on_tabs']) {
                   $nb = self::countForContract($item);
@@ -305,7 +305,7 @@ class Contract_Item extends CommonDBRelation{
 
             default :
                if ($_SESSION['glpishow_count_on_tabs']
-                   && in_array($item->getType(), $CFG_GLPI["contract_types"])) {
+                   && in_array($item->getInstanceType(), $CFG_GLPI["contract_types"])) {
                    $nb = self::countForItem($item);
                }
                return self::createTabEntry(Contract::getTypeName(Session::getPluralNumber()), $nb);
@@ -323,12 +323,12 @@ class Contract_Item extends CommonDBRelation{
    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
       global $CFG_GLPI;
 
-      switch ($item->getType()) {
+      switch ($item->getInstanceType()) {
          case 'Contract' :
             self::showForContract($item, $withtemplate);
 
          default :
-            if (in_array($item->getType(), $CFG_GLPI["contract_types"])) {
+            if (in_array($item->getInstanceType(), $CFG_GLPI["contract_types"])) {
                self::showForItem($item, $withtemplate);
             }
       }
@@ -378,7 +378,7 @@ class Contract_Item extends CommonDBRelation{
    static function showForItem(CommonDBTM $item, $withtemplate = 0) {
       global $DB, $CFG_GLPI;
 
-      $itemtype = $item->getType();
+      $itemtype = $item->getInstanceType();
       $ID       = $item->fields['id'];
 
       if (!Contract::canView()

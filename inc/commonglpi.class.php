@@ -268,7 +268,7 @@ class CommonGLPI {
 
       $menu       = [];
 
-      $type       = static::getInstanceType();
+      $type       = static::getType();
       $item       = new $type();
       $forbidden  = $type::getForbiddenActionsForMenu();
 

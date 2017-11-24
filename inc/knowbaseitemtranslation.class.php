@@ -86,7 +86,7 @@ class KnowbaseItemTranslation extends CommonDBChild {
 
       if (!$withtemplate) {
          $nb = 0;
-         switch ($item->getType()) {
+         switch ($item->getInstanceType()) {
             case __CLASS__ :
                $ong[1] = $this->getTypeName(1);
                if ($item->canUpdateItem()) {
@@ -115,7 +115,7 @@ class KnowbaseItemTranslation extends CommonDBChild {
    **/
    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
 
-      if ($item->getType() == __CLASS__) {
+      if ($item->getInstanceType() == __CLASS__) {
          switch ($tabnum) {
             case 1 :
                $item->showFull();

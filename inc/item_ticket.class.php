@@ -171,7 +171,7 @@ class Item_Ticket extends CommonDBRelation{
 
       $restrict = "`glpi_items_tickets`.`tickets_id` = `glpi_tickets`.`id`
                    AND `glpi_items_tickets`.`items_id` = '".$item->getField('id')."'
-                   AND `glpi_items_tickets`.`itemtype` = '".$item->getType()."'".
+                   AND `glpi_items_tickets`.`itemtype` = '".$item->getInstanceType()."'".
                    getEntitiesRestrictRequest(" AND ", "glpi_tickets", '', '', true);
 
       $nb = countElementsInTable(['glpi_items_tickets', 'glpi_tickets'], $restrict);
@@ -579,7 +579,7 @@ class Item_Ticket extends CommonDBRelation{
 
       if (!$withtemplate) {
          $nb = 0;
-         switch ($item->getType()) {
+         switch ($item->getInstanceType()) {
             case 'Ticket' :
                if (($_SESSION["glpiactiveprofile"]["helpdesk_hardware"] != 0)
                    && (count($_SESSION["glpiactiveprofile"]["helpdesk_item_type"]) > 0)) {
@@ -599,7 +599,7 @@ class Item_Ticket extends CommonDBRelation{
 
    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
 
-      switch ($item->getType()) {
+      switch ($item->getInstanceType()) {
          case 'Ticket' :
             self::showForTicket($item);
             break;
@@ -1161,19 +1161,19 @@ class Item_Ticket extends CommonDBRelation{
                      }
 
                      if ($ok) {
-                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
+                        $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_OK);
                      } else {
-                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
+                        $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_KO);
                         $ma->addMessage($item->getErrorMessage(ERROR_ON_ACTION));
                      }
 
                   } else {
-                     $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_NORIGHT);
+                     $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_NORIGHT);
                      $ma->addMessage($item->getErrorMessage(ERROR_RIGHT));
                   }
 
                } else {
-                  $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
+                  $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_KO);
                   $ma->addMessage($item->getErrorMessage(ERROR_NOT_FOUND));
                }
             }
@@ -1196,24 +1196,24 @@ class Item_Ticket extends CommonDBRelation{
                         }
 
                         if ($ok) {
-                           $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
+                           $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_OK);
                         } else {
-                           $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
+                           $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_KO);
                            $ma->addMessage($item->getErrorMessage(ERROR_ON_ACTION));
                         }
 
                      } else {
-                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_NORIGHT);
+                        $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_NORIGHT);
                         $ma->addMessage($item->getErrorMessage(ERROR_RIGHT));
                      }
 
                   } else {
-                     $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
+                     $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_KO);
                      $ma->addMessage($item->getErrorMessage(ERROR_NOT_FOUND));
                   }
 
                } else {
-                  $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
+                  $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_KO);
                   $ma->addMessage($item->getErrorMessage(ERROR_NOT_FOUND));
                }
             }

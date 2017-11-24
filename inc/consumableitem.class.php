@@ -98,10 +98,10 @@ class ConsumableItem extends CommonDBTM {
    function cleanDBonPurge() {
 
       $class = new Consumable();
-      $class->cleanDBonItemDelete($this->getType(), $this->fields['id']);
+      $class->cleanDBonItemDelete($this->getInstanceType(), $this->fields['id']);
 
       $class = new Alert();
-      $class->cleanDBonItemDelete($this->getType(), $this->fields['id']);
+      $class->cleanDBonItemDelete($this->getInstanceType(), $this->fields['id']);
    }
 
 

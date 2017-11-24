@@ -125,10 +125,10 @@ class ReservationItem extends CommonDBChild {
    function cleanDBonPurge() {
 
       $class = new Reservation();
-      $class->cleanDBonItemDelete($this->getType(), $this->fields['id']);
+      $class->cleanDBonItemDelete($this->getInstanceType(), $this->fields['id']);
 
       $class = new Alert();
-      $class->cleanDBonItemDelete($this->getType(), $this->fields['id']);
+      $class->cleanDBonItemDelete($this->getInstanceType(), $this->fields['id']);
 
    }
 
@@ -300,7 +300,7 @@ class ReservationItem extends CommonDBChild {
       echo "<table class='tab_cadre_fixe'>";
       echo "<tr><th colspan='2'>".__('Reserve an item')."</th></tr>";
       echo "<tr class='tab_bg_1'>";
-      if ($ri->getFromDBbyItem($item->getType(), $item->getID())) {
+      if ($ri->getFromDBbyItem($item->getInstanceType(), $item->getID())) {
          echo "<td class='center'>";
          //Switch reservation state
 
@@ -325,7 +325,7 @@ class ReservationItem extends CommonDBChild {
          echo "<td class='center'>";
          Html::showSimpleForm(static::getFormURL(), 'add', __('Authorize reservations'),
                               ['items_id'     => $item->getID(),
-                                    'itemtype'     => $item->getType(),
+                                    'itemtype'     => $item->getInstanceType(),
                                     'entities_id'  => $item->getEntityID(),
                                     'is_recursive' => $item->isRecursive(),]);
          echo "</td>";
@@ -755,7 +755,7 @@ class ReservationItem extends CommonDBChild {
    **/
    function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
 
-      if ($item->getType() == __CLASS__) {
+      if ($item->getInstanceType() == __CLASS__) {
          if (Session::haveRight("reservation", ReservationItem::RESERVEANITEM)) {
             $tabs[1] = __('Reservation');
          }
@@ -775,7 +775,7 @@ class ReservationItem extends CommonDBChild {
     **/
    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
 
-      if ($item->getType() == __CLASS__) {
+      if ($item->getInstanceType() == __CLASS__) {
          switch ($tabnum) {
             case 1 :
                $item->showListSimple();

@@ -160,7 +160,7 @@ class Link_Itemtype extends CommonDBChild {
 
       if (!$withtemplate) {
          $nb = 0;
-         switch ($item->getType()) {
+         switch ($item->getInstanceType()) {
             case 'Link' :
                if ($_SESSION['glpishow_count_on_tabs']) {
                   $nb = countElementsInTable($this->getTable(),
@@ -176,7 +176,7 @@ class Link_Itemtype extends CommonDBChild {
 
    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
 
-      if ($item->getType() == 'Link') {
+      if ($item->getInstanceType() == 'Link') {
          self::showForLink($item);
       }
       return true;

@@ -156,7 +156,7 @@ class Notepad extends CommonDBChild {
    static function countForItem(CommonDBTM $item) {
 
       return countElementsInTable('glpi_notepads',
-                                  ['itemtype' => $item->getType(),
+                                  ['itemtype' => $item->getInstanceType(),
                                    'items_id' => $item->getID()]);
    }
 
@@ -171,7 +171,7 @@ class Notepad extends CommonDBChild {
       $query = "SELECT `glpi_notepads`.*, `glpi_users`.`picture`
                 FROM `glpi_notepads`
                 LEFT JOIN `glpi_users` ON (`glpi_notepads`.`users_id_lastupdater` = `glpi_users`.`id`)
-                WHERE `glpi_notepads`.`itemtype` = '".$item->getType()."'
+                WHERE `glpi_notepads`.`itemtype` = '".$item->getInstanceType()."'
                      AND `glpi_notepads`.`items_id` = '".$item->getID()."'
                 ORDER BY `date_mod` DESC";
 
@@ -298,7 +298,7 @@ class Notepad extends CommonDBChild {
          echo "<div class='boxnoteleft'></div>";
          echo "<form name='addnote_form$rand' id='addnote_form$rand' ";
          echo " method='post' action='".Toolbox::getItemTypeFormURL('Notepad')."'>";
-         echo Html::hidden('itemtype', ['value' => $item->getType()]);
+         echo Html::hidden('itemtype', ['value' => $item->getInstanceType()]);
          echo Html::hidden('items_id', ['value' => $item->getID()]);
 
          echo "<div class='boxnotecontent'>";

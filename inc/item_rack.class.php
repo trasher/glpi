@@ -62,13 +62,13 @@ class Item_Rack extends CommonDBRelation {
 
    function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
       $nb = 0;
-      switch ($item->getType()) {
+      switch ($item->getInstanceType()) {
          default:
             if ($_SESSION['glpishow_count_on_tabs']) {
                $nb = countElementsInTable(
                   self::getTable(),
                   [
-                     'itemtype'  => $item->getType(),
+                     'itemtype'  => $item->getInstanceType(),
                      'items_id'  => $item->getID()
                   ]);
             }
@@ -193,8 +193,8 @@ class Item_Rack extends CommonDBRelation {
       foreach ($items as $row) {
          $item = new $row['itemtype'];
          $item->getFromDB($row['items_id']);
-         $model_class = $item->getType() . 'Model';
-         $modelsfield = strtolower($item->getType()) . 'models_id';
+         $model_class = $item->getInstanceType() . 'Model';
+         $modelsfield = strtolower($item->getInstanceType()) . 'models_id';
          $model = new $model_class;
          if ($model->getFromDB($item->fields[$modelsfield])) {
             $item->model = $model;
@@ -613,8 +613,8 @@ class Item_Rack extends CommonDBRelation {
                "border-color: {$row['bgcolor']};'";
       }
 
-      $typestable = 'glpi_' . strtolower($item->getType()).'types';
-      $typesfield = strtolower($item->getType()) . 'types_id';
+      $typestable = 'glpi_' . strtolower($item->getInstanceType()).'types';
+      $typesfield = strtolower($item->getInstanceType()) . 'types_id';
       $name = sprintf(
          '%1$s %2$s %3$s',
          Dropdown::getDropDownName($typestable, $item->fields[$typesfield]),
@@ -715,8 +715,8 @@ class Item_Rack extends CommonDBRelation {
 
          $item = new $itemtype;
          $item->getFromDB($items_id);
-         $model_class = $item->getType() . 'Model';
-         $modelsfield = strtolower($item->getType()) . 'models_id';
+         $model_class = $item->getInstanceType() . 'Model';
+         $modelsfield = strtolower($item->getInstanceType()) . 'models_id';
          $model = new $model_class;
          if ($model->getFromDB($item->fields[$modelsfield])) {
             $item->model = $model;

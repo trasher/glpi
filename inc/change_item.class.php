@@ -85,7 +85,7 @@ class Change_Item extends CommonDBRelation{
 
       $restrict = "`glpi_changes_items`.`changes_id` = `glpi_changes`.`id`
                    AND `glpi_changes_items`.`items_id` = '".$item->getField('id')."'
-                   AND `glpi_changes_items`.`itemtype` = '".$item->getType()."'".
+                   AND `glpi_changes_items`.`itemtype` = '".$item->getInstanceType()."'".
                    getEntitiesRestrictRequest(" AND ", "glpi_changes", '', '', true);
 
       $nb = countElementsInTable(['glpi_changes_items', 'glpi_changes'], $restrict);
@@ -261,7 +261,7 @@ class Change_Item extends CommonDBRelation{
 
       if (!$withtemplate) {
          $nb = 0;
-         switch ($item->getType()) {
+         switch ($item->getInstanceType()) {
             case 'Change' :
                if ($_SESSION['glpishow_count_on_tabs']) {
                   $nb = countElementsInTable('glpi_changes_items',
@@ -295,7 +295,7 @@ class Change_Item extends CommonDBRelation{
                   if ($_SESSION['glpishow_count_on_tabs']) {
                      // Direct one
                      $nb = countElementsInTable('glpi_changes_items',
-                                                   ['itemtype' => $item->getType(),
+                                                   ['itemtype' => $item->getInstanceType(),
                                                     'items_id' => $item->getID()]);
                      // Linked items
                      $linkeditems = $item->getLinkedItems();
@@ -321,7 +321,7 @@ class Change_Item extends CommonDBRelation{
 
    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
 
-      switch ($item->getType()) {
+      switch ($item->getInstanceType()) {
          case 'Change' :
             self::showForChange($item);
             break;
