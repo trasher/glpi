@@ -117,7 +117,7 @@ class Document_Item extends CommonDBRelation{
       if (is_subclass_of($input['itemtype'], 'CommonITILObject')) {
          $input['timeline_position'] = CommonITILObject::TIMELINE_LEFT;
          if (isset($input["users_id"])) {
-            $input['timeline_position'] = $input['itemtype']::getTimelinePosition($input['items_id'], $this->getType(), $input["users_id"]);
+            $input['timeline_position'] = $input['itemtype']::getTimelinePosition($input['items_id'], $this->getInstanceType(), $input["users_id"]);
          }
       }
 
@@ -217,7 +217,7 @@ class Document_Item extends CommonDBRelation{
    static function countForItem(CommonDBTM $item) {
 
       $restrict = "`glpi_documents_items`.`items_id` = '".$item->getField('id')."'
-                   AND `glpi_documents_items`.`itemtype` = '".$item->getType()."'";
+                   AND `glpi_documents_items`.`itemtype` = '".$item->getInstanceType()."'";
 
       if (Session::getLoginUserID()) {
          $restrict .= getEntitiesRestrictRequest(" AND ", "glpi_documents_items", '', '', true);
@@ -229,9 +229,9 @@ class Document_Item extends CommonDBRelation{
       $nb = countElementsInTable(['glpi_documents_items'], $restrict);
 
       // Document case : search in both
-      if ($item->getType() == 'Document') {
+      if ($item->getInstanceType() == 'Document') {
          $restrict = "`glpi_documents_items`.`documents_id` = '".$item->getField('id')."'
-                      AND `glpi_documents_items`.`itemtype` = '".$item->getType()."'";
+                      AND `glpi_documents_items`.`itemtype` = '".$item->getInstanceType()."'";
 
          if (Session::getLoginUserID()) {
             $restrict .= getEntitiesRestrictRequest(" AND ", "glpi_documents_items", '', '', true);
@@ -251,14 +251,14 @@ class Document_Item extends CommonDBRelation{
    static function countForDocument(Document $item) {
       return countElementsInTable(['glpi_documents_items'],
                                  ['glpi_documents_items.documents_id' => $item->getField('id'),
-                                  'NOT' => ['glpi_documents_items.itemtype' => $item->getType()]]);
+                                  'NOT' => ['glpi_documents_items.itemtype' => $item->getInstanceType()]]);
    }
 
 
    function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
 
       $nbdoc = $nbitem = 0;
-      switch ($item->getType()) {
+      switch ($item->getInstanceType()) {
          case 'Document' :
             $ong = [];
             if ($_SESSION['glpishow_count_on_tabs']) {
@@ -274,9 +274,9 @@ class Document_Item extends CommonDBRelation{
          default :
             // Can exist for template
             if (Document::canView()
-                || ($item->getType() == 'Ticket')
-                || ($item->getType() == 'Reminder')
-                || ($item->getType() == 'KnowbaseItem')) {
+                || ($item->getInstanceType() == 'Ticket')
+                || ($item->getInstanceType() == 'Reminder')
+                || ($item->getInstanceType() == 'KnowbaseItem')) {
 
                if ($_SESSION['glpishow_count_on_tabs']) {
                   $nbitem = self::countForItem($item);
@@ -291,7 +291,7 @@ class Document_Item extends CommonDBRelation{
 
    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
 
-      switch ($item->getType()) {
+      switch ($item->getInstanceType()) {
          case 'Document' :
             switch ($tabnum) {
                case 1 :
@@ -582,9 +582,9 @@ class Document_Item extends CommonDBRelation{
          return false;
       }
 
-      if (($item->getType() != 'Ticket')
-          && ($item->getType() != 'KnowbaseItem')
-          && ($item->getType() != 'Reminder')
+      if (($item->getInstanceType() != 'Ticket')
+          && ($item->getInstanceType() != 'KnowbaseItem')
+          && ($item->getInstanceType() != 'Reminder')
           && !Document::canView()) {
          return false;
       }
@@ -619,9 +619,9 @@ class Document_Item extends CommonDBRelation{
       echo "<td colspan='$colspan'>";
       echo "<input type='hidden' name='entities_id' value='$entity'>";
       echo "<input type='hidden' name='is_recursive' value='".$item->isRecursive()."'>";
-      echo "<input type='hidden' name='itemtype' value='".$item->getType()."'>";
+      echo "<input type='hidden' name='itemtype' value='".$item->getInstanceType()."'>";
       echo "<input type='hidden' name='items_id' value='".$item->getID()."'>";
-      if ($item->getType() == 'Ticket') {
+      if ($item->getInstanceType() == 'Ticket') {
          echo "<input type='hidden' name='tickets_id' value='".$item->getID()."'>";
       }
       Html::file(['multiple' => true]);
@@ -661,7 +661,7 @@ class Document_Item extends CommonDBRelation{
       // find documents already associated to the item
       $doc_item   = new self();
       $used_found = $doc_item->find("`items_id` = '".$item->getID()."'
-                                    AND `itemtype` = '".$item->getType()."'");
+                                    AND `itemtype` = '".$item->getInstanceType()."'");
       $used       = array_keys($used_found);
       $used       = array_combine($used, $used);
 
@@ -693,7 +693,7 @@ class Document_Item extends CommonDBRelation{
          $result = $DB->query($q);
          $nb     = $DB->result($result, 0, 0);
 
-         if ($item->getType() == 'Document') {
+         if ($item->getInstanceType() == 'Document') {
             $used[$item->getID()] = $item->getID();
          }
 
@@ -714,9 +714,9 @@ class Document_Item extends CommonDBRelation{
          echo "<td class='right'>";
          echo "<input type='hidden' name='entities_id' value='$entity'>";
          echo "<input type='hidden' name='is_recursive' value='".$item->isRecursive()."'>";
-         echo "<input type='hidden' name='itemtype' value='".$item->getType()."'>";
+         echo "<input type='hidden' name='itemtype' value='".$item->getInstanceType()."'>";
          echo "<input type='hidden' name='items_id' value='".$item->getID()."'>";
-         if ($item->getType() == 'Ticket') {
+         if ($item->getInstanceType() == 'Ticket') {
             echo "<input type='hidden' name='tickets_id' value='".$item->getID()."'>";
          }
          Html::file(['multiple' => true]);
@@ -735,9 +735,9 @@ class Document_Item extends CommonDBRelation{
             echo "<table class='tab_cadre_fixe'>";
             echo "<tr class='tab_bg_1'>";
             echo "<td colspan='4' class='center'>";
-            echo "<input type='hidden' name='itemtype' value='".$item->getType()."'>";
+            echo "<input type='hidden' name='itemtype' value='".$item->getInstanceType()."'>";
             echo "<input type='hidden' name='items_id' value='".$item->getID()."'>";
-            if ($item->getType() == 'Ticket') {
+            if ($item->getInstanceType() == 'Ticket') {
                echo "<input type='hidden' name='tickets_id' value='".$item->getID()."'>";
                echo "<input type='hidden' name='documentcategories_id' value='".
                       $CFG_GLPI["documentcategories_id_forticket"]."'>";
@@ -826,7 +826,7 @@ class Document_Item extends CommonDBRelation{
                 LEFT JOIN `glpi_documentcategories`
                         ON (`glpi_documents`.`documentcategories_id`=`glpi_documentcategories`.`id`)
                 WHERE `glpi_documents_items`.`items_id` = '".$item->getID()."'
-                      AND `glpi_documents_items`.`itemtype` = '".$item->getType()."' ";
+                      AND `glpi_documents_items`.`itemtype` = '".$item->getInstanceType()."' ";
 
       if (Session::getLoginUserID()) {
          $query .= getEntitiesRestrictRequest(" AND", "glpi_documents", '', '', true);
@@ -836,7 +836,7 @@ class Document_Item extends CommonDBRelation{
       }
 
       // Document : search links in both order using union
-      if ($item->getType() == 'Document') {
+      if ($item->getInstanceType() == 'Document') {
          $query .= "UNION
                     SELECT `glpi_documents_items`.`id` AS assocID,
                            `glpi_documents_items`.`date_mod` AS assocdate,
@@ -852,7 +852,7 @@ class Document_Item extends CommonDBRelation{
                     LEFT JOIN `glpi_documentcategories`
                         ON (`glpi_documents`.`documentcategories_id`=`glpi_documentcategories`.`id`)
                     WHERE `glpi_documents_items`.`documents_id` = '".$item->getID()."'
-                          AND `glpi_documents_items`.`itemtype` = '".$item->getType()."' ";
+                          AND `glpi_documents_items`.`itemtype` = '".$item->getInstanceType()."' ";
 
          if (Session::getLoginUserID()) {
             $query .= getEntitiesRestrictRequest(" AND", "glpi_documents", '', '', true);
@@ -915,7 +915,7 @@ class Document_Item extends CommonDBRelation{
       if ($number) {
          // Don't use this for document associated to document
          // To not loose navigation list for current document
-         if ($item->getType() != 'Document') {
+         if ($item->getInstanceType() != 'Document') {
             Session::initNavigateListItems('Document',
                               //TRANS : %1$s is the itemtype name,
                               //        %2$s is the name of the item (used for headings of a list)
@@ -934,7 +934,7 @@ class Document_Item extends CommonDBRelation{
                $downloadlink = $document->getDownloadLink($linkparam);
             }
 
-            if ($item->getType() != 'Document') {
+            if ($item->getInstanceType() != 'Document') {
                Session::addToNavigateListItems('Document', $docID);
             }
             $used[$docID] = $docID;

@@ -59,7 +59,7 @@ class Item_OperatingSystem extends CommonDBRelation {
 
       $restrict = "`glpi_items_operatingsystems`.`operatingsystems_id` = `glpi_operatingsystems`.`id`
                    AND `glpi_items_operatingsystems`.`items_id` = '".$item->getField('id')."'
-                   AND `glpi_items_operatingsystems`.`itemtype` = '".$item->getType()."'".
+                   AND `glpi_items_operatingsystems`.`itemtype` = '".$item->getInstanceType()."'".
                    getEntitiesRestrictRequest(" AND ", self::getTable(), '', '', true);
 
       $nb = countElementsInTable(['glpi_items_operatingsystems', 'glpi_operatingsystems'], $restrict);
@@ -83,13 +83,13 @@ class Item_OperatingSystem extends CommonDBRelation {
 
    function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
       $nb = 0;
-      switch ($item->getType()) {
+      switch ($item->getInstanceType()) {
          default:
             if ($_SESSION['glpishow_count_on_tabs']) {
                $nb = countElementsInTable(
                   'glpi_items_operatingsystems',
                   [
-                     'itemtype'  => $item->getType(),
+                     'itemtype'  => $item->getInstanceType(),
                      'items_id'  => $item->getID()
                   ]);
             }
@@ -157,7 +157,7 @@ class Item_OperatingSystem extends CommonDBRelation {
                 LEFT JOIN `glpi_operatingsystemversions`
                         ON (`glpi_items_operatingsystems`.`operatingsystemversions_id` = `glpi_operatingsystemversions`.`id`)
                 WHERE `glpi_items_operatingsystems`.`items_id` = '".$item->getID()."'
-                      AND `glpi_items_operatingsystems`.`itemtype` = '".$item->getType()."' ";
+                      AND `glpi_items_operatingsystems`.`itemtype` = '".$item->getInstanceType()."' ";
 
       $query .= " ORDER BY $sort $order";
 
@@ -179,8 +179,8 @@ class Item_OperatingSystem extends CommonDBRelation {
       /*if ($canedit && $numrows >= 1
           && !(!empty($withtemplate) && ($withtemplate == 2))) {
          echo "<div class='center firstbloc'>".
-            "<a class='vsubmit' href='" . Toolbox::getItemTypeFormURL(self::getType()) . "?items_id=" . $item->getID() .
-            "&amp;itemtype=" . $item->getType() . "&amp;withtemplate=" . $withtemplate."'>";
+            "<a class='vsubmit' href='" . Toolbox::getItemTypeFormURL(self::getInstanceType()) . "?items_id=" . $item->getID() .
+            "&amp;itemtype=" . $item->getInstanceType() . "&amp;withtemplate=" . $withtemplate."'>";
          echo __('Add an operating system');
          echo "</a></div>\n";
       }*/
@@ -192,7 +192,7 @@ class Item_OperatingSystem extends CommonDBRelation {
             $id = array_keys($os)[0];
          } else {
             //set itemtype and items_id
-            $instance->fields['itemtype']    = $item->getType();
+            $instance->fields['itemtype']    = $item->getInstanceType();
             $instance->fields['items_id']    = $item->getID();
             $instance->fields['entities_id'] = $item->fields['entities_id'];
          }
@@ -645,29 +645,29 @@ class Item_OperatingSystem extends CommonDBRelation {
                if ($item->getFromDB($id)) {
                   if ($item->can($id, UPDATE, $input)) {
                      $exists = $ios->getFromDBByCrit([
-                        'itemtype'  => $item->getType(),
+                        'itemtype'  => $item->getInstanceType(),
                         'items_id'  => $item->getID()
                      ]);
                      $ok = false;
                      if ($exists) {
                         $ok = $ios->update(['id'  => $ios->getID()] + $input);
                      } else {
-                        $ok = $ios->add(['itemtype' => $item->getType(), 'items_id' => $item->getID()] + $input);
+                        $ok = $ios->add(['itemtype' => $item->getInstanceType(), 'items_id' => $item->getID()] + $input);
                      }
 
                      if ($ok != false) {
-                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
+                        $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_OK);
                      } else {
-                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
+                        $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_KO);
                         $ma->addMessage($item->getErrorMessage(ERROR_ON_ACTION));
                      }
 
                   } else {
-                     $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
+                     $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_KO);
                      $ma->addMessage($item->getErrorMessage(ERROR_NOT_FOUND));
                   }
                } else {
-                  $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
+                  $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_KO);
                   $ma->addMessage($item->getErrorMessage(ERROR_NOT_FOUND));
                }
             }

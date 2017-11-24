@@ -84,6 +84,22 @@ class CommonGLPI {
 
 
    /**
+    * Return the type of the instanciated object
+    *
+    * @return string
+   **/
+   public function getInstanceType() {
+      if (property_exists($this, 'instance_type')) {
+         return $this->instance_type;
+      } else {
+         //switch back to old way
+         return $this::getType();
+      }
+   }
+
+
+
+   /**
     * Register tab on an objet
     *
     * @since version 0.83
@@ -162,15 +178,15 @@ class CommonGLPI {
       }
 
       // Object with class with 'addtabon' attribute
-      if (isset(self::$othertabs[$this->getType()])
+      if (isset(self::$othertabs[$this->getInstanceType()])
           && !$this->isNewItem()) {
 
-         foreach (self::$othertabs[$this->getType()] as $typetab) {
+         foreach (self::$othertabs[$this->getInstanceType()] as $typetab) {
             $this->addStandardTab($typetab, $onglets, $options);
          }
       }
 
-      $class = $this->getType();
+      $class = $this->getInstanceType();
       if (($_SESSION['glpi_use_mode'] == Session::DEBUG_MODE)
           && (!$this->isNewItem() || $this->showdebug)
           && (method_exists($class, 'showDebug')
@@ -235,7 +251,7 @@ class CommonGLPI {
       if (self::isLayoutExcludedPage()
           || !self::isLayoutWithMain()
           || !method_exists($this, "showForm")) {
-         $ong[$this->getType().'$main'] = $this->getTypeName(1);
+         $ong[$this->getInstanceType().'$main'] = $this->getTypeName(1);
       }
       return $this;
    }
@@ -252,7 +268,7 @@ class CommonGLPI {
 
       $menu       = [];
 
-      $type       = static::getType();
+      $type       = static::getInstanceType();
       $item       = new $type();
       $forbidden  = $type::getForbiddenActionsForMenu();
 
@@ -520,11 +536,11 @@ class CommonGLPI {
       if (isset($_GET['withtemplate'])
           && !empty($_GET['withtemplate'])) {
          Html::redirect($CFG_GLPI["root_doc"]."/front/setup.templates.php?add=0&itemtype=".
-                        $this->getType());
+                        $this->getInstanceType());
 
-      } else if (isset($_SESSION['glpilisturl'][$this->getType()])
-                 && !empty($_SESSION['glpilisturl'][$this->getType()])) {
-         Html::redirect($_SESSION['glpilisturl'][$this->getType()]);
+      } else if (isset($_SESSION['glpilisturl'][$this->getInstanceType()])
+                 && !empty($_SESSION['glpilisturl'][$this->getInstanceType()])) {
+         Html::redirect($_SESSION['glpilisturl'][$this->getInstanceType()]);
 
       } else {
          Html::redirect($this->getSearchURL());
@@ -687,7 +703,7 @@ class CommonGLPI {
          if (isset($cleaned_options['stock_image'])) {
             unset($cleaned_options['stock_image']);
          }
-         if ($this->getType() == 'Ticket') {
+         if ($this->getInstanceType() == 'Ticket') {
             $this->input = $cleaned_options;
             $this->saveInput();
             // $extraparamhtml can be tool long in case of ticket with content
@@ -717,7 +733,7 @@ class CommonGLPI {
          foreach ($onglets as $key => $val) {
             $tabs[$key] = ['title'  => $val,
                                 'url'    => $tabpage,
-                                'params' => "_target=$target&amp;_itemtype=".$this->getType().
+                                'params' => "_target=$target&amp;_itemtype=".$this->getInstanceType().
                                             "&amp;_glpi_tab=$key&amp;id=$ID$extraparamhtml"];
          }
 
@@ -727,11 +743,11 @@ class CommonGLPI {
              && (count($tabs) > 1)) {
             $tabs[-1] = ['title'  => __('All'),
                               'url'    => $tabpage,
-                              'params' => "_target=$target&amp;_itemtype=".$this->getType().
+                              'params' => "_target=$target&amp;_itemtype=".$this->getInstanceType().
                                           "&amp;_glpi_tab=-1&amp;id=$ID$extraparamhtml"];
          }
 
-         Ajax::createTabs('tabspanel', 'tabcontent', $tabs, $this->getType(), $ID,
+         Ajax::createTabs('tabspanel', 'tabcontent', $tabs, $this->getInstanceType(), $ID,
                           $this->taborientation, $options);
       }
       echo "</div>";
@@ -780,12 +796,12 @@ class CommonGLPI {
 
       if (empty($withtemplate)
           && !$this->isNewID($ID)
-          && $this->getType()
+          && $this->getInstanceType()
           && $this->displaylist) {
 
-         $glpilistitems =& $_SESSION['glpilistitems'][$this->getType()];
-         $glpilisttitle =& $_SESSION['glpilisttitle'][$this->getType()];
-         $glpilisturl   =& $_SESSION['glpilisturl'][$this->getType()];
+         $glpilistitems =& $_SESSION['glpilistitems'][$this->getInstanceType()];
+         $glpilisttitle =& $_SESSION['glpilisttitle'][$this->getInstanceType()];
+         $glpilisturl   =& $_SESSION['glpilisturl'][$this->getInstanceType()];
 
          if (empty($glpilisturl)) {
             $glpilisturl = $this->getSearchURL();
@@ -1008,7 +1024,7 @@ class CommonGLPI {
    function showDebugInfo() {
       global $CFG_GLPI;
 
-      $class = $this->getType();
+      $class = $this->getInstanceType();
 
       if (method_exists($class, 'showDebug')) {
          $this->showDebug();

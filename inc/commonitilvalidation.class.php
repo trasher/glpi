@@ -64,7 +64,7 @@ abstract class CommonITILValidation  extends CommonDBChild {
 
 
    function getItilObjectItemType() {
-      return str_replace('Validation', '', $this->getType());
+      return str_replace('Validation', '', $this->getInstanceType());
    }
 
 
@@ -245,7 +245,7 @@ abstract class CommonITILValidation  extends CommonDBChild {
       }
 
       $itemtype = static::$itemtype;
-      $input['timeline_position'] = $itemtype::getTimelinePosition($input[static::$items_id], $this->getType(), $input["users_id"]);
+      $input['timeline_position'] = $itemtype::getTimelinePosition($input[static::$items_id], $this->getInstanceType(), $input["users_id"]);
 
       return parent::prepareInputForAdd($input);
    }
@@ -702,18 +702,18 @@ abstract class CommonITILValidation  extends CommonDBChild {
                         }
                      }
                      if ($ok) {
-                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
+                        $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_OK);
                      } else {
-                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
+                        $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_KO);
                         $ma->addMessage($item->getErrorMessage(ERROR_ON_ACTION));
                      }
 
                   } else {
-                     $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_NORIGHT);
+                     $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_NORIGHT);
                      $ma->addMessage($item->getErrorMessage(ERROR_RIGHT));
                   }
                } else {
-                  $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
+                  $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_KO);
                   $ma->addMessage($item->getErrorMessage(ERROR_NOT_FOUND));
                }
             }
@@ -800,7 +800,7 @@ abstract class CommonITILValidation  extends CommonDBChild {
       if ($canadd) {
          echo "<script type='text/javascript' >\n";
          echo "function viewAddValidation" . $tID . "$rand() {\n";
-         $params = ['type'             => $this->getType(),
+         $params = ['type'             => $this->getInstanceType(),
                          'parenttype'       => static::$itemtype,
                          static::$items_id  => $tID,
                          'id'               => -1];
@@ -845,14 +845,14 @@ abstract class CommonITILValidation  extends CommonDBChild {
          $header .= "</tr>";
          echo $header;
 
-         Session::initNavigateListItems($this->getType(),
+         Session::initNavigateListItems($this->getInstanceType(),
                //TRANS : %1$s is the itemtype name, %2$s is the name of the item (used for headings of a list)
                                         sprintf(__('%1$s = %2$s'), $item->getTypeName(1),
                                                 $item->fields["name"]));
 
          while ($row = $DB->fetch_assoc($result)) {
             $canedit = $this->canEdit($row["id"]);
-            Session::addToNavigateListItems($this->getType(), $row["id"]);
+            Session::addToNavigateListItems($this->getInstanceType(), $row["id"]);
             $bgcolor = self::getStatusColor($row['status']);
             $status  = self::getStatus($row['status']);
 
@@ -865,7 +865,7 @@ abstract class CommonITILValidation  extends CommonDBChild {
             if ($canedit) {
                echo "\n<script type='text/javascript' >\n";
                echo "function viewEditValidation" .$item->fields['id']. $row["id"]. "$rand() {\n";
-               $params = ['type'             => $this->getType(),
+               $params = ['type'             => $this->getInstanceType(),
                                'parenttype'       => static::$itemtype,
                                static::$items_id  => $this->fields[static::$items_id],
                                'id'               => $row["id"]];
@@ -924,9 +924,9 @@ abstract class CommonITILValidation  extends CommonDBChild {
       $this->showFormHeader($options);
 
       if ($validation_admin) {
-         if ($this->getType() == 'ChangeValidation') {
+         if ($this->getInstanceType() == 'ChangeValidation') {
             $validation_right = 'validate';
-         } else if ($this->getType() == 'TicketValidation') {
+         } else if ($this->getInstanceType() == 'TicketValidation') {
             $ticket = new Ticket();
             $ticket->getFromDB($this->fields[static::$items_id]);
 

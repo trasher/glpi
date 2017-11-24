@@ -54,7 +54,7 @@ abstract class CommonITILCost extends CommonDBChild {
 
 
    function getItilObjectItemType() {
-      return str_replace('Cost', '', $this->getType());
+      return str_replace('Cost', '', $this->getInstanceType());
    }
 
 
@@ -64,7 +64,7 @@ abstract class CommonITILCost extends CommonDBChild {
    function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
 
       // can exists for template
-      if (($item->getType() == static::$itemtype)
+      if (($item->getInstanceType() == static::$itemtype)
           && static::canView()) {
          $nb = 0;
          if ($_SESSION['glpishow_count_on_tabs']) {

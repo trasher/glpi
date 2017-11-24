@@ -401,7 +401,7 @@ class CommonDBTM extends CommonGLPI {
     * @return array array of type + ID
    **/
    function getLogTypeID() {
-      return [$this->getType(), $this->fields['id']];
+      return [$this->getInstanceType(), $this->fields['id']];
    }
 
 
@@ -488,7 +488,7 @@ class CommonDBTM extends CommonGLPI {
             if ($values[$i] == 'NULL') {
                $query .= $values[$i];
             } else {
-               if (($this->getType() == 'ProfileRight') && ($values[$i] == '')) {
+               if (($this->getInstanceType() == 'ProfileRight') && ($values[$i] == '')) {
                   $values[$i] = 0;
                }
                $query .= "'".$values[$i]."'";
@@ -608,7 +608,7 @@ class CommonDBTM extends CommonGLPI {
       if ($this->dohistory) {
          $query = "DELETE
                    FROM `glpi_logs`
-                   WHERE (`itemtype` = '".$this->getType()."'
+                   WHERE (`itemtype` = '".$this->getInstanceType()."'
                           AND `items_id` = '".$this->fields['id']."')";
          $DB->query($query);
       }
@@ -661,14 +661,14 @@ class CommonDBTM extends CommonGLPI {
       }
 
       // Clean ticket open against the item
-      if (in_array($this->getType(), $CFG_GLPI["ticket_types"])) {
+      if (in_array($this->getInstanceType(), $CFG_GLPI["ticket_types"])) {
          $job         = new Ticket();
          $itemsticket = new Item_Ticket();
 
          $query = "SELECT *
                    FROM `glpi_items_tickets`
                    WHERE `items_id` = '".$this->fields['id']."'
-                         AND `itemtype`='".$this->getType()."'";
+                         AND `itemtype`='".$this->getInstanceType()."'";
          $result = $DB->query($query);
 
          if ($DB->numrows($result)) {
@@ -740,49 +740,49 @@ class CommonDBTM extends CommonGLPI {
       if (Infocom::canApplyOn($this)) {
          $infocom = new Infocom();
 
-         if ($infocom->getFromDBforDevice($this->getType(), $this->fields['id'])) {
+         if ($infocom->getFromDBforDevice($this->getInstanceType(), $this->fields['id'])) {
              $infocom->delete(['id' => $infocom->fields['id']]);
          }
       }
 
       // If this type have NETPORT, clean one associated to purged item
-      if (in_array($this->getType(), $CFG_GLPI['networkport_types'])) {
+      if (in_array($this->getInstanceType(), $CFG_GLPI['networkport_types'])) {
          // If we don't use delete, then cleanDBonPurge() is not call and the NetworkPorts are not
          // clean properly
          $networkPortObject = new NetworkPort();
-         $networkPortObject->cleanDBonItemDelete($this->getType(), $this->getID());
+         $networkPortObject->cleanDBonItemDelete($this->getInstanceType(), $this->getID());
          // Manage networkportmigration if exists
          if ($DB->tableExists('glpi_networkportmigrations')) {
             $networkPortMigObject = new NetworkPortMigration();
-            $networkPortMigObject->cleanDBonItemDelete($this->getType(), $this->getID());
+            $networkPortMigObject->cleanDBonItemDelete($this->getInstanceType(), $this->getID());
          }
       }
 
       // If this type is RESERVABLE clean one associated to purged item
-      if (in_array($this->getType(), $CFG_GLPI['reservation_types'])) {
+      if (in_array($this->getInstanceType(), $CFG_GLPI['reservation_types'])) {
          $rr = new ReservationItem();
 
-         if ($rr->getFromDBbyItem($this->getType(), $this->fields['id'])) {
+         if ($rr->getFromDBbyItem($this->getInstanceType(), $this->fields['id'])) {
              $rr->delete(['id' => $infocom->fields['id']]);
          }
       }
 
       // If this type have CONTRACT, clean one associated to purged item
-      if (in_array($this->getType(), $CFG_GLPI['contract_types'])) {
+      if (in_array($this->getInstanceType(), $CFG_GLPI['contract_types'])) {
          $ci = new Contract_Item();
-         $ci->cleanDBonItemDelete($this->getType(), $this->fields['id']);
+         $ci->cleanDBonItemDelete($this->getInstanceType(), $this->fields['id']);
       }
 
       // If this type have DOCUMENT, clean one associated to purged item
       if (Document::canApplyOn($this)) {
          $di = new Document_Item();
-         $di->cleanDBonItemDelete($this->getType(), $this->fields['id']);
+         $di->cleanDBonItemDelete($this->getInstanceType(), $this->fields['id']);
       }
 
       // If this type have NOTEPAD, clean one associated to purged item
       if ($this->usenotepad) {
          $note = new Notepad();
-         $note->cleanDBonItemDelete($this->getType(), $this->fields['id']);
+         $note->cleanDBonItemDelete($this->getInstanceType(), $this->fields['id']);
       }
 
    }
@@ -805,7 +805,7 @@ class CommonDBTM extends CommonGLPI {
     * @return void
    **/
    protected function saveInput() {
-      $_SESSION['saveInput'][$this->getType()] = $this->input;
+      $_SESSION['saveInput'][$this->getInstanceType()] = $this->input;
    }
 
 
@@ -817,7 +817,7 @@ class CommonDBTM extends CommonGLPI {
     * @return void
    **/
    protected function clearSavedInput() {
-      unset($_SESSION['saveInput'][$this->getType()]);
+      unset($_SESSION['saveInput'][$this->getInstanceType()]);
    }
 
 
@@ -832,8 +832,8 @@ class CommonDBTM extends CommonGLPI {
    **/
    protected function restoreInput(Array $default = []) {
 
-      if (isset($_SESSION['saveInput'][$this->getType()])) {
-         $saved = Html::cleanPostForTextArea($_SESSION['saveInput'][$this->getType()]);
+      if (isset($_SESSION['saveInput'][$this->getInstanceType()])) {
+         $saved = Html::cleanPostForTextArea($_SESSION['saveInput'][$this->getInstanceType()]);
 
          // clear saved data when restored (only need once)
          $this->clearSavedInput();
@@ -933,7 +933,7 @@ class CommonDBTM extends CommonGLPI {
                   $changes[0] = 0;
                   $changes[1] = $changes[2] = "";
 
-                  Log::history($this->fields["id"], $this->getType(), $changes, 0,
+                  Log::history($this->fields["id"], $this->getInstanceType(), $changes, 0,
                                Log::HISTORY_CREATE_ITEM);
                }
 
@@ -942,8 +942,8 @@ class CommonDBTM extends CommonGLPI {
                    && Infocom::canApplyOn($this)) {
 
                   $ic = new Infocom();
-                  if (!$ic->getFromDBforDevice($this->getType(), $this->fields['id'])) {
-                     $ic->add(['itemtype' => $this->getType(),
+                  if (!$ic->getFromDBforDevice($this->getInstanceType(), $this->fields['id'])) {
+                     $ic->add(['itemtype' => $this->getInstanceType(),
                                     'items_id' => $this->fields['id']]);
                   }
                }
@@ -965,7 +965,7 @@ class CommonDBTM extends CommonGLPI {
                   $this->clearSavedInput();
                }
                if ($this->notificationqueueonaction) {
-                  QueuedNotification::forceSendFor($this->getType(), $this->fields['id']);
+                  QueuedNotification::forceSendFor($this->getInstanceType(), $this->fields['id']);
                }
                // For unit test (workaround for MyIsam without transaction)
                if (isset($DB->objcreated) && is_array($DB->objcreated)) {
@@ -1233,8 +1233,8 @@ class CommonDBTM extends CommonGLPI {
                      Plugin::doHook("item_update", $this);
 
                      //Fill forward_entity_to array with itemtypes coming from plugins
-                     if (isset(self::$plugins_forward_entity[$this->getType()])) {
-                        foreach (self::$plugins_forward_entity[$this->getType()] as $itemtype) {
+                     if (isset(self::$plugins_forward_entity[$this->getInstanceType()])) {
+                        foreach (self::$plugins_forward_entity[$this->getInstanceType()] as $itemtype) {
                            static::$forward_entity_to[] = $itemtype;
                         }
                      }
@@ -1259,7 +1259,7 @@ class CommonDBTM extends CommonGLPI {
             $this->post_updateItem($history);
 
             if ($this->notificationqueueonaction) {
-               QueuedNotification::forceSendFor($this->getType(), $this->fields['id']);
+               QueuedNotification::forceSendFor($this->getInstanceType(), $this->fields['id']);
             }
 
             return true;
@@ -1290,7 +1290,7 @@ class CommonDBTM extends CommonGLPI {
                       WHERE ";
 
             if ($item->isField('itemtype')) {
-               $query .= " `itemtype` = '".$this->getType()."'
+               $query .= " `itemtype` = '".$this->getInstanceType()."'
                           AND `items_id` = '".$this->fields['id']."'";
             } else {
                $query .= " `".$this->getForeignKeyField()."` = '".$this->fields['id']."'";
@@ -1468,7 +1468,7 @@ class CommonDBTM extends CommonGLPI {
                      $logaction = Log::HISTORY_LOCK_ITEM;
                   }
 
-                  Log::history($this->fields["id"], $this->getType(), $changes, 0,
+                  Log::history($this->fields["id"], $this->getInstanceType(), $changes, 0,
                                $logaction);
                }
                $this->post_deleteItem();
@@ -1476,7 +1476,7 @@ class CommonDBTM extends CommonGLPI {
                Plugin::doHook("item_delete", $this);
             }
             if ($this->notificationqueueonaction) {
-               QueuedNotification::forceSendFor($this->getType(), $this->fields['id']);
+               QueuedNotification::forceSendFor($this->getInstanceType(), $this->fields['id']);
             }
             return true;
          }
@@ -1631,13 +1631,13 @@ class CommonDBTM extends CommonGLPI {
                 && $this->isDynamic()) {
                $logaction = Log::HISTORY_UNLOCK_ITEM;
             }
-            Log::history($this->input["id"], $this->getType(), $changes, 0, $logaction);
+            Log::history($this->input["id"], $this->getInstanceType(), $changes, 0, $logaction);
          }
 
          $this->post_restoreItem();
          Plugin::doHook("item_restore", $this);
          if ($this->notificationqueueonaction) {
-            QueuedNotification::forceSendFor($this->getType(), $this->fields['id']);
+            QueuedNotification::forceSendFor($this->getInstanceType(), $this->fields['id']);
          }
          return true;
       }
@@ -1849,7 +1849,7 @@ class CommonDBTM extends CommonGLPI {
       if (InfoCom::canApplyOn($this)) {
          $infocom = new Infocom();
 
-         if ($infocom->getFromDBforDevice($this->getType(), $this->fields['id'])) {
+         if ($infocom->getFromDBforDevice($this->getInstanceType(), $this->fields['id'])) {
             return $infocom->canPurge();
          }
       }
@@ -2040,10 +2040,10 @@ class CommonDBTM extends CommonGLPI {
       }
 
       // Doc links to this item
-      if (($this->getType() > 0)
+      if (($this->getInstanceType() > 0)
           && countElementsInTable(['glpi_documents_items', 'glpi_documents'],
                                   ['glpi_documents_items.items_id'=> $ID,
-                                   'glpi_documents_items.itemtype'=> $this->getType(),
+                                   'glpi_documents_items.itemtype'=> $this->getInstanceType(),
                                    'FKEY' => ['glpi_documents_items' => 'documents_id','glpi_documents' => 'id'],
                                    'NOT'  => ['glpi_documents.entities_id' => $entities]]) > '0') {
          return false;
@@ -2052,7 +2052,7 @@ class CommonDBTM extends CommonGLPI {
 
       // check connections of a computer
       $connectcomputer = ['Monitor', 'Peripheral', 'Phone', 'Printer'];
-      if (in_array($this->getType(), $connectcomputer)) {
+      if (in_array($this->getInstanceType(), $connectcomputer)) {
          return Computer_Item::canUnrecursSpecif($this, $entities);
       }
       return true;
@@ -2228,7 +2228,7 @@ class CommonDBTM extends CommonGLPI {
 
                if ($this->can($ID, PURGE)) {
                   echo "<span class='very_small_space'>";
-                  if (in_array($this->getType(), Item_Devices::getConcernedItems())) {
+                  if (in_array($this->getInstanceType(), Item_Devices::getConcernedItems())) {
                      Html::showToolTip(__('Check to keep the devices while deleting this item'));
                      echo "&nbsp;";
                      echo "<input type='checkbox' name='keep_devices' value='1'";
@@ -2399,7 +2399,7 @@ class CommonDBTM extends CommonGLPI {
 
                echo "<input type='hidden' name='entities_id' value='$entity'>";
 
-            } else if ($this->getType() != 'User') {
+            } else if ($this->getInstanceType() != 'User') {
                // For Rules except ruleticket and slalevel
                echo "<input type='hidden' name='entities_id' value='0'>";
 
@@ -3069,7 +3069,7 @@ class CommonDBTM extends CommonGLPI {
                           'value' => nl2br($this->getField('otherserial'))];
       }
 
-      if ($this->isField('states_id') && $this->getType()!='State') {
+      if ($this->isField('states_id') && $this->getInstanceType()!='State') {
          $tmp = Dropdown::getDropdownName('glpi_states', $this->getField('states_id'));
          if ((strlen($tmp) != 0) && ($tmp != '&nbsp;')) {
             $toadd[] = ['name'  => __('Status'),
@@ -3077,7 +3077,7 @@ class CommonDBTM extends CommonGLPI {
          }
       }
 
-      if ($this->isField('locations_id') && $this->getType()!='Location') {
+      if ($this->isField('locations_id') && $this->getInstanceType()!='Location') {
          $tmp = Dropdown::getDropdownName("glpi_locations", $this->getField('locations_id'));
          if ((strlen($tmp) != 0) && ($tmp != '&nbsp;')) {
             $toadd[] = ['name'  => __('Location'),
@@ -3094,7 +3094,7 @@ class CommonDBTM extends CommonGLPI {
       }
 
       if ($this->isField('groups_id')
-          && ($this->getType() != 'Group')) {
+          && ($this->getInstanceType() != 'Group')) {
          $tmp = Dropdown::getDropdownName("glpi_groups", $this->getField('groups_id'));
          if ((strlen($tmp) != 0) && ($tmp != '&nbsp;')) {
             $toadd[] = ['name'  => __('Group'),
@@ -3122,7 +3122,7 @@ class CommonDBTM extends CommonGLPI {
 
       if (InfoCom::canApplyOn($this)) {
          $infocom = new Infocom();
-         if ($infocom->getFromDBforDevice($this->getType(), $this->fields['id'])) {
+         if ($infocom->getFromDBforDevice($this->getInstanceType(), $this->fields['id'])) {
             $toadd[] = ['name'  => __('Warranty expiration date'),
                              'value' => Infocom::getWarrantyExpir($infocom->fields["warranty_date"],
                                                                   $infocom->fields["warranty_duration"],
@@ -3597,7 +3597,7 @@ class CommonDBTM extends CommonGLPI {
    function getOptions() {
 
       if (!$this->searchopt) {
-         $this->searchopt = Search::getOptions($this->getType());
+         $this->searchopt = Search::getOptions($this->getInstanceType());
       }
 
       return $this->searchopt;
@@ -4805,7 +4805,7 @@ class CommonDBTM extends CommonGLPI {
             }
 
          } else {
-            if ($this->getType() == 'Ticket') {
+            if ($this->getInstanceType() == 'Ticket') {
                //TRANS: Default document to files attached to tickets : %d is the ticket id
                $input2["name"] = addslashes(sprintf(__('Document Ticket %d'), $this->getID()));
                $input2["tickets_id"] = $this->getID();
@@ -4850,7 +4850,7 @@ class CommonDBTM extends CommonGLPI {
                   'documents_id'  => $docID,
                   '_do_notif'     => $donotif,
                   '_disablenotif' => $disablenotif,
-                  'itemtype'      => $item_fordocitem->getType(),
+                  'itemtype'      => $item_fordocitem->getInstanceType(),
                   'items_id'      => $item_fordocitem->getID()
                ];
                if (isset($input['users_id'])) {

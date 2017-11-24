@@ -80,7 +80,7 @@ class Infocom extends CommonDBChild {
 
       // We also allow direct items to check
       if ($item instanceof CommonGLPI) {
-         $item = $item->getType();
+         $item = $item->getInstanceType();
       }
 
       if (in_array($item, $CFG_GLPI['infocom_types'])) {
@@ -133,7 +133,7 @@ class Infocom extends CommonDBChild {
       // Can exists on template
       if (Session::haveRight(self::$rightname, READ)) {
          $nb = 0;
-         switch ($item->getType()) {
+         switch ($item->getInstanceType()) {
             case 'Supplier' :
                if ($_SESSION['glpishow_count_on_tabs']) {
                   $nb = self::countForSupplier($item);
@@ -143,7 +143,7 @@ class Infocom extends CommonDBChild {
             default :
                if ($_SESSION['glpishow_count_on_tabs']) {
                   $nb = countElementsInTable('glpi_infocoms',
-                                             ['itemtype' => $item->getType(),
+                                             ['itemtype' => $item->getInstanceType(),
                                               'items_id' => $item->getID()]);
                }
                return self::createTabEntry(__('Management'), $nb);
@@ -160,7 +160,7 @@ class Infocom extends CommonDBChild {
    **/
    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
 
-      switch ($item->getType()) {
+      switch ($item->getInstanceType()) {
          case 'Supplier' :
             $item->showInfocoms();
             break;
@@ -405,7 +405,7 @@ class Infocom extends CommonDBChild {
               && ($this->oldvalues['warranty_duration'] < $this->fields['warranty_duration']))) {
 
          $alert = new Alert();
-         $alert->clear($this->getType(), $this->fields['id'], Alert::END);
+         $alert->clear($this->getInstanceType(), $this->fields['id'], Alert::END);
       }
       // Check budgets link validity
       if ((in_array('budgets_id', $this->updates)
@@ -434,7 +434,7 @@ class Infocom extends CommonDBChild {
    function cleanDBonPurge() {
 
       $class = new Alert();
-      $class->cleanDBonItemDelete($this->getType(), $this->fields['id']);
+      $class->cleanDBonItemDelete($this->getInstanceType(), $this->fields['id']);
    }
 
 
@@ -1016,13 +1016,13 @@ class Infocom extends CommonDBChild {
          }
 
          if (!strpos($_SERVER['PHP_SELF'], "infocoms-show")
-             && in_array($item->getType(), ['CartridgeItem', 'ConsumableItem', 'Software'])) {
+             && in_array($item->getInstanceType(), ['CartridgeItem', 'ConsumableItem', 'Software'])) {
             echo "<div class='firstbloc center'>".
                   __('For this type of item, the financial and administrative information are only a model for the items which you should add.').
                  "</div>";
          }
-         if (!$ic->getFromDBforDevice($item->getType(), $dev_ID)) {
-            $input = ['itemtype'    => $item->getType(),
+         if (!$ic->getFromDBforDevice($item->getInstanceType(), $dev_ID)) {
+            $input = ['itemtype'    => $item->getInstanceType(),
                            'items_id'    => $dev_ID,
                            'entities_id' => $item->getEntityID()];
 
@@ -1035,7 +1035,7 @@ class Infocom extends CommonDBChild {
 
                Html::showSimpleForm($CFG_GLPI["root_doc"]."/front/infocom.form.php",
                                     'add', __('Enable the financial and administrative information'),
-                                     ['itemtype' => $item->getType(),
+                                     ['itemtype' => $item->getInstanceType(),
                                            'items_id' => $dev_ID]);
                echo "</td></tr></table></div>";
             }
@@ -1122,7 +1122,7 @@ class Infocom extends CommonDBChild {
             echo "</td>";
             $tplmark = '';
             if ($item->isTemplate()
-                || in_array($item->getType(),
+                || in_array($item->getInstanceType(),
                             ['CartridgeItem', 'ConsumableItem', 'Software'])) {
                $tplmark = $item->getAutofillMark('immo_number', ['withtemplate' => $withtemplate], $ic->getField('immo_number'));
             }
@@ -1192,7 +1192,7 @@ class Infocom extends CommonDBChild {
             echo "</td></tr>";
 
             echo "<tr class='tab_bg_1'>";
-            if (!in_array($item->getType(), ['Cartridge', 'CartridgeItem', 'Consumable',
+            if (!in_array($item->getInstanceType(), ['Cartridge', 'CartridgeItem', 'Consumable',
                                                   'ConsumableItem', 'Software',
                                                   'SoftwareLicense'])) {
                echo "<td>".__('TCO (value + tracking cost)')."</td><td>";
@@ -1201,7 +1201,7 @@ class Infocom extends CommonDBChild {
                 echo "<td colspan='2'>";
             }
             echo "</td>";
-            if (!in_array($item->getType(), ['Cartridge', 'CartridgeItem', 'Consumable',
+            if (!in_array($item->getInstanceType(), ['Cartridge', 'CartridgeItem', 'Consumable',
                                                   'ConsumableItem', 'Software',
                                                   'SoftwareLicense'])) {
                echo "<td>".__('Monthly TCO')."</td><td>";
@@ -1972,24 +1972,24 @@ class Infocom extends CommonDBChild {
          case 'activate' :
             $ic = new self();
             if ($ic->canCreate()) {
-               $itemtype = $item->getType();
+               $itemtype = $item->getInstanceType();
                foreach ($ids as  $key) {
                   if (!$ic->getFromDBforDevice($itemtype, $key)) {
                      $input = ['itemtype' => $itemtype,
                                     'items_id' => $key];
                      if ($ic->can(-1, CREATE, $input)) {
                         if ($ic->add($input)) {
-                           $ma->itemDone($item->getType(), $key, MassiveAction::ACTION_OK);
+                           $ma->itemDone($item->getInstanceType(), $key, MassiveAction::ACTION_OK);
                         } else {
-                           $ma->itemDone($item->getType(), $key, MassiveAction::ACTION_KO);
+                           $ma->itemDone($item->getInstanceType(), $key, MassiveAction::ACTION_KO);
                            $ma->addMessage($ic->getErrorMessage(ERROR_ON_ACTION));
                         }
                      } else {
-                        $ma->itemDone($item->getType(), $key, MassiveAction::ACTION_NORIGHT);
+                        $ma->itemDone($item->getInstanceType(), $key, MassiveAction::ACTION_NORIGHT);
                         $ma->addMessage($ic->getErrorMessage(ERROR_RIGHT));
                      }
                   } else {
-                     $ma->itemDone($item->getType(), $key, MassiveAction::ACTION_KO);
+                     $ma->itemDone($item->getInstanceType(), $key, MassiveAction::ACTION_KO);
                      $ma->addMessage($ic->getErrorMessage(ERROR_NOT_FOUND));
                   }
                }

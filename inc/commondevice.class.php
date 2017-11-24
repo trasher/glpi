@@ -346,7 +346,7 @@ abstract class CommonDevice extends CommonDropdown {
 
       global $CFG_GLPI;
 
-      $this_type = $this->getType();
+      $this_type = $this->getInstanceType();
 
       if (isset($options['dont_display'][$this_type])) {
          return $father;
@@ -359,7 +359,7 @@ abstract class CommonDevice extends CommonDropdown {
       }
 
       if ($options['canedit']) {
-         $field_name  = 'quantity_'.$this->getType().'_'.$this->getID();
+         $field_name  = 'quantity_'.$this->getInstanceType().'_'.$this->getID();
          $content .= "&nbsp;<span class='fa fa-plus pointer' title='".__s('Add')."'
                       onClick=\"".Html::jsShow($field_name)."\"
                       ><span class='sr-only'>" .  __s('Add') . "</span></span>";
@@ -375,7 +375,7 @@ abstract class CommonDevice extends CommonDropdown {
       }
 
       $linktype = static::getItem_DeviceType();
-      if (in_array($item->getType(), $linktype::itemAffinity())) {
+      if (in_array($item->getInstanceType(), $linktype::itemAffinity())) {
          $cell = $row->addCell($row->getHeaderByName('common', 'device'),
                                $content, $father, $this);
       } else {
@@ -468,7 +468,7 @@ abstract class CommonDevice extends CommonDropdown {
       if ((isset($this->input['_registeredID']))
           && (is_array($this->input['_registeredID']))) {
 
-         $input = ['itemtype' => $this->getType(),
+         $input = ['itemtype' => $this->getInstanceType(),
                         'items_id' => $this->getID()];
 
          foreach ($this->input['_registeredID'] as $id => $registered_id) {

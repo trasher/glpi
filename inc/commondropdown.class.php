@@ -185,7 +185,7 @@ abstract class CommonDropdown extends CommonDBTM {
    function displayHeader() {
 
       if (empty($this->third_level_menu)) {
-         $this->third_level_menu = $this->getType();
+         $this->third_level_menu = $this->getInstanceType();
       }
       Html::header($this->getTypeName(Session::getPluralNumber()), '', $this->first_level_menu, $this->second_level_menu,
                    $this->third_level_menu);
@@ -730,7 +730,7 @@ abstract class CommonDropdown extends CommonDBTM {
       }
 
       $ruleinput      = ["name" => stripslashes($value)];
-      $rulecollection = RuleCollection::getClassByType($this->getType(), true);
+      $rulecollection = RuleCollection::getClassByType($this->getInstanceType(), true);
 
       foreach ($this->additional_fields_for_dictionnary as $field) {
          if (isset($external_params[$field])) {
@@ -821,9 +821,9 @@ abstract class CommonDropdown extends CommonDBTM {
                   if ($item->getEntityID() == $_SESSION['glpiactive_entity']) {
                      if ($item->update(['id'           => $key,
                                              'is_recursive' => 1])) {
-                        $ma->itemDone($item->getType(), $key, MassiveAction::ACTION_OK);
+                        $ma->itemDone($item->getInstanceType(), $key, MassiveAction::ACTION_OK);
                      } else {
-                        $ma->itemDone($item->getType(), $key, MassiveAction::ACTION_KO);
+                        $ma->itemDone($item->getInstanceType(), $key, MassiveAction::ACTION_KO);
                         $ma->addMessage($item->getErrorMessage(ERROR_ON_ACTION));
                      }
                   } else {
@@ -846,14 +846,14 @@ abstract class CommonDropdown extends CommonDBTM {
                            $item->delete(['id'          => $key,
                                                '_replace_by' => $newid], 1);
                         }
-                        $ma->itemDone($item->getType(), $key, MassiveAction::ACTION_OK);
+                        $ma->itemDone($item->getInstanceType(), $key, MassiveAction::ACTION_OK);
                      } else {
-                        $ma->itemDone($item->getType(), $key, MassiveAction::ACTION_KO);
+                        $ma->itemDone($item->getInstanceType(), $key, MassiveAction::ACTION_KO);
                         $ma->addMessage($item->getErrorMessage(ERROR_ON_ACTION));
                      }
                   }
                } else {
-                  $ma->itemDone($item->getType(), $key, MassiveAction::ACTION_NORIGHT);
+                  $ma->itemDone($item->getInstanceType(), $key, MassiveAction::ACTION_NORIGHT);
                   $ma->addMessage($item->getErrorMessage(ERROR_RIGHT));
                }
             }

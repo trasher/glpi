@@ -696,7 +696,7 @@ class Ticket extends CommonITILObject {
          $nb    = 0;
          $title = self::getTypeName(Session::getPluralNumber());
          if ($_SESSION['glpishow_count_on_tabs']) {
-            switch ($item->getType()) {
+            switch ($item->getInstanceType()) {
                case 'User' :
                   $nb = countElementsInTable(['glpi_tickets', 'glpi_tickets_users'],
                                              getEntitiesRestrictRequest("", 'glpi_tickets').
@@ -747,7 +747,7 @@ class Ticket extends CommonITILObject {
                            ]
                         ],
                         'WHERE' => [
-                           'itemtype' => $item->getType(),
+                           'itemtype' => $item->getInstanceType(),
                            'items_id' => $item->getID(),
                            'is_deleted' => 0
                         ]
@@ -786,13 +786,13 @@ class Ticket extends CommonITILObject {
 
          } // glpishow_count_on_tabs
          // Not for Ticket class
-         if ($item->getType() != __CLASS__) {
+         if ($item->getInstanceType() != __CLASS__) {
             return self::createTabEntry($title, $nb);
          }
       } // self::READALL right check
 
       // Not check self::READALL for Ticket itself
-      switch ($item->getType()) {
+      switch ($item->getInstanceType()) {
          case __CLASS__ :
             $ong    = [];
 
@@ -827,7 +827,7 @@ class Ticket extends CommonITILObject {
 
    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
 
-      switch ($item->getType()) {
+      switch ($item->getInstanceType()) {
          case __CLASS__ :
             switch ($tabnum) {
 
@@ -949,7 +949,7 @@ class Ticket extends CommonITILObject {
       $DB->query($query1);
 
       $ts = new TicketValidation();
-      $ts->cleanDBonItemDelete($this->getType(), $this->fields['id']);
+      $ts->cleanDBonItemDelete($this->getInstanceType(), $this->fields['id']);
 
       $query1 = "DELETE
                  FROM `glpi_ticketsatisfactions`
@@ -960,7 +960,7 @@ class Ticket extends CommonITILObject {
       $pt->cleanDBonItemDelete('Ticket', $this->fields['id']);
 
       $ts = new TicketCost();
-      $ts->cleanDBonItemDelete($this->getType(), $this->fields['id']);
+      $ts->cleanDBonItemDelete($this->getInstanceType(), $this->fields['id']);
 
       $slaLevel_ticket = new SlaLevel_Ticket();
       $slaLevel_ticket->deleteForTicket($this->getID(), SLM::TTO);
@@ -3092,7 +3092,7 @@ class Ticket extends CommonITILObject {
          ],
          'datatype'           => 'text'
       ];
-      if ($this->getType() == 'Ticket'
+      if ($this->getInstanceType() == 'Ticket'
           && $CFG_GLPI["use_rich_text"]) {
          $newtab['htmltext'] = true;
       }
@@ -5930,7 +5930,7 @@ class Ticket extends CommonITILObject {
       $order            = '';
       $options['reset'] = 'reset';
 
-      switch ($item->getType()) {
+      switch ($item->getInstanceType()) {
          case 'User' :
             $restrict = "(`glpi_tickets_users`.`users_id` = '".$item->getID()."' ".
                         " AND `glpi_tickets_users`.`type` = ".CommonITILActor::REQUESTER.")";
@@ -6009,7 +6009,7 @@ class Ticket extends CommonITILObject {
 
          default :
             $restrict = "(`glpi_items_tickets`.`items_id` = '".$item->getID()."' ".
-                        " AND `glpi_items_tickets`.`itemtype` = '".$item->getType()."')";
+                        " AND `glpi_items_tickets`.`itemtype` = '".$item->getInstanceType()."')";
 
             // you can only see your tickets
             if (!Session::haveRight(self::$rightname, self::READALL)) {
@@ -6030,8 +6030,8 @@ class Ticket extends CommonITILObject {
             $options['criteria'][0]['value']      = 'all';
             $options['criteria'][0]['link']       = 'AND';
 
-            $options['metacriteria'][0]['itemtype']   = $item->getType();
-            $options['metacriteria'][0]['field']      = Search::getOptionNumber($item->getType(),
+            $options['metacriteria'][0]['itemtype']   = $item->getInstanceType();
+            $options['metacriteria'][0]['field']      = Search::getOptionNumber($item->getInstanceType(),
                                                                                 'id');
             $options['metacriteria'][0]['searchtype'] = 'equals';
             $options['metacriteria'][0]['value']      = $item->getID();
@@ -6058,13 +6058,13 @@ class Ticket extends CommonITILObject {
       echo "<div class='firstbloc'>";
       // Link to open a new ticket
       if ($item->getID()
-          && Ticket::isPossibleToAssignType($item->getType())
+          && Ticket::isPossibleToAssignType($item->getInstanceType())
           && self::canCreate()
           && !(!empty($withtemplate) && ($withtemplate == 2))
             && (!isset($item->fields['is_template']) || ($item->fields['is_template'] == 0))) {
          Html::showSimpleForm($CFG_GLPI["root_doc"]."/front/ticket.form.php",
                               '_add_fromitem', __('New ticket for this item...'),
-                              ['itemtype' => $item->getType(),
+                              ['itemtype' => $item->getInstanceType(),
                                     'items_id' => $item->getID()]);
       }
       echo "</div><div>";
@@ -6093,7 +6093,7 @@ class Ticket extends CommonITILObject {
       }
 
       if ($item->getID()
-          && ($item->getType() == 'User')
+          && ($item->getInstanceType() == 'User')
           && self::canCreate()
           && !(!empty($withtemplate) && ($withtemplate == 2))
           && isset($item->fields['is_template']) && ($item->fields['is_template'] == 0)) {
@@ -6690,7 +6690,7 @@ class Ticket extends CommonITILObject {
                 LEFT JOIN `glpi_entities`
                   ON (`glpi_documents`.`entities_id`=`glpi_entities`.`id`)
                 WHERE `glpi_documents_items`.`items_id` = '".$item->fields['id']."'
-                      AND `glpi_documents_items`.`itemtype` = '".$item->getType()."' ";
+                      AND `glpi_documents_items`.`itemtype` = '".$item->getInstanceType()."' ";
 
       if (Session::getLoginUserID()) {
          $query .= getEntitiesRestrictRequest(" AND", "glpi_documents", '', '', true);

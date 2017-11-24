@@ -195,7 +195,7 @@ class KnowbaseItem extends CommonDBVisible {
 
       if (!$withtemplate) {
          $nb = 0;
-         switch ($item->getType()) {
+         switch ($item->getInstanceType()) {
             case __CLASS__ :
                $ong[1] = $this->getTypeName(1);
                if ($item->canUpdateItem()) {
@@ -342,15 +342,15 @@ class KnowbaseItem extends CommonDBVisible {
    function cleanDBonPurge() {
 
       $class = new KnowbaseItem_User();
-      $class->cleanDBonItemDelete($this->getType(), $this->fields['id']);
+      $class->cleanDBonItemDelete($this->getInstanceType(), $this->fields['id']);
       $class = new Entity_KnowbaseItem();
-      $class->cleanDBonItemDelete($this->getType(), $this->fields['id']);
+      $class->cleanDBonItemDelete($this->getInstanceType(), $this->fields['id']);
       $class = new Group_KnowbaseItem();
-      $class->cleanDBonItemDelete($this->getType(), $this->fields['id']);
+      $class->cleanDBonItemDelete($this->getInstanceType(), $this->fields['id']);
       $class = new KnowbaseItem_Profile();
-      $class->cleanDBonItemDelete($this->getType(), $this->fields['id']);
+      $class->cleanDBonItemDelete($this->getInstanceType(), $this->fields['id']);
       $class = new KnowbaseItem_Item();
-      $class->cleanDBonItemDelete($this->getType(), $this->fields['id']);
+      $class->cleanDBonItemDelete($this->getInstanceType(), $this->fields['id']);
       $class = new KnowbaseItem_Revision();
       $class->deleteByCriteria(['knowbaseitems_id' => $this->getID()]);
       $class = new KnowbaseItem_Comment();
@@ -749,7 +749,7 @@ class KnowbaseItem extends CommonDBVisible {
                echo "<td>".__('Add link')."</td>";
                echo "<td colspan='3'>";
                echo "<input type='checkbox' name='_do_item_link' value='1' checked='checked'/> ";
-               echo Html::hidden('_itemtype', ['value' => $item->getType()]);
+               echo Html::hidden('_itemtype', ['value' => $item->getInstanceType()]);
                echo Html::hidden('_items_id', ['value' => $item->getID()]);
                echo sprintf(
                   __('link with %1$s'),

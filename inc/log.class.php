@@ -88,7 +88,7 @@ class Log extends CommonDBTM {
          $nb = 0;
          if ($_SESSION['glpishow_count_on_tabs']) {
             $nb = countElementsInTable('glpi_logs',
-                                       ['itemtype' => $item->getType(),
+                                       ['itemtype' => $item->getInstanceType(),
                                         'items_id' => $item->getID()]);
          }
          return self::createTabEntry(self::getTypeName(1), $nb);
@@ -138,7 +138,7 @@ class Log extends CommonDBTM {
                continue;
             }
             // specific for profile
-            if (($item->getType() == 'ProfileRight')
+            if (($item->getInstanceType() == 'ProfileRight')
                 && ($key == 'rights')) {
                if (isset($val2['rightname'])
                    && ($val2['rightname'] == $item->fields['name'])) {
@@ -253,7 +253,7 @@ class Log extends CommonDBTM {
    static function showForItem(CommonDBTM $item, $withtemplate = 0) {
       global $DB;
 
-      $itemtype = $item->getType();
+      $itemtype = $item->getInstanceType();
       $items_id = $item->getField('id');
 
       $SEARCHOPTION = Search::getOptions($itemtype);
@@ -321,7 +321,7 @@ class Log extends CommonDBTM {
    static function getHistoryData(CommonDBTM $item, $start = 0, $limit = 0, array $sqlfilter = []) {
       global $DB;
 
-      $itemtype  = $item->getType();
+      $itemtype  = $item->getInstanceType();
       $items_id  = $item->getField('id');
       $itemtable = $item->getTable();
 

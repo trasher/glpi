@@ -62,8 +62,8 @@ class ComputerVirtualMachine extends CommonDBChild {
    function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
 
       if (!$withtemplate
-          && ($item->getType() == 'Computer')
-          && Computer::canView()) {
+          && ($item->getType() == 'Asset')
+          && Asset::canView()) {
          $nb = 0;
          if ($_SESSION['glpishow_count_on_tabs']) {
             $nb = countElementsInTable('glpi_computervirtualmachines',
@@ -243,11 +243,11 @@ class ComputerVirtualMachine extends CommonDBChild {
    /**
     * Show hosts for a virtualmachine
     *
-    * @param $comp   Computer object that represents the virtual machine
+    * @param Asset $comp Asset object that represents the virtual machine
     *
     * @return Nothing (call to classes members)
    **/
-   static function showForVirtualMachine(Computer $comp) {
+   static function showForVirtualMachine(Asset $comp) {
       global $DB;
 
       $ID = $comp->fields['id'];
@@ -312,11 +312,11 @@ class ComputerVirtualMachine extends CommonDBChild {
    /**
     * Print the computers disks
     *
-    * @param $comp Computer object
+    * @param Asset $comp Asset object
     *
-    * @return Nothing (call to classes members)
+    * @return void
    **/
-   static function showForComputer(Computer $comp) {
+   static function showForComputer(Asset $comp) {
       global $DB;
 
       $ID = $comp->fields['id'];
@@ -477,7 +477,7 @@ class ComputerVirtualMachine extends CommonDBChild {
       }
 
       $query = "SELECT `id`
-                FROM `glpi_computers`
+                FROM `glpi_assets`
                 WHERE LOWER(`uuid`) ".self::getUUIDRestrictRequest($fields['uuid']);
       $result = $DB->query($query);
 

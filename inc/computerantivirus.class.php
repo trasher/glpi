@@ -58,8 +58,8 @@ class ComputerAntivirus extends CommonDBChild {
    function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
 
       // can exists for template
-      if (($item->getType() == 'Computer')
-          && Computer::canView()) {
+      if (($item->getType() == 'Asset')
+          && Asset::canView()) {
          $nb = 0;
          if ($_SESSION['glpishow_count_on_tabs']) {
             $nb = countElementsInTable('glpi_computerantiviruses',
@@ -302,12 +302,12 @@ class ComputerAntivirus extends CommonDBChild {
    /**
     * Print the computers antiviruses
     *
-    * @param $comp                  Computer object
-    * @param $withtemplate boolean  Template or basic item (default 0)
+    * @param Asset   $comp         Asset object
+    * @param boolean $withtemplate Template or basic item (default 0)
     *
-    * @return Nothing (call to classes members)
+    * @return void
    **/
-   static function showForComputer(Computer $comp, $withtemplate = 0) {
+   static function showForComputer(Asset $comp, $withtemplate = 0) {
       global $DB;
 
       $ID = $comp->fields['id'];

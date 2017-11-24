@@ -54,7 +54,7 @@ abstract class CommonITILTask  extends CommonDBTM {
 
 
    function getItilObjectItemType() {
-      return str_replace('Task', '', $this->getType());
+      return str_replace('Task', '', $this->getInstanceType());
    }
 
 
@@ -179,7 +179,7 @@ abstract class CommonITILTask  extends CommonDBTM {
 
    function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
 
-      if (($item->getType() == $this->getItilObjectItemType())
+      if (($item->getInstanceType() == $this->getItilObjectItemType())
           && $this->canView()) {
          $nb = 0;
          if ($_SESSION['glpishow_count_on_tabs']) {
@@ -200,7 +200,7 @@ abstract class CommonITILTask  extends CommonDBTM {
 
    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
 
-      $itemtype = $item->getType().'Task';
+      $itemtype = $item->getInstanceType().'Task';
       if ($task = getItemForItemtype($itemtype)) {
          $task->showSummary($item);
          return true;
@@ -222,7 +222,7 @@ abstract class CommonITILTask  extends CommonDBTM {
       $changes[1] = '';
       $changes[2] = $this->fields['id'];
       Log::history($this->getField($item->getForeignKeyField()), $this->getItilObjectItemType(),
-                   $changes, $this->getType(), Log::HISTORY_DELETE_SUBITEM);
+                   $changes, $this->getInstanceType(), Log::HISTORY_DELETE_SUBITEM);
 
       if (!isset($this->input['_disablenotif']) && $CFG_GLPI["use_notifications"]) {
          $options = ['task_id'             => $this->fields["id"],
@@ -275,7 +275,7 @@ abstract class CommonITILTask  extends CommonDBTM {
             return false;
          }
          Planning::checkAlreadyPlanned($input["users_id_tech"], $input["begin"], $input["end"],
-                                       [$this->getType() => [$input["id"]]]);
+                                       [$this->getInstanceType() => [$input["id"]]]);
 
          $calendars_id = Entity::getUsedConfig('calendars_id', $input["_job"]->fields['entities_id']);
          $calendar     = new Calendar();
@@ -304,7 +304,7 @@ abstract class CommonITILTask  extends CommonDBTM {
       global $CFG_GLPI;
 
       if (in_array("begin", $this->updates)) {
-         PlanningRecall::managePlanningUpdates($this->getType(), $this->getID(),
+         PlanningRecall::managePlanningUpdates($this->getInstanceType(), $this->getID(),
                                                $this->fields["begin"]);
       }
 
@@ -373,7 +373,7 @@ abstract class CommonITILTask  extends CommonDBTM {
          $changes[1] = '';
          $changes[2] = $this->fields['id'];
          Log::history($this->getField($item->getForeignKeyField()), $itemtype, $changes,
-                      $this->getType(), Log::HISTORY_UPDATE_SUBITEM);
+                      $this->getInstanceType(), Log::HISTORY_UPDATE_SUBITEM);
       }
    }
 
@@ -424,7 +424,7 @@ abstract class CommonITILTask  extends CommonDBTM {
 
       $input['timeline_position'] = CommonITILObject::TIMELINE_LEFT;
       if (isset($input["users_id"])) {
-         $input['timeline_position'] = $itemtype::getTimelinePosition($input["_job"]->getID(), $this->getType(), $input["users_id"]);
+         $input['timeline_position'] = $itemtype::getTimelinePosition($input["_job"]->getID(), $this->getInstanceType(), $input["users_id"]);
       }
 
       return $input;
@@ -447,7 +447,7 @@ abstract class CommonITILTask  extends CommonDBTM {
       if (isset($this->fields["begin"]) && !empty($this->fields["begin"])) {
          Planning::checkAlreadyPlanned($this->fields["users_id_tech"], $this->fields["begin"],
                                        $this->fields["end"],
-                                       [$this->getType() => [$this->fields["id"]]]);
+                                       [$this->getInstanceType() => [$this->fields["id"]]]);
 
          $calendars_id = Entity::getUsedConfig('calendars_id', $this->input["_job"]->fields['entities_id']);
          $calendar     = new Calendar();
@@ -503,7 +503,7 @@ abstract class CommonITILTask  extends CommonDBTM {
       $changes[1] = '';
       $changes[2] = $this->fields['id'];
       Log::history($this->getField($this->input["_job"]->getForeignKeyField()),
-                   $this->input["_job"]->getTYpe(), $changes, $this->getType(),
+                   $this->input["_job"]->getTYpe(), $changes, $this->getInstanceType(),
                    Log::HISTORY_ADD_SUBITEM);
    }
 
@@ -532,7 +532,7 @@ abstract class CommonITILTask  extends CommonDBTM {
    function cleanDBonPurge() {
 
       $class = new PlanningRecall();
-      $class->cleanDBonItemDelete($this->getType(), $this->fields['id']);
+      $class->cleanDBonItemDelete($this->getInstanceType(), $this->fields['id']);
    }
 
 
@@ -1197,7 +1197,7 @@ abstract class CommonITILTask  extends CommonDBTM {
          echo "2' ";
       }
 
-      $tasktype = $this->getType();
+      $tasktype = $this->getInstanceType();
       if ($canedit) {
          echo "style='cursor:pointer' onClick=\"viewEdit$tasktype" . $this->fields['id'] . "$rand();\"";
       }
@@ -1242,8 +1242,8 @@ abstract class CommonITILTask  extends CommonDBTM {
          if ($canedit) {
             echo "\n<script type='text/javascript' >\n";
             echo "function viewEdit$tasktype" . $this->fields["id"] . "$rand() {\n";
-            $params = ['type'       => $this->getType(),
-                            'parenttype' => $item->getType(),
+            $params = ['type'       => $this->getInstanceType(),
+                            'parenttype' => $item->getInstanceType(),
                             $item->getForeignKeyField()
                                          => $this->fields[$item->getForeignKeyField()],
                             'id'         => $this->fields["id"]];
@@ -1308,7 +1308,7 @@ abstract class CommonITILTask  extends CommonDBTM {
             if (PlanningRecall::isAvailable()
                 && $_SESSION["glpiactiveprofile"]["interface"] == "central") {
                echo "<tr><td>"._x('Planning', 'Reminder')."</td><td>";
-               PlanningRecall::specificForm(['itemtype' => $this->getType(),
+               PlanningRecall::specificForm(['itemtype' => $this->getInstanceType(),
                                                   'items_id' => $this->fields["id"]]);
             }
             echo "</td></tr>";
@@ -1510,7 +1510,7 @@ abstract class CommonITILTask  extends CommonDBTM {
       Ajax::createIframeModalWindow('planningcheck'.$rand,
                                     $CFG_GLPI["root_doc"].
                                           "/front/planning.php?checkavailability=checkavailability".
-                                          "&itemtype=".$item->getType()."&$fkfield=".$item->getID(),
+                                          "&itemtype=".$item->getInstanceType()."&$fkfield=".$item->getID(),
                                     ['title'  => __('Availability')]);
 
       echo "<br />";
@@ -1551,7 +1551,7 @@ abstract class CommonITILTask  extends CommonDBTM {
                             'rand_user' => $rand_user,
                             'rand_group' => $rand_group,
                             'entity'    => $item->fields["entities_id"],
-                            'itemtype'  => $this->getType(),
+                            'itemtype'  => $this->getInstanceType(),
                             'items_id'  => $this->getID()];
             Ajax::updateItemJsCode("viewplan$rand_text", $CFG_GLPI["root_doc"] . "/ajax/planning.php",
                                    $params);
@@ -1588,7 +1588,7 @@ abstract class CommonITILTask  extends CommonDBTM {
                             'entity'    => $item->fields['entities_id'],
                             'rand_user' => $rand_user,
                             'rand_group' => $rand_group,
-                            'itemtype'  => $this->getType(),
+                            'itemtype'  => $this->getInstanceType(),
                             'items_id'  => $this->getID()];
             Ajax::updateItemJsCode("viewplan$rand_text", $CFG_GLPI["root_doc"]."/ajax/planning.php",
                                    $params);
@@ -1612,7 +1612,7 @@ abstract class CommonITILTask  extends CommonDBTM {
           && PlanningRecall::isAvailable()) {
 
          echo "<tr class='tab_bg_1'><td>"._x('Planning', 'Reminder')."</td><td class='center'>";
-         PlanningRecall::dropdown(['itemtype' => $this->getType(),
+         PlanningRecall::dropdown(['itemtype' => $this->getInstanceType(),
                                         'items_id' => $this->getID()]);
          echo "</td><td colspan='2'></td></tr>";
       }
@@ -1665,7 +1665,7 @@ abstract class CommonITILTask  extends CommonDBTM {
 
       $rand = mt_rand();
 
-      $tasktype = $this->getType();
+      $tasktype = $this->getInstanceType();
       if ($caneditall || $canadd || $canpurge) {
          echo "<div id='viewitem$tasktype$rand'></div>\n";
       }
@@ -1674,7 +1674,7 @@ abstract class CommonITILTask  extends CommonDBTM {
          echo "<script type='text/javascript' >\n";
          echo "function viewAdd$tasktype$rand() {\n";
          $params = ['type'                      => $tasktype,
-                         'parenttype'                => $item->getType(),
+                         'parenttype'                => $item->getInstanceType(),
                          $item->getForeignKeyField() => $item->fields['id'],
                          'id'                        => -1];
          Ajax::updateItemJsCode("viewitem$tasktype$rand",
@@ -1939,8 +1939,8 @@ abstract class CommonITILTask  extends CommonDBTM {
          echo "</td>";
 
          echo "<td>";
-         $link = "<a id='".strtolower($item_link->getType())."ticket".$item_link->fields["id"].$rand."' href='".$CFG_GLPI["root_doc"].
-                   "/front/".strtolower($item_link->getType()).".form.php?id=".$item_link->fields["id"];
+         $link = "<a id='".strtolower($item_link->getInstanceType())."ticket".$item_link->fields["id"].$rand."' href='".$CFG_GLPI["root_doc"].
+                   "/front/".strtolower($item_link->getInstanceType()).".form.php?id=".$item_link->fields["id"];
          $link .= "&amp;forcetab=".$tab_name."$1";
          $link   .= "'>";
          $link    = sprintf(__('%1$s'), $link);

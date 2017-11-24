@@ -64,7 +64,7 @@ class KnowbaseItem_Item extends CommonDBRelation {
    function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
       $nb = 0;
       if ($_SESSION['glpishow_count_on_tabs']) {
-         if ($item->getType() == KnowbaseItem::getType()) {
+         if ($item->getInstanceType() == KnowbaseItem::getType()) {
             $nb = countElementsInTable(
                'glpi_knowbaseitems_items',
                ['knowbaseitems_id' => $item->getID()]
@@ -73,7 +73,7 @@ class KnowbaseItem_Item extends CommonDBRelation {
             $nb = countElementsInTable(
                'glpi_knowbaseitems_items',
                [
-                  'itemtype' => $item::getType(),
+                  'itemtype' => $item->getInstanceType(),
                   'items_id' => $item->getId()
                ]
             );
@@ -81,7 +81,7 @@ class KnowbaseItem_Item extends CommonDBRelation {
       }
 
       $type_name = null;
-      if ($item->getType() == KnowbaseItem::getType()) {
+      if ($item->getInstanceType() == KnowbaseItem::getType()) {
          $type_name = _n('Associated element', 'Associated elements', $nb);
       } else {
          $type_name = __('Knowledge base');
@@ -106,7 +106,7 @@ class KnowbaseItem_Item extends CommonDBRelation {
       global $DB;
 
       $item_id = $item->getID();
-      $item_type = $item::getType();
+      $item_type = $item->getInstanceType();
 
       if (isset($_GET["start"])) {
          $start = intval($_GET["start"]);
@@ -123,7 +123,7 @@ class KnowbaseItem_Item extends CommonDBRelation {
          $number = countElementsInTable(
             'glpi_knowbaseitems_items',
             [
-               'itemtype' => $item::getType(),
+               'itemtype' => $item->getInstanceType(),
                'items_id' => $item_id
             ]
          );
@@ -159,7 +159,7 @@ class KnowbaseItem_Item extends CommonDBRelation {
             echo '<input type="hidden" name="knowbaseitems_id" value="' . $item->getID() . '">';
          } else {
             echo "<input type=\"hidden\" name=\"items_id\" value=\"" . $item->getID() . "\">";
-            echo "<input type=\"hidden\" name=\"itemtype\" value=\"" . $item::getType() . "\">";
+            echo "<input type=\"hidden\" name=\"itemtype\" value=\"" . $item->getInstanceType() . "\">";
          }
          echo "</div>";
          Html::closeForm();
@@ -180,7 +180,7 @@ class KnowbaseItem_Item extends CommonDBRelation {
 
       // Display the pager
       $type_name = null;
-      if ($item->getType() == KnowbaseItem::getType()) {
+      if ($item->getInstanceType() == KnowbaseItem::getType()) {
          $type_name = _n('Linked item', 'Linked items', 1);
       } else {
          $type_name = self::getTypeName(1);
@@ -216,7 +216,7 @@ class KnowbaseItem_Item extends CommonDBRelation {
 
       foreach (self::getItems($item, $start, $_SESSION['glpilist_limit']) as $data) {
          $linked_item = null;
-         if ($item->getType() == KnowbaseItem::getType()) {
+         if ($item->getInstanceType() == KnowbaseItem::getType()) {
             $linked_item = getItemForItemtype($data['itemtype']);
             $linked_item->getFromDB($data['items_id']);
          } else {
@@ -232,7 +232,7 @@ class KnowbaseItem_Item extends CommonDBRelation {
 
          $link = $linked_item::getFormURLWithID($linked_item->getID());
 
-         $createdate = $item::getType() == KnowbaseItem::getType() ? 'date_creation' : 'date';
+         $createdate = $item->getInstanceType() == KnowbaseItem::getType() ? 'date_creation' : 'date';
          // show line
          echo "<tr class='tab_bg_2'>";
 
@@ -323,7 +323,7 @@ class KnowbaseItem_Item extends CommonDBRelation {
 
       $items_id  = (int)$item->getField('id');
 
-      if ($item::getType() == KnowbaseItem::getType()) {
+      if ($item->getInstanceType() == KnowbaseItem::getType()) {
          $id_field = 'glpi_knowbaseitems_items.knowbaseitems_id';
          $visibility = KnowbaseItem::getVisibilityCriteria();
          if (count($visibility['LEFT JOIN'])) {
@@ -335,7 +335,7 @@ class KnowbaseItem_Item extends CommonDBRelation {
       } else {
          $id_field = 'glpi_knowbaseitems_items.items_id';
          $where = getEntitiesRestrictCriteria($item->getTable(), '', '', $item->maybeRecursive());
-         $where[] = ['glpi_knowbaseitems_items.itemtype' => $item::getType()];
+         $where[] = ['glpi_knowbaseitems_items.itemtype' => $item->getInstanceType()];
          if (count($where)) {
             $options['FROM'][] = $item->getTable();
             $where[] = ['glpi_knowbaseitems_items.items_id' => '`' . $item->getTable() . '`.`id`'];
@@ -359,7 +359,7 @@ class KnowbaseItem_Item extends CommonDBRelation {
          if ($used === false) {
             $linked_items[] = $data;
          } else {
-            $key = $item::getType() == KnowbaseItem::getType() ? 'items_id' : 'knowbaseitems_id';
+            $key = $item->getInstanceType() == KnowbaseItem::getType() ? 'items_id' : 'knowbaseitems_id';
             $linked_items[$data[$key]] = $data[$key];
          }
       }

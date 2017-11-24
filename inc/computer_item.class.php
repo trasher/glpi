@@ -77,7 +77,7 @@ class Computer_Item extends CommonDBRelation{
    static function countForItem(CommonDBTM $item) {
 
       return countElementsInTable('glpi_computers_items',
-                                  ['itemtype'   => $item->getType(),
+                                  ['itemtype'   => $item->getInstanceType(),
                                    'items_id'   => $item->getField('id'),
                                    'is_deleted' => 0 ]);
    }
@@ -86,11 +86,11 @@ class Computer_Item extends CommonDBRelation{
    /**
     * Count connection for a Computer
     *
-    * @param $comp   Computer object
+    * @param Asset $comp Asset object
     *
     * @return integer: count
    **/
-   static function countForComputer(Computer $comp) {
+   static function countForComputer(Asset $comp) {
 
       return countElementsInTable('glpi_computers_items',
                                   ['computers_id' => $comp->getField('id'),
@@ -103,16 +103,16 @@ class Computer_Item extends CommonDBRelation{
     *
     * @since version 0.84
     *
-    * @param $comp   Computer object
-    * @param $item   CommonDBTM object
+    * @param Asset      $comp Asset object
+    * @param CommonDBTM $item CommonDBTM object
     *
     * @return integer: count
    **/
-   static function countForAll(Computer $comp, CommonDBTM $item) {
+   static function countForAll(Asset $comp, CommonDBTM $item) {
 
       return countElementsInTable('glpi_computers_items',
                                   ['computers_id' => $comp->getField('id'),
-                                   'itemtype'     => $item->getType(),
+                                   'itemtype'     => $item->getInstanceType(),
                                    'items_id'     => $item->getField('id')]);
    }
 
@@ -327,7 +327,7 @@ class Computer_Item extends CommonDBRelation{
       if ($item->getField('id')) {
          $query = "SELECT `id`
                    FROM `glpi_computers_items`
-                   WHERE `itemtype` = '".$item->getType()."'
+                   WHERE `itemtype` = '".$item->getInstanceType()."'
                          AND `items_id` = '".$item->getField('id')."'";
          $result = $DB->query($query);
 
@@ -349,12 +349,12 @@ class Computer_Item extends CommonDBRelation{
     *
     * Print the form for computers or templates connections to printers, screens or peripherals
     *
-    * @param $comp                     Computer object
-    * @param $withtemplate    boolean  Template or basic item (default 0)
+    * @param Asset   $comp         Asset object
+    * @param boolean $withtemplate Template or basic item (default 0)
     *
     * @return Nothing (call to classes members)
    **/
-   static function showForComputer(Computer $comp, $withtemplate = 0) {
+   static function showForComputer(Asset $comp, $withtemplate = 0) {
       global $DB, $CFG_GLPI;
 
       $ID      = $comp->fields['id'];
@@ -526,7 +526,7 @@ class Computer_Item extends CommonDBRelation{
       $used    = [];
       $compids = [];
       $crit    = ['FIELDS'     => ['id', 'computers_id', 'is_dynamic'],
-                       'itemtype'   => $item->getType(),
+                       'itemtype'   => $item->getInstanceType(),
                        'items_id'   => $ID,
                        'is_deleted' => 0];
       foreach ($DB->request('glpi_computers_items', $crit) as $data) {
@@ -547,12 +547,12 @@ class Computer_Item extends CommonDBRelation{
 
          echo "<tr class='tab_bg_1'><td class='right'>";
          echo "<input type='hidden' name='items_id' value='$ID'>";
-         echo "<input type='hidden' name='itemtype' value='".$item->getType()."'>";
+         echo "<input type='hidden' name='itemtype' value='".$item->getInstanceType()."'>";
          if ($item->isRecursive()) {
-            self::dropdownConnect('Computer', $item->getType(), "computers_id",
+            self::dropdownConnect('Computer', $item->getInstanceType(), "computers_id",
                                   getSonsOf("glpi_entities", $item->getEntityID()), 0, $used);
          } else {
-            self::dropdownConnect('Computer', $item->getType(), "computers_id",
+            self::dropdownConnect('Computer', $item->getInstanceType(), "computers_id",
                                   $item->getEntityID(), 0, $used);
          }
          echo "</td><td class='center'>";
@@ -657,7 +657,7 @@ class Computer_Item extends CommonDBRelation{
          $query = "SELECT `glpi_computers_items`.`id`
                    FROM `glpi_computers_items`
                    WHERE `glpi_computers_items`.`items_id` = '".$item->fields['id']."'
-                         AND `glpi_computers_items`.`itemtype` = '".$item->getType()."'";
+                         AND `glpi_computers_items`.`itemtype` = '".$item->getInstanceType()."'";
          $result = $DB->query($query);
 
          if ($data = $DB->fetch_assoc($result)) {
@@ -766,7 +766,7 @@ class Computer_Item extends CommonDBRelation{
       // can exists for Template
       if ($item->can($item->getField('id'), READ)) {
          $nb = 0;
-         switch ($item->getType()) {
+         switch ($item->getInstanceType()) {
             case 'Phone' :
             case 'Printer' :
             case 'Peripheral' :
@@ -805,7 +805,7 @@ class Computer_Item extends CommonDBRelation{
     */
    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
 
-      switch ($item->getType()) {
+      switch ($item->getInstanceType()) {
          case 'Phone' :
          case 'Printer' :
          case 'Peripheral' :
@@ -886,7 +886,7 @@ class Computer_Item extends CommonDBRelation{
       // RELATION : computers -> items
       $sql = "SELECT `itemtype`, GROUP_CONCAT(DISTINCT `items_id`) AS ids, `computers_id`
               FROM `glpi_computers_items`
-              WHERE `glpi_computers_items`.`itemtype` = '".$item->getType()."'
+              WHERE `glpi_computers_items`.`itemtype` = '".$item->getInstanceType()."'
                     AND `glpi_computers_items`.`items_id` = ".$item->fields['id']."
               GROUP BY `itemtype`";
       $res = $DB->query($sql);

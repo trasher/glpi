@@ -151,18 +151,18 @@ class Computer_SoftwareVersion extends CommonDBRelation {
                      if ($item->update(['id' => $id,
                                              'softwareversions_id'
                                                   => $input['softwareversions_id']])) {
-                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
+                        $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_OK);
                      } else {
-                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
+                        $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_KO);
                         $ma->addMessage($item->getErrorMessage(ERROR_ON_ACTION));
                      }
                   } else {
-                     $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_NORIGHT);
+                     $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_NORIGHT);
                      $ma->addMessage($item->getErrorMessage(ERROR_RIGHT));
                   }
                }
             } else {
-               $ma->itemDone($item->getType(), $ids, MassiveAction::ACTION_KO);
+               $ma->itemDone($item->getInstanceType(), $ids, MassiveAction::ACTION_KO);
             }
             return;
 
@@ -175,18 +175,18 @@ class Computer_SoftwareVersion extends CommonDBRelation {
                      if ($itemtoadd->add(['computers_id' => $id,
                                                'softwareversions_id'
                                                               => $_POST['peer_softwareversions_id']])) {
-                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
+                        $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_OK);
                      } else {
-                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
+                        $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_KO);
                         $ma->addMessage($itemtoadd->getErrorMessage(ERROR_ON_ACTION));
                      }
                   } else {
-                     $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_NORIGHT);
+                     $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_NORIGHT);
                      $ma->addMessage($itemtoadd->getErrorMessage(ERROR_RIGHT));
                   }
                }
             } else {
-               $ma->itemDone($item->getType(), $ids, MassiveAction::ACTION_KO);
+               $ma->itemDone($item->getInstanceType(), $ids, MassiveAction::ACTION_KO);
             }
             return;
 
@@ -651,12 +651,12 @@ class Computer_SoftwareVersion extends CommonDBRelation {
    /**
     * Show software installed on a computer
     *
-    * @param $comp            Computer object
-    * @param $withtemplate    template case of the view process (default 0)
+    * @param Asset   $comp         Asset object
+    * @param boolean $withtemplate template case of the view process (default 0)
     *
-    * @return nothing
+    * @return void
    **/
-   static function showForComputer(Computer $comp, $withtemplate = 0) {
+   static function showForComputer(Asset $comp, $withtemplate = 0) {
       global $DB, $CFG_GLPI;
 
       if (!Software::canView()) {
@@ -1136,7 +1136,7 @@ class Computer_SoftwareVersion extends CommonDBRelation {
    function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
 
       $nb = 0;
-      switch ($item->getType()) {
+      switch ($item->getInstanceType()) {
          case 'Software' :
             if (!$withtemplate) {
                if ($_SESSION['glpishow_count_on_tabs']) {
@@ -1180,13 +1180,13 @@ class Computer_SoftwareVersion extends CommonDBRelation {
    **/
    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
 
-      if ($item->getType()=='Software') {
+      if ($item->getInstanceType()=='Software') {
          self::showForSoftware($item);
 
-      } else if ($item->getType()=='Computer') {
+      } else if ($item->getInstanceType()=='Computer') {
          self::showForComputer($item, $withtemplate);
 
-      } else if ($item->getType()=='SoftwareVersion') {
+      } else if ($item->getInstanceType()=='SoftwareVersion') {
          switch ($tabnum) {
             case 1 :
                self::showForVersionByEntity($item);

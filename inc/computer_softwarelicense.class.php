@@ -143,18 +143,18 @@ class Computer_SoftwareLicense extends CommonDBRelation {
                      if ($item->update(['id'  => $id,
                                              'softwarelicenses_id'
                                              => $input['softwarelicenses_id']])) {
-                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
+                        $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_OK);
                      } else {
-                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
+                        $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_KO);
                         $ma->addMessage($item->getErrorMessage(ERROR_ON_ACTION));
                      }
                   } else {
-                     $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_NORIGHT);
+                     $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_NORIGHT);
                      $ma->addMessage($item->getErrorMessage(ERROR_RIGHT));
                   }
                }
             } else {
-               $ma->itemDone($item->getType(), $ids, MassiveAction::ACTION_KO);
+               $ma->itemDone($item->getInstanceType(), $ids, MassiveAction::ACTION_KO);
             }
             return;
 
@@ -179,19 +179,19 @@ class Computer_SoftwareLicense extends CommonDBRelation {
                         if ($csv->can(-1, CREATE, $params)) {
                            //Process rules
                            if ($csv->add($params)) {
-                              $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
+                              $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_OK);
                            } else {
-                              $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
+                              $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_KO);
                            }
                         } else {
-                           $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_NORIGHT);
+                           $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_NORIGHT);
                         }
                      } else {
                         Session::addMessageAfterRedirect(__('A version is required!'), false, ERROR);
-                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
+                        $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_KO);
                      }
                   } else {
-                     $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
+                     $ma->itemDone($item->getInstanceType(), $id, MassiveAction::ACTION_KO);
                   }
                }
             }
@@ -650,7 +650,7 @@ class Computer_SoftwareLicense extends CommonDBRelation {
    function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
 
       $nb = 0;
-      switch ($item->getType()) {
+      switch ($item->getInstanceType()) {
          case 'SoftwareLicense' :
             if (!$withtemplate) {
                if ($_SESSION['glpishow_count_on_tabs']) {
@@ -668,7 +668,7 @@ class Computer_SoftwareLicense extends CommonDBRelation {
 
    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
 
-      if ($item->getType() == 'SoftwareLicense') {
+      if ($item->getInstanceType() == 'SoftwareLicense') {
          switch ($tabnum) {
             case 1 :
                self::showForLicenseByEntity($item);

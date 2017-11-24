@@ -58,6 +58,7 @@ class Asset extends CommonDBTM {
    protected $usenotepad               = true;
 
    protected $assettype;
+   protected $instance_type;
 
    /**
     * Constructor
@@ -78,6 +79,7 @@ class Asset extends CommonDBTM {
             throw new \RuntimeException("Unknown asset type $typename");
          }
       }
+      $this->instance_type = $this->assettype->fields['name'];
    }
 
    public function getAssetTypeName() {
@@ -129,7 +131,7 @@ class Asset extends CommonDBTM {
 
       $ong = [];
       $this->addDefaultFormTab($ong)
-         ->addStandardTab(__CLASS__, $ong, $options)
+         ->addStandardTab($this->getAssetTypeName(), $ong, $options)
          ->addStandardTab('Item_OperatingSystem', $ong, $options)
          ->addStandardTab('Item_Devices', $ong, $options)
          ->addStandardTab('ComputerDisk', $ong, $options)
@@ -240,7 +242,7 @@ class Asset extends CommonDBTM {
                $item = new $device();
                $crit = [
                   'FIELDS'       => 'id',
-                  'itemtype'     => self::getType(),
+                  'itemtype'     => $this->getInstanceType(),
                   'items_id'     => $this->fields["id"],
                   'is_deleted'   => 0
                ];
@@ -302,13 +304,13 @@ class Asset extends CommonDBTM {
       // Manage add from template
       if (isset($this->input["_oldID"])) {
          // ADD OS
-         Item_OperatingSystem::cloneItem($this->getType(), $this->input["_oldID"], $this->fields['id']);
+         Item_OperatingSystem::cloneItem($this->getInstanceType(), $this->input["_oldID"], $this->fields['id']);
 
          // ADD Devices
-         Item_devices::cloneItem($this->getType(), $this->input["_oldID"], $this->fields['id']);
+         Item_devices::cloneItem($this->getInstanceType(), $this->input["_oldID"], $this->fields['id']);
 
          // ADD Infocoms
-         Infocom::cloneItem($this->getType(), $this->input["_oldID"], $this->fields['id']);
+         Infocom::cloneItem($this->getInstanceType(), $this->input["_oldID"], $this->fields['id']);
 
          // ADD volumes
          ComputerDisk::cloneComputer($this->input["_oldID"], $this->fields['id']);
@@ -319,19 +321,19 @@ class Asset extends CommonDBTM {
          Computer_SoftwareLicense::cloneComputer($this->input["_oldID"], $this->fields['id']);
 
          // ADD Contract
-         Contract_Item::cloneItem($this->getType(), $this->input["_oldID"], $this->fields['id']);
+         Contract_Item::cloneItem($this->getInstanceType(), $this->input["_oldID"], $this->fields['id']);
 
          // ADD Documents
-         Document_Item::cloneItem($this->getType(), $this->input["_oldID"], $this->fields['id']);
+         Document_Item::cloneItem($this->getInstanceType(), $this->input["_oldID"], $this->fields['id']);
 
          // ADD Ports
-         NetworkPort::cloneItem($this->getType(), $this->input["_oldID"], $this->fields['id']);
+         NetworkPort::cloneItem($this->getInstanceType(), $this->input["_oldID"], $this->fields['id']);
 
          // Add connected devices
          Computer_Item::cloneComputer($this->input["_oldID"], $this->fields['id']);
 
          //Add KB links
-         KnowbaseItem_Item::cloneItem($this->getType(), $this->input["_oldID"], $this->fields['id']);
+         KnowbaseItem_Item::cloneItem($this->getInstanceType(), $this->input["_oldID"], $this->fields['id']);
       }
    }
 
@@ -351,12 +353,12 @@ class Asset extends CommonDBTM {
       $ci->cleanDBonItemDelete('Computer', $this->fields['id']);
 
       $ip = new Item_Project();
-      $ip->cleanDBonItemDelete(__CLASS__, $this->fields['id']);
+      $ip->cleanDBonItemDelete($this->assettype->fields['name'], $this->fields['id']);
 
       $ci = new Computer_Item();
       $ci->cleanDBonItemDelete('Computer', $this->fields['id']);
 
-      Item_Devices::cleanItemDeviceDBOnItemDelete($this->getType(), $this->fields['id'],
+      Item_Devices::cleanItemDeviceDBOnItemDelete($this->getInstanceType(), $this->fields['id'],
                                                   (!empty($this->input['keep_devices'])));
 
       $disk = new ComputerDisk();
@@ -400,7 +402,7 @@ class Asset extends CommonDBTM {
       echo "<td>";
       $objectName = autoName($this->fields["name"], "name",
                              (isset($options['withtemplate']) && ( $options['withtemplate']== 2)),
-                             $this->getType(), $this->fields["entities_id"]);
+                             $this->getInstanceType(), $this->fields["entities_id"]);
       Html::autocompletionTextField(
          $this,
          'name',
@@ -489,7 +491,7 @@ class Asset extends CommonDBTM {
 
       $objectName = autoName($this->fields["otherserial"], "otherserial",
                              (isset($options['withtemplate']) && ($options['withtemplate'] == 2)),
-                             $this->getType(), $this->fields["entities_id"]);
+                             $this->getInstanceType(), $this->fields["entities_id"]);
       Html::autocompletionTextField(
          $this,
          'otherserial',
@@ -652,7 +654,7 @@ class Asset extends CommonDBTM {
          'datatype'           => 'number'
       ];
 
-      $tab = array_merge($tab, Location::getSearchOptionsToAddNew());
+      $tab = array_merge($tab, Location::getSearchOptionsToAddNew($this->getInstanceType()));
 
       $tab[] = [
          'id'                 => '4',
@@ -833,12 +835,12 @@ class Asset extends CommonDBTM {
       ];
 
       // add operating system search options
-      $tab = array_merge($tab, Item_OperatingSystem::getSearchOptionsToAddNew(get_class($this)));
+      $tab = array_merge($tab, Item_OperatingSystem::getSearchOptionsToAddNew($this->getInstanceType()));
 
       // add objectlock search options
-      $tab = array_merge($tab, ObjectLock::getSearchOptionsToAddNew(get_class($this)));
+      $tab = array_merge($tab, ObjectLock::getSearchOptionsToAddNew($this->getInstanceType()));
 
-      $tab = array_merge($tab, Notepad::getSearchOptionsToAddNew());
+      $tab = array_merge($tab, Notepad::getSearchOptionsToAddNew($this->getInstanceType()));
 
       $tab[] = [
           'id'                => 'periph',
@@ -1276,7 +1278,7 @@ class Asset extends CommonDBTM {
          ]
       ];
 
-      $tab = array_merge($tab, ComputerAntivirus::getSearchOptionsToAddNew());
+      $tab = array_merge($tab, ComputerAntivirus::getSearchOptionsToAddNew($this->getInstanceType()));
 
       return $tab;
    }

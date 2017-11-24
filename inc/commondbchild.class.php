@@ -470,7 +470,7 @@ abstract class CommonDBChild extends CommonDBConnexity {
          $changes[0] = '0';
          $changes[1] = "";
          $changes[2] = $this->getHistoryNameForItem($item, 'add');
-         Log::history($item->getID(), $item->getType(), $changes, $this->getType(),
+         Log::history($item->getID(), $item->getInstanceType(), $changes, $this->getInstanceType(),
                       static::$log_history_add);
       }
    }
@@ -506,7 +506,7 @@ abstract class CommonDBChild extends CommonDBConnexity {
             if ((!is_array($changes)) || (count($changes) != 3)) {
                continue;
             }
-            Log::history($item->getID(), $item->getType(), $changes, $this->getType(),
+            Log::history($item->getID(), $item->getInstanceType(), $changes, $this->getInstanceType(),
                          static::$log_history_update);
          }
       }
@@ -522,7 +522,7 @@ abstract class CommonDBChild extends CommonDBConnexity {
             $changes[0] = '0';
             $changes[1] = addslashes($this->getHistoryNameForItem($prevItem, 'update item previous'));
             $changes[2] = '';
-            Log::history($prevItem->getID(), $prevItem->getType(), $changes, $this->getType(),
+            Log::history($prevItem->getID(), $prevItem->getInstanceType(), $changes, $this->getInstanceType(),
                          static::$log_history_delete);
          }
 
@@ -531,7 +531,7 @@ abstract class CommonDBChild extends CommonDBConnexity {
             $changes[0] = '0';
             $changes[1] = '';
             $changes[2] = addslashes($this->getHistoryNameForItem($newItem, 'update item next'));
-            Log::history($newItem->getID(), $newItem->getType(), $changes, $this->getType(),
+            Log::history($newItem->getID(), $newItem->getInstanceType(), $changes, $this->getInstanceType(),
                          static::$log_history_add);
          }
       }
@@ -562,7 +562,7 @@ abstract class CommonDBChild extends CommonDBConnexity {
             $changes[1] = addslashes($this->getHistoryNameForItem($item, 'delete'));
             $changes[2] = '';
          }
-         Log::history($item->getID(), $item->getType(), $changes, $this->getType(),
+         Log::history($item->getID(), $item->getInstanceType(), $changes, $this->getInstanceType(),
                       static::$log_history_delete);
       }
    }
@@ -591,7 +591,7 @@ abstract class CommonDBChild extends CommonDBConnexity {
             $changes[0] = '0';
             $changes[1] = addslashes($this->getHistoryNameForItem($item, 'lock'));
             $changes[2] = '';
-            Log::history($item->getID(), $item->getType(), $changes, $this->getType(),
+            Log::history($item->getID(), $item->getInstanceType(), $changes, $this->getInstanceType(),
                          static::$log_history_lock);
          }
       }
@@ -621,7 +621,7 @@ abstract class CommonDBChild extends CommonDBConnexity {
             $changes[0] = '0';
             $changes[1] = '';
             $changes[2] = addslashes($this->getHistoryNameForItem($item, 'unlock'));
-            Log::history($item->getID(), $item->getType(), $changes, $this->getType(),
+            Log::history($item->getID(), $item->getInstanceType(), $changes, $this->getInstanceType(),
                          static::$log_history_unlock);
          }
       }
@@ -720,7 +720,7 @@ abstract class CommonDBChild extends CommonDBConnexity {
       if ($canedit) {
          $lower_name         = strtolower(get_called_class());
          $child_count_js_var = 'nb'.$lower_name.'s';
-         $div_id             = "add_".$lower_name."_to_".$item->getType()."_".$items_id;
+         $div_id             = "add_".$lower_name."_to_".$item->getInstanceType()."_".$items_id;
 
          // Beware : -1 is for the first element added ...
          $result = "&nbsp;<script type='text/javascript'>var $child_count_js_var=2; </script>";
@@ -777,7 +777,7 @@ abstract class CommonDBChild extends CommonDBConnexity {
       }
 
       $lower_name = strtolower(get_called_class());
-      $div_id     = "add_".$lower_name."_to_".$item->getType()."_".$items_id;
+      $div_id     = "add_".$lower_name."_to_".$item->getInstanceType()."_".$items_id;
 
       // To be sure not to load bad datas from this table
       if ($items_id == 0) {
@@ -792,7 +792,7 @@ abstract class CommonDBChild extends CommonDBConnexity {
       ];
 
       if (preg_match('/^itemtype/', static::$itemtype)) {
-         $query['WHERE']['itemtype'] = $item->getType();
+         $query['WHERE']['itemtype'] = $item->getInstanceType();
       }
 
       $current_item = new static();

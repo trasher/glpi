@@ -143,12 +143,12 @@ abstract class CommonDBVisible extends CommonDBTM {
       $canedit = $this->canEdit($ID);
       $rand    = mt_rand();
       $nb      = $this->countVisibilities();
-      $str_type = strtolower($this::getType());
+      $str_type = strtolower($this->getInstanceType());
 
       if ($canedit) {
          echo "<div class='firstbloc'>";
          echo "<form name='{$str_type}visibility_form$rand' id='{$str_type}visibility_form$rand' ";
-         echo " method='post' action='".Toolbox::getItemTypeFormURL($this::getType())."'>";
+         echo " method='post' action='".Toolbox::getItemTypeFormURL($this->getInstanceType())."'>";
          echo "<input type='hidden' name='{$str_type}s_id' value='$ID'>";
          echo "<table class='tab_cadre_fixe'>";
          echo "<tr class='tab_bg_1'><th colspan='4'>".__('Add a target')."</tr>";
@@ -208,7 +208,7 @@ abstract class CommonDBVisible extends CommonDBTM {
                echo "<tr class='tab_bg_1'>";
                if ($canedit) {
                   echo "<td>";
-                  Html::showMassiveActionCheckBox($this::getType() . '_User', $data["id"]);
+                  Html::showMassiveActionCheckBox($this->getInstanceType() . '_User', $data["id"]);
                   echo "</td>";
                }
                echo "<td>".__('User')."</td>";
@@ -225,7 +225,7 @@ abstract class CommonDBVisible extends CommonDBTM {
                echo "<tr class='tab_bg_1'>";
                if ($canedit) {
                   echo "<td>";
-                  Html::showMassiveActionCheckBox('Group_' . $this::getType(), $data["id"]);
+                  Html::showMassiveActionCheckBox('Group_' . $this->getInstanceType(), $data["id"]);
                   echo "</td>";
                }
                echo "<td>".__('Group')."</td>";
@@ -256,7 +256,7 @@ abstract class CommonDBVisible extends CommonDBTM {
                echo "<tr class='tab_bg_1'>";
                if ($canedit) {
                   echo "<td>";
-                  Html::showMassiveActionCheckBox('Entity_' . $this::getType(), $data["id"]);
+                  Html::showMassiveActionCheckBox('Entity_' . $this->getInstanceType(), $data["id"]);
                   echo "</td>";
                }
                echo "<td>".__('Entity')."</td>";
@@ -280,7 +280,7 @@ abstract class CommonDBVisible extends CommonDBTM {
                echo "<tr class='tab_bg_1'>";
                if ($canedit) {
                   echo "<td>";
-                  Html::showMassiveActionCheckBox('Profile_' . $this::getType(), $data["id"]);
+                  Html::showMassiveActionCheckBox('Profile_' . $this->getInstanceType(), $data["id"]);
                   echo "</td>";
                }
                echo "<td>"._n('Profile', 'Profiles', 1)."</td>";
@@ -327,7 +327,7 @@ abstract class CommonDBVisible extends CommonDBTM {
    protected function getShowVisibilityDropdownParams() {
       return [
          'type'  => '__VALUE__',
-         'right' => strtolower($this::getType()) . '_public'
+         'right' => strtolower($this->getInstanceType()) . '_public'
       ];
    }
 }
