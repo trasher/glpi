@@ -38,6 +38,10 @@ use Glpi\Event;
 
 include ('../inc/includes.php');
 
+if (!isset($_GET['assettype']) && !isset($_POST['assettype'])) {
+   throw new \RuntimeException('Missing asset type');
+}
+
 Session::checkRight("computer", READ);
 
 if (!isset($_GET["id"])) {
@@ -48,63 +52,63 @@ if (!isset($_GET["withtemplate"])) {
    $_GET["withtemplate"] = "";
 }
 
-$computer = new Computer();
-//Add a new computer
+$asset = new Asset(isset($_POST['assettype']) ? $_POST['assettype'] : $_GET['assettype']);
+//Add a new Asset
 if (isset($_POST["add"])) {
-   $computer->check(-1, CREATE, $_POST);
-   if ($newID = $computer->add($_POST)) {
-      Event::log($newID, "computers", 4, "inventory",
+   $asset->check(-1, CREATE, $_POST);
+   if ($newID = $asset->add($_POST)) {
+      Event::log($newID, $asset->getAssetTypeName(), 4, "inventory",
                  sprintf(__('%1$s adds the item %2$s'), $_SESSION["glpiname"], $_POST["name"]));
 
       if ($_SESSION['glpibackcreated']) {
-         Html::redirect($computer->getLinkURL());
+         Html::redirect($asset->getLinkURL());
       }
    }
    Html::back();
 
    // delete a computer
 } else if (isset($_POST["delete"])) {
-   $computer->check($_POST['id'], DELETE);
-   $ok = $computer->delete($_POST);
+   $asset->check($_POST['id'], DELETE);
+   $ok = $asset->delete($_POST);
    if ($ok) {
-      Event::log($_POST["id"], "computers", 4, "inventory",
+      Event::log($_POST["id"], $asset->getAssetTypeName(), 4, "inventory",
                  //TRANS: %s is the user login
                  sprintf(__('%s deletes an item'), $_SESSION["glpiname"]));
    }
-   $computer->redirectToList();
+   $asset->redirectToList();
 
 } else if (isset($_POST["restore"])) {
-   $computer->check($_POST['id'], DELETE);
-   if ($computer->restore($_POST)) {
-      Event::log($_POST["id"], "computers", 4, "inventory",
+   $asset->check($_POST['id'], DELETE);
+   if ($asset->restore($_POST)) {
+      Event::log($_POST["id"], $asset->getAssetTypeName(), 4, "inventory",
                  //TRANS: %s is the user login
                  sprintf(__('%s restores an item'), $_SESSION["glpiname"]));
    }
-   $computer->redirectToList();
+   $asset->redirectToList();
 
 } else if (isset($_POST["purge"])) {
-   $computer->check($_POST['id'], PURGE);
-   if ($computer->delete($_POST, 1)) {
-      Event::log($_POST["id"], "computers", 4, "inventory",
+   $asset->check($_POST['id'], PURGE);
+   if ($asset->delete($_POST, 1)) {
+      Event::log($_POST["id"], $asset->getTypeName(), 4, "inventory",
                  //TRANS: %s is the user login
                  sprintf(__('%s purges an item'), $_SESSION["glpiname"]));
    }
-   $computer->redirectToList();
+   $asset->redirectToList();
 
    //update a computer
 } else if (isset($_POST["update"])) {
-   $computer->check($_POST['id'], UPDATE);
-   $computer->update($_POST);
-   Event::log($_POST["id"], "computers", 4, "inventory",
+   $asset->check($_POST['id'], UPDATE);
+   $asset->update($_POST);
+   Event::log($_POST["id"], $asset->getAssetTypeName(), 4, "inventory",
               //TRANS: %s is the user login
               sprintf(__('%s updates an item'), $_SESSION["glpiname"]));
    Html::back();
 
    // Disconnect a computer from a printer/monitor/phone/peripheral
 } else {//print computer information
-   Html::header(Computer::getTypeName(Session::getPluralNumber()), $_SERVER['PHP_SELF'], "assets", "computer");
+   Html::header(Computer::getTypeName(Session::getPluralNumber()), $_SERVER['PHP_SELF'], "assets", "asset");
    //show computer form to add
-   $computer->display(['id'           => $_GET["id"],
-                            'withtemplate' => $_GET["withtemplate"]]);
+   $asset->display(['id'           => $_GET["id"],
+                    'withtemplate' => $_GET["withtemplate"]]);
    Html::footer();
 }
