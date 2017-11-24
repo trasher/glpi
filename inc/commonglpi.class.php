@@ -620,9 +620,8 @@ class CommonGLPI {
     *
     * @return string
    **/
-   static function getFormURLWithID($id = 0, $full = true) {
-
-      $itemtype = get_called_class();
+   public function getFormURLWithID($id = 0, $full = true) {
+      $itemtype = $this->getInstanceType();
       $link     = $itemtype::getFormURL($full);
       $link    .= (strpos($link, '?') ? '&':'?').'id=' . $id;
       return $link;

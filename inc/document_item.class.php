@@ -526,7 +526,7 @@ class Document_Item extends CommonDBRelation{
                            $linkname = $tmpitem->getLink();
                         }
                      }
-                     $link     = $itemtype::getFormURLWithID($data['id']);
+                     $link     = $item->getFormURLWithID($data['id']);
                      $name = "<a href=\"".$link."\">".$linkname."</a>";
 
                      echo "<tr class='tab_bg_1'>";

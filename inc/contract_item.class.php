@@ -728,7 +728,7 @@ class Contract_Item extends CommonDBRelation{
                    || empty($data["name"])) {
                   $name = sprintf(__('%1$s (%2$s)'), $name, $objdata["id"]);
                }
-               $link = $itemtype::getFormURLWithID($objdata["id"]);
+               $link = $item->getFormURLWithID($objdata["id"]);
                $name = "<a href=\"".$link."\">".$name."</a>";
 
                echo "<tr class='tab_bg_1'>";

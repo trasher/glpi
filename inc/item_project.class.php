@@ -214,7 +214,7 @@ class Item_Project extends CommonDBRelation{
                    || empty($data[$itemtype::getNameField()])) {
                   $name = sprintf(__('%1$s (%2$s)'), $name, $data["id"]);
                }
-               $link     = $item::getFormURLWithID($data['id']);
+               $link     = $item->getFormURLWithID($data['id']);
                $namelink = "<a href=\"".$link."\">".$name."</a>";
 
                echo "<tr class='tab_bg_1'>";

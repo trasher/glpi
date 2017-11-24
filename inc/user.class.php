@@ -3804,7 +3804,7 @@ class User extends CommonDBTM {
                   $cansee = $item->can($data["id"], READ);
                   $link   = $data["name"];
                   if ($cansee) {
-                     $link_item = $item::getFormURLWithID($data['id']);
+                     $link_item = $item->getFormURLWithID($data['id']);
                      if ($_SESSION["glpiis_ids_visible"] || empty($link)) {
                         $link = sprintf(__('%1$s (%2$s)'), $link, $data["id"]);
                      }
@@ -3885,7 +3885,7 @@ class User extends CommonDBTM {
                      $cansee = $item->can($data["id"], READ);
                      $link   = $data["name"];
                      if ($cansee) {
-                        $link_item = $item::getFormURLWithID($data['id']);
+                        $link_item = $item->getFormURLWithID($data['id']);
                         if ($_SESSION["glpiis_ids_visible"] || empty($link)) {
                            $link = sprintf(__('%1$s (%2$s)'), $link, $data["id"]);
                         }

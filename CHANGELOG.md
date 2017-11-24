@@ -3,6 +3,13 @@
 The present file will list all changes made to the project; according to the
 [Keep a Changelog](http://keepachangelog.com/) project.
 
+## [9.3]
+
+### API changes
+
+#### Changes
+- `CommonDBTM::getFormURLWithID` is no longer static
+
 ## [9.2.1]
 
 ### Added

@@ -218,7 +218,8 @@ class SavedSearch_Alert extends CommonDBChild {
                echo ', ';
             }
             if (Session::haveRight('notification', UPDATE)) {
-               $url = Notification::getFormURLWithID($row['id']);
+               $notification = new Notification();
+               $url = $notification->getFormURLWithID($row['id']);
                echo "<a href='$url'>" . $row['name'] . "</a>";
             } else {
                echo $row['name'];

@@ -209,7 +209,7 @@ class Change_Item extends CommonDBRelation{
             $nb            = $DB->numrows($result_linked);
 
             for ($prem=true; $data=$DB->fetch_assoc($result_linked); $prem=false) {
-               $link     = $itemtype::getFormURLWithID($data['id']);
+               $link     = $item->getFormURLWithID($data['id']);
                $linkname = $data["name"];
                if ($_SESSION["glpiis_ids_visible"]
                    || empty($data["name"])) {

@@ -230,7 +230,7 @@ class KnowbaseItem_Item extends CommonDBRelation {
             $name = sprintf(__('%1$s (%2$s)'), $name, $linked_item->getID());
          }
 
-         $link = $linked_item::getFormURLWithID($linked_item->getID());
+         $link = $linked_item->getFormURLWithID($linked_item->getID());
 
          $createdate = $item->getInstanceType() == KnowbaseItem::getType() ? 'date_creation' : 'date';
          // show line

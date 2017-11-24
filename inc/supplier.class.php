@@ -576,7 +576,8 @@ class Supplier extends CommonDBTM {
                   if ($_SESSION["glpiis_ids_visible"] || empty($data["name"])) {
                      $name = sprintf(__('%1$s (%2$s)'), $name, $data["id"]);
                   }
-                  $link = $linktype::getFormURLWithID($data[$linkfield]);
+                  $linkobject = new $linktype();
+                  $link = $linkobject->getFormURLWithID($data[$linkfield]);
                   $name = "<a href='$link'>".$name."</a>";
 
                   echo "<tr class='tab_bg_1";
