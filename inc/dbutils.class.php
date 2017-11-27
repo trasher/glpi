@@ -319,9 +319,8 @@ final class DbUtils {
          //to avoid issues when pecl-event is installed...
          $itemtype = 'Glpi\\Event';
       } else {
-         $assettype = new AssetType();
-         $is_asset = $assettype->getFromDBByCrit(['name' => $itemtype]);
-         if ($is_asset) {
+         $is_asset = isAssetItemType($itemtype);
+         if ($is_asset !== false) {
             return new Asset($itemtype);
          }
       }

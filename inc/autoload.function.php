@@ -104,9 +104,23 @@ function isPluginItemType($classname) {
  * @return AssetType|false
  */
 function isAssetItemType($classname) {
-   $assettype = new AssetType();
-   if ($assettype->getFromDBByCrit(['name' => $classname])) {
-      return $assettype;
+   global $DB, $GLPI_CACHE;
+
+   $ckey = 'glpi_assets';
+   if (!$GLPI_CACHE->hasItem($ckey)) {
+      $types = [];
+      $iterator = $DB->request([
+         'SELECT' => ['id', 'name'],
+         'FROM'   => AssetType::getTable()
+      ]);
+      while ($row = $iterator->next()) {
+         $types[$row['name']] = $row;
+      }
+      $GLPI_CACHE->addItem($ckey, $types);
+   }
+   $assettypes = $GLPI_CACHE->getItem($ckey);
+   if (isset($assettypes[$classname])) {
+      return $assettypes[$classname];
    } else {
       return false;
    }
