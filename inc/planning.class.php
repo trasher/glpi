@@ -83,7 +83,7 @@ class Planning extends CommonGLPI {
     *
     *   @since version 9.1
    **/
-   static function getMenuContent() {
+   public function getMenuContent() {
       global $CFG_GLPI;
 
       $menu = [];

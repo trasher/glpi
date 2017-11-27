@@ -251,7 +251,7 @@ class CommonGLPI {
       if (self::isLayoutExcludedPage()
           || !self::isLayoutWithMain()
           || !method_exists($this, "showForm")) {
-         $ong[$this->getInstanceType().'$main'] = $this->getTypeName(1);
+         $ong[$this->getInstanceType().'$main'] = $this->getAssetTypeName(1);
       }
       return $this;
    }
@@ -264,25 +264,36 @@ class CommonGLPI {
     *
     * @return array array for menu
    **/
-   static function getMenuContent() {
+   public function getMenuContent() {
 
       $menu       = [];
 
-      $type       = static::getType();
-      $item       = new $type();
-      $forbidden  = $type::getForbiddenActionsForMenu();
+      $type       = $this->getInstanceType();
+      $item       = $this;
+      $forbidden  = $this->getForbiddenActionsForMenu();
 
-      $debug      = false;
+      if (property_exists($this, 'instance_type')) {
+         $tmp_menu = [
+            'title'     => $this->getAssetTypeName(),
+            'shortcut'  => '', //TODO or to remove
+            'page'      => $this->getInstanceSearchURL(false),
+            'links'     => ['search' => $this->getInstanceSearchURL(false)]
+         ];
+      } else {
+         $tmp_menu = [
+            'title'     => static::getMenuName(),
+            'shortcut'  => static::getMenuShorcut(),
+            'page'      => static::getSearchURL(false),
+            'links'     => ['search' => static::getSearchURL(false)]
+         ];
+      }
 
       if ($item instanceof CommonDBTM) {
-         if ($type::canView()) {
-            $menu['title']           = static::getMenuName();
-            $menu['shortcut']        = static::getMenuShorcut();
-            $menu['page']            = static::getSearchURL(false);
-            $menu['links']['search'] = static::getSearchURL(false);
+         if ($this->canView()) {
+            $menu = $tmp_menu;
 
             if (!in_array('add', $forbidden)
-                && $type::canCreate()) {
+                && $this->canCreate()) {
 
                if ($item->maybeTemplate()) {
                   $menu['links']['add'] = '/front/setup.templates.php?'.'itemtype='.$type.
@@ -292,28 +303,25 @@ class CommonGLPI {
                                                   '&amp;add=0';
                   }
                } else {
-                  $menu['links']['add'] = static::getFormURL(false);
+                  $menu['links']['add'] = $this->getFormURL(false);
                }
             }
 
-            if ($data = static::getAdditionalMenuLinks()) {
+            if ($data = $this->getAdditionalMenuLinks()) {
                $menu['links'] += $data;
             }
 
          }
       } else {
          if (!method_exists($type, 'canView')
-             || $item->canView()) {
-            $menu['title']           = static::getMenuName();
-            $menu['shortcut']        = static::getMenuShorcut();
-            $menu['page']            = static::getSearchURL(false);
-            $menu['links']['search'] = static::getSearchURL(false);
+             || $this->canView()) {
+            $menu = $tmp_menu;
          }
       }
-      if ($data = static::getAdditionalMenuOptions()) {
+      if ($data = $this->getAdditionalMenuOptions()) {
          $menu['options'] = $data;
       }
-      if ($data = static::getAdditionalMenuContent()) {
+      if ($data = $this->getAdditionalMenuContent()) {
          $newmenu[strtolower($type)]  = $menu;
          // Force overwrite existing menu
          foreach ($data as $key => $val) {
@@ -597,6 +605,24 @@ class CommonGLPI {
       return Toolbox::getItemTypeSearchURL(get_called_class(), $full);
    }
 
+   /**
+    * Get the search page URL for the current instance
+    *
+    * @since 9.3
+    *
+    * @param boolean $full path or relative one (true by default)
+    *
+    * @return string
+   **/
+   function getInstanceSearchURL($full = true) {
+      $itemtype = $this->getInstanceType();
+      $link = Toolbox::getItemTypeSearchURL(get_called_class(), $full);
+      if (isAssetItemType($itemtype)) {
+         $link    .= (strpos($link, '?') ? '&':'?').'assettype=' . $itemtype;
+      }
+      return $link;
+   }
+
 
    /**
     * Get the form page URL for the current class
@@ -609,6 +635,23 @@ class CommonGLPI {
       return Toolbox::getItemTypeFormURL(get_called_class(), $full);
    }
 
+   /**
+    * Get the form page URL for the current instance
+    *
+    * @since 9.3
+    *
+    * @param boolean $full path or relative one (true by default)
+    *
+    * @return string
+   **/
+   function getInstanceFormURL($full = true) {
+      $itemtype = $this->getInstanceType();
+      $link = Toolbox::getItemTypeFormURL(get_called_class(), $full);
+      if (isAssetItemType($itemtype)) {
+         $link    .= (strpos($link, '?') ? '&':'?').'assettype=' . $itemtype;
+      }
+      return $link;
+   }
 
    /**
     * Get the form page URL for the current class and point to a specific ID
@@ -621,8 +664,7 @@ class CommonGLPI {
     * @return string
    **/
    public function getFormURLWithID($id = 0, $full = true) {
-      $itemtype = $this->getInstanceType();
-      $link     = $itemtype::getFormURL($full);
+      $link = $this->getInstanceFormURL($full);
       $link    .= (strpos($link, '?') ? '&':'?').'id=' . $id;
       return $link;
    }
@@ -871,7 +913,7 @@ class CommonGLPI {
          echo Toolbox::substr($glpilisttitle, 0, 100)."...";
          echo "</a></td>";
 
-         $name = $this->getTypeName(1);
+         $name = $this->getAssetTypeName(1);
          if (isset($this->fields['id']) && ($this instanceof CommonDBTM)) {
             $name = sprintf(__('%1$s - %2$s'), $name, $this->getName());
             if ($_SESSION['glpiis_ids_visible'] || empty($name)) {
@@ -1277,4 +1319,7 @@ class CommonGLPI {
       }
    }
 
+   public function getAssetTypeName() {
+      return $this->getTypeName();
+   }
 }

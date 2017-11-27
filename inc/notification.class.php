@@ -151,7 +151,7 @@ class Notification extends CommonDBTM {
     *
     *  @since version 0.85
    **/
-   static function getMenuContent() {
+   public function getMenuContent() {
       global $CFG_GLPI;
 
       $menu = [];

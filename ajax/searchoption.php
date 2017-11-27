@@ -50,7 +50,7 @@ if (isset($_POST["itemtype"])
     && isset($_POST["field"])
     && isset($_POST["num"]) ) {
 
-   if (!is_subclass_of($_POST['itemtype'], 'CommonDBTM')) {
+   if (!is_subclass_of($_POST['itemtype'], 'CommonDBTM') && !isAssetItemType($_POST['itemtype'])) {
       throw new \RuntimeException('Invalid itemtype provided!');
    }
 

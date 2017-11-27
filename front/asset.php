@@ -41,10 +41,11 @@ if (!isset($_GET['assettype'])) {
 }
 
 $assettype = $_GET['assettype'];
+$asset = new Asset($_GET['assettype']);
 
 Session::checkRight("computer", READ);
 
-Html::header($assettype::getTypeName(Session::getPluralNumber()), $_SERVER['PHP_SELF'], "assets", "asset");
+Html::header($asset->getAssetTypeName(), $_SERVER['PHP_SELF'], "assets", strtolower($assettype));
 
 Search::show($assettype);
 

@@ -89,7 +89,6 @@ class Asset extends CommonDBTM {
       return $this->assettype->getName();
    }
 
-
    static function getTable($classname = null) {
       return 'glpi_assets';
    }

@@ -9,6 +9,7 @@ The present file will list all changes made to the project; according to the
 
 #### Changes
 - `CommonDBTM::getFormURLWithID` is no longer static
+- `CommonGLPI::getMenuContent` is no longer static
 
 ## [9.2.1]
 

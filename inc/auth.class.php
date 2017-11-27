@@ -96,7 +96,7 @@ class Auth extends CommonGLPI {
       return Session::haveRight('config', READ);
    }
 
-   static function getMenuContent() {
+   public function getMenuContent() {
 
       $menu = [];
       if (Config::canUpdate()) {

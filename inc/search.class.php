@@ -4815,9 +4815,11 @@ class Search {
          switch ($searchopt[$ID]["datatype"]) {
             case "itemlink" :
                if (isset($searchopt[$ID]['assettype'])) {
-                  $linkitemtype = $searchopt[$ID]['assettype'];
+                  $assettype = $searchopt[$ID]['assettype'];
+                  $linkitemtype = new Asset($assettype);
                } else {
-                  $linkitemtype  = getItemTypeForTable($searchopt[$ID]["table"]);
+                  $assettype = getItemTypeForTable($searchopt[$ID]["table"]);
+                  $linkitemtype = new $assettype;
                }
 
                $out           = "";
@@ -4833,13 +4835,13 @@ class Search {
                         $out .= $separate;
                      }
                      $count_display++;
-                     $page  = $linkitemtype::getFormUrl();
+                     $page  = $linkitemtype->getInstanceFormUrl();
                      $page .= (strpos($page, '?') ? '&id' : '?id');
                      $name  = Dropdown::getValueWithUnit($data[$num][$k]['name'], $unit);
                      if ($_SESSION["glpiis_ids_visible"] || empty($data[$num][$k]['name'])) {
                         $name = sprintf(__('%1$s (%2$s)'), $name, $data[$num][$k]['id']);
                      }
-                     $out  .= "<a id='".$linkitemtype."_".$data['id']."_".
+                     $out  .= "<a id='".$linkitemtype->getInstanceType()."_".$data['id']."_".
                                 $data[$num][$k]['id']."' href='$page=".$data[$num][$k]['id']."'>".
                                $name."</a>";
                   }

@@ -1287,11 +1287,32 @@ class Html {
     * @return string
    **/
    static function getMenuInfos() {
+      global $DB;
 
       $menu['assets']['title']       = __('Assets');
-      $menu['assets']['types']       = ['Computer', 'Monitor', 'Software',
-                                             'NetworkEquipment', 'Peripheral', 'Printer',
-                                             'CartridgeItem', 'ConsumableItem', 'Phone'];
+
+      $assettypes = $DB->request([
+         'SELECT' => 'name',
+         'FROM'   => AssetType::getTable()
+      ]);
+
+      $assets = [];
+      while ($assettype = $assettypes->next()) {
+         $assets[] = $assettype['name'];
+      }
+
+      $menu['assets']['types']       = array_merge(
+         $assets, [
+            'Monitor',
+            'Software',
+            'NetworkEquipment',
+            'Peripheral',
+            'Printer',
+            'CartridgeItem',
+            'ConsumableItem',
+            'Phone'
+         ]
+      );
 
       $menu['helpdesk']['title']     = __('Assistance');
       $menu['helpdesk']['types']     = ['Ticket', 'Problem', 'Change',
@@ -1315,7 +1336,7 @@ class Html {
                                              'Profile', 'QueuedNotification', 'Backup', 'Glpi\\Event'];
 
       $menu['config']['title']       = __('Setup');
-      $menu['config']['types']       = ['CommonDropdown', 'CommonDevice', 'Notification',
+      $menu['config']['types']       = [/*'CommonDropdown', 'CommonDevice',*/ 'Notification',
                                         'SLM', 'Config', 'Control', 'Crontask', 'Auth',
                                         'MailCollector', 'Link', 'Plugin'];
 
@@ -1368,7 +1389,12 @@ class Html {
          foreach ($menu as $category => $datas) {
             if (isset($datas['types']) && count($datas['types'])) {
                foreach ($datas['types'] as $type) {
-                  if ($data = $type::getMenuContent()) {
+                  if (isAssetItemType($type)) {
+                     $item = new Asset($type);
+                  } else {
+                     $item = new $type;
+                  }
+                  if ($data = $item->getMenuContent()) {
                      // Multi menu entries management
                      if (isset($data['is_multi_entries']) && $data['is_multi_entries']) {
                         if (!isset($menu[$category]['content'])) {
@@ -5958,7 +5984,7 @@ class Html {
 
       // Generate array for menu and check right
       if ($full === true) {
-         $menu    = self::generateMenuSession();
+         $menu    = self::generateMenuSession($_SESSION['glpi_use_mode'] == Session::DEBUG_MODE);
          $sector  = $options['sector'];
          $item    = $options['item'];
          $option  = $options['option'];

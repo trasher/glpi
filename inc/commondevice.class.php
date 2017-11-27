@@ -96,7 +96,7 @@ abstract class CommonDevice extends CommonDropdown {
     *
     *  @since version 0.85
    **/
-   static function getMenuContent() {
+   public function getMenuContent() {
 
       $menu = [];
       if (self::canView()) {

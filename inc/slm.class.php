@@ -168,7 +168,7 @@ class SLM extends CommonDBTM {
    }
 
 
-   static function getMenuContent() {
+   public function getMenuContent() {
 
       $menu = [];
       if (Config::canUpdate()) {
