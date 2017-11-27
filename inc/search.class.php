@@ -2826,6 +2826,10 @@ class Search {
             }
       }
 
+      if ($assettype = isAssetItemType($itemtype)) {
+         $condition .= ($condition == '' ? '' : ' AND ') . "assettypes_id={$assettype['id']}";
+      }
+
       /* Hook to restrict user right on current itemtype */
       list($itemtype, $condition) = Plugin::doHookFunction('add_default_where', [$itemtype, $condition]);
       return $condition;
