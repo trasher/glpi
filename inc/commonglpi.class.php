@@ -267,6 +267,7 @@ class CommonGLPI {
             $menu['title']           = static::getMenuName();
             $menu['shortcut']        = static::getMenuShorcut();
             $menu['page']            = static::getSearchURL(false);
+            $menu['itemtype']        = static::getType();
             $menu['links']['search'] = static::getSearchURL(false);
 
             if (!in_array('add', $forbidden)
@@ -294,6 +295,7 @@ class CommonGLPI {
              || $item->canView()) {
             $menu['title']           = static::getMenuName();
             $menu['shortcut']        = static::getMenuShorcut();
+            $menu['itemtype']        = static::getType();
             $menu['page']            = static::getSearchURL(false);
             $menu['links']['search'] = static::getSearchURL(false);
          }
