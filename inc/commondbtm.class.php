@@ -5151,6 +5151,8 @@ class CommonDBTM extends CommonGLPI {
                $element['type'] = 'select';
             }
             $table = getTableNameForForeignKeyField($column['Field']);
+            $itemtype = getItemTypeForTable($table);
+            $element['itemtype'] = $itemtype;
             $element['values'] = [];
          } else if (strstr($column['Field'], 'date')) {
             $element['type'] = 'date';
