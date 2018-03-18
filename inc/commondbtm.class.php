@@ -5270,6 +5270,7 @@ class CommonDBTM extends CommonGLPI {
          $table = getTableNameForForeignKeyField($column['Field']);
          $itemtype = getItemTypeForTable($table);
          $element['itemtype'] = $itemtype;
+         $element['itemtype_name'] = $itemtype::getTypeName(Session::getPluralNumber());
          $element['values'] = [];
       } else if (strstr($column['Field'], 'date')) {
          $element['type'] = 'date';
