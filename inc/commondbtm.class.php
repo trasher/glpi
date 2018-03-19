@@ -5130,7 +5130,7 @@ class CommonDBTM extends CommonGLPI {
     *
     * Missing fields from database will be automatically displayed.
     * If you want to avoid this;
-    * @see getHiddenFields and/or @see getFieldsToDrop
+    * @see getFormHiddenFields and/or @see getFormFieldsToDrop
     *
     * @return array
     */
@@ -5211,7 +5211,14 @@ class CommonDBTM extends CommonGLPI {
       return $fields;
    }
 
-   protected function getHiddenFields($add = false) {
+   /**
+    * Get hidden fields building form
+    *
+    * @param boolean $add Add or update
+    *
+    * @return array
+    */
+   protected function getFormHiddenFields($add = false) {
       $fields = [
          'is_dynamic',
          'is_template',
@@ -5225,7 +5232,14 @@ class CommonDBTM extends CommonGLPI {
       return $fields;
    }
 
-   protected function getFieldsToDrop($add = false) {
+   /**
+    * Get field to be dropped building form
+    *
+    * @param boolean $add Add or update
+    *
+    * @return array
+    */
+   protected function getFormFieldsToDrop($add = false) {
       $fields = [
          'entities_id',
          'is_recursive',
@@ -5258,7 +5272,7 @@ class CommonDBTM extends CommonGLPI {
          $this->form_elements[$column['Field']] = $this->buildFormElement($column);
       }
 
-      foreach ($this->getFieldsToDrop(true) as $field) {
+      foreach ($this->getFormFieldsToDrop(true) as $field) {
          unset($this->form_elements[$field]);
       }
 
@@ -5290,7 +5304,7 @@ class CommonDBTM extends CommonGLPI {
          $element = $this->form_elements[$column['Field']] + $element;
       }
 
-      $hiddens = $this->getHiddenFields(true);
+      $hiddens = $this->getFormHiddenFields(true);
       if (in_array($column['Field'], $hiddens)) {
          $element['type'] = 'hidden';
       } else if (Toolbox::endsWith($column['Field'], '_id') || strstr($column['Field'], '_id_')) {
