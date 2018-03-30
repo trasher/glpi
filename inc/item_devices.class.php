@@ -558,10 +558,15 @@ class Item_Devices extends CommonDBRelation {
 
 
    function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
+      global $IS_TWIG;
 
       if ($item->canView()) {
          $nb = 0;
          if (in_array($item->getType(), self::getConcernedItems())) {
+            if ($IS_TWIG === true) {
+               return _n('Component', 'Components', Session::getPluralNumber());
+            }
+
             if ($_SESSION['glpishow_count_on_tabs']) {
                foreach (self::getItemAffinities($item->getType()) as $link_type) {
                   $nb   += countElementsInTable($link_type::getTable(),
@@ -574,6 +579,10 @@ class Item_Devices extends CommonDBRelation {
                                         $nb);
          }
          if ($item instanceof CommonDevice) {
+            if ($IS_TWIG === true) {
+               return _n('Item', 'Items', Session::getPluralNumber());
+            }
+
             if ($_SESSION['glpishow_count_on_tabs']) {
                $deviceClass     = $item->getType();
                $linkClass       = $deviceClass::getItem_DeviceType();
@@ -587,6 +596,21 @@ class Item_Devices extends CommonDBRelation {
          }
       }
       return '';
+   }
+
+   protected function countForTab($item, $tab) {
+      //TODO: Items tab
+      $count = 0;
+      foreach (self::getItemAffinities($item->getType()) as $link_type) {
+         $count += countElementsInTable(
+            $link_type::getTable(), [
+               'items_id'   => $item->getID(),
+               'itemtype'   => $item->getType(),
+               'is_deleted' => 0
+            ]
+         );
+      }
+      return $count;
    }
 
 
