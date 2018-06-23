@@ -5201,6 +5201,17 @@ class CommonDBTM extends CommonGLPI {
          ]
       ];
 
+      $fields = $this->getDbFormFields($fields);
+
+      return $fields;
+   }
+
+   /**
+    * Add fields from database - if missing
+    *
+    * @return array
+    */
+   protected function getDbFormFields($fields) {
       global $DB;
       if ($dbfields = $DB->list_fields($this->getTable())) {
          foreach (array_keys($fields) as $field) {
@@ -5212,7 +5223,6 @@ class CommonDBTM extends CommonGLPI {
             }
          }
       }
-
       return $fields;
    }
 
