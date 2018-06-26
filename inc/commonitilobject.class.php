@@ -5853,7 +5853,7 @@ abstract class CommonITILObject extends CommonDBTM {
          'actors'    => [
             'title'     => __('Actors'),
             'show'      => false,
-            'elements'  => []
+            'elements'  => ['guess']
          ],
          'specific'  => [
             'title'     => __('Specific'),
