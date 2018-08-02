@@ -129,19 +129,15 @@ class Infocom extends CommonDBChild {
       // Can exists on template
       if (Session::haveRight(self::$rightname, READ)) {
          $nb = 0;
+         if ($_SESSION['glpishow_count_on_tabs']) {
+            $nb = self::countForItem($item);
+         }
+
          switch ($item->getType()) {
             case 'Supplier' :
-               if ($_SESSION['glpishow_count_on_tabs']) {
-                  $nb = self::countForSupplier($item);
-               }
                return self::createTabEntry(_n('Item', 'Items', Session::getPluralNumber()), $nb);
 
             default :
-               if ($_SESSION['glpishow_count_on_tabs']) {
-                  $nb = countElementsInTable('glpi_infocoms',
-                                             ['itemtype' => $item->getType(),
-                                              'items_id' => $item->getID()]);
-               }
                return self::createTabEntry(__('Management'), $nb);
          }
       }
@@ -165,20 +161,6 @@ class Infocom extends CommonDBChild {
             self::showForItem($item, $withtemplate);
       }
       return true;
-   }
-
-
-   /**
-    * @param $item   Supplier  object
-   **/
-   static function countForSupplier(Supplier $item) {
-
-      $restrict = "`glpi_infocoms`.`suppliers_id` = '".$item->getField('id') ."'
-                    AND `itemtype` NOT IN ('ConsumableItem', 'CartridgeItem', 'Software') ".
-                    getEntitiesRestrictRequest(" AND ", "glpi_infocoms", '',
-                                               $_SESSION['glpiactiveentities']);
-
-      return countElementsInTable(['glpi_infocoms'], $restrict);
    }
 
 
@@ -2056,5 +2038,29 @@ class Infocom extends CommonDBChild {
     */
    public static function getExcludedTypes() {
       return ['ConsumableItem', 'CartridgeItem', 'Software'];
+   }
+
+   /**
+    * Get linked items list for specified item
+    *
+    * @since 9.3.1
+    *
+    * @param CommonDBTM $item  Item instance
+    * @param boolean    $noent Flag to not compute entity informations
+    *
+    * @return array
+    */
+   protected static function getListForItemParams(CommonDBTM $item, $noent = false) {
+      global $DB;
+      $params = parent::getListForItemParams($item, $noent);
+
+      if ($item->getType() == 'Supplier') {
+         $params['WHERE'] = [
+            'suppliers_id' => $item->fields['id'],
+            'NOT'          => ['itemtype' => self::getExcludedTypes()]
+         ] + getEntitiesRestrictCriteria('glpi_infocoms', '', $_SESSION['glpiactiveentities']);
+      }
+
+      return $params;
    }
 }

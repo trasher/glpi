@@ -1594,24 +1594,6 @@ abstract class CommonDBRelation extends CommonDBConnexity {
    }
 
    /**
-    * Get linked items list for specified item
-    *
-    * @since 9.3.1
-    *
-    * @param CommonDBTM $item Item instance
-    *
-    * @return DBmysqlIterator
-    */
-   public static function getListForItem(CommonDBTM $item) {
-      global $DB;
-
-      $params = static::getListForItemParams($item);
-      $iterator = $DB->request($params);
-
-      return $iterator;
-   }
-
-   /**
     * Get distinct item types query parameters
     *
     * @since 9.3.1
@@ -1739,29 +1721,6 @@ abstract class CommonDBRelation extends CommonDBConnexity {
       $iterator = $DB->request($params);
 
       return $iterator;
-   }
-
-   /**
-    * Count for item
-    *
-    * @param CommonDBTM $item CommonDBTM object
-    *
-    * @return integer
-    */
-   static function countForItem(CommonDBTM $item) {
-      global $DB;
-
-      $params = static::getListForItemParams($item);
-      unset($params['SELECT']);
-      $params['COUNT'] = 'cpt';
-      $iterator = $DB->request($params);
-
-      $cpt = 0;
-      while ($row = $iterator->next()) {
-         $cpt += $row['cpt'];
-      }
-
-      return $cpt;
    }
 
    /**

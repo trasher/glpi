@@ -1177,18 +1177,6 @@ class NetworkPort extends CommonDBChild {
    }
 
 
-   /**
-    * @param CommonDBTM $item
-   **/
-   static function countForItem(CommonDBTM $item) {
-
-      return countElementsInTable('glpi_networkports',
-                                  ['itemtype'   => $item->getType(),
-                                   'items_id'   => $item->getField('id'),
-                                   'is_deleted' => 0 ]);
-   }
-
-
    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
       global $CFG_GLPI;
 

@@ -852,4 +852,35 @@ abstract class CommonDBChild extends CommonDBConnexity {
 
       return $this->update($input);
    }
+
+   /**
+    * Get linked items list for specified item
+    *
+    * @since 9.3.1
+    *
+    * @param CommonDBTM $item  Item instance
+    * @param boolean    $noent Flag to not compute entity informations
+    *
+    * @return array
+    */
+   protected static function getListForItemParams(CommonDBTM $item, $noent = false) {
+      global $DB;
+
+      $params = [
+         'FROM'   => static::getTable()
+      ];
+      if (static::$itemtype == 'itemtype') {
+         $params['WHERE']  = [
+            'itemtype'  => $item->getType(),
+            'items_id'  => $item->fields['id'],
+            //'is_deleted' => 0
+         ];
+      } else {
+         $params['WHERE'] = [
+            static::$items_id => $item->fields['id']
+         ];
+      }
+
+      return $params;
+   }
 }

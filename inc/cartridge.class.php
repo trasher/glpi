@@ -1200,36 +1200,19 @@ class Cartridge extends CommonDBChild {
 
       if (!$withtemplate && self::canView()) {
          $nb = 0;
+         if ($_SESSION['glpishow_count_on_tabs']) {
+            $nb = self::countForItem($item);
+         }
+
          switch ($item->getType()) {
             case 'Printer' :
-               if ($_SESSION['glpishow_count_on_tabs']) {
-                  $nb = self::countForPrinter($item);
-               }
                return self::createTabEntry(self::getTypeName(Session::getPluralNumber()), $nb);
 
             case 'CartridgeItem' :
-               if ($_SESSION['glpishow_count_on_tabs']) {
-                  $nb = self::countForCartridgeItem($item);
-               }
                return self::createTabEntry(self::getTypeName(Session::getPluralNumber()), $nb);
          }
       }
       return '';
-   }
-
-
-   static function countForCartridgeItem(CartridgeItem $item) {
-
-      return countElementsInTable(['glpi_cartridges'], ['glpi_cartridges.cartridgeitems_id' => $item->getField('id')]);
-   }
-
-
-   /**
-    * @param $item Printer object
-   **/
-   static function countForPrinter(Printer $item) {
-
-      return countElementsInTable(['glpi_cartridges'], ['glpi_cartridges.printers_id' => $item->getField('id')]);
    }
 
 
@@ -1254,4 +1237,26 @@ class Cartridge extends CommonDBChild {
       return $ci->getRights($interface);
    }
 
+   /**
+    * Get linked items list for specified item
+    *
+    * @since 9.3.1
+    *
+    * @param CommonDBTM $item  Item instance
+    * @param boolean    $noent Flag to not compute entity informations
+    *
+    * @return array
+    */
+   protected static function getListForItemParams(CommonDBTM $item, $noent = false) {
+      global $DB;
+      $params = parent::getListForItemParams($item, $noent);
+
+      if ($item->getType() == 'Printer') {
+         $params['WHERE'] = [
+            'printers_id'  => $item->fields['id'],
+         ];
+      }
+
+      return $params;
+   }
 }

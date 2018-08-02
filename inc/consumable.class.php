@@ -729,21 +729,12 @@ class Consumable extends CommonDBChild {
          switch ($item->getType()) {
             case 'ConsumableItem' :
                if ($_SESSION['glpishow_count_on_tabs']) {
-                  $nb =  self::countForConsumableItem($item);
+                  $nb =  self::countForItem($item);
                }
                return self::createTabEntry(self::getTypeName(Session::getPluralNumber()), $nb);
          }
       }
       return '';
-   }
-
-
-   /**
-    * @param $item   string  ConsumableItem object
-   **/
-   static function countForConsumableItem(ConsumableItem $item) {
-
-      return countElementsInTable(['glpi_consumables'], ['glpi_consumables.consumableitems_id' => $item->getField('id')]);
    }
 
 

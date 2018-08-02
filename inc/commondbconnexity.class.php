@@ -734,4 +734,56 @@ abstract class CommonDBConnexity extends CommonDBTM {
       parent::processMassiveActionsForOneItemtype($ma, $item, $ids);
    }
 
+   /**
+    * Get linked items list for specified item
+    *
+    * @since 9.3.1
+    *
+    * @param CommonDBTM $item  Item instance
+    * @param boolean    $noent Flag to not compute entity informations
+    *
+    * @return array
+    */
+   abstract protected static function getListForItemParams(CommonDBTM $item, $noent = false);
+
+   /**
+    * Get linked items list for specified item
+    *
+    * @since 9.3.1
+    *
+    * @param CommonDBTM $item Item instance
+    *
+    * @return DBmysqlIterator
+    */
+   public static function getListForItem(CommonDBTM $item) {
+      global $DB;
+
+      $params = static::getListForItemParams($item);
+      $iterator = $DB->request($params);
+
+      return $iterator;
+   }
+
+   /**
+    * Count for item
+    *
+    * @param CommonDBTM $item CommonDBTM object
+    *
+    * @return integer
+    */
+   static function countForItem(CommonDBTM $item) {
+      global $DB;
+
+      $params = static::getListForItemParams($item);
+      unset($params['SELECT']);
+      $params['COUNT'] = 'cpt';
+      $iterator = $DB->request($params);
+
+      $cpt = 0;
+      while ($row = $iterator->next()) {
+         $cpt += $row['cpt'];
+      }
+
+      return $cpt;
+   }
 }
