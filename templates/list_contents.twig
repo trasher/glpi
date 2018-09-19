@@ -77,17 +77,10 @@
       <div class="box-body">
          <form class="form-horizontal" id="search_form" action="{{ path_for('list', {'itemtype': search_data.itemtype }) }}">
 {% if form_header %}
+            <input type="hidden" name="rules" id="rules">
             <header id="search_criteria">
                <div class="box-body">
-   {% if old_search == false %}
                   <div id="query_builder"></div>
-   {% else %}
-                  <div class="legacy">
-                  {{ search_form|raw }}
-                  </div>
-   {% endif %}
-
-   {% if old_search == false %}
                   <div>
                      <button type="button" class="btn btn-default">
                         <a href="#" onclick="savesearch.dialog('open'); return false;" class="bookmark_record save" title="{{ __('Save current search') }}">
@@ -100,12 +93,11 @@
                            <span class="sr-only">{{ __('Blank') }}</span>
                         </a>
                      </button>
-                     <button type="submit" class="btn btn-primary">
+                     <button type="submit" class="btn btn-primary" id="searchlist">
                         <i class="fa fa-search"></i>
                         {{ __('Search') }}
                      </button>
                   </div>
-   {% endif %}
 {#<script type="text/javascript">
          $(function() {
             $('#loadbookmark').dialog({
@@ -377,6 +369,8 @@ var savesearch;$(function() {savesearch=$('<div />').dialog({
    {% endfor %}
                </tbody>
             </table>
+            {% include "elements/hidden.twig" with {'element': {'name': '_glpi_csrf_token', 'value': call_static('Session', 'getNewCSRFToken')}} %}
+
          </form>
       </div> <!-- /.box-body -->
       <div class="box-footer">

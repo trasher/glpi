@@ -499,6 +499,40 @@ permit_select_parent	0
          }
       }, _select2_common);
 
+      var _setSelect2AjaxValue = function(elt, value, url) {
+         $.ajax(url, {
+            data: {
+               '_one_id': value,
+               'display_emptychoice': false
+            },
+            'dataType': 'json',
+            'type': 'POST',
+         }).done(function(data) {
+            var iterate_options = function(options, value) {
+               var to_return = false;
+               $.each(options, function(index, option) {
+                  if (option.hasOwnProperty('id')
+                        && option.id == value) {
+                     to_return = option;
+                     return false; // act as break;
+                  }
+
+                  if (option.hasOwnProperty('children')) {
+                     to_return = iterate_options(option.children, value);
+                  }
+               });
+
+               return to_return;
+            };
+
+            var option = iterate_options(data.results, value);
+            if (option !== false) {
+               var newOption = new Option(option.text, option.id, true, true);
+               $(elt).append(newOption).trigger('change');
+            }
+         })
+      };
+
       var _bindSimpleSelect = function(elt) {
           $(elt).select2(
             Object.assign({

@@ -1,4 +1,60 @@
 .query-builder .rules-group-container {
-   background: none;
+   background: rgba(0, 0, 0, .05);
+   border: 1px dotted rgba(0, 0, 0, .1);
+}
+
+.query-builder .rule-container {
    border: none;
+   margin: 1px;
+   background: none;
+}
+
+.query-builder .rule-container:hover {
+   background: rgba(0, 0, 0, .05);
+}
+
+.query-builder .rule-value-container {
+   border-left: none;
+}
+
+.query-builder .btn-success {
+   background-color: rgba(0, 0, 0, .1);
+   border-color: transparent;
+   color: rgba(0, 0, 0, .5);
+}
+.query-builder .btn-success:hover,
+.query-builder .btn-success:active,
+.query-builder .btn-success:focus,
+.query-builder .btn-success.hover {
+   background-color: rgba(0, 0, 0, .1);
+   border-color: rgba(0, 0, 0, .5);
+}
+.query-builder .btn-danger {
+   background-color: rgba(185, 34, 34, 0.5);
+   border-color: transparent;
+}
+.query-builder .btn-danger:hover,
+.query-builder .btn-danger:active,
+.query-builder .btn-danger:focus,
+.query-builder .btn-danger.hover {
+   background-color: rgba(185, 34, 34, 0.1);
+   color: rgba(185, 34, 34, 0.5);
+}
+
+.query-builder .error-container,
+.query-builder .rule-container .rule-filter-container,
+.query-builder .rule-container .rule-operator-container,
+.query-builder .rule-container .rule-value-container {
+   margin: 0;
+   padding: 0;
+}
+
+/*.query-builder .btn-primary {
+   background-color: #f4f4f4;
+   color: #444;
+   border-color: #ddd;
+}*/
+
+.query-builder .rules-list>:first-child::before {
+   top: -10px;
 }

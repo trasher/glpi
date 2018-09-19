@@ -696,7 +696,7 @@ if (!file_exists(GLPI_CONFIG_DIR . "/config_db.php")) {
       );
    })->setName('knowbase');
 
-   $app->get('/{itemtype}/list[/page/{page:\d+}[/{reset:reset}]]', function ($request, $response, $args) {
+   $app->map(['GET', 'POST'], '/{itemtype}/list[/page/{page:\d+}[/{reset:reset}]]', function ($request, $response, $args) {
       $item = new $args['itemtype']();
       $params = $request->getQueryParams() + $args;
       if (isset($args['reset'])) {
@@ -711,43 +711,112 @@ if (!file_exists(GLPI_CONFIG_DIR . "/config_db.php")) {
       if (isset($args['page'])) {
          $search->setPage((int)$args['page']);
       }
+
+      // retrieve rules from submited form and manage default values if they don't exist
+      $raw_rules = $request->getParam("rules");
+      if ($raw_rules === null) {
+         $raw_rules = "[]";
+      }
+      $rules = json_decode($raw_rules, true);
+
+      if (count($rules) <= 0) {
+         $raw_rules = json_encode([[
+            'id'       => 'view',
+            'operator' => "contains",
+            'value'    => '',
+         ]]);
+      }
+
+      // transform query builder rules into GLPI Search engine criteria
+      $search_params = Search::getSearchParamsFromQueryBuilder($rules);
+
+      // search data
+      $params = Search::manageParams($item->getType(), $search_params);
       $data = $search->getData();
 
-      //legacy
-      $params = Search::manageParams($item->getType(), $_GET);
+      // construct filters array for query builder based on searchoptions
+      $search_options = Search::getCleanedOptions($item->getType());
+      $query_builder_filters = [[
+         'id'          => 'view',
+         'label'       => __('Items seen' ),
+         'type'        => 'string',
+         'description' => __('Search on currently displayed columns'),
+         'operators'   => ['contains', 'not_contains',
+                           'begins_with', 'not_begins_with',
+                           'ends_with', 'not_ends_with'],
+      ]];
+      $_operators = [
+         'equal',
+         'not_equal',
+         'in',
+         'not_in',
+         'less',
+         'less_or_equal',
+         'greater',
+         'greater_or_equal',
+         //'between',
+         //'not_between',
+         'begins_with',
+         'not_begins_with',
+         'contains',
+         'not_contains',
+         'ends_with',
+         'not_ends_with',
+         'is_empty',
+         'is_not_empty',
+         'is_null',
+         'is_not_null'
+      ];
+      $last_groupname = "";
+      $router = $this->get('router');
+      foreach ($search_options as $so_key => $so) {
+         if (!is_iterable($so)) {
+            $last_groupname = $so;
+            continue;
+         } else if (!isset($so['table'])) {
+            $last_groupname = $so['name'];
+            continue;
+         }
 
-      ob_start();
-      Search::showGenericSearch($item->getType(), $params);
-      $search_form = ob_get_contents();
-      ob_end_clean();
-      $search_form = preg_replace(
-         '/<\/?form[^>]*?>/',
-         '',
-         $search_form
-      );
+         $input = "text";
+         $add_opts = [];
+         if (isset($so['datatype'])
+             && $so['datatype'] == 'dropdown') {
+            $input = "select";
 
-      /*ob_start();
-      if ($params['as_map'] == 1) {
-         Search::showMap($item->getType(), $params, $data);
-      } else {
-         Search::showList($item->getType(), $params, $data);
+            $add_opts = [
+               'plugin'           => 'select2',
+               '_glpi_url'        => $router->pathFor('dropdown-getvalue', [
+                  'itemtype' => getItemTypeForTable($so['table'])
+               ]),
+               'default_operator' => "equal",
+            ];
+         }
+
+         $filter = $add_opts + [
+            'id'               => $so_key,
+            'type'             => 'string',
+            'label'            => $so['name'],
+            'input'            => $input,
+            'default_operator' => "contains",
+            'optgroup'         => $last_groupname,
+            'field'            => $so['table'].".".$so['field'],
+         ];
+         $query_builder_filters[] = $filter;
       }
-      $contents = ob_get_contents();
-      ob_end_clean();*/
-      //end legacy
 
-      $get = $request->getQueryParams();
-
-      //var_dump(Search::getCleanedOptions($item->getType()));
+      // render the view
       return $this->view->render(
          $response,
          'list.twig', [
             'page_title'      => $item->getTypeName(Session::getPluralNumber()),
             'search_data'     => $data,
-            'search_form'     => $search_form,
             'item'            => $item,
-            'old_search'      => isset($get['querybuilder']) ? false : true,
-            'search_options'  => Search::getCleanedOptions($item->getType())
+            'old_search'      => false,
+            'operators'       => json_encode($_operators),
+            'search_options'  => $search_options,
+            'filters'         => $query_builder_filters,
+            'rules'           => $raw_rules,
          ]
       );
    })->setName('list');

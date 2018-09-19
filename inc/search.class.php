@@ -770,128 +770,8 @@ class Search {
       // Add search conditions
       // If there is search items
       if (count($data['search']['criteria'])) {
-         foreach ($data['search']['criteria'] as $key => $criteria) {
-            // if real search (strlen >0) and not all and view search
-            if (isset($criteria['value']) && (strlen($criteria['value']) > 0)) {
-               // common search
-               if (isset($criteria['field']) && ($criteria['field'] != "all") && ($criteria['field'] != "view")) {
-                  $LINK    = " ";
-                  $NOT     = 0;
-                  $tmplink = "";
-                  if (isset($criteria['link']) && in_array($criteria['link'], array_keys(self::getLogicalOperators()))) {
-                     if (strstr($criteria['link'], "NOT")) {
-                        $tmplink = " ".str_replace(" NOT", "", $criteria['link']);
-                        $NOT     = 1;
-                     } else {
-                        $tmplink = " ".$criteria['link'];
-                     }
-                  } else {
-                     $tmplink = " AND ";
-                  }
-
-                  if (isset($searchopt[$criteria['field']]["usehaving"])) {
-                     // Manage Link if not first item
-                     if (!empty($HAVING)) {
-                        $LINK = $tmplink;
-                     }
-                     // Find key
-                     $item_num = array_search($criteria['field'], $data['tocompute']);
-                     $new_having = self::addHaving($LINK, $NOT, $data['itemtype'],
-                                                    $criteria['field'], $criteria['searchtype'],
-                                                    $criteria['value'], 0, $item_num);
-                     if ($new_having !== false) {
-                        $HAVING .= $new_having;
-                     }
-                  } else {
-                     // Manage Link if not first item
-                     if (!empty($WHERE)) {
-                        $LINK = $tmplink;
-                     }
-
-                     $new_where = self::addWhere($LINK, $NOT, $data['itemtype'], $criteria['field'],
-                                                 $criteria['searchtype'], $criteria['value']);
-
-                     if ($new_where !== false) {
-                        $WHERE .= $new_where;
-                     }
-                  }
-
-               } else { // view and all search
-                  $LINK       = " OR ";
-                  $NOT        = 0;
-                  $globallink = " AND ";
-
-                  if (isset($criteria['link'])) {
-                     switch ($criteria['link']) {
-                        case "AND" :
-                           $LINK       = " OR ";
-                           $globallink = " AND ";
-                           break;
-
-                        case "AND NOT" :
-                           $LINK       = " AND ";
-                           $NOT        = 1;
-                           $globallink = " AND ";
-                           break;
-
-                        case "OR" :
-                           $LINK       = " OR ";
-                           $globallink = " OR ";
-                           break;
-
-                        case "OR NOT" :
-                           $LINK       = " AND ";
-                           $NOT        = 1;
-                           $globallink = " OR ";
-                           break;
-                     }
-
-                  } else {
-                     $tmplink =" AND ";
-                  }
-
-                  // Manage Link if not first item
-                  if (!empty($WHERE)) {
-                     $WHERE .= $globallink;
-                  }
-                  $WHERE .= " ( ";
-                  $first2 = true;
-
-                  $items = [];
-
-                  if (isset($criteria['field']) && $criteria['field'] == "all") {
-                     $items = $searchopt;
-
-                  } else { // toview case : populate toview
-                     foreach ($data['toview'] as $key2 => $val2) {
-                        $items[$val2] = $searchopt[$val2];
-                     }
-                  }
-
-                  foreach ($items as $key2 => $val2) {
-                     if (isset($val2['nosearch']) && $val2['nosearch']) {
-                        continue;
-                     }
-                     if (is_array($val2)) {
-                        // Add Where clause if not to be done in HAVING CLAUSE
-                        if (!isset($val2["usehaving"])) {
-                           $tmplink = $LINK;
-                           if ($first2) {
-                              $tmplink = " ";
-                           }
-                           $new_where = self::addWhere($tmplink, $NOT, $data['itemtype'], $key2,
-                                                       $criteria['searchtype'], $criteria['value']);
-                           if ($new_where !== false) {
-                              $first2  = false;
-                              $WHERE .=  $new_where;
-                           }
-                        }
-                     }
-                  }
-                  $WHERE .= " ) ";
-               }
-            }
-         }
+         $WHERE = self::constructCriteriaSQL($data['search']['criteria'], $data);
+         $HAVING = self::constructCriteriaSQL($data['search']['criteria'], $data, true);
       }
 
       //// 4 - ORDER
@@ -1210,6 +1090,141 @@ class Search {
                   $LIMIT;
       }
       $data['sql']['search'] = $QUERY;
+   }
+
+   static function constructCriteriaSQL($criteria = [], $data, $is_having = false) {
+      $sql = "";
+
+      foreach ($criteria as $criterion) {
+         // common search
+         if (!isset($criterion['field'])
+               || $criterion['field'] != "all"
+               || $criterion['field'] != "view") {
+            $LINK    = " ";
+            $NOT     = 0;
+            $tmplink = "";
+            if (isset($criterion['link'])
+                  && in_array($criterion['link'], array_keys(self::getLogicalOperators()))) {
+               if (strstr($criterion['link'], "NOT")) {
+                  $tmplink = " ".str_replace(" NOT", "", $criterion['link']);
+                  $NOT     = 1;
+               } else {
+                  $tmplink = " ".$criterion['link'];
+               }
+            } else {
+               $tmplink = " AND ";
+            }
+
+            if (isset($criterion['criteria']) && count($criterion['criteria'])) {
+               $sub_sql = self::constructCriteriaSQL($criterion['criteria'], $data, $is_having);
+               if (strlen($sub_sql)) {
+                  $sql .= "$tmplink ($sub_sql)";
+               }
+            } else if ($is_having
+                  && isset($searchopt[$criterion['field']]["usehaving"])) {
+               // Manage Link if not first item
+               if (!empty($sql)) {
+                  $LINK = $tmplink;
+               }
+               // Find key
+               $item_num = array_search($criterion['field'], $data['tocompute']);
+               $new_having = self::addHaving($LINK, $NOT, $data['itemtype'],
+                                                $criterion['field'], $criterion['searchtype'],
+                                                $criterion['value'], 0, $item_num);
+               if ($new_having !== false) {
+                  $sql .= $new_having;
+               }
+            } else if (!$is_having) {
+               // Manage Link if not first item
+               if (!empty($sql)) {
+                  $LINK = $tmplink;
+               }
+
+               $new_where = self::addWhere($LINK, $NOT, $data['itemtype'], $criterion['field'],
+                                             $criterion['searchtype'], $criterion['value']);
+
+               if ($new_where !== false) {
+                  $sql .= $new_where;
+               }
+            }
+
+         } else { // view and all search
+            $LINK       = " OR ";
+            $NOT        = 0;
+            $globallink = " AND ";
+
+            if (isset($criterion['link'])) {
+               switch ($criterion['link']) {
+                  case "AND" :
+                     $LINK       = " OR ";
+                     $globallink = " AND ";
+                     break;
+
+                  case "AND NOT" :
+                     $LINK       = " AND ";
+                     $NOT        = 1;
+                     $globallink = " AND ";
+                     break;
+
+                  case "OR" :
+                     $LINK       = " OR ";
+                     $globallink = " OR ";
+                     break;
+
+                  case "OR NOT" :
+                     $LINK       = " AND ";
+                     $NOT        = 1;
+                     $globallink = " OR ";
+                     break;
+               }
+
+            } else {
+               $tmplink =" AND ";
+            }
+
+            // Manage Link if not first item
+            if (!empty($sql)) {
+               $sql .= $globallink;
+            }
+            $sql .= " ( ";
+            $first2 = true;
+
+            $items = [];
+
+            if (isset($criterion['field']) && $criterion['field'] == "all") {
+               $items = $searchopt;
+
+            } else { // toview case : populate toview
+               foreach ($data['toview'] as $key2 => $val2) {
+                  $items[$val2] = $searchopt[$val2];
+               }
+            }
+
+            foreach ($items as $key2 => $val2) {
+               if (isset($val2['nosearch']) && $val2['nosearch']) {
+                  continue;
+               }
+               if (is_array($val2)) {
+                  // Add Where clause if not to be done in HAVING CLAUSE
+                  if (!isset($val2["usehaving"])) {
+                     $tmplink = $LINK;
+                     if ($first2) {
+                        $tmplink = " ";
+                     }
+                     $new_where = self::addWhere($tmplink, $NOT, $data['itemtype'], $key2,
+                                                   $criterion['searchtype'], $criterion['value']);
+                     if ($new_where !== false) {
+                        $first2  = false;
+                        $sql .=  $new_where;
+                     }
+                  }
+               }
+            }
+            $sql .= " ) ";
+         }
+      }
+
+      return $sql;
    }
 
 
@@ -1998,6 +2013,7 @@ class Search {
                   $valuename = $criteria['value'];
                }
                switch ($criteria['searchtype']) {
+                  case "equal" :
                   case "equals" :
                      if (in_array($searchopt[$criteria['field']]["field"],
                                   ['name', 'completename'])) {
@@ -2007,6 +2023,7 @@ class Search {
                      }
                      break;
 
+                  case "not_equal" :
                   case "notequals" :
                      if (in_array($searchopt[$criteria['field']]["field"],
                                     ['name', 'completename'])) {
@@ -2016,24 +2033,29 @@ class Search {
                      }
                      break;
 
+                  case "less" :
                   case "lessthan" :
                      $titlecontain = sprintf(__('%1$s < %2$s'), $titlecontain, $valuename);
                      break;
 
+                  case "greater" :
                   case "morethan" :
                      $titlecontain = sprintf(__('%1$s > %2$s'), $titlecontain, $valuename);
                      break;
 
+                  case "contain" :
                   case "contains" :
                      $titlecontain = sprintf(__('%1$s = %2$s'), $titlecontain,
                                              '%'.$valuename.'%');
                      break;
 
+                  case "in" :
                   case "under" :
                      $titlecontain = sprintf(__('%1$s %2$s'), $titlecontain,
                                              sprintf(__('%1$s %2$s'), __('under'), $gdname));
                      break;
 
+                  case "not_in" :
                   case "notunder" :
                      $titlecontain = sprintf(__('%1$s %2$s'), $titlecontain,
                                              sprintf(__('%1$s %2$s'), __('not under'), $gdname));
@@ -3293,6 +3315,11 @@ class Search {
             $SEARCH = self::makeTextSearch($val, $nott);
             break;
 
+         case "not_contains" :
+            $SEARCH = self::makeTextSearch($val, !$nott);
+            break;
+
+         case "equal" :
          case "equals" :
             if ($nott) {
                $SEARCH = " <> '$val'";
@@ -3301,6 +3328,7 @@ class Search {
             }
             break;
 
+         case "not_equal" :
          case "notequals" :
             if ($nott) {
                $SEARCH = " = '$val'";
@@ -3309,6 +3337,7 @@ class Search {
             }
             break;
 
+         case "in" :
          case "under" :
             if ($nott) {
                $SEARCH = " NOT IN ('".implode("','", getSonsOf($inittable, $val))."')";
@@ -3317,11 +3346,108 @@ class Search {
             }
             break;
 
+         case "not_in" :
          case "notunder" :
             if ($nott) {
                $SEARCH = " IN ('".implode("','", getSonsOf($inittable, $val))."')";
             } else {
                $SEARCH = " NOT IN ('".implode("','", getSonsOf($inittable, $val))."')";
+            }
+            break;
+
+         case "begins_with" :
+            if ($nott) {
+               $SEARCH = " LIKE '$val%'";
+            } else {
+               $SEARCH = " NOT LIKE '$val%'";
+            }
+            break;
+
+         case "not_begins_with" :
+            if ($nott) {
+               $SEARCH = " NOT LIKE '$val%'";
+            } else {
+               $SEARCH = " LIKE '$val%'";
+            }
+            break;
+
+         case "ends_with" :
+            if ($nott) {
+               $SEARCH = " LIKE '%$val'";
+            } else {
+               $SEARCH = " NOT LIKE '%$val'";
+            }
+            break;
+
+         case "not_ends_with" :
+            if ($nott) {
+               $SEARCH = " NOT LIKE '%$val'";
+            } else {
+               $SEARCH = " LIKE '%$val'";
+            }
+            break;
+
+         case "less" :
+            if ($nott) {
+               $SEARCH = ">= $val";
+            } else {
+               $SEARCH = "< $val";
+            }
+            break;
+
+         case "less_or_equal" :
+            if ($nott) {
+               $SEARCH = "> $val";
+            } else {
+               $SEARCH = "<= $val";
+            }
+            break;
+
+         case "greater" :
+            if ($nott) {
+               $SEARCH = "<= $val";
+            } else {
+               $SEARCH = "> $val";
+            }
+            break;
+
+         case "greater_or_equal" :
+            if ($nott) {
+               $SEARCH = "< $val";
+            } else {
+               $SEARCH = ">= $val";
+            }
+            break;
+
+         case "is_null" :
+            if ($nott) {
+               $SEARCH = "IS NOT NULL";
+            } else {
+               $SEARCH = "IS NULL";
+            }
+            break;
+
+         case "is_not_null" :
+            if ($nott) {
+               $SEARCH = "IS NULL";
+            } else {
+               $SEARCH = "IS NOT NULL";
+            }
+            break;
+
+         case "is_empty" :
+            if ($nott) {
+               $SEARCH = " = ''";
+            } else {
+               $SEARCH = " <> ''";
+            }
+            break;
+
+         case "is_not_empty" :
+            if ($nott) {
+               $SEARCH = " <> ''";
+            } else {
+               $SEARCH = " = ''";
             }
             break;
 
@@ -3411,14 +3537,17 @@ class Search {
          case "glpi_groups.completename" :
             if ($val == 'mygroups') {
                switch ($searchtype) {
+                  case 'equal' :
                   case 'equals' :
                      return " $link (`$table`.`id` IN ('".implode("','",
                                                                   $_SESSION['glpigroups'])."')) ";
 
+                  case 'not_equal' :
                   case 'notequals' :
                      return " $link (`$table`.`id` NOT IN ('".implode("','",
                                                                       $_SESSION['glpigroups'])."')) ";
 
+                  case 'in' :
                   case 'under' :
                      $groups = $_SESSION['glpigroups'];
                      foreach ($_SESSION['glpigroups'] as $g) {
@@ -3427,6 +3556,7 @@ class Search {
                      $groups = array_unique($groups);
                      return " $link (`$table`.`id` IN ('".implode("','", $groups)."')) ";
 
+                  case 'not_in' :
                   case 'notunder' :
                      $groups = $_SESSION['glpigroups'];
                      foreach ($_SESSION['glpigroups'] as $g) {
@@ -3622,7 +3752,10 @@ class Search {
                break;
 
             case "itemlink" :
-               if (in_array($searchtype, ['equals', 'notequals', 'under', 'notunder'])) {
+               if (in_array($searchtype, ['equals', 'notequals',
+                                          'equal', 'not_Equal',
+                                          'under', 'notunder',
+                                          'in', 'not_in'])) {
                   return " $link (`$table`.`id`".$SEARCH.') ';
                }
                break;
@@ -3632,7 +3765,7 @@ class Search {
             case "date_delay" :
                if ($searchopt[$ID]["datatype"] == 'datetime') {
                   // Specific search for datetime
-                  if (in_array($searchtype, ['equals', 'notequals'])) {
+                  if (in_array($searchtype, ['equals', 'equal', 'notequals', 'not_equal'])) {
                      $val = preg_replace("/:00$/", '', $val);
                      $val = '^'.$val;
                      if ($searchtype == 'notequals') {
@@ -3770,7 +3903,10 @@ class Search {
       }
 
       // Default case
-      if (in_array($searchtype, ['equals', 'notequals','under', 'notunder'])) {
+      if (in_array($searchtype, ['equals', 'equal',
+                                 'notequals', 'not_equal',
+                                 'under', 'in',
+                                 'notunder', 'not_in'])) {
 
          if ((!isset($searchopt[$ID]['searchequalsonfield'])
               || !$searchopt[$ID]['searchequalsonfield'])
@@ -6813,5 +6949,47 @@ class Search {
    public function setPage($page) {
       $this->current_page = $page;
       return $this;
+   }
+
+   public static function getSearchParamsFromQueryBuilder($rules = []) {
+      return [
+         'start'        => 0,
+         'order'        => 'ASC',
+         'sort'         => 1,
+         'is_deleted'   => 0,
+         'as_map'       => 0,
+         'criteria'     => self::parseRuleNode($rules),
+         'metacriteria' => [],
+      ];
+   }
+
+   public static function parseRuleNode($rules = [], $link = "AND") {
+      $criteria = [];
+      if (isset($rules['condition'])) {
+         $link = $rules['condition'];
+      }
+      if (isset($rules['not'])
+          && $rules['not']) {
+         $link = "$link NOT";
+      }
+
+      foreach ($rules['rules'] as $current_rule) {
+         $criterion = [
+            "link" => $link,
+         ];
+
+         if (isset($current_rule['rules'])) {
+            $criterion['criteria'] = self::parseRuleNode($current_rule, $link);
+         } else {
+            $criterion += [
+               "field"      => $current_rule['id'],
+               "searchtype" => $current_rule['operator'],
+               "value"      => $current_rule['value'],
+            ];
+         }
+         $criteria[] = $criterion;
+      }
+
+      return $criteria;
    }
 }
