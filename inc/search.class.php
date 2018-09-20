@@ -689,6 +689,7 @@ class Search {
       $COMMONLEFTJOIN = self::addDefaultJoin($data['itemtype'], $itemtable, $already_link_tables);
 
       $itemtype = $data['itemtype'];
+      $COMMONSUBLEFTJOIN = '';
       if ($sub_item !== false && method_exists($sub_item['sub_item'], 'addSubDefaultJoin') && $sub_item['sub_item']->getType() !== $itemtype) {
          $sub = $sub_item['sub_item'];
          $COMMONSUBLEFTJOIN = $sub::addSubDefaultJoin($sub_item['item']);
@@ -7016,21 +7017,23 @@ class Search {
          $link = "$link NOT";
       }
 
-      foreach ($rules['rules'] as $current_rule) {
-         $criterion = [
-            "link" => $link,
-         ];
-
-         if (isset($current_rule['rules'])) {
-            $criterion['criteria'] = self::parseRuleNode($current_rule, $link);
-         } else {
-            $criterion += [
-               "field"      => $current_rule['id'],
-               "searchtype" => $current_rule['operator'],
-               "value"      => $current_rule['value'],
+      if (isset($rules['rules'])) {
+         foreach ($rules['rules'] as $current_rule) {
+            $criterion = [
+               "link" => $link,
             ];
+
+            if (isset($current_rule['rules'])) {
+               $criterion['criteria'] = self::parseRuleNode($current_rule, $link);
+            } else {
+               $criterion += [
+                  "field"      => $current_rule['id'],
+                  "searchtype" => $current_rule['operator'],
+                  "value"      => $current_rule['value'],
+               ];
+            }
+            $criteria[] = $criterion;
          }
-         $criteria[] = $criterion;
       }
 
       return $criteria;
