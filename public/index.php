@@ -974,7 +974,6 @@ if (!file_exists(GLPI_CONFIG_DIR . "/config_db.php")) {
                      'item'      => $item,
                      'sub_item'  => $sub_item
                   ]);
-                  echo $data['sql']['search'];
 
                   return $this->view->render(
                      $response,
