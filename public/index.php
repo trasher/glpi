@@ -889,13 +889,6 @@ if (!file_exists(GLPI_CONFIG_DIR . "/config_db.php")) {
 
    $app->get('/ajax/tab/{itemtype}/{id:\d+}/{tab}', function ($request, $response, $args) {
       $get = $request->getQueryParams();
-      /*if (!isset($_GET["sort"])) {
-         $_GET["sort"] = "";
-      }
-
-      if (!isset($_GET["order"])) {
-         $_GET["order"] = "";
-      }*/
 
       if (!isset($get["withtemplate"])) {
          $get["withtemplate"] = "";
@@ -938,16 +931,7 @@ if (!file_exists(GLPI_CONFIG_DIR . "/config_db.php")) {
          switch ($sub_item_display) {
             case CommonGLPI::SUBITEM_SHOW_LIST:
                if ($sub_item instanceof CommonDBRelation) {
-                  //$item = new $args['itemtype']();
                   $params = $request->getQueryParams() + $args;
-                  /*if (isset($args['reset'])) {
-                     $params = $args;
-                     unset($params['reset']);
-                     $this->flash->addMessage('info', __('Search params has been reset'));
-                  }*/
-                  /*if (isset($args['page'])) {
-                     $params['start'] = ($args['page'] - 1) * $_SESSION['glpilist_limit'];
-                  }*/
 
                   if ($item->getType() == $sub_item::$itemtype_1) {
                      $link_type = $sub_item::$itemtype_2;
@@ -957,21 +941,6 @@ if (!file_exists(GLPI_CONFIG_DIR . "/config_db.php")) {
                      $link_type = ($sub_item::$itemtype_1 != 'itemtype' ? $sub_item::$itemtype_1 : $sub_item::$itemtype_2);
                   }
 
-                  /*$inverse = $item->getType() == $sub_item::$itemtype_1;
-                  $link_type  = $sub_item::$itemtype_1;
-                  if ($inverse === true) {
-                     $link_type  = $sub_item::$itemtype_2;
-                     if ($link_type == 'itemtype') {
-                        $link_type = $item->getType();
-                        if ($itemtype != null) {
-                           $link_type  = $itemtype;
-                        } else {
-                           $link_type = $item->getType();
-                        }
-                     }
-                  }*/
-
-                  $getparams = [];
                   if ($link_type != 'itemtype') {
                      $link = new $link_type;
                   } else {
@@ -986,14 +955,6 @@ if (!file_exists(GLPI_CONFIG_DIR . "/config_db.php")) {
                      'item'      => $item,
                      'sub_item'  => $sub_item
                   ]);
-
-                  $params = [];
-                  /*$params = $request->getQueryParams() + $args;
-                  if (isset($args['reset'])) {
-                     $params = $args;
-                     unset($params['reset']);
-                     $this->flash->addMessage('info', __('Search params has been reset'));
-                  }*/
 
                   return $this->view->render(
                      $response,
@@ -1056,12 +1017,6 @@ if (!file_exists(GLPI_CONFIG_DIR . "/config_db.php")) {
 
                $sub_item->getFromDBByCrit($getcrit);
 
-               /*if ($item instanceof CommonITILObject) {
-                  $tpl = 'itil_add_page';
-               }*/
-               /** FIXME: check if already exists to load right form.
-               $sub_item->getFromDBByCrit([
-               ]);*/
                if ($sub_item->isNewItem()) {
                   $params['glpi_form'] = $sub_item->getAddForm();
                } else {
