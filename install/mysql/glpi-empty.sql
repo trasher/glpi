@@ -1,36 +1,33 @@
-# /**
-#  * ---------------------------------------------------------------------
-#  * GLPI - Gestionnaire Libre de Parc Informatique
-#  * Copyright (C) 2015-2018 Teclib' and contributors.
-#  *
-#  * http://glpi-project.org
-#  *
-#  * based on GLPI - Gestionnaire Libre de Parc Informatique
-#  * Copyright (C) 2003-2014 by the INDEPNET Development Team.
-#  *
-#  * ---------------------------------------------------------------------
-#  *
-#  * LICENSE
-#  *
-#  * This file is part of GLPI.
-#  *
-#  * GLPI is free software; you can redistribute it and/or modify
-#  * it under the terms of the GNU General Public License as published by
-#  * the Free Software Foundation; either version 2 of the License, or
-#  * (at your option) any later version.
-#  *
-#  * GLPI is distributed in the hope that it will be useful,
-#  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  * GNU General Public License for more details.
-#  *
-#  * You should have received a copy of the GNU General Public License
-#  * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
-#  * ---------------------------------------------------------------------
-# */
-#GLPI Dump database on 2016-02-08 16:57
-
-### Dump table glpi_alerts
+/**
+ * ---------------------------------------------------------------------
+ * GLPI - Gestionnaire Libre de Parc Informatique
+ * Copyright (C) 2015-2018 Teclib' and contributors.
+ *
+ * http://glpi-project.org
+ *
+ * based on GLPI - Gestionnaire Libre de Parc Informatique
+ * Copyright (C) 2003-2014 by the INDEPNET Development Team.
+ *
+ * ---------------------------------------------------------------------
+ *
+ * LICENSE
+ *
+ * This file is part of GLPI.
+ *
+ * GLPI is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * GLPI is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ * ---------------------------------------------------------------------
+*/
 
 DROP TABLE IF EXISTS `glpi_alerts`;
 CREATE TABLE `glpi_alerts` (
@@ -46,8 +43,6 @@ CREATE TABLE `glpi_alerts` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_authldapreplicates
-
 DROP TABLE IF EXISTS `glpi_authldapreplicates`;
 CREATE TABLE `glpi_authldapreplicates` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -59,8 +54,6 @@ CREATE TABLE `glpi_authldapreplicates` (
   KEY `authldaps_id` (`authldaps_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_authldaps
 
 DROP TABLE IF EXISTS `glpi_authldaps`;
 CREATE TABLE `glpi_authldaps` (
@@ -118,8 +111,6 @@ CREATE TABLE `glpi_authldaps` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_authmails
-
 DROP TABLE IF EXISTS `glpi_authmails`;
 CREATE TABLE `glpi_authmails` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -133,8 +124,6 @@ CREATE TABLE `glpi_authmails` (
   KEY `date_mod` (`date_mod`),
   KEY `is_active` (`is_active`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-### Dump table glpi_apiclients
 
 DROP TABLE IF EXISTS `glpi_apiclients`;
 CREATE TABLE `glpi_apiclients` (
@@ -158,8 +147,6 @@ CREATE TABLE `glpi_apiclients` (
 INSERT INTO `glpi_apiclients` VALUES (1, 0, 1, 'full access from localhost', NULL, 1, INET_ATON('127.0.0.1'), INET_ATON('127.0.0.1'), '::1', '', NULL, 0, NULL);
 
 
-### Dump table glpi_autoupdatesystems
-
 DROP TABLE IF EXISTS `glpi_autoupdatesystems`;
 CREATE TABLE `glpi_autoupdatesystems` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -169,8 +156,6 @@ CREATE TABLE `glpi_autoupdatesystems` (
   KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_blacklistedmailcontents
 
 DROP TABLE IF EXISTS `glpi_blacklistedmailcontents`;
 CREATE TABLE `glpi_blacklistedmailcontents` (
@@ -185,8 +170,6 @@ CREATE TABLE `glpi_blacklistedmailcontents` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_blacklists
 
 DROP TABLE IF EXISTS `glpi_blacklists`;
 CREATE TABLE `glpi_blacklists` (
@@ -208,8 +191,6 @@ INSERT INTO `glpi_blacklists` VALUES ('1','1','empty IP','',NULL,NULL,NULL);
 INSERT INTO `glpi_blacklists` VALUES ('2','1','localhost','127.0.0.1',NULL,NULL,NULL);
 INSERT INTO `glpi_blacklists` VALUES ('3','1','zero IP','0.0.0.0',NULL,NULL,NULL);
 INSERT INTO `glpi_blacklists` VALUES ('4','2','empty MAC','',NULL,NULL,NULL);
-
-### Dump table glpi_savedsearches
 
 DROP TABLE IF EXISTS `glpi_savedsearches`;
 CREATE TABLE `glpi_savedsearches` (
@@ -240,8 +221,6 @@ CREATE TABLE `glpi_savedsearches` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_savedsearches_users
-
 DROP TABLE IF EXISTS `glpi_savedsearches_users`;
 CREATE TABLE `glpi_savedsearches_users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -253,8 +232,6 @@ CREATE TABLE `glpi_savedsearches_users` (
   KEY `savedsearches_id` (`savedsearches_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_savedsearches_alerts
 
 DROP TABLE IF EXISTS `glpi_savedsearches_alerts`;
 CREATE TABLE `glpi_savedsearches_alerts` (
@@ -274,8 +251,6 @@ CREATE TABLE `glpi_savedsearches_alerts` (
   UNIQUE KEY `unicity` (`savedsearches_id`,`operator`, `value`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_budgets
 
 DROP TABLE IF EXISTS `glpi_budgets`;
 CREATE TABLE `glpi_budgets` (
@@ -309,8 +284,6 @@ CREATE TABLE `glpi_budgets` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_budgettypes
-
 DROP TABLE IF EXISTS `glpi_budgettypes`;
 CREATE TABLE `glpi_budgettypes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -323,8 +296,6 @@ CREATE TABLE `glpi_budgettypes` (
   KEY `date_mod` (`date_mod`),
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-### Dump table glpi_businesscriticities
 
 DROP TABLE IF EXISTS `glpi_businesscriticities`;
 CREATE TABLE `glpi_businesscriticities` (
@@ -348,8 +319,6 @@ CREATE TABLE `glpi_businesscriticities` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_calendars
-
 DROP TABLE IF EXISTS `glpi_calendars`;
 CREATE TABLE `glpi_calendars` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -370,8 +339,6 @@ CREATE TABLE `glpi_calendars` (
 
 INSERT INTO `glpi_calendars` VALUES ('1','Default','0','1','Default calendar',NULL,'[0,43200,43200,43200,43200,43200,0]',NULL);
 
-### Dump table glpi_calendars_holidays
-
 DROP TABLE IF EXISTS `glpi_calendars_holidays`;
 CREATE TABLE `glpi_calendars_holidays` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -382,8 +349,6 @@ CREATE TABLE `glpi_calendars_holidays` (
   KEY `holidays_id` (`holidays_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_calendarsegments
 
 DROP TABLE IF EXISTS `glpi_calendarsegments`;
 CREATE TABLE `glpi_calendarsegments` (
@@ -404,8 +369,6 @@ INSERT INTO `glpi_calendarsegments` VALUES ('2','1','0','0','2','08:00:00','20:0
 INSERT INTO `glpi_calendarsegments` VALUES ('3','1','0','0','3','08:00:00','20:00:00');
 INSERT INTO `glpi_calendarsegments` VALUES ('4','1','0','0','4','08:00:00','20:00:00');
 INSERT INTO `glpi_calendarsegments` VALUES ('5','1','0','0','5','08:00:00','20:00:00');
-
-### Dump table glpi_cartridgeitems
 
 DROP TABLE IF EXISTS `glpi_cartridgeitems`;
 CREATE TABLE `glpi_cartridgeitems` (
@@ -439,8 +402,6 @@ CREATE TABLE `glpi_cartridgeitems` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_cartridgeitems_printermodels
-
 DROP TABLE IF EXISTS `glpi_cartridgeitems_printermodels`;
 CREATE TABLE `glpi_cartridgeitems_printermodels` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -451,8 +412,6 @@ CREATE TABLE `glpi_cartridgeitems_printermodels` (
   KEY `cartridgeitems_id` (`cartridgeitems_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_cartridgeitemtypes
 
 DROP TABLE IF EXISTS `glpi_cartridgeitemtypes`;
 CREATE TABLE `glpi_cartridgeitemtypes` (
@@ -467,8 +426,6 @@ CREATE TABLE `glpi_cartridgeitemtypes` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_cartridges
 
 DROP TABLE IF EXISTS `glpi_cartridges`;
 CREATE TABLE `glpi_cartridges` (
@@ -490,8 +447,6 @@ CREATE TABLE `glpi_cartridges` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_certificates
 
 DROP TABLE IF EXISTS `glpi_certificates`;
 CREATE TABLE `glpi_certificates` (
@@ -542,8 +497,6 @@ CREATE TABLE `glpi_certificates` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_certificates_items
-
 DROP TABLE IF EXISTS `glpi_certificates_items`;
 CREATE TABLE `glpi_certificates_items` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -560,8 +513,6 @@ CREATE TABLE `glpi_certificates_items` (
   KEY `date_mod` (`date_mod`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_certificatetypes
 
 DROP TABLE IF EXISTS `glpi_certificatetypes`;
 CREATE TABLE `glpi_certificatetypes` (
@@ -580,8 +531,6 @@ CREATE TABLE `glpi_certificatetypes` (
   KEY `date_mod` (`date_mod`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_changecosts
 
 DROP TABLE IF EXISTS `glpi_changecosts`;
 CREATE TABLE `glpi_changecosts` (
@@ -608,8 +557,6 @@ CREATE TABLE `glpi_changecosts` (
   KEY `budgets_id` (`budgets_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_changes
 
 DROP TABLE IF EXISTS `glpi_changes`;
 CREATE TABLE `glpi_changes` (
@@ -666,8 +613,6 @@ CREATE TABLE `glpi_changes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_changes_groups
-
 DROP TABLE IF EXISTS `glpi_changes_groups`;
 CREATE TABLE `glpi_changes_groups` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -679,8 +624,6 @@ CREATE TABLE `glpi_changes_groups` (
   KEY `group` (`groups_id`,`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_changes_items
 
 DROP TABLE IF EXISTS `glpi_changes_items`;
 CREATE TABLE `glpi_changes_items` (
@@ -694,8 +637,6 @@ CREATE TABLE `glpi_changes_items` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_changes_problems
-
 DROP TABLE IF EXISTS `glpi_changes_problems`;
 CREATE TABLE `glpi_changes_problems` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -706,8 +647,6 @@ CREATE TABLE `glpi_changes_problems` (
   KEY `problems_id` (`problems_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_changes_suppliers
 
 DROP TABLE IF EXISTS `glpi_changes_suppliers`;
 CREATE TABLE `glpi_changes_suppliers` (
@@ -723,8 +662,6 @@ CREATE TABLE `glpi_changes_suppliers` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_changes_tickets
-
 DROP TABLE IF EXISTS `glpi_changes_tickets`;
 CREATE TABLE `glpi_changes_tickets` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -735,8 +672,6 @@ CREATE TABLE `glpi_changes_tickets` (
   KEY `tickets_id` (`tickets_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_changes_users
 
 DROP TABLE IF EXISTS `glpi_changes_users`;
 CREATE TABLE `glpi_changes_users` (
@@ -751,8 +686,6 @@ CREATE TABLE `glpi_changes_users` (
   KEY `user` (`users_id`,`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_changetasks
 
 DROP TABLE IF EXISTS `glpi_changetasks`;
 CREATE TABLE `glpi_changetasks` (
@@ -789,8 +722,6 @@ CREATE TABLE `glpi_changetasks` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_changevalidations
-
 DROP TABLE IF EXISTS `glpi_changevalidations`;
 CREATE TABLE `glpi_changevalidations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -815,8 +746,6 @@ CREATE TABLE `glpi_changevalidations` (
   KEY `status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_computerantiviruses
 
 DROP TABLE IF EXISTS `glpi_computerantiviruses`;
 CREATE TABLE `glpi_computerantiviruses` (
@@ -847,8 +776,6 @@ CREATE TABLE `glpi_computerantiviruses` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_items_disks
 
 DROP TABLE IF EXISTS `glpi_items_disks`;
 CREATE TABLE `glpi_items_disks` (
@@ -884,8 +811,6 @@ CREATE TABLE `glpi_items_disks` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_computermodels
-
 DROP TABLE IF EXISTS `glpi_computermodels`;
 CREATE TABLE `glpi_computermodels` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -909,8 +834,6 @@ CREATE TABLE `glpi_computermodels` (
   KEY `product_number` (`product_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_computers
 
 DROP TABLE IF EXISTS `glpi_computers`;
 CREATE TABLE `glpi_computers` (
@@ -970,8 +893,6 @@ CREATE TABLE `glpi_computers` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_computers_items
-
 DROP TABLE IF EXISTS `glpi_computers_items`;
 CREATE TABLE `glpi_computers_items` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -988,8 +909,6 @@ CREATE TABLE `glpi_computers_items` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_computers_softwarelicenses
-
 DROP TABLE IF EXISTS `glpi_computers_softwarelicenses`;
 CREATE TABLE `glpi_computers_softwarelicenses` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1004,8 +923,6 @@ CREATE TABLE `glpi_computers_softwarelicenses` (
   KEY `is_dynamic` (`is_dynamic`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_computers_softwareversions
 
 DROP TABLE IF EXISTS `glpi_computers_softwareversions`;
 CREATE TABLE `glpi_computers_softwareversions` (
@@ -1029,8 +946,6 @@ CREATE TABLE `glpi_computers_softwareversions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_computertypes
-
 DROP TABLE IF EXISTS `glpi_computertypes`;
 CREATE TABLE `glpi_computertypes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1044,8 +959,6 @@ CREATE TABLE `glpi_computertypes` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_computervirtualmachines
 
 DROP TABLE IF EXISTS `glpi_computervirtualmachines`;
 CREATE TABLE `glpi_computervirtualmachines` (
@@ -1079,8 +992,6 @@ CREATE TABLE `glpi_computervirtualmachines` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_items_operatingsystems
 
 DROP TABLE IF EXISTS `glpi_items_operatingsystems`;
 CREATE TABLE `glpi_items_operatingsystems` (
@@ -1118,8 +1029,6 @@ CREATE TABLE `glpi_items_operatingsystems` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_operatingsystemkernels
-
 DROP TABLE IF EXISTS `glpi_operatingsystemkernels`;
 CREATE TABLE `glpi_operatingsystemkernels` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1131,8 +1040,6 @@ CREATE TABLE `glpi_operatingsystemkernels` (
   KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_operatingsystemkernelversions
 
 DROP TABLE IF EXISTS `glpi_operatingsystemkernelversions`;
 CREATE TABLE `glpi_operatingsystemkernelversions` (
@@ -1147,8 +1054,6 @@ CREATE TABLE `glpi_operatingsystemkernelversions` (
   KEY `operatingsystemkernels_id` (`operatingsystemkernels_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-### Dump table glpi_operatingsystemeditions
-
 DROP TABLE IF EXISTS `glpi_operatingsystemeditions`;
 CREATE TABLE `glpi_operatingsystemeditions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1159,8 +1064,6 @@ CREATE TABLE `glpi_operatingsystemeditions` (
   PRIMARY KEY (`id`),
   KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-### Dump table glpi_configs
 
 DROP TABLE IF EXISTS `glpi_configs`;
 CREATE TABLE `glpi_configs` (
@@ -1372,8 +1275,6 @@ INSERT INTO `glpi_configs` VALUES ('207','core','purge_user_auth_changes','0');
 INSERT INTO `glpi_configs` VALUES ('208','core','purge_plugins','0');
 INSERT INTO `glpi_configs` VALUES ('209','core','display_login_source','1');
 
-### Dump table glpi_consumableitems
-
 DROP TABLE IF EXISTS `glpi_consumableitems`;
 CREATE TABLE `glpi_consumableitems` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1408,8 +1309,6 @@ CREATE TABLE `glpi_consumableitems` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_consumableitemtypes
-
 DROP TABLE IF EXISTS `glpi_consumableitemtypes`;
 CREATE TABLE `glpi_consumableitemtypes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1423,8 +1322,6 @@ CREATE TABLE `glpi_consumableitemtypes` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_consumables
 
 DROP TABLE IF EXISTS `glpi_consumables`;
 CREATE TABLE `glpi_consumables` (
@@ -1447,8 +1344,6 @@ CREATE TABLE `glpi_consumables` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_contacts
 
 DROP TABLE IF EXISTS `glpi_contacts`;
 CREATE TABLE `glpi_contacts` (
@@ -1484,8 +1379,6 @@ CREATE TABLE `glpi_contacts` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_contacts_suppliers
-
 DROP TABLE IF EXISTS `glpi_contacts_suppliers`;
 CREATE TABLE `glpi_contacts_suppliers` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1496,8 +1389,6 @@ CREATE TABLE `glpi_contacts_suppliers` (
   KEY `contacts_id` (`contacts_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_contacttypes
 
 DROP TABLE IF EXISTS `glpi_contacttypes`;
 CREATE TABLE `glpi_contacttypes` (
@@ -1512,8 +1403,6 @@ CREATE TABLE `glpi_contacttypes` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_contractcosts
 
 DROP TABLE IF EXISTS `glpi_contractcosts`;
 CREATE TABLE `glpi_contractcosts` (
@@ -1537,8 +1426,6 @@ CREATE TABLE `glpi_contractcosts` (
   KEY `budgets_id` (`budgets_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_contracts
 
 DROP TABLE IF EXISTS `glpi_contracts`;
 CREATE TABLE `glpi_contracts` (
@@ -1585,8 +1472,6 @@ CREATE TABLE `glpi_contracts` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_contracts_items
-
 DROP TABLE IF EXISTS `glpi_contracts_items`;
 CREATE TABLE `glpi_contracts_items` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1600,8 +1485,6 @@ CREATE TABLE `glpi_contracts_items` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_contracts_suppliers
-
 DROP TABLE IF EXISTS `glpi_contracts_suppliers`;
 CREATE TABLE `glpi_contracts_suppliers` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1612,8 +1495,6 @@ CREATE TABLE `glpi_contracts_suppliers` (
   KEY `contracts_id` (`contracts_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_contracttypes
 
 DROP TABLE IF EXISTS `glpi_contracttypes`;
 CREATE TABLE `glpi_contracttypes` (
@@ -1628,8 +1509,6 @@ CREATE TABLE `glpi_contracttypes` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_crontasklogs
 
 DROP TABLE IF EXISTS `glpi_crontasklogs`;
 CREATE TABLE `glpi_crontasklogs` (
@@ -1647,8 +1526,6 @@ CREATE TABLE `glpi_crontasklogs` (
   KEY `crontasklogs_id_state` (`crontasklogs_id`,`state`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_crontasks
 
 DROP TABLE IF EXISTS `glpi_crontasks`;
 CREATE TABLE `glpi_crontasks` (
@@ -1706,8 +1583,6 @@ INSERT INTO `glpi_crontasks` VALUES ('30','Telemetry','telemetry','2592000',NULL
 INSERT INTO `glpi_crontasks` VALUES ('31','Certificate','certificate','86400',NULL,'0','1','3','0','24','10',NULL,NULL,NULL,NULL,NULL);
 INSERT INTO `glpi_crontasks` VALUES ('32','OlaLevel_Ticket','olaticket','300',NULL,'1','1','3','0','24','30','2014-06-18 08:02:00',NULL,NULL,NULL,NULL);
 
-### Dump table glpi_devicecasemodels
-
 DROP TABLE IF EXISTS `glpi_devicecasemodels`;
 CREATE TABLE `glpi_devicecasemodels` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1718,8 +1593,6 @@ CREATE TABLE `glpi_devicecasemodels` (
   KEY `name` (`name`),
   KEY `product_number` (`product_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-### Dump table glpi_devicecases
 
 DROP TABLE IF EXISTS `glpi_devicecases`;
 CREATE TABLE `glpi_devicecases` (
@@ -1745,8 +1618,6 @@ CREATE TABLE `glpi_devicecases` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_devicecasetypes
-
 DROP TABLE IF EXISTS `glpi_devicecasetypes`;
 CREATE TABLE `glpi_devicecasetypes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1761,8 +1632,6 @@ CREATE TABLE `glpi_devicecasetypes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_devicecontrolmodels
-
 DROP TABLE IF EXISTS `glpi_devicecontrolmodels`;
 CREATE TABLE `glpi_devicecontrolmodels` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1773,8 +1642,6 @@ CREATE TABLE `glpi_devicecontrolmodels` (
   KEY `name` (`name`),
   KEY `product_number` (`product_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-### Dump table glpi_devicecontrols
 
 DROP TABLE IF EXISTS `glpi_devicecontrols`;
 CREATE TABLE `glpi_devicecontrols` (
@@ -1801,8 +1668,6 @@ CREATE TABLE `glpi_devicecontrols` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_devicedrivemodels
-
 DROP TABLE IF EXISTS `glpi_devicedrivemodels`;
 CREATE TABLE `glpi_devicedrivemodels` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1813,8 +1678,6 @@ CREATE TABLE `glpi_devicedrivemodels` (
   KEY `name` (`name`),
   KEY `product_number` (`product_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-### Dump table glpi_devicedrives
 
 DROP TABLE IF EXISTS `glpi_devicedrives`;
 CREATE TABLE `glpi_devicedrives` (
@@ -1842,8 +1705,6 @@ CREATE TABLE `glpi_devicedrives` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_devicegenericmodels
-
 DROP TABLE IF EXISTS `glpi_devicegenericmodels`;
 CREATE TABLE `glpi_devicegenericmodels` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1855,8 +1716,6 @@ CREATE TABLE `glpi_devicegenericmodels` (
   KEY `product_number` (`product_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_devicegenerics
 
 DROP TABLE IF EXISTS `glpi_devicegenerics`;
 CREATE TABLE `glpi_devicegenerics` (
@@ -1886,8 +1745,6 @@ CREATE TABLE `glpi_devicegenerics` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_devicegenerictypes
-
 DROP TABLE IF EXISTS `glpi_devicegenerictypes`;
 CREATE TABLE `glpi_devicegenerictypes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1897,8 +1754,6 @@ CREATE TABLE `glpi_devicegenerictypes` (
   KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_devicegraphiccardmodels
 
 DROP TABLE IF EXISTS `glpi_devicegraphiccardmodels`;
 CREATE TABLE `glpi_devicegraphiccardmodels` (
@@ -1910,8 +1765,6 @@ CREATE TABLE `glpi_devicegraphiccardmodels` (
   KEY `name` (`name`),
   KEY `product_number` (`product_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-### Dump table glpi_devicegraphiccards
 
 DROP TABLE IF EXISTS `glpi_devicegraphiccards`;
 CREATE TABLE `glpi_devicegraphiccards` (
@@ -1940,8 +1793,6 @@ CREATE TABLE `glpi_devicegraphiccards` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_deviceharddrivemodels
-
 DROP TABLE IF EXISTS `glpi_deviceharddrivemodels`;
 CREATE TABLE `glpi_deviceharddrivemodels` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1952,8 +1803,6 @@ CREATE TABLE `glpi_deviceharddrivemodels` (
   KEY `name` (`name`),
   KEY `product_number` (`product_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-### Dump table glpi_deviceharddrives
 
 DROP TABLE IF EXISTS `glpi_deviceharddrives`;
 CREATE TABLE `glpi_deviceharddrives` (
@@ -1982,8 +1831,6 @@ CREATE TABLE `glpi_deviceharddrives` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_devicememorymodels
-
 DROP TABLE IF EXISTS `glpi_devicememorymodels`;
 CREATE TABLE `glpi_devicememorymodels` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1995,8 +1842,6 @@ CREATE TABLE `glpi_devicememorymodels` (
   KEY `product_number` (`product_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_devicememories
 
 DROP TABLE IF EXISTS `glpi_devicememories`;
 CREATE TABLE `glpi_devicememories` (
@@ -2024,8 +1869,6 @@ CREATE TABLE `glpi_devicememories` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_devicememorytypes
-
 DROP TABLE IF EXISTS `glpi_devicememorytypes`;
 CREATE TABLE `glpi_devicememorytypes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -2044,8 +1887,6 @@ INSERT INTO `glpi_devicememorytypes` VALUES ('2','DDR',NULL,NULL,NULL);
 INSERT INTO `glpi_devicememorytypes` VALUES ('3','SDRAM',NULL,NULL,NULL);
 INSERT INTO `glpi_devicememorytypes` VALUES ('4','SDRAM-2',NULL,NULL,NULL);
 
-### Dump table glpi_devicemotherboardmodels
-
 DROP TABLE IF EXISTS `glpi_devicemotherboardmodels`;
 CREATE TABLE `glpi_devicemotherboardmodels` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -2056,8 +1897,6 @@ CREATE TABLE `glpi_devicemotherboardmodels` (
   KEY `name` (`name`),
   KEY `product_number` (`product_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-### Dump table glpi_devicemotherboards
 
 DROP TABLE IF EXISTS `glpi_devicemotherboards`;
 CREATE TABLE `glpi_devicemotherboards` (
@@ -2082,8 +1921,6 @@ CREATE TABLE `glpi_devicemotherboards` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_devicenetworkcardmodels
-
 DROP TABLE IF EXISTS `glpi_devicenetworkcardmodels`;
 CREATE TABLE `glpi_devicenetworkcardmodels` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -2094,8 +1931,6 @@ CREATE TABLE `glpi_devicenetworkcardmodels` (
   KEY `name` (`name`),
   KEY `product_number` (`product_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-### Dump table glpi_devicenetworkcards
 
 DROP TABLE IF EXISTS `glpi_devicenetworkcards`;
 CREATE TABLE `glpi_devicenetworkcards` (
@@ -2121,8 +1956,6 @@ CREATE TABLE `glpi_devicenetworkcards` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_devicepcimodels
-
 DROP TABLE IF EXISTS `glpi_devicepcimodels`;
 CREATE TABLE `glpi_devicepcimodels` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -2133,8 +1966,6 @@ CREATE TABLE `glpi_devicepcimodels` (
   KEY `name` (`name`),
   KEY `product_number` (`product_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-### Dump table glpi_devicepcis
 
 DROP TABLE IF EXISTS `glpi_devicepcis`;
 CREATE TABLE `glpi_devicepcis` (
@@ -2160,8 +1991,6 @@ CREATE TABLE `glpi_devicepcis` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_devicepowersupplymodels
-
 DROP TABLE IF EXISTS `glpi_devicepowersupplymodels`;
 CREATE TABLE `glpi_devicepowersupplymodels` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -2173,8 +2002,6 @@ CREATE TABLE `glpi_devicepowersupplymodels` (
   KEY `product_number` (`product_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_devicepowersupplies
 
 DROP TABLE IF EXISTS `glpi_devicepowersupplies`;
 CREATE TABLE `glpi_devicepowersupplies` (
@@ -2200,8 +2027,6 @@ CREATE TABLE `glpi_devicepowersupplies` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_deviceprocessormodels
-
 DROP TABLE IF EXISTS `glpi_deviceprocessormodels`;
 CREATE TABLE `glpi_deviceprocessormodels` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -2212,8 +2037,6 @@ CREATE TABLE `glpi_deviceprocessormodels` (
   KEY `name` (`name`),
   KEY `product_number` (`product_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-### Dump table glpi_deviceprocessors
 
 DROP TABLE IF EXISTS `glpi_deviceprocessors`;
 CREATE TABLE `glpi_deviceprocessors` (
@@ -2240,8 +2063,6 @@ CREATE TABLE `glpi_deviceprocessors` (
   KEY `deviceprocessormodels_id` (`deviceprocessormodels_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_devicesensors
 
 DROP TABLE IF EXISTS `glpi_devicesensors`;
 CREATE TABLE `glpi_devicesensors` (
@@ -2270,8 +2091,6 @@ CREATE TABLE `glpi_devicesensors` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_devicesensormodels
-
 DROP TABLE IF EXISTS `glpi_devicesensormodels`;
 CREATE TABLE `glpi_devicesensormodels` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -2284,8 +2103,6 @@ CREATE TABLE `glpi_devicesensormodels` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_devicesensortypes
-
 DROP TABLE IF EXISTS `glpi_devicesensortypes`;
 CREATE TABLE `glpi_devicesensortypes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -2295,8 +2112,6 @@ CREATE TABLE `glpi_devicesensortypes` (
   KEY `name` (`name`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_devicesimcards
 
 DROP TABLE IF EXISTS `glpi_devicesimcards`;
 CREATE TABLE IF NOT EXISTS `glpi_devicesimcards` (
@@ -2321,8 +2136,6 @@ CREATE TABLE IF NOT EXISTS `glpi_devicesimcards` (
    KEY `manufacturers_id` (`manufacturers_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_items_devicesimcards
 
 DROP TABLE IF EXISTS `glpi_items_devicesimcards`;
 CREATE TABLE IF NOT EXISTS `glpi_items_devicesimcards` (
@@ -2359,8 +2172,6 @@ CREATE TABLE IF NOT EXISTS `glpi_items_devicesimcards` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_devicesimcardtypes
-
 DROP TABLE IF EXISTS `glpi_devicesimcardtypes`;
 CREATE TABLE IF NOT EXISTS `glpi_devicesimcardtypes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -2379,8 +2190,6 @@ INSERT INTO `glpi_devicesimcardtypes` VALUES ('2','Mini SIM',NULL,NULL,NULL);
 INSERT INTO `glpi_devicesimcardtypes` VALUES ('3','Micro SIM',NULL,NULL,NULL);
 INSERT INTO `glpi_devicesimcardtypes` VALUES ('4','Nano SIM',NULL,NULL,NULL);
 
-### Dump table glpi_devicesoundcardmodels
-
 DROP TABLE IF EXISTS `glpi_devicesoundcardmodels`;
 CREATE TABLE `glpi_devicesoundcardmodels` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -2392,8 +2201,6 @@ CREATE TABLE `glpi_devicesoundcardmodels` (
   KEY `product_number` (`product_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_devicesoundcards
 
 DROP TABLE IF EXISTS `glpi_devicesoundcards`;
 CREATE TABLE `glpi_devicesoundcards` (
@@ -2417,8 +2224,6 @@ CREATE TABLE `glpi_devicesoundcards` (
   KEY `devicesoundcardmodels_id` (`devicesoundcardmodels_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_displaypreferences
 
 DROP TABLE IF EXISTS `glpi_displaypreferences`;
 CREATE TABLE `glpi_displaypreferences` (
@@ -2664,8 +2469,6 @@ INSERT INTO `glpi_displaypreferences` VALUES ('262','SavedSearch','3','1','0');
 INSERT INTO `glpi_displaypreferences` VALUES ('263','SavedSearch','10','1','0');
 INSERT INTO `glpi_displaypreferences` VALUES ('264','SavedSearch','11','1','0');
 
-### Dump table glpi_documentcategories
-
 DROP TABLE IF EXISTS `glpi_documentcategories`;
 CREATE TABLE `glpi_documentcategories` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -2685,8 +2488,6 @@ CREATE TABLE `glpi_documentcategories` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_documents
 
 DROP TABLE IF EXISTS `glpi_documents`;
 CREATE TABLE `glpi_documents` (
@@ -2722,8 +2523,6 @@ CREATE TABLE `glpi_documents` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_documents_items
-
 DROP TABLE IF EXISTS `glpi_documents_items`;
 CREATE TABLE `glpi_documents_items` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -2741,8 +2540,6 @@ CREATE TABLE `glpi_documents_items` (
   KEY `users_id` (`users_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_documenttypes
 
 DROP TABLE IF EXISTS `glpi_documenttypes`;
 CREATE TABLE `glpi_documenttypes` (
@@ -2836,8 +2633,6 @@ INSERT INTO `glpi_documenttypes` VALUES ('70','PowerPoint XML','pptx','ppt-dist.
 INSERT INTO `glpi_documenttypes` VALUES ('71','Comma-Separated Values','csv','csv-dist.png',NULL,'1','2011-12-06 09:48:34',NULL,NULL);
 INSERT INTO `glpi_documenttypes` VALUES ('72','Scalable Vector Graphics','svg','svg-dist.png',NULL,'1','2011-12-06 09:48:34',NULL,NULL);
 
-### Dump table glpi_domains
-
 DROP TABLE IF EXISTS `glpi_domains`;
 CREATE TABLE `glpi_domains` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -2854,8 +2649,6 @@ CREATE TABLE `glpi_domains` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_dropdowntranslations
-
 DROP TABLE IF EXISTS `glpi_dropdowntranslations`;
 CREATE TABLE `glpi_dropdowntranslations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -2871,8 +2664,6 @@ CREATE TABLE `glpi_dropdowntranslations` (
   KEY `field` (`field`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_entities
 
 DROP TABLE IF EXISTS `glpi_entities`;
 CREATE TABLE `glpi_entities` (
@@ -2951,8 +2742,6 @@ CREATE TABLE `glpi_entities` (
 
 INSERT INTO `glpi_entities` VALUES ('0','Root entity','-1','Root entity',NULL,'1',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'0',NULL,NULL,NULL,'0','0','0','0','0','0','0','0','0','0','0','-10','0','0','-10','1',NULL,'1','0','0',NULL,'0','0','0','0','0','1','-10','0','0','10','10','0','1','0',NULL,NULL,0);
 
-### Dump table glpi_entities_knowbaseitems
-
 DROP TABLE IF EXISTS `glpi_entities_knowbaseitems`;
 CREATE TABLE `glpi_entities_knowbaseitems` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -2965,8 +2754,6 @@ CREATE TABLE `glpi_entities_knowbaseitems` (
   KEY `is_recursive` (`is_recursive`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_entities_reminders
 
 DROP TABLE IF EXISTS `glpi_entities_reminders`;
 CREATE TABLE `glpi_entities_reminders` (
@@ -2981,8 +2768,6 @@ CREATE TABLE `glpi_entities_reminders` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_entities_rssfeeds
-
 DROP TABLE IF EXISTS `glpi_entities_rssfeeds`;
 CREATE TABLE `glpi_entities_rssfeeds` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -2995,8 +2780,6 @@ CREATE TABLE `glpi_entities_rssfeeds` (
   KEY `is_recursive` (`is_recursive`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_events
 
 DROP TABLE IF EXISTS `glpi_events`;
 CREATE TABLE `glpi_events` (
@@ -3013,8 +2796,6 @@ CREATE TABLE `glpi_events` (
   KEY `item` (`type`,`items_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_fieldblacklists
 
 DROP TABLE IF EXISTS `glpi_fieldblacklists`;
 CREATE TABLE `glpi_fieldblacklists` (
@@ -3035,8 +2816,6 @@ CREATE TABLE `glpi_fieldblacklists` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_fieldunicities
-
 DROP TABLE IF EXISTS `glpi_fieldunicities`;
 CREATE TABLE `glpi_fieldunicities` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -3056,8 +2835,6 @@ CREATE TABLE `glpi_fieldunicities` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stores field unicity criterias';
 
-
-### Dump table glpi_filesystems
 
 DROP TABLE IF EXISTS `glpi_filesystems`;
 CREATE TABLE `glpi_filesystems` (
@@ -3093,8 +2870,6 @@ INSERT INTO `glpi_filesystems` VALUES ('18','UFS',NULL,NULL,NULL);
 INSERT INTO `glpi_filesystems` VALUES ('19','XFS',NULL,NULL,NULL);
 INSERT INTO `glpi_filesystems` VALUES ('20','ZFS',NULL,NULL,NULL);
 
-### Dump table glpi_fqdns
-
 DROP TABLE IF EXISTS `glpi_fqdns`;
 CREATE TABLE `glpi_fqdns` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -3114,8 +2889,6 @@ CREATE TABLE `glpi_fqdns` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_groups
 
 DROP TABLE IF EXISTS `glpi_groups`;
 CREATE TABLE `glpi_groups` (
@@ -3159,8 +2932,6 @@ CREATE TABLE `glpi_groups` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_groups_knowbaseitems
-
 DROP TABLE IF EXISTS `glpi_groups_knowbaseitems`;
 CREATE TABLE `glpi_groups_knowbaseitems` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -3176,8 +2947,6 @@ CREATE TABLE `glpi_groups_knowbaseitems` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_groups_problems
-
 DROP TABLE IF EXISTS `glpi_groups_problems`;
 CREATE TABLE `glpi_groups_problems` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -3189,8 +2958,6 @@ CREATE TABLE `glpi_groups_problems` (
   KEY `group` (`groups_id`,`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_groups_reminders
 
 DROP TABLE IF EXISTS `glpi_groups_reminders`;
 CREATE TABLE `glpi_groups_reminders` (
@@ -3207,8 +2974,6 @@ CREATE TABLE `glpi_groups_reminders` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_groups_rssfeeds
-
 DROP TABLE IF EXISTS `glpi_groups_rssfeeds`;
 CREATE TABLE `glpi_groups_rssfeeds` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -3224,8 +2989,6 @@ CREATE TABLE `glpi_groups_rssfeeds` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_groups_tickets
-
 DROP TABLE IF EXISTS `glpi_groups_tickets`;
 CREATE TABLE `glpi_groups_tickets` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -3237,8 +3000,6 @@ CREATE TABLE `glpi_groups_tickets` (
   KEY `group` (`groups_id`,`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_groups_users
 
 DROP TABLE IF EXISTS `glpi_groups_users`;
 CREATE TABLE `glpi_groups_users` (
@@ -3255,8 +3016,6 @@ CREATE TABLE `glpi_groups_users` (
   KEY `is_userdelegate` (`is_userdelegate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_holidays
 
 DROP TABLE IF EXISTS `glpi_holidays`;
 CREATE TABLE `glpi_holidays` (
@@ -3279,8 +3038,6 @@ CREATE TABLE `glpi_holidays` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_infocoms
 
 DROP TABLE IF EXISTS `glpi_infocoms`;
 CREATE TABLE `glpi_infocoms` (
@@ -3328,8 +3085,6 @@ CREATE TABLE `glpi_infocoms` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_interfacetypes
-
 DROP TABLE IF EXISTS `glpi_interfacetypes`;
 CREATE TABLE `glpi_interfacetypes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -3351,8 +3106,6 @@ INSERT INTO `glpi_interfacetypes` VALUES ('5','AGP','',NULL,NULL);
 INSERT INTO `glpi_interfacetypes` VALUES ('6','PCI','',NULL,NULL);
 INSERT INTO `glpi_interfacetypes` VALUES ('7','PCIe','',NULL,NULL);
 INSERT INTO `glpi_interfacetypes` VALUES ('8','PCI-X','',NULL,NULL);
-
-### Dump table glpi_ipaddresses
 
 DROP TABLE IF EXISTS `glpi_ipaddresses`;
 CREATE TABLE `glpi_ipaddresses` (
@@ -3381,8 +3134,6 @@ CREATE TABLE `glpi_ipaddresses` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_ipaddresses_ipnetworks
-
 DROP TABLE IF EXISTS `glpi_ipaddresses_ipnetworks`;
 CREATE TABLE `glpi_ipaddresses_ipnetworks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -3394,8 +3145,6 @@ CREATE TABLE `glpi_ipaddresses_ipnetworks` (
   KEY `ipaddresses_id` (`ipaddresses_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_ipnetworks
 
 DROP TABLE IF EXISTS `glpi_ipnetworks`;
 CREATE TABLE `glpi_ipnetworks` (
@@ -3439,8 +3188,6 @@ CREATE TABLE `glpi_ipnetworks` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_ipnetworks_vlans
-
 DROP TABLE IF EXISTS `glpi_ipnetworks_vlans`;
 CREATE TABLE `glpi_ipnetworks_vlans` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -3450,8 +3197,6 @@ CREATE TABLE `glpi_ipnetworks_vlans` (
   UNIQUE KEY `link` (`ipnetworks_id`,`vlans_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_items_devicecases
 
 DROP TABLE IF EXISTS `glpi_items_devicecases`;
 CREATE TABLE `glpi_items_devicecases` (
@@ -3481,8 +3226,6 @@ CREATE TABLE `glpi_items_devicecases` (
   KEY `states_id` (`states_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_items_devicecontrols
 
 DROP TABLE IF EXISTS `glpi_items_devicecontrols`;
 CREATE TABLE `glpi_items_devicecontrols` (
@@ -3515,8 +3258,6 @@ CREATE TABLE `glpi_items_devicecontrols` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_items_devicedrives
-
 DROP TABLE IF EXISTS `glpi_items_devicedrives`;
 CREATE TABLE `glpi_items_devicedrives` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -3548,8 +3289,6 @@ CREATE TABLE `glpi_items_devicedrives` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_items_devicegenerics
-
 DROP TABLE IF EXISTS `glpi_items_devicegenerics`;
 CREATE TABLE `glpi_items_devicegenerics` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -3576,8 +3315,6 @@ CREATE TABLE `glpi_items_devicegenerics` (
   KEY `otherserial` (`otherserial`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_items_devicegraphiccards
 
 DROP TABLE IF EXISTS `glpi_items_devicegraphiccards`;
 CREATE TABLE `glpi_items_devicegraphiccards` (
@@ -3612,8 +3349,6 @@ CREATE TABLE `glpi_items_devicegraphiccards` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_items_deviceharddrives
-
 DROP TABLE IF EXISTS `glpi_items_deviceharddrives`;
 CREATE TABLE `glpi_items_deviceharddrives` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -3646,8 +3381,6 @@ CREATE TABLE `glpi_items_deviceharddrives` (
   KEY `states_id` (`states_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_items_devicememories
 
 DROP TABLE IF EXISTS `glpi_items_devicememories`;
 CREATE TABLE `glpi_items_devicememories` (
@@ -3682,8 +3415,6 @@ CREATE TABLE `glpi_items_devicememories` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_items_devicemotherboards
-
 DROP TABLE IF EXISTS `glpi_items_devicemotherboards`;
 CREATE TABLE `glpi_items_devicemotherboards` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -3712,8 +3443,6 @@ CREATE TABLE `glpi_items_devicemotherboards` (
   KEY `states_id` (`states_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_items_devicenetworkcards
 
 DROP TABLE IF EXISTS `glpi_items_devicenetworkcards`;
 CREATE TABLE `glpi_items_devicenetworkcards` (
@@ -3748,8 +3477,6 @@ CREATE TABLE `glpi_items_devicenetworkcards` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_items_devicepcis
-
 DROP TABLE IF EXISTS `glpi_items_devicepcis`;
 CREATE TABLE `glpi_items_devicepcis` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -3781,8 +3508,6 @@ CREATE TABLE `glpi_items_devicepcis` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_items_devicepowersupplies
-
 DROP TABLE IF EXISTS `glpi_items_devicepowersupplies`;
 CREATE TABLE `glpi_items_devicepowersupplies` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -3812,47 +3537,6 @@ CREATE TABLE `glpi_items_devicepowersupplies` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_items_deviceprocessors
-
-DROP TABLE IF EXISTS `glpi_items_deviceprocessors`;
-CREATE TABLE `glpi_items_deviceprocessors` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `items_id` int(11) NOT NULL DEFAULT '0',
-  `itemtype` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `deviceprocessors_id` int(11) NOT NULL DEFAULT '0',
-  `frequency` int(11) NOT NULL DEFAULT '0',
-  `serial` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
-  `is_dynamic` tinyint(1) NOT NULL DEFAULT '0',
-  `nbcores` int(11) DEFAULT NULL,
-  `nbthreads` int(11) DEFAULT NULL,
-  `entities_id` int(11) NOT NULL DEFAULT '0',
-  `is_recursive` tinyint(1) NOT NULL DEFAULT '0',
-  `busID` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `otherserial` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `locations_id` int(11) NOT NULL DEFAULT '0',
-  `states_id` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  KEY `computers_id` (`items_id`),
-  KEY `deviceprocessors_id` (`deviceprocessors_id`),
-  KEY `specificity` (`frequency`),
-  KEY `is_deleted` (`is_deleted`),
-  KEY `is_dynamic` (`is_dynamic`),
-  KEY `serial` (`serial`),
-  KEY `nbcores` (`nbcores`),
-  KEY `nbthreads` (`nbthreads`),
-  KEY `entities_id` (`entities_id`),
-  KEY `is_recursive` (`is_recursive`),
-  KEY `busID` (`busID`),
-  KEY `item` (`itemtype`,`items_id`),
-  KEY `otherserial` (`otherserial`),
-  KEY `locations_id` (`locations_id`),
-  KEY `states_id` (`states_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-
-### Dump table glpi_items_devicesensors
-
 DROP TABLE IF EXISTS `glpi_items_devicesensors`;
 CREATE TABLE `glpi_items_devicesensors` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -3879,8 +3563,6 @@ CREATE TABLE `glpi_items_devicesensors` (
   KEY `otherserial` (`otherserial`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_items_devicesoundcards
 
 DROP TABLE IF EXISTS `glpi_items_devicesoundcards`;
 CREATE TABLE `glpi_items_devicesoundcards` (
@@ -3913,8 +3595,6 @@ CREATE TABLE `glpi_items_devicesoundcards` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_items_problems
-
 DROP TABLE IF EXISTS `glpi_items_problems`;
 CREATE TABLE `glpi_items_problems` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -3926,8 +3606,6 @@ CREATE TABLE `glpi_items_problems` (
   KEY `item` (`itemtype`,`items_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_items_projects
 
 DROP TABLE IF EXISTS `glpi_items_projects`;
 CREATE TABLE `glpi_items_projects` (
@@ -3941,8 +3619,6 @@ CREATE TABLE `glpi_items_projects` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_items_tickets
-
 DROP TABLE IF EXISTS `glpi_items_tickets`;
 CREATE TABLE `glpi_items_tickets` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -3954,8 +3630,6 @@ CREATE TABLE `glpi_items_tickets` (
   KEY `tickets_id` (`tickets_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_itilcategories
 
 DROP TABLE IF EXISTS `glpi_itilcategories`;
 CREATE TABLE `glpi_itilcategories` (
@@ -4001,8 +3675,6 @@ CREATE TABLE `glpi_itilcategories` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_itils_projects
-
 DROP TABLE IF EXISTS `glpi_itils_projects`;
 CREATE TABLE `glpi_itils_projects` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -4014,8 +3686,6 @@ CREATE TABLE `glpi_itils_projects` (
   KEY `projects_id` (`projects_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_knowbaseitemcategories
 
 DROP TABLE IF EXISTS `glpi_knowbaseitemcategories`;
 CREATE TABLE `glpi_knowbaseitemcategories` (
@@ -4040,8 +3710,6 @@ CREATE TABLE `glpi_knowbaseitemcategories` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_knowbaseitems
 
 DROP TABLE IF EXISTS `glpi_knowbaseitems`;
 CREATE TABLE `glpi_knowbaseitems` (
@@ -4069,8 +3737,6 @@ CREATE TABLE `glpi_knowbaseitems` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_knowbaseitems_profiles
-
 DROP TABLE IF EXISTS `glpi_knowbaseitems_profiles`;
 CREATE TABLE `glpi_knowbaseitems_profiles` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -4086,8 +3752,6 @@ CREATE TABLE `glpi_knowbaseitems_profiles` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_knowbaseitems_users
-
 DROP TABLE IF EXISTS `glpi_knowbaseitems_users`;
 CREATE TABLE `glpi_knowbaseitems_users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -4098,57 +3762,6 @@ CREATE TABLE `glpi_knowbaseitems_users` (
   KEY `users_id` (`users_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_knowbaseitemtranslations
-
-DROP TABLE IF EXISTS `glpi_knowbaseitemtranslations`;
-CREATE TABLE `glpi_knowbaseitemtranslations` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `knowbaseitems_id` int(11) NOT NULL DEFAULT '0',
-  `language` varchar(5) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `name` text COLLATE utf8_unicode_ci,
-  `answer` longtext COLLATE utf8_unicode_ci,
-  `users_id` int(11) NOT NULL DEFAULT '0',
-  `date_mod` datetime DEFAULT NULL,
-  `date_creation` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `item` (`knowbaseitems_id`,`language`),
-  KEY `users_id` (`users_id`),
-  FULLTEXT KEY `fulltext` (`name`,`answer`),
-  FULLTEXT KEY `name` (`name`),
-  FULLTEXT KEY `answer` (`answer`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-
-### Dump table glpi_lines
-
-DROP TABLE IF EXISTS `glpi_lines`;
-CREATE TABLE `glpi_lines` (
-  `id` INT(11) NOT NULL auto_increment,
-  `name` VARCHAR(255) NOT NULL DEFAULT '',
-  `entities_id` INT(11) NOT NULL DEFAULT 0,
-  `is_recursive` TINYINT(1) NOT NULL DEFAULT 0,
-  `is_deleted` TINYINT(1) NOT NULL DEFAULT 0,
-  `caller_num` VARCHAR(255) NOT NULL DEFAULT '',
-  `caller_name` VARCHAR(255) NOT NULL DEFAULT '',
-  `users_id` INT(11) NOT NULL DEFAULT 0,
-  `groups_id` INT(11) NOT NULL DEFAULT 0,
-  `lineoperators_id` INT(11) NOT NULL DEFAULT 0,
-  `locations_id` INT(11) NOT NULL DEFAULT '0',
-  `states_id` INT(11) NOT NULL DEFAULT '0',
-  `linetypes_id` INT(11) NOT NULL DEFAULT '0',
-  `date_creation` DATETIME DEFAULT NULL,
-  `date_mod` DATETIME DEFAULT NULL,
-  `comment` TEXT,
-  PRIMARY KEY (`id`),
-  KEY `entities_id` (`entities_id`),
-  KEY `is_recursive` (`is_recursive`),
-  KEY `users_id` (`users_id`),
-  KEY `lineoperators_id` (`lineoperators_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-
-### Dump table glpi_lineoperators
 
 DROP TABLE IF EXISTS `glpi_lineoperators`;
 CREATE TABLE IF NOT EXISTS `glpi_lineoperators` (
@@ -4184,8 +3797,6 @@ CREATE TABLE IF NOT EXISTS `glpi_linetypes` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-### Dump table glpi_links
-
 DROP TABLE IF EXISTS `glpi_links`;
 CREATE TABLE `glpi_links` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -4204,8 +3815,6 @@ CREATE TABLE `glpi_links` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_links_itemtypes
-
 DROP TABLE IF EXISTS `glpi_links_itemtypes`;
 CREATE TABLE `glpi_links_itemtypes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -4216,8 +3825,6 @@ CREATE TABLE `glpi_links_itemtypes` (
   KEY `links_id` (`links_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_locations
 
 DROP TABLE IF EXISTS `glpi_locations`;
 CREATE TABLE `glpi_locations` (
@@ -4253,8 +3860,6 @@ CREATE TABLE `glpi_locations` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_logs
-
 DROP TABLE IF EXISTS `glpi_logs`;
 CREATE TABLE `glpi_logs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -4274,8 +3879,6 @@ CREATE TABLE `glpi_logs` (
   KEY `id_search_option` (`id_search_option`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_mailcollectors
 
 DROP TABLE IF EXISTS `glpi_mailcollectors`;
 CREATE TABLE `glpi_mailcollectors` (
@@ -4302,8 +3905,6 @@ CREATE TABLE `glpi_mailcollectors` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_manufacturers
-
 DROP TABLE IF EXISTS `glpi_manufacturers`;
 CREATE TABLE `glpi_manufacturers` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -4317,8 +3918,6 @@ CREATE TABLE `glpi_manufacturers` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_monitormodels
 
 DROP TABLE IF EXISTS `glpi_monitormodels`;
 CREATE TABLE `glpi_monitormodels` (
@@ -4343,8 +3942,6 @@ CREATE TABLE `glpi_monitormodels` (
   KEY `product_number` (`product_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_monitors
 
 DROP TABLE IF EXISTS `glpi_monitors`;
 CREATE TABLE `glpi_monitors` (
@@ -4406,8 +4003,6 @@ CREATE TABLE `glpi_monitors` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_monitortypes
-
 DROP TABLE IF EXISTS `glpi_monitortypes`;
 CREATE TABLE `glpi_monitortypes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -4421,8 +4016,6 @@ CREATE TABLE `glpi_monitortypes` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_netpoints
 
 DROP TABLE IF EXISTS `glpi_netpoints`;
 CREATE TABLE `glpi_netpoints` (
@@ -4442,8 +4035,6 @@ CREATE TABLE `glpi_netpoints` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_networkaliases
-
 DROP TABLE IF EXISTS `glpi_networkaliases`;
 CREATE TABLE `glpi_networkaliases` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -4458,8 +4049,6 @@ CREATE TABLE `glpi_networkaliases` (
   KEY `networknames_id` (`networknames_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_networkequipmentmodels
 
 DROP TABLE IF EXISTS `glpi_networkequipmentmodels`;
 CREATE TABLE `glpi_networkequipmentmodels` (
@@ -4484,8 +4073,6 @@ CREATE TABLE `glpi_networkequipmentmodels` (
   KEY `product_number` (`product_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_networkequipments
 
 DROP TABLE IF EXISTS `glpi_networkequipments`;
 CREATE TABLE `glpi_networkequipments` (
@@ -4541,8 +4128,6 @@ CREATE TABLE `glpi_networkequipments` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_networkequipmenttypes
-
 DROP TABLE IF EXISTS `glpi_networkequipmenttypes`;
 CREATE TABLE `glpi_networkequipmenttypes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -4557,8 +4142,6 @@ CREATE TABLE `glpi_networkequipmenttypes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_networkinterfaces
-
 DROP TABLE IF EXISTS `glpi_networkinterfaces`;
 CREATE TABLE `glpi_networkinterfaces` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -4568,8 +4151,6 @@ CREATE TABLE `glpi_networkinterfaces` (
   KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_networknames
 
 DROP TABLE IF EXISTS `glpi_networknames`;
 CREATE TABLE `glpi_networknames` (
@@ -4597,8 +4178,6 @@ CREATE TABLE `glpi_networknames` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_networkportaggregates
-
 DROP TABLE IF EXISTS `glpi_networkportaggregates`;
 CREATE TABLE `glpi_networkportaggregates` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -4612,8 +4191,6 @@ CREATE TABLE `glpi_networkportaggregates` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_networkportaliases
 
 DROP TABLE IF EXISTS `glpi_networkportaliases`;
 CREATE TABLE `glpi_networkportaliases` (
@@ -4630,8 +4207,6 @@ CREATE TABLE `glpi_networkportaliases` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_networkportdialups
-
 DROP TABLE IF EXISTS `glpi_networkportdialups`;
 CREATE TABLE `glpi_networkportdialups` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -4644,8 +4219,6 @@ CREATE TABLE `glpi_networkportdialups` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_networkportethernets
 
 DROP TABLE IF EXISTS `glpi_networkportethernets`;
 CREATE TABLE `glpi_networkportethernets` (
@@ -4667,8 +4240,6 @@ CREATE TABLE `glpi_networkportethernets` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-### Dump table glpi_networkportfiberchannels
-
 DROP TABLE IF EXISTS `glpi_networkportfiberchannels`;
 CREATE TABLE `glpi_networkportfiberchannels` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -4689,8 +4260,6 @@ CREATE TABLE `glpi_networkportfiberchannels` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-### Dump table glpi_networkportlocals
-
 DROP TABLE IF EXISTS `glpi_networkportlocals`;
 CREATE TABLE `glpi_networkportlocals` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -4703,8 +4272,6 @@ CREATE TABLE `glpi_networkportlocals` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_networkports
 
 DROP TABLE IF EXISTS `glpi_networkports`;
 CREATE TABLE `glpi_networkports` (
@@ -4735,8 +4302,6 @@ CREATE TABLE `glpi_networkports` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_networkports_networkports
-
 DROP TABLE IF EXISTS `glpi_networkports_networkports`;
 CREATE TABLE `glpi_networkports_networkports` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -4747,8 +4312,6 @@ CREATE TABLE `glpi_networkports_networkports` (
   KEY `networkports_id_2` (`networkports_id_2`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_networkports_vlans
 
 DROP TABLE IF EXISTS `glpi_networkports_vlans`;
 CREATE TABLE `glpi_networkports_vlans` (
@@ -4761,8 +4324,6 @@ CREATE TABLE `glpi_networkports_vlans` (
   KEY `vlans_id` (`vlans_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_networkportwifis
 
 DROP TABLE IF EXISTS `glpi_networkportwifis`;
 CREATE TABLE `glpi_networkportwifis` (
@@ -4786,8 +4347,6 @@ CREATE TABLE `glpi_networkportwifis` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_networks
-
 DROP TABLE IF EXISTS `glpi_networks`;
 CREATE TABLE `glpi_networks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -4801,8 +4360,6 @@ CREATE TABLE `glpi_networks` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_notepads
 
 DROP TABLE IF EXISTS `glpi_notepads`;
 CREATE TABLE `glpi_notepads` (
@@ -4822,8 +4379,6 @@ CREATE TABLE `glpi_notepads` (
   KEY `users_id` (`users_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_notifications
 
 DROP TABLE IF EXISTS `glpi_notifications`;
 CREATE TABLE `glpi_notifications` (
@@ -4916,8 +4471,6 @@ INSERT INTO `glpi_notifications` VALUES(66, 'Saved searches', 0, 'SavedSearch_Al
 INSERT INTO `glpi_notifications` VALUES(67, 'Certificates', 0, 'Certificate', 'alert', '', 1, 1, NULL, NULL);
 
 
-### Dump table glpi_notifications_notificationtemplates
-
 DROP TABLE IF EXISTS `glpi_notifications_notificationtemplates`;
 CREATE TABLE `glpi_notifications_notificationtemplates` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -4999,8 +4552,6 @@ INSERT INTO `glpi_notifications_notificationtemplates` VALUES(65, '65', 'mailing
 INSERT INTO `glpi_notifications_notificationtemplates` VALUES(66, '66', 'mailing', 24);
 INSERT INTO `glpi_notifications_notificationtemplates` VALUES(67, '67', 'mailing', 25);
 
-
-### Dump table glpi_notificationtargets
 
 DROP TABLE IF EXISTS `glpi_notificationtargets`;
 CREATE TABLE `glpi_notificationtargets` (
@@ -5143,8 +4694,6 @@ INSERT INTO `glpi_notificationtargets` VALUES ('129','23','1','64');
 INSERT INTO `glpi_notificationtargets` VALUES ('130','8','1','65');
 INSERT INTO `glpi_notificationtargets` VALUES ('131','19','1','66');
 
-### Dump table glpi_notificationtemplates
-
 DROP TABLE IF EXISTS `glpi_notificationtemplates`;
 CREATE TABLE `glpi_notificationtemplates` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -5186,8 +4735,6 @@ INSERT INTO `glpi_notificationtemplates` VALUES ('22','Project Tasks','ProjectTa
 INSERT INTO `glpi_notificationtemplates` VALUES ('23','Unlock Item request','ObjectLock','2016-02-08 16:57:46',NULL,NULL,NULL);
 INSERT INTO `glpi_notificationtemplates` VALUES ('24','Saved searches alerts','SavedSearch_Alert','2017-04-05 14:57:34',NULL,NULL,NULL);
 INSERT INTO `glpi_notificationtemplates` VALUES ('25','Certificates','Certificate',NULL,'',NULL,NULL);
-
-### Dump table glpi_notificationtemplatetranslations
 
 DROP TABLE IF EXISTS `glpi_notificationtemplatetranslations`;
 CREATE TABLE `glpi_notificationtemplatetranslations` (
@@ -5822,8 +5369,6 @@ INSERT INTO `glpi_notificationtemplatetranslations` VALUES ('25','25','','##cert
 &lt;br /&gt; &lt;a href=\"##certificate.url##\"&gt; ##certificate.url##
 &lt;/a&gt;&lt;br /&gt; ##ENDFOREACHcertificates##&lt;/p&gt;');
 
-### Dump table glpi_notimportedemails
-
 DROP TABLE IF EXISTS `glpi_notimportedemails`;
 CREATE TABLE `glpi_notimportedemails` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -5841,8 +5386,6 @@ CREATE TABLE `glpi_notimportedemails` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
-### Dump table glpi_objectlocks
-
 DROP TABLE IF EXISTS `glpi_objectlocks`;
 CREATE TABLE `glpi_objectlocks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -5854,8 +5397,6 @@ CREATE TABLE `glpi_objectlocks` (
   UNIQUE KEY `item` (`itemtype`,`items_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_operatingsystemarchitectures
 
 DROP TABLE IF EXISTS `glpi_operatingsystemarchitectures`;
 CREATE TABLE `glpi_operatingsystemarchitectures` (
@@ -5871,8 +5412,6 @@ CREATE TABLE `glpi_operatingsystemarchitectures` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_operatingsystems
-
 DROP TABLE IF EXISTS `glpi_operatingsystems`;
 CREATE TABLE `glpi_operatingsystems` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -5886,8 +5425,6 @@ CREATE TABLE `glpi_operatingsystems` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_operatingsystemservicepacks
 
 DROP TABLE IF EXISTS `glpi_operatingsystemservicepacks`;
 CREATE TABLE `glpi_operatingsystemservicepacks` (
@@ -5903,8 +5440,6 @@ CREATE TABLE `glpi_operatingsystemservicepacks` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_operatingsystemversions
-
 DROP TABLE IF EXISTS `glpi_operatingsystemversions`;
 CREATE TABLE `glpi_operatingsystemversions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -5918,8 +5453,6 @@ CREATE TABLE `glpi_operatingsystemversions` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_peripheralmodels
 
 DROP TABLE IF EXISTS `glpi_peripheralmodels`;
 CREATE TABLE `glpi_peripheralmodels` (
@@ -5944,8 +5477,6 @@ CREATE TABLE `glpi_peripheralmodels` (
   KEY `product_number` (`product_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_peripherals
 
 DROP TABLE IF EXISTS `glpi_peripherals`;
 CREATE TABLE `glpi_peripherals` (
@@ -6000,8 +5531,6 @@ CREATE TABLE `glpi_peripherals` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_peripheraltypes
-
 DROP TABLE IF EXISTS `glpi_peripheraltypes`;
 CREATE TABLE `glpi_peripheraltypes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -6015,8 +5544,6 @@ CREATE TABLE `glpi_peripheraltypes` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_phonemodels
 
 DROP TABLE IF EXISTS `glpi_phonemodels`;
 CREATE TABLE `glpi_phonemodels` (
@@ -6034,8 +5561,6 @@ CREATE TABLE `glpi_phonemodels` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_phonepowersupplies
-
 DROP TABLE IF EXISTS `glpi_phonepowersupplies`;
 CREATE TABLE `glpi_phonepowersupplies` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -6049,8 +5574,6 @@ CREATE TABLE `glpi_phonepowersupplies` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_phones
 
 DROP TABLE IF EXISTS `glpi_phones`;
 CREATE TABLE `glpi_phones` (
@@ -6110,8 +5633,6 @@ CREATE TABLE `glpi_phones` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_phonetypes
-
 DROP TABLE IF EXISTS `glpi_phonetypes`;
 CREATE TABLE `glpi_phonetypes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -6125,8 +5646,6 @@ CREATE TABLE `glpi_phonetypes` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_planningrecalls
 
 DROP TABLE IF EXISTS `glpi_planningrecalls`;
 CREATE TABLE `glpi_planningrecalls` (
@@ -6144,8 +5663,6 @@ CREATE TABLE `glpi_planningrecalls` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_plugins
-
 DROP TABLE IF EXISTS `glpi_plugins`;
 CREATE TABLE `glpi_plugins` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -6162,8 +5679,6 @@ CREATE TABLE `glpi_plugins` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_printermodels
-
 DROP TABLE IF EXISTS `glpi_printermodels`;
 CREATE TABLE `glpi_printermodels` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -6179,8 +5694,6 @@ CREATE TABLE `glpi_printermodels` (
   KEY `product_number` (`product_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_printers
 
 DROP TABLE IF EXISTS `glpi_printers`;
 CREATE TABLE `glpi_printers` (
@@ -6246,8 +5759,6 @@ CREATE TABLE `glpi_printers` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_printertypes
-
 DROP TABLE IF EXISTS `glpi_printertypes`;
 CREATE TABLE `glpi_printertypes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -6261,8 +5772,6 @@ CREATE TABLE `glpi_printertypes` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_problemcosts
 
 DROP TABLE IF EXISTS `glpi_problemcosts`;
 CREATE TABLE `glpi_problemcosts` (
@@ -6287,8 +5796,6 @@ CREATE TABLE `glpi_problemcosts` (
   KEY `budgets_id` (`budgets_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_problems
 
 DROP TABLE IF EXISTS `glpi_problems`;
 CREATE TABLE `glpi_problems` (
@@ -6340,8 +5847,6 @@ CREATE TABLE `glpi_problems` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_problems_suppliers
-
 DROP TABLE IF EXISTS `glpi_problems_suppliers`;
 CREATE TABLE `glpi_problems_suppliers` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -6356,8 +5861,6 @@ CREATE TABLE `glpi_problems_suppliers` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_problems_tickets
-
 DROP TABLE IF EXISTS `glpi_problems_tickets`;
 CREATE TABLE `glpi_problems_tickets` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -6368,8 +5871,6 @@ CREATE TABLE `glpi_problems_tickets` (
   KEY `tickets_id` (`tickets_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_problems_users
 
 DROP TABLE IF EXISTS `glpi_problems_users`;
 CREATE TABLE `glpi_problems_users` (
@@ -6384,8 +5885,6 @@ CREATE TABLE `glpi_problems_users` (
   KEY `user` (`users_id`,`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_problemtasks
 
 DROP TABLE IF EXISTS `glpi_problemtasks`;
 CREATE TABLE `glpi_problemtasks` (
@@ -6421,8 +5920,6 @@ CREATE TABLE `glpi_problemtasks` (
   KEY `tasktemplates_id` (`tasktemplates_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_profilerights
 
 DROP TABLE IF EXISTS `glpi_profilerights`;
 CREATE TABLE `glpi_profilerights` (
@@ -7045,8 +6542,6 @@ INSERT INTO `glpi_profilerights` VALUES ('867','7','datacenter','255');
 INSERT INTO `glpi_profilerights` VALUES ('868','8','datacenter','0');
 INSERT INTO `glpi_profilerights` VALUES ('870','4','rule_asset','1055');
 
-### Dump table glpi_profiles
-
 DROP TABLE IF EXISTS `glpi_profiles`;
 CREATE TABLE `glpi_profiles` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -7100,8 +6595,6 @@ INSERT INTO `glpi_profiles` VALUES ('8','Read-Only','central','0','0','[]','{\"1
                        \"8\":{\"1\":0,\"9\":0,\"10\":0,\"7\":0,\"4\":0,\"11\":0,\"12\":0,\"5\":0,\"6\":0},
                        \"6\":{\"1\":0,\"9\":0,\"10\":0,\"7\":0,\"4\":0,\"11\":0,\"12\":0,\"5\":0,\"8\":0}}','2016-02-08 16:57:46');
 
-### Dump table glpi_profiles_reminders
-
 DROP TABLE IF EXISTS `glpi_profiles_reminders`;
 CREATE TABLE `glpi_profiles_reminders` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -7117,8 +6610,6 @@ CREATE TABLE `glpi_profiles_reminders` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_profiles_rssfeeds
-
 DROP TABLE IF EXISTS `glpi_profiles_rssfeeds`;
 CREATE TABLE `glpi_profiles_rssfeeds` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -7133,8 +6624,6 @@ CREATE TABLE `glpi_profiles_rssfeeds` (
   KEY `is_recursive` (`is_recursive`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_profiles_users
 
 DROP TABLE IF EXISTS `glpi_profiles_users`;
 CREATE TABLE `glpi_profiles_users` (
@@ -7156,8 +6645,6 @@ INSERT INTO `glpi_profiles_users` VALUES ('2','2','4','0','1','0');
 INSERT INTO `glpi_profiles_users` VALUES ('3','3','1','0','1','0');
 INSERT INTO `glpi_profiles_users` VALUES ('4','4','6','0','1','0');
 INSERT INTO `glpi_profiles_users` VALUES ('5','5','2','0','1','0');
-
-### Dump table glpi_projectcosts
 
 DROP TABLE IF EXISTS `glpi_projectcosts`;
 CREATE TABLE `glpi_projectcosts` (
@@ -7181,8 +6668,6 @@ CREATE TABLE `glpi_projectcosts` (
   KEY `budgets_id` (`budgets_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_projects
 
 DROP TABLE IF EXISTS `glpi_projects`;
 CREATE TABLE `glpi_projects` (
@@ -7237,8 +6722,6 @@ CREATE TABLE `glpi_projects` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_projectstates
-
 DROP TABLE IF EXISTS `glpi_projectstates`;
 CREATE TABLE `glpi_projectstates` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -7258,8 +6741,6 @@ CREATE TABLE `glpi_projectstates` (
 INSERT INTO `glpi_projectstates` VALUES ('1','New',NULL,'#06ff00','0',NULL,NULL);
 INSERT INTO `glpi_projectstates` VALUES ('2','Processing',NULL,'#ffb800','0',NULL,NULL);
 INSERT INTO `glpi_projectstates` VALUES ('3','Closed',NULL,'#ff0000','1',NULL,NULL);
-
-### Dump table glpi_projecttasks
 
 DROP TABLE IF EXISTS `glpi_projecttasks`;
 CREATE TABLE `glpi_projecttasks` (
@@ -7308,8 +6789,6 @@ CREATE TABLE `glpi_projecttasks` (
   KEY `is_milestone` (`is_milestone`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-### Dump table glpi_projecttasktemplates
-
 DROP TABLE IF EXISTS `glpi_projecttasktemplates`;
 CREATE TABLE `glpi_projecttasktemplates` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -7354,8 +6833,6 @@ CREATE TABLE `glpi_projecttasktemplates` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_projecttasks_tickets
-
 DROP TABLE IF EXISTS `glpi_projecttasks_tickets`;
 CREATE TABLE `glpi_projecttasks_tickets` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -7366,8 +6843,6 @@ CREATE TABLE `glpi_projecttasks_tickets` (
   KEY `projects_id` (`projecttasks_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_projecttaskteams
 
 DROP TABLE IF EXISTS `glpi_projecttaskteams`;
 CREATE TABLE `glpi_projecttaskteams` (
@@ -7380,8 +6855,6 @@ CREATE TABLE `glpi_projecttaskteams` (
   KEY `item` (`itemtype`,`items_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_projecttasktypes
 
 DROP TABLE IF EXISTS `glpi_projecttasktypes`;
 CREATE TABLE `glpi_projecttasktypes` (
@@ -7397,8 +6870,6 @@ CREATE TABLE `glpi_projecttasktypes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_projectteams
-
 DROP TABLE IF EXISTS `glpi_projectteams`;
 CREATE TABLE `glpi_projectteams` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -7410,8 +6881,6 @@ CREATE TABLE `glpi_projectteams` (
   KEY `item` (`itemtype`,`items_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_projecttypes
 
 DROP TABLE IF EXISTS `glpi_projecttypes`;
 CREATE TABLE `glpi_projecttypes` (
@@ -7426,8 +6895,6 @@ CREATE TABLE `glpi_projecttypes` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_queuednotifications
 
 DROP TABLE IF EXISTS `glpi_queuednotifications`;
 CREATE TABLE `glpi_queuednotifications` (
@@ -7466,8 +6933,6 @@ CREATE TABLE `glpi_queuednotifications` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_registeredids
-
 DROP TABLE IF EXISTS `glpi_registeredids`;
 CREATE TABLE `glpi_registeredids` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -7481,8 +6946,6 @@ CREATE TABLE `glpi_registeredids` (
   KEY `device_type` (`device_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_reminders
 
 DROP TABLE IF EXISTS `glpi_reminders`;
 CREATE TABLE `glpi_reminders` (
@@ -7511,8 +6974,6 @@ CREATE TABLE `glpi_reminders` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_reminders_users
-
 DROP TABLE IF EXISTS `glpi_reminders_users`;
 CREATE TABLE `glpi_reminders_users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -7523,8 +6984,6 @@ CREATE TABLE `glpi_reminders_users` (
   KEY `users_id` (`users_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_requesttypes
 
 DROP TABLE IF EXISTS `glpi_requesttypes`;
 CREATE TABLE `glpi_requesttypes` (
@@ -7560,8 +7019,6 @@ INSERT INTO `glpi_requesttypes` VALUES ('4','Direct','0','0','0','0','1','1','1'
 INSERT INTO `glpi_requesttypes` VALUES ('5','Written','0','0','0','0','1','1','1',NULL,NULL,NULL);
 INSERT INTO `glpi_requesttypes` VALUES ('6','Other','0','0','0','0','1','1','1',NULL,NULL,NULL);
 
-### Dump table glpi_reservationitems
-
 DROP TABLE IF EXISTS `glpi_reservationitems`;
 CREATE TABLE `glpi_reservationitems` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -7581,8 +7038,6 @@ CREATE TABLE `glpi_reservationitems` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_reservations
-
 DROP TABLE IF EXISTS `glpi_reservations`;
 CREATE TABLE `glpi_reservations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -7600,8 +7055,6 @@ CREATE TABLE `glpi_reservations` (
   KEY `resagroup` (`reservationitems_id`,`group`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_rssfeeds
 
 DROP TABLE IF EXISTS `glpi_rssfeeds`;
 CREATE TABLE `glpi_rssfeeds` (
@@ -7626,8 +7079,6 @@ CREATE TABLE `glpi_rssfeeds` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_rssfeeds_users
-
 DROP TABLE IF EXISTS `glpi_rssfeeds_users`;
 CREATE TABLE `glpi_rssfeeds_users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -7638,8 +7089,6 @@ CREATE TABLE `glpi_rssfeeds_users` (
   KEY `users_id` (`users_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_ruleactions
 
 DROP TABLE IF EXISTS `glpi_ruleactions`;
 CREATE TABLE `glpi_ruleactions` (
@@ -7663,8 +7112,6 @@ INSERT INTO `glpi_ruleactions` VALUES ('8','8','assign','_import_category','1');
 INSERT INTO `glpi_ruleactions` VALUES ('9','9','regex_result','_affect_user_by_regex','#0');
 INSERT INTO `glpi_ruleactions` VALUES ('10','10','regex_result','_affect_user_by_regex','#0');
 INSERT INTO `glpi_ruleactions` VALUES ('11','11','regex_result','_affect_user_by_regex','#0');
-
-### Dump table glpi_rulecriterias
 
 DROP TABLE IF EXISTS `glpi_rulecriterias`;
 CREATE TABLE `glpi_rulecriterias` (
@@ -7699,8 +7146,6 @@ INSERT INTO `glpi_rulecriterias` VALUES ('20','11','_itemtype','0','Computer');
 INSERT INTO `glpi_rulecriterias` VALUES ('21','11','_auto','0','1');
 INSERT INTO `glpi_rulecriterias` VALUES ('22','11','contact','6','/(.*)/');
 
-### Dump table glpi_rulerightparameters
-
 DROP TABLE IF EXISTS `glpi_rulerightparameters`;
 CREATE TABLE `glpi_rulerightparameters` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -7727,8 +7172,6 @@ INSERT INTO `glpi_rulerightparameters` VALUES ('10','(LDAP)DistinguishedName','d
 INSERT INTO `glpi_rulerightparameters` VALUES ('12','(AD)User ID','samaccountname','',NULL,NULL);
 INSERT INTO `glpi_rulerightparameters` VALUES ('13','(LDAP) Title','title','',NULL,NULL);
 INSERT INTO `glpi_rulerightparameters` VALUES ('14','(LDAP) MemberOf','memberof','',NULL,NULL);
-
-### Dump table glpi_rules
 
 DROP TABLE IF EXISTS `glpi_rules`;
 CREATE TABLE `glpi_rules` (
@@ -7767,8 +7210,6 @@ INSERT INTO `glpi_rules` VALUES ('9','0','RuleAsset','1','Domain user assignatio
 INSERT INTO `glpi_rules` VALUES ('10','0','RuleAsset','2','Multiple users: assign to the first','','AND','1','Automatically generated by GLPI 9.3',NULL,'1','fbeb1115-7a37b143-5a3a6fc1b03762.88595154','3',NULL);
 INSERT INTO `glpi_rules` VALUES ('11','0','RuleAsset','3','One user assignation','','AND','1','Automatically generated by GLPI 9.3',NULL,'1','fbeb1115-7a37b143-5a3a6fc1b073e1.16257440','3',NULL);
 
-### Dump table glpi_slalevelactions
-
 DROP TABLE IF EXISTS `glpi_slalevelactions`;
 CREATE TABLE `glpi_slalevelactions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -7780,8 +7221,6 @@ CREATE TABLE `glpi_slalevelactions` (
   KEY `slalevels_id` (`slalevels_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_slalevelcriterias
 
 DROP TABLE IF EXISTS `glpi_slalevelcriterias`;
 CREATE TABLE `glpi_slalevelcriterias` (
@@ -7795,8 +7234,6 @@ CREATE TABLE `glpi_slalevelcriterias` (
   KEY `condition` (`condition`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_slalevels
 
 DROP TABLE IF EXISTS `glpi_slalevels`;
 CREATE TABLE `glpi_slalevels` (
@@ -7816,8 +7253,6 @@ CREATE TABLE `glpi_slalevels` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_slalevels_tickets
-
 DROP TABLE IF EXISTS `glpi_slalevels_tickets`;
 CREATE TABLE `glpi_slalevels_tickets` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -7829,8 +7264,6 @@ CREATE TABLE `glpi_slalevels_tickets` (
   KEY `slalevels_id` (`slalevels_id`),
   UNIQUE KEY `unicity` (`tickets_id`,`slalevels_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-### Dump table glpi_olalevelactions
 
 DROP TABLE IF EXISTS `glpi_olalevelactions`;
 CREATE TABLE `glpi_olalevelactions` (
@@ -7844,8 +7277,6 @@ CREATE TABLE `glpi_olalevelactions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_olalevelcriterias
-
 DROP TABLE IF EXISTS `glpi_olalevelcriterias`;
 CREATE TABLE `glpi_olalevelcriterias` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -7858,8 +7289,6 @@ CREATE TABLE `glpi_olalevelcriterias` (
   KEY `condition` (`condition`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_olalevels
 
 DROP TABLE IF EXISTS `glpi_olalevels`;
 CREATE TABLE `glpi_olalevels` (
@@ -7879,8 +7308,6 @@ CREATE TABLE `glpi_olalevels` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_olalevels_tickets
-
 DROP TABLE IF EXISTS `glpi_olalevels_tickets`;
 CREATE TABLE `glpi_olalevels_tickets` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -7892,8 +7319,6 @@ CREATE TABLE `glpi_olalevels_tickets` (
   KEY `olalevels_id` (`olalevels_id`),
   UNIQUE KEY `unicity` (`tickets_id`,`olalevels_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-### Dump table glpi_slms
 
 DROP TABLE IF EXISTS `glpi_slms`;
 CREATE TABLE `glpi_slms` (
@@ -7913,8 +7338,6 @@ CREATE TABLE `glpi_slms` (
   KEY `date_mod` (`date_mod`),
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-### Dump table glpi_slas
 
 DROP TABLE IF EXISTS `glpi_slas`;
 CREATE TABLE `glpi_slas` (
@@ -7939,8 +7362,6 @@ CREATE TABLE `glpi_slas` (
   KEY `slms_id` (`slms_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-### Dump table glpi_olas
-
 DROP TABLE IF EXISTS `glpi_olas`;
 CREATE TABLE `glpi_olas` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -7964,8 +7385,6 @@ CREATE TABLE `glpi_olas` (
   KEY `slms_id` (`slms_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-### Dump table glpi_softwarecategories
-
 DROP TABLE IF EXISTS `glpi_softwarecategories`;
 CREATE TABLE `glpi_softwarecategories` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -7981,8 +7400,6 @@ CREATE TABLE `glpi_softwarecategories` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO `glpi_softwarecategories` VALUES ('1','FUSION',NULL,'0','FUSION','1',NULL,NULL);
-
-### Dump table glpi_softwarelicenses
 
 DROP TABLE IF EXISTS `glpi_softwarelicenses`;
 CREATE TABLE `glpi_softwarelicenses` (
@@ -8043,8 +7460,6 @@ CREATE TABLE `glpi_softwarelicenses` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_softwarelicensetypes
-
 DROP TABLE IF EXISTS `glpi_softwarelicensetypes`;
 CREATE TABLE `glpi_softwarelicensetypes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -8067,8 +7482,6 @@ CREATE TABLE `glpi_softwarelicensetypes` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO `glpi_softwarelicensetypes` VALUES ('1', 'OEM', '', NULL, NULL, '0', '0', NULL, NULL, '0', '1', 'OEM');
-
-### Dump table glpi_softwares
 
 DROP TABLE IF EXISTS `glpi_softwares`;
 CREATE TABLE `glpi_softwares` (
@@ -8114,8 +7527,6 @@ CREATE TABLE `glpi_softwares` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_softwareversions
-
 DROP TABLE IF EXISTS `glpi_softwareversions`;
 CREATE TABLE `glpi_softwareversions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -8140,8 +7551,6 @@ CREATE TABLE `glpi_softwareversions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_solutiontemplates
-
 DROP TABLE IF EXISTS `glpi_solutiontemplates`;
 CREATE TABLE `glpi_solutiontemplates` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -8163,8 +7572,6 @@ CREATE TABLE `glpi_solutiontemplates` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_solutiontypes
-
 DROP TABLE IF EXISTS `glpi_solutiontypes`;
 CREATE TABLE `glpi_solutiontypes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -8183,7 +7590,6 @@ CREATE TABLE `glpi_solutiontypes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_itilsolutions
 DROP TABLE IF EXISTS `glpi_itilsolutions`;
 CREATE TABLE `glpi_itilsolutions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -8215,8 +7621,6 @@ CREATE TABLE `glpi_itilsolutions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_ssovariables
-
 DROP TABLE IF EXISTS `glpi_ssovariables`;
 CREATE TABLE `glpi_ssovariables` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -8235,8 +7639,6 @@ INSERT INTO `glpi_ssovariables` VALUES ('3','PHP_AUTH_USER','',NULL,NULL);
 INSERT INTO `glpi_ssovariables` VALUES ('4','USERNAME','',NULL,NULL);
 INSERT INTO `glpi_ssovariables` VALUES ('5','REDIRECT_REMOTE_USER','',NULL,NULL);
 INSERT INTO `glpi_ssovariables` VALUES ('6','HTTP_REMOTE_USER','',NULL,NULL);
-
-### Dump table glpi_states
 
 DROP TABLE IF EXISTS `glpi_states`;
 CREATE TABLE `glpi_states` (
@@ -8282,8 +7684,6 @@ CREATE TABLE `glpi_states` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_suppliers
-
 DROP TABLE IF EXISTS `glpi_suppliers`;
 CREATE TABLE `glpi_suppliers` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -8314,8 +7714,6 @@ CREATE TABLE `glpi_suppliers` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_suppliers_tickets
-
 DROP TABLE IF EXISTS `glpi_suppliers_tickets`;
 CREATE TABLE `glpi_suppliers_tickets` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -8330,8 +7728,6 @@ CREATE TABLE `glpi_suppliers_tickets` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_suppliertypes
-
 DROP TABLE IF EXISTS `glpi_suppliertypes`;
 CREATE TABLE `glpi_suppliertypes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -8345,8 +7741,6 @@ CREATE TABLE `glpi_suppliertypes` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_taskcategories
 
 DROP TABLE IF EXISTS `glpi_taskcategories`;
 CREATE TABLE `glpi_taskcategories` (
@@ -8378,8 +7772,6 @@ CREATE TABLE `glpi_taskcategories` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_tasktemplates
-
 DROP TABLE IF EXISTS `glpi_tasktemplates`;
 CREATE TABLE `glpi_tasktemplates` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -8409,8 +7801,6 @@ CREATE TABLE `glpi_tasktemplates` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_ticketcosts
-
 DROP TABLE IF EXISTS `glpi_ticketcosts`;
 CREATE TABLE `glpi_ticketcosts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -8434,8 +7824,6 @@ CREATE TABLE `glpi_ticketcosts` (
   KEY `budgets_id` (`budgets_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_ticketfollowups
 
 DROP TABLE IF EXISTS `glpi_ticketfollowups`;
 CREATE TABLE `glpi_ticketfollowups` (
@@ -8462,8 +7850,6 @@ CREATE TABLE `glpi_ticketfollowups` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_ticketrecurrents
-
 DROP TABLE IF EXISTS `glpi_ticketrecurrents`;
 CREATE TABLE `glpi_ticketrecurrents` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -8487,8 +7873,6 @@ CREATE TABLE `glpi_ticketrecurrents` (
   KEY `next_creation_date` (`next_creation_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_tickets
 
 DROP TABLE IF EXISTS `glpi_tickets`;
 CREATE TABLE `glpi_tickets` (
@@ -8565,8 +7949,6 @@ CREATE TABLE `glpi_tickets` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_tickets_tickets
-
 DROP TABLE IF EXISTS `glpi_tickets_tickets`;
 CREATE TABLE `glpi_tickets_tickets` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -8577,8 +7959,6 @@ CREATE TABLE `glpi_tickets_tickets` (
   UNIQUE KEY `unicity` (`tickets_id_1`,`tickets_id_2`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_tickets_users
 
 DROP TABLE IF EXISTS `glpi_tickets_users`;
 CREATE TABLE `glpi_tickets_users` (
@@ -8594,8 +7974,6 @@ CREATE TABLE `glpi_tickets_users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_ticketsatisfactions
-
 DROP TABLE IF EXISTS `glpi_ticketsatisfactions`;
 CREATE TABLE `glpi_ticketsatisfactions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -8609,8 +7987,6 @@ CREATE TABLE `glpi_ticketsatisfactions` (
   UNIQUE KEY `tickets_id` (`tickets_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_tickettasks
 
 DROP TABLE IF EXISTS `glpi_tickettasks`;
 CREATE TABLE `glpi_tickettasks` (
@@ -8650,8 +8026,6 @@ CREATE TABLE `glpi_tickettasks` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_tickettemplatehiddenfields
-
 DROP TABLE IF EXISTS `glpi_tickettemplatehiddenfields`;
 CREATE TABLE `glpi_tickettemplatehiddenfields` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -8661,8 +8035,6 @@ CREATE TABLE `glpi_tickettemplatehiddenfields` (
   UNIQUE KEY `unicity` (`tickettemplates_id`,`num`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_tickettemplatemandatoryfields
 
 DROP TABLE IF EXISTS `glpi_tickettemplatemandatoryfields`;
 CREATE TABLE `glpi_tickettemplatemandatoryfields` (
@@ -8675,8 +8047,6 @@ CREATE TABLE `glpi_tickettemplatemandatoryfields` (
 
 INSERT INTO `glpi_tickettemplatemandatoryfields` VALUES ('1','1','21');
 
-### Dump table glpi_tickettemplatepredefinedfields
-
 DROP TABLE IF EXISTS `glpi_tickettemplatepredefinedfields`;
 CREATE TABLE `glpi_tickettemplatepredefinedfields` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -8687,8 +8057,6 @@ CREATE TABLE `glpi_tickettemplatepredefinedfields` (
   KEY `tickettemplates_id_id_num` (`tickettemplates_id`,`num`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_tickettemplates
 
 DROP TABLE IF EXISTS `glpi_tickettemplates`;
 CREATE TABLE `glpi_tickettemplates` (
@@ -8704,8 +8072,6 @@ CREATE TABLE `glpi_tickettemplates` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO `glpi_tickettemplates` VALUES ('1','Default','0','1',NULL);
-
-### Dump table glpi_ticketvalidations
 
 DROP TABLE IF EXISTS `glpi_ticketvalidations`;
 CREATE TABLE `glpi_ticketvalidations` (
@@ -8730,8 +8096,6 @@ CREATE TABLE `glpi_ticketvalidations` (
   KEY `status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_transfers
 
 DROP TABLE IF EXISTS `glpi_transfers`;
 CREATE TABLE `glpi_transfers` (
@@ -8774,8 +8138,6 @@ CREATE TABLE `glpi_transfers` (
 
 INSERT INTO `glpi_transfers` VALUES ('1','complete','2','2','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1',NULL,NULL,'1');
 
-### Dump table glpi_usercategories
-
 DROP TABLE IF EXISTS `glpi_usercategories`;
 CREATE TABLE `glpi_usercategories` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -8789,8 +8151,6 @@ CREATE TABLE `glpi_usercategories` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_useremails
 
 DROP TABLE IF EXISTS `glpi_useremails`;
 CREATE TABLE `glpi_useremails` (
@@ -8806,8 +8166,6 @@ CREATE TABLE `glpi_useremails` (
   KEY `is_dynamic` (`is_dynamic`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_users
 
 DROP TABLE IF EXISTS `glpi_users`;
 CREATE TABLE `glpi_users` (
@@ -8921,8 +8279,6 @@ INSERT INTO `glpi_users` (`id`, `name`, `password`, `language`, `list_limit`, `a
 INSERT INTO `glpi_users` (`id`, `name`, `password`, `language`, `list_limit`, `authtype`)
    VALUES ('5','normal','$2y$10$Z6doq4zVHkSPZFbPeXTCluN1Q/r0ryZ3ZsSJncJqkN3.8cRiN0NV.','en_GB','20','1');
 
-### Dump table glpi_usertitles
-
 DROP TABLE IF EXISTS `glpi_usertitles`;
 CREATE TABLE `glpi_usertitles` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -8937,8 +8293,6 @@ CREATE TABLE `glpi_usertitles` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_virtualmachinestates
-
 DROP TABLE IF EXISTS `glpi_virtualmachinestates`;
 CREATE TABLE `glpi_virtualmachinestates` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -8951,8 +8305,6 @@ CREATE TABLE `glpi_virtualmachinestates` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_virtualmachinesystems
 
 DROP TABLE IF EXISTS `glpi_virtualmachinesystems`;
 CREATE TABLE `glpi_virtualmachinesystems` (
@@ -8967,8 +8319,6 @@ CREATE TABLE `glpi_virtualmachinesystems` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_virtualmachinetypes
-
 DROP TABLE IF EXISTS `glpi_virtualmachinetypes`;
 CREATE TABLE `glpi_virtualmachinetypes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -8981,8 +8331,6 @@ CREATE TABLE `glpi_virtualmachinetypes` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
-### Dump table glpi_vlans
 
 DROP TABLE IF EXISTS `glpi_vlans`;
 CREATE TABLE `glpi_vlans` (
@@ -9003,8 +8351,6 @@ CREATE TABLE `glpi_vlans` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_wifinetworks
-
 DROP TABLE IF EXISTS `glpi_wifinetworks`;
 CREATE TABLE `glpi_wifinetworks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -9024,8 +8370,6 @@ CREATE TABLE `glpi_wifinetworks` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-### Dump table glpi_knowbaseitems_items
-
 DROP TABLE IF EXISTS `glpi_knowbaseitems_items`;
 CREATE TABLE `glpi_knowbaseitems_items` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -9040,8 +8384,6 @@ CREATE TABLE `glpi_knowbaseitems_items` (
   KEY `item_id` (`items_id`),
   KEY `item` (`itemtype`,`items_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-### Dump table glpi_knowbaseitems_revisions
 
 DROP TABLE IF EXISTS `glpi_knowbaseitems_revisions`;
 CREATE TABLE `glpi_knowbaseitems_revisions` (
@@ -9058,8 +8400,6 @@ CREATE TABLE `glpi_knowbaseitems_revisions` (
   KEY `revision` (`revision`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-### Dump table glpi_knowbaseitems_comments
-
 DROP TABLE IF EXISTS `glpi_knowbaseitems_comments`;
 CREATE TABLE `glpi_knowbaseitems_comments` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -9073,8 +8413,6 @@ CREATE TABLE `glpi_knowbaseitems_comments` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-### Dump table glpi_devicebatterymodels
-
 DROP TABLE IF EXISTS `glpi_devicebatterymodels`;
 CREATE TABLE `glpi_devicebatterymodels` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -9085,8 +8423,6 @@ CREATE TABLE `glpi_devicebatterymodels` (
   KEY `name` (`name`),
   KEY `product_number` (`product_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-### Dump table glpi_devicebatteries
 
 DROP TABLE IF EXISTS `glpi_devicebatteries`;
 CREATE TABLE `glpi_devicebatteries` (
@@ -9112,8 +8448,6 @@ CREATE TABLE `glpi_devicebatteries` (
   KEY `devicebatterymodels_id` (`devicebatterymodels_id`),
   KEY `devicebatterytypes_id` (`devicebatterytypes_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-### Dump table glpi_items_devicebatteries
 
 DROP TABLE IF EXISTS `glpi_items_devicebatteries`;
 CREATE TABLE `glpi_items_devicebatteries` (
@@ -9155,8 +8489,6 @@ CREATE TABLE `glpi_devicebatterytypes` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-### Dump table glpi_devicefirmwaremodels
-
 DROP TABLE IF EXISTS `glpi_devicefirmwaremodels`;
 CREATE TABLE `glpi_devicefirmwaremodels` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -9167,8 +8499,6 @@ CREATE TABLE `glpi_devicefirmwaremodels` (
   KEY `name` (`name`),
   KEY `product_number` (`product_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-### Dump table glpi_devicefirmwares
 
 DROP TABLE IF EXISTS `glpi_devicefirmwares`;
 CREATE TABLE `glpi_devicefirmwares` (
@@ -9194,8 +8524,6 @@ CREATE TABLE `glpi_devicefirmwares` (
   KEY `devicefirmwaremodels_id` (`devicefirmwaremodels_id`),
   KEY `devicefirmwaretypes_id` (`devicefirmwaretypes_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-### Dump table glpi_items_devicefirmwares
 
 DROP TABLE IF EXISTS `glpi_items_devicefirmwares`;
 CREATE TABLE `glpi_items_devicefirmwares` (

@@ -497,36 +497,29 @@ class DBmysql {
     * @return boolean true if all query are successfull
     */
    function runFile($path) {
-      $DBf_handle = fopen($path, "rt");
-      if (!$DBf_handle) {
+      $script = fopen($path, 'r');
+      if (!$script) {
          return false;
       }
+      $sql_query = @fread(
+         $script,
+         @filesize($path)
+      ) . "\n";
+      $sql_query = html_entity_decode($sql_query, ENT_COMPAT, 'UTF-8');
 
-      $formattedQuery = "";
-      $lastresult     = false;
-      while (!feof($DBf_handle)) {
-         // specify read length to be able to read long lines
-         $buffer = fgets($DBf_handle, 102400);
+      $sql_query = $this->removeSqlComments($sql_query);
+      $sql_query = $this->removeSqlRemarks($sql_query);
+      $queries = explode(';', $sql_query);
 
-         // do not strip comments due to problems when # in begin of a data line
-         $formattedQuery .= $buffer;
-         if ((substr(rtrim($formattedQuery), -1) == ";")
-             && (substr(rtrim($formattedQuery), -4) != "&gt;")
-             && (substr(rtrim($formattedQuery), -4) != "160;")) {
-
-            $formattedQuerytorun = $formattedQuery;
-
-            // Do not use the $DB->query
-            if ($this->query($formattedQuerytorun)) { //if no success continue to concatenate
-               $formattedQuery = "";
-               $lastresult     = true;
-            } else {
-               $lastresult = false;
-            }
+      foreach ($queries as $query) {
+         $query = trim($query);
+         if ($query != '' && $query[0] != '-') {
+            $query = htmlentities($query);
+            $this->queryOrDie($query);
          }
       }
 
-      return $lastresult;
+      return true;
    }
 
    /**
@@ -1160,4 +1153,72 @@ class DBmysql {
    public function rollBack() {
       return $this->dbh->rollback();
    }
+
+   /**
+    * Remove SQL comments
+    * © 2011 PHPBB Group
+    *
+    * @param string $output SQL statements
+    *
+    * @return string
+    */
+   public function removeSqlComments($output) {
+      $lines = explode("\n", $output);
+      $output = "";
+
+      // try to keep mem. use down
+      $linecount = count($lines);
+
+      $in_comment = false;
+      for ($i = 0; $i < $linecount; $i++) {
+         if (preg_match("/^\/\*/", preg_quote($lines[$i]))) {
+            $in_comment = true;
+         }
+
+         if (!$in_comment) {
+            $output .= $lines[$i] . "\n";
+         }
+
+         if (preg_match("/\*\/$/", preg_quote($lines[$i]))) {
+            $in_comment = false;
+         }
+      }
+
+      unset($lines);
+      return $output;
+   }
+
+   /**
+    * Remove remarks from SQL
+    * © 2011 PHPBB Group
+    *
+    * @param $string $sql SQL statements
+    *
+    * @return string
+    */
+   public function removeSqlRemarks($sql) {
+      $lines = explode("\n", $sql);
+
+      // try to keep mem. use down
+      $sql = "";
+
+      $linecount = count($lines);
+      $output = "";
+
+      for ($i = 0; $i < $linecount; $i++) {
+         if (($i != ($linecount - 1)) || (strlen($lines[$i]) > 0)) {
+            if (isset($lines[$i][0])) {
+               if (/*$lines[$i][0] != "#" && */substr($lines[$i], 0, 2) != "--") {
+                  $output .= $lines[$i] . "\n";
+               } else {
+                  $output .= "\n";
+               }
+            }
+            // Trading a bit of speed for lower mem. use here.
+            $lines[$i] = "";
+         }
+      }
+      return $output;
+   }
+
 }
