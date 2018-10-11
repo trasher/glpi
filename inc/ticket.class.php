@@ -2024,7 +2024,7 @@ class Ticket extends CommonITILObject {
       if ((isset($this->input["plan"]) && count($this->input["plan"]))
           || (isset($this->input["actiontime"]) && ($this->input["actiontime"] > 0))) {
 
-         $task = new TicketTask();
+         $task = new ITILTask();
          $type = "new";
          if (isset($this->fields["status"]) && ($this->fields["status"]  == self::SOLVED)) {
             $type = "solved";
@@ -2097,7 +2097,7 @@ class Ticket extends CommonITILObject {
           && is_array($this->input['_tasktemplates_id'])
           && count($this->input['_tasktemplates_id'])) {
          $tasktemplate = new TaskTemplate;
-         $tickettask   = new TicketTask;
+         $tickettask   = new ITILTask;
          foreach ($this->input['_tasktemplates_id'] as $tasktemplates_id) {
             $tasktemplate->getFromDB($tasktemplates_id);
             $tasktemplate_content = Toolbox::addslashes_deep($tasktemplate->fields["content"]);
@@ -2582,7 +2582,7 @@ class Ticket extends CommonITILObject {
                = __('Add a new followup');
          }
 
-         if (TicketTask::canCreate()) {
+         if (ITILTask::canCreate()) {
             $actions[__CLASS__.MassiveAction::CLASS_ACTION_SEPARATOR.'add_task'] = __('Add a new task');
          }
 
@@ -3021,7 +3021,7 @@ class Ticket extends CommonITILObject {
 
       $tab = array_merge($tab, ITILFollowup::rawSearchOptionsToAdd());
 
-      $tab = array_merge($tab, TicketTask::rawSearchOptionsToAdd());
+      $tab = array_merge($tab, ITILTask::rawSearchOptionsToAdd());
 
       $tab = array_merge($tab, $this->getSearchOptionsStats());
 

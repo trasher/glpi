@@ -39,36 +39,6 @@ class ChangeTask extends CommonITILTask {
    static $rightname = 'task';
 
 
-   static function getTypeName($nb = 0) {
-      return _n('Change task', 'Change tasks', $nb);
-   }
-
-
-   static function canCreate() {
-      return Session::haveRight('change', UPDATE);
-   }
-
-
-   static function canView() {
-      return Session::haveRightsOr('change', [Change::READALL, Change::READMY]);
-   }
-
-
-   static function canUpdate() {
-      return Session::haveRight('change', UPDATE);
-   }
-
-
-   function canViewPrivates() {
-      return true;
-   }
-
-
-   function canEditAll() {
-      return Session::haveRightsOr('change', [CREATE, UPDATE, DELETE, PURGE]);
-   }
-
-
    /**
     * Does current user have right to show the current task?
     *

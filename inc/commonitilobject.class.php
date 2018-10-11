@@ -5685,7 +5685,7 @@ abstract class CommonITILObject extends CommonDBTM {
     * Returns the position of the $sub_type for the $user_id in the timeline
     *
     * @param int $items_id is the id of the ITIL object
-    * @param string $sub_type is ITILFollowup, Document_Item, TicketTask, TicketValidation or Solution
+    * @param string $sub_type is ITILFollowup, Document_Item, ITILTask, TicketValidation or Solution
     * @param int $users_id
     * @since 9.2
     */
@@ -6018,7 +6018,7 @@ abstract class CommonITILObject extends CommonDBTM {
       $restrict_fup .= " AND `itemtype`='" . self::getType() . "' AND `items_id`='" . $this->getID() . "'";
 
       $restrict_task = "";
-      if (!Session::haveRight("task", CommonITILTask::SEEPRIVATE)) {
+      if (!Session::haveRight("task", ITILTask::SEEPRIVATE)) {
          $restrict_task = " AND (`is_private` = 0
                                  OR `users_id` ='" . Session::getLoginUserID() . "') ";
       }

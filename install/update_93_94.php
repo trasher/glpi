@@ -290,6 +290,99 @@ function update93to94() {
    $migration->addField("glpi_changevalidations", "timeline_position", "tinyint(1) NOT NULL DEFAULT '0'");
    $migration->addField("glpi_problemtasks", "timeline_position", "tinyint(1) NOT NULL DEFAULT '0'");
 
+   /** ITIL Tasks */
+   if (!$DB->tableExists('glpi_itiltasks')) {
+      $query = "CREATE TABLE `glpi_itiltasks` (
+                  `id` int(11) NOT NULL AUTO_INCREMENT,
+                  `itemtype` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+                  `items_id` int(11) NOT NULL DEFAULT '0',
+                  `taskcategories_id` int(11) NOT NULL DEFAULT '0',
+                  `date` datetime DEFAULT NULL,
+                  `users_id` int(11) NOT NULL DEFAULT '0',
+                  `users_id_editor` int(11) NOT NULL DEFAULT '0',
+                  `content` longtext COLLATE utf8_unicode_ci,
+                  `is_private` tinyint(1) NOT NULL DEFAULT '0',
+                  `actiontime` int(11) NOT NULL DEFAULT '0',
+                  `begin` datetime DEFAULT NULL,
+                  `end` datetime DEFAULT NULL,
+                  `state` int(11) NOT NULL DEFAULT '1',
+                  `users_id_tech` int(11) NOT NULL DEFAULT '0',
+                  `groups_id_tech` INT(11) NOT NULL DEFAULT '0',
+                  `date_mod` datetime DEFAULT NULL,
+                  `date_creation` datetime DEFAULT NULL,
+                  `tasktemplates_id` int(11) NOT NULL DEFAULT '0',
+                  `timeline_position` tinyint(1) NOT NULL DEFAULT '0',
+                  PRIMARY KEY (`id`),
+                  KEY `date` (`date`),
+                  KEY `date_mod` (`date_mod`),
+                  KEY `date_creation` (`date_creation`),
+                  KEY `users_id` (`users_id`),
+                  KEY `users_id_editor` (`users_id_editor`),
+                  KEY `itemtype` (`itemtype`),
+                  KEY `item_id` (`items_id`),
+                  KEY `is_private` (`is_private`),
+                  KEY `taskcategories_id` (`taskcategories_id`),
+                  KEY `state` (`state`),
+                  KEY `users_id_tech` (`users_id_tech`),
+                  KEY `groups_id_tech` (`groups_id_tech`),
+                  KEY `begin` (`begin`),
+                  KEY `end` (`end`),
+                  KEY `tasktemplates_id` (`tasktemplates_id`)
+               ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
+      $DB->queryOrDie($query, "9.4 add table glpi_itiltasks");
+   }
+
+   foreach (['Change', 'Problem', 'Ticket'] as $itemtype) {
+      $table = 'glpi_' . strtolower($itemtype) . 'tasks';
+      if ($DB->tableExists($table)) {
+         $fkey = getForeignKeyFieldForItemType($itemtype);
+         $is_private = ($itemtype == 'Ticket' ? '`is_private`' : '0');
+         $query = "INSERT INTO `glpi_itiltasks` (
+                  `itemtype`,
+                  `items_id`,
+                  `taskcategories_id`,
+                  `date`,
+                  `users_id`,
+                  `users_id_editor`,
+                  `content`,
+                  `is_private`,
+                  `actiontime`,
+                  `begin`,
+                  `end`,
+                  `state`,
+                  `users_id_tech`,
+                  `groups_id_tech`,
+                  `date_mod`,
+                  `date_creation`,
+                  `tasktemplates_id`,
+                  `timeline_position`
+               )
+                  SELECT
+                     '$itemtype',
+                     `$fkey`,
+                     `taskcategories_id`,
+                     `date`,
+                     `users_id`,
+                     `users_id_editor`,
+                     `content`,
+                     $is_private,
+                     `actiontime`,
+                     `begin`,
+                     `end`,
+                     `state`,
+                     `users_id_tech`,
+                     `groups_id_tech`,
+                     `date_mod`,
+                     `date_creation`,
+                     `tasktemplates_id`,
+                     `timeline_position`
+                  FROM $table";
+         $DB->queryOrDie($query, "Migrate tasks for $itemtype");
+         $DB->queryOrDie("DROP TABLE $table", "Remove tasks table for $itemtype");
+      }
+   }
+   /** /ITIL Tasks */
+
    // ************ Keep it at the end **************
    $migration->executeMigration();
 

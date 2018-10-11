@@ -34,11 +34,16 @@ if (!defined('GLPI_ROOT')) {
    die("Sorry. You can't access this file directly");
 }
 
-/// TODO extends it from CommonDBChild
-abstract class CommonITILTask  extends CommonDBTM {
+class ITILTask  extends CommonDBChild {
 
    // From CommonDBTM
    public $auto_message_on_action = false;
+   static $rightname              = 'task';
+   private $item                  = null;
+
+   static public $log_history_add    = Log::HISTORY_LOG_SIMPLE_MESSAGE;
+   static public $log_history_update = Log::HISTORY_LOG_SIMPLE_MESSAGE;
+   static public $log_history_delete = Log::HISTORY_LOG_SIMPLE_MESSAGE;
 
    const SEEPUBLIC       =    1;
    const UPDATEMY        =    2;
@@ -47,6 +52,8 @@ abstract class CommonITILTask  extends CommonDBTM {
    const ADDALLITEM      = 4096;
    const SEEPRIVATE      = 8192;
 
+   static public $itemtype = 'itemtype';
+   static public $items_id = 'items_id';
 
 
    function getItilObjectItemType() {
@@ -54,13 +61,44 @@ abstract class CommonITILTask  extends CommonDBTM {
    }
 
 
+   static function canCreate() {
+      return (Session::haveRight('change', UPDATE)
+         || Session::haveRight('problem', UPDATE)
+         || Session::haveRight(self::$rightname, parent::ADDALLITEM)
+         || Session::haveRight('ticket', Ticket::OWN)
+      );
+   }
+
+
+   static function canView() {
+      return (Session::haveRightsOr('change', [Change::READALL, Change::READMY])
+         || Session::haveRightsOr('problem', [Problem::READALL, Problem::READMY])
+         || Session::haveRightsOr(self::$rightname, [parent::SEEPUBLIC, parent::SEEPRIVATE])
+         || Session::haveRight('ticket', Ticket::OWN)
+      );
+   }
+
+
    function canViewPrivates() {
+      //FIXME: should be Session::haveRight(self::$rightname, parent::SEEPRIVATE) for Tickets and True for all others.
       return false;
    }
 
 
+   static function canUpdate() {
+      return (Session::haveRight('change', UPDATE)
+         || Session::haveRight('problem', UPDATE)
+         || Session::haveRight(self::$rightname, parent::UPDATEALL)
+         || Session::haveRight('ticket', Ticket::OWN)
+      );
+   }
+
+
    function canEditAll() {
-      return false;
+      return (Session::haveRightsOr('change', [CREATE, UPDATE, DELETE, PURGE])
+         || Session::haveRightsOr('problem', [CREATE, UPDATE, DELETE, PURGE])
+         || Session::haveRight(self::$rightname, parent::UPDATEALL)
+      );
    }
 
 
@@ -71,7 +109,7 @@ abstract class CommonITILTask  extends CommonDBTM {
     *
     * @return object of the concerned item or false on error
    **/
-   function getItem() {
+   /*function getItem() {
 
       if ($item = getItemForItemtype($this->getItilObjectItemType())) {
          if ($item->getFromDB($this->fields[$item->getForeignKeyField()])) {
@@ -79,7 +117,7 @@ abstract class CommonITILTask  extends CommonDBTM {
          }
       }
       return false;
-   }
+   }*/
 
 
    /**

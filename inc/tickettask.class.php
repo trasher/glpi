@@ -39,39 +39,6 @@ class TicketTask extends CommonITILTask {
    static $rightname = 'task';
 
 
-   static function getTypeName($nb = 0) {
-      return _n('Ticket task', 'Ticket tasks', $nb);
-   }
-
-
-   static function canCreate() {
-      return (Session::haveRight(self::$rightname, parent::ADDALLITEM)
-              || Session::haveRight('ticket', Ticket::OWN));
-   }
-
-
-   static function canView() {
-      return (Session::haveRightsOr(self::$rightname, [parent::SEEPUBLIC, parent::SEEPRIVATE])
-              || Session::haveRight('ticket', Ticket::OWN));
-   }
-
-
-   static function canUpdate() {
-      return (Session::haveRight(self::$rightname, parent::UPDATEALL)
-              || Session::haveRight('ticket', Ticket::OWN));
-   }
-
-
-   function canViewPrivates() {
-      return Session::haveRight(self::$rightname, parent::SEEPRIVATE);
-   }
-
-
-   function canEditAll() {
-      return Session::haveRight(self::$rightname, parent::UPDATEALL);
-   }
-
-
    /**
     * Does current user have right to show the current task?
     *

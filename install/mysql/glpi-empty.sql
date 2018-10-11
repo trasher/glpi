@@ -752,44 +752,6 @@ CREATE TABLE `glpi_changes_users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_changetasks
-
-DROP TABLE IF EXISTS `glpi_changetasks`;
-CREATE TABLE `glpi_changetasks` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `changes_id` int(11) NOT NULL DEFAULT '0',
-  `taskcategories_id` int(11) NOT NULL DEFAULT '0',
-  `state` int(11) NOT NULL DEFAULT '0',
-  `date` datetime DEFAULT NULL,
-  `begin` datetime DEFAULT NULL,
-  `end` datetime DEFAULT NULL,
-  `users_id` int(11) NOT NULL DEFAULT '0',
-  `users_id_editor` int(11) NOT NULL DEFAULT '0',
-  `users_id_tech` int(11) NOT NULL DEFAULT '0',
-  `groups_id_tech` INT(11) NOT NULL DEFAULT '0',
-  `content` longtext COLLATE utf8_unicode_ci,
-  `actiontime` int(11) NOT NULL DEFAULT '0',
-  `date_mod` datetime DEFAULT NULL,
-  `date_creation` datetime DEFAULT NULL,
-  `tasktemplates_id` int(11) NOT NULL DEFAULT '0',
-  `timeline_position` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  KEY `changes_id` (`changes_id`),
-  KEY `state` (`state`),
-  KEY `users_id` (`users_id`),
-  KEY `users_id_editor` (`users_id_editor`),
-  KEY `users_id_tech` (`users_id_tech`),
-  KEY `groups_id_tech` (`groups_id_tech`),
-  KEY `date` (`date`),
-  KEY `date_mod` (`date_mod`),
-  KEY `date_creation` (`date_creation`),
-  KEY `begin` (`begin`),
-  KEY `end` (`end`),
-  KEY `taskcategories_id` (`taskcategories_id`),
-  KEY `tasktemplates_id` (`tasktemplates_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-
 ### Dump table glpi_changevalidations
 
 DROP TABLE IF EXISTS `glpi_changevalidations`;
@@ -6419,44 +6381,6 @@ CREATE TABLE `glpi_problems_users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-### Dump table glpi_problemtasks
-
-DROP TABLE IF EXISTS `glpi_problemtasks`;
-CREATE TABLE `glpi_problemtasks` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `problems_id` int(11) NOT NULL DEFAULT '0',
-  `taskcategories_id` int(11) NOT NULL DEFAULT '0',
-  `date` datetime DEFAULT NULL,
-  `begin` datetime DEFAULT NULL,
-  `end` datetime DEFAULT NULL,
-  `users_id` int(11) NOT NULL DEFAULT '0',
-  `users_id_editor` int(11) NOT NULL DEFAULT '0',
-  `users_id_tech` int(11) NOT NULL DEFAULT '0',
-  `groups_id_tech` INT(11) NOT NULL DEFAULT '0',
-  `content` longtext COLLATE utf8_unicode_ci,
-  `actiontime` int(11) NOT NULL DEFAULT '0',
-  `state` int(11) NOT NULL DEFAULT '0',
-  `date_mod` datetime DEFAULT NULL,
-  `date_creation` datetime DEFAULT NULL,
-  `tasktemplates_id` int(11) NOT NULL DEFAULT '0',
-  `timeline_position` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  KEY `problems_id` (`problems_id`),
-  KEY `users_id` (`users_id`),
-  KEY `users_id_editor` (`users_id_editor`),
-  KEY `users_id_tech` (`users_id_tech`),
-  KEY `groups_id_tech` (`groups_id_tech`),
-  KEY `date` (`date`),
-  KEY `date_mod` (`date_mod`),
-  KEY `date_creation` (`date_creation`),
-  KEY `begin` (`begin`),
-  KEY `end` (`end`),
-  KEY `state` (`state`),
-  KEY `taskcategories_id` (`taskcategories_id`),
-  KEY `tasktemplates_id` (`tasktemplates_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-
 ### Dump table glpi_profilerights
 
 DROP TABLE IF EXISTS `glpi_profilerights`;
@@ -8619,13 +8543,13 @@ CREATE TABLE `glpi_ticketsatisfactions` (
   UNIQUE KEY `tickets_id` (`tickets_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+### Dump table glpi_itiltasks
 
-### Dump table glpi_tickettasks
-
-DROP TABLE IF EXISTS `glpi_tickettasks`;
-CREATE TABLE `glpi_tickettasks` (
+DROP TABLE IF EXISTS `glpi_itiltasks`;
+CREATE TABLE `glpi_itiltasks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `tickets_id` int(11) NOT NULL DEFAULT '0',
+  `itemtype` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `items_id` int(11) NOT NULL DEFAULT '0',
   `taskcategories_id` int(11) NOT NULL DEFAULT '0',
   `date` datetime DEFAULT NULL,
   `users_id` int(11) NOT NULL DEFAULT '0',
@@ -8648,7 +8572,8 @@ CREATE TABLE `glpi_tickettasks` (
   KEY `date_creation` (`date_creation`),
   KEY `users_id` (`users_id`),
   KEY `users_id_editor` (`users_id_editor`),
-  KEY `tickets_id` (`tickets_id`),
+  KEY `itemtype` (`itemtype`),
+  KEY `item_id` (`items_id`),
   KEY `is_private` (`is_private`),
   KEY `taskcategories_id` (`taskcategories_id`),
   KEY `state` (`state`),
@@ -8658,6 +8583,7 @@ CREATE TABLE `glpi_tickettasks` (
   KEY `end` (`end`),
   KEY `tasktemplates_id` (`tasktemplates_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 
 
 ### Dump table glpi_tickettemplatehiddenfields

@@ -39,38 +39,8 @@ class ProblemTask extends CommonITILTask {
    static $rightname = 'task';
 
 
-   static function getTypeName($nb = 0) {
-      return _n('Problem task', 'Problem tasks', $nb);
-   }
-
-
-   static function canCreate() {
-      return Session::haveRight('problem', UPDATE);
-   }
-
-
-   static function canView() {
-      return Session::haveRightsOr('problem', [Problem::READALL, Problem::READMY]);
-   }
-
-
-   static function canUpdate() {
-      return Session::haveRight('problem', UPDATE);
-   }
-
-
    static function canPurge() {
       return Session::haveRight('problem', UPDATE);
-   }
-
-
-   function canViewPrivates() {
-      return true;
-   }
-
-
-   function canEditAll() {
-      return Session::haveRightsOr('problem', [CREATE, UPDATE, DELETE, PURGE]);
    }
 
 
