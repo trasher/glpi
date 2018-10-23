@@ -5,68 +5,66 @@ env:
   - DB=mysql
 
 before_script:
-  - ./tests/LDAP/ldap_run.sh
+  - if [[ "$LDAP" == "true" ]]; then ./tests/LDAP/ldap_run.sh; fi
   - composer self-update
   - sed -e '/"php":/d' -i composer.json
   - rm -f composer.lock
-  - composer install --optimize-autoloader
+  - if [[ "$NIGHTLY" == "true" ]]; then composer install --ignore-platform-reqs; else composer install; fi
+  - vendor/bin/parallel-lint --exclude files --exclude plugins --exclude vendor --exclude tools/vendor .
+  # (Temporary) fix for travis, see:
+  # https://github.com/travis-ci/travis-ci/issues/6339
+  # and https://github.com/sensiolabs/security-checker/pull/77#issuecomment-290733113
+  - vendor/bin/security-checker security:check --end-point=http://security.sensiolabs.org/check_lock
+  #- vendor/bin/security-checker security:check
   #install 0.72.3 database
+  - if [[ "$UPDATE" == "true" ]]; then mysql -u root -e 'create database glpitest0723;'; fi
+  - if [[ "$UPDATE" == "true" ]]; then mysql -u root glpitest0723 < tests/glpi-0.72.3-empty.sql; fi
+  - if [[ "$UPDATE" == "true" ]]; then cp tests/travis.config_db.php tests/config_db.php; fi
+  - if [[ "$UPDATE" == "true" ]]; then php scripts/cliupdate.php --config-dir=../tests --dev; fi
   - if [[ "$UPDATE" == "true" ]]; then php scripts/cliupdate.php --config-dir=../tests --dev |grep -q "No migration needed." || (echo "scripts/cliupdate.php FAILED" && exit 1); fi
   - if [[ "$UPDATE" == "true" ]]; then php scripts/innodb_migration.php --config-dir=../tests; fi
+  - if [[ "$UPDATE" == "true" ]]; then rm tests/config_db.php; fi
   - mysql -u root -e 'create database glpitest;'
   - php scripts/cliinstall.php --db=glpitest --user=root --tests
   - php scripts/cliupdate.php --config-dir=../tests |grep -q "No migration needed." || (echo "scripts/cliupdate.php FAILED" && exit 1)
   - ./tests/test_fail_update.sh; git checkout install/update_92_93.php;
+  - php -S localhost:8088 tests/router.php &>/dev/null &
   # LDAP stuff
-  - ./tests/LDAP/ldap_fixtures.sh > /dev/null
+  - if [[ "$LDAP" == "true" ]]; then ./tests/LDAP/ldap_fixtures.sh > /dev/null; fi
+  #APCu
+  - phpenv config-add tests/enable-apcu.ini
   - if [[ "$UPDATE" == "true" ]]; then ./vendor/bin/robo --load-from tools minify; fi
 script:
   - mysql -u root -e 'select version();'
-  - composer testldap
+  - if [[ "$UPDATE" == "true" ]]; then php vendor/bin/atoum -p 'php -d memory_limit=512M' --debug --force-terminal --use-dot-report --configurations tests/telemetry.php --bootstrap-file tests/bootstrap.php --no-code-coverage --max-children-number 1 -d tests/database; fi
+  - php vendor/bin/atoum -p 'php -d memory_limit=512M' --debug --force-terminal --use-dot-report --configurations tests/telemetry.php --bootstrap-file tests/bootstrap.php --no-code-coverage -d tests/units
+  - php vendor/bin/atoum -p 'php -d memory_limit=512M' --debug --force-terminal --use-dot-report --configurations tests/telemetry.php --bootstrap-file tests/bootstrap.php --no-code-coverage --max-children-number 1 -d tests/functionnal
+  - php vendor/bin/atoum -p 'php -d memory_limit=512M' --debug --force-terminal --use-dot-report --configurations tests/telemetry.php --bootstrap-file tests/bootstrap.php --no-code-coverage --max-children-number 1 -d tests/web
+  - if [[ "$LDAP" == "true" ]]; then composer testldap; fi
+  - if [[ "$CS" == "true" ]]; then vendor/bin/phpcs -d memory_limit=512M -p --standard=vendor/glpi-project/coding-standard/GlpiStandard/ --ignore=/vendor/,/plugins/,/files/,/lib/,/config/,/tests/config,/css/tiny_mce,/.git ./; fi
 
 #note: default maria version is 5.5 for all main php versions list exept nightly
 matrix:
   include:
     - php: 5.6
-      addons:
-        apt:
-          packages:
-            - ldap-utils
-            - slapd
     - php: 7.0
+      env: UPDATE=true
       addons:
         mariadb: 10.2
-        apt:
-          packages:
-            - ldap-utils
-            - slapd
-
     - php: 7.1
       addons:
         mariadb: 10.1
-        apt:
-          packages:
-            - ldap-utils
-            - slapd
-
     - php: 7.2
+      env: CS=true
+      env: LDAP=true
       addons:
         apt:
           packages:
             - ldap-utils
             - slapd
     - php: 7.3
-      addons:
-        apt:
-          packages:
-            - ldap-utils
-            - slapd
     - php: nightly
-      addons:
-        apt:
-          packages:
-            - ldap-utils
-            - slapd
+      env: NIGHTLY=true
   allow_failures:
     - php: nightly
 
@@ -74,14 +72,14 @@ cache:
   directories:
     - $HOME/.composer/cache
 
-notifications:
-  irc:
-    channels:
-      - "chat.freenode.org#glpi"
-    on_success: change
-    on_failure: always
-    use_notice: true
-    skip_join: true
+#notifications:
+#  irc:
+#    channels:
+#      - "chat.freenode.org#glpi"
+#    on_success: change
+#    on_failure: always
+#    use_notice: true
+#    skip_join: true
 
 #exclude old branches, without tests
 branches:
