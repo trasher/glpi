@@ -40,6 +40,7 @@ The following methods have been deprecated:
 - `Ticket::processMassiveActionsForOneItemtype()`
 - `Ticket::showFormMassiveAction()`
 - `Ticket::showMassiveActionsSubForm()`
+- `DbUtils::getEntitiesRestrictRequest()` and therefore `getEntitiesRestrictRequest()`
 
 #### Removed
 

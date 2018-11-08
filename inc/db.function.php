@@ -582,6 +582,8 @@ function getDbRelations() {
 /**
  * Get SQL request to restrict to current entities of the user
  *
+ * @deprecated 9.4
+ *
  * @param $separator          separator in the begin of the request (default AND)
  * @param $table              table where apply the limit (if needed, multiple tables queries)
  *                            (default '')
@@ -598,6 +600,7 @@ function getDbRelations() {
 **/
 function getEntitiesRestrictRequest($separator = "AND", $table = "", $field = "", $value = '',
                                     $is_recursive = false, $complete_request = false) {
+   Toolbox::deprecated('Use getEntitiesRestrictCriteria');
    $dbu = new DbUtils();
    return $dbu->getEntitiesRestrictRequest(
       $separator,

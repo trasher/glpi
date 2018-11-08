@@ -471,6 +471,8 @@ final class DbUtils {
    /**
     * Get SQL request to restrict to current entities of the user
     *
+    * @deprecated 9.4
+    *
     * @param string  $separator        separator in the begin of the request (default AND)
     * @param string  $table            table where apply the limit (if needed, multiple tables queries)
     *                                  (default '')
@@ -488,6 +490,7 @@ final class DbUtils {
    public function getEntitiesRestrictRequest($separator = "AND", $table = "", $field = "", $value = '',
                                        $is_recursive = false, $complete_request = false) {
 
+      Toolbox::deprecated('Use getEntitiesRestrictCriteria');
       $query = $separator ." ( ";
 
       // !='0' needed because consider as empty
