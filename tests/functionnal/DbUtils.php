@@ -468,11 +468,12 @@ class DbUtils extends DbTestCase {
    public function testGetEntityRestrict() {
       $this->login();
       $this->newTestedInstance();
+      define('GLPI_RESTRICT_TESTS', true); //bypass getEntitiesRestrictRequest depreciation
 
       // See all, really all
       $_SESSION['glpishowallentities'] = 1; // will be restored by setEntity call
 
-      //$this->string($this->testedInstance->getEntitiesRestrictRequest('AND', 'glpi_computers'))->isEmpty();
+      $this->string($this->testedInstance->getEntitiesRestrictRequest('AND', 'glpi_computers'))->isEmpty();
 
       $it = new \DBmysqlIterator(null);
 
@@ -480,22 +481,22 @@ class DbUtils extends DbTestCase {
       $this->string($it->getSql())->isIdenticalTo('SELECT * FROM `glpi_computers`');
 
       //keep testing old method from db.function
-      //$this->string(getEntitiesRestrictRequest('AND', 'glpi_computers'))->isEmpty();
+      $this->string(getEntitiesRestrictRequest('AND', 'glpi_computers'))->isEmpty();
       $it->execute('glpi_computers', getEntitiesRestrictCriteria('glpi_computers'));
       $this->string($it->getSql())->isIdenticalTo('SELECT * FROM `glpi_computers`');
 
       // See all
       $this->setEntity('_test_root_entity', true);
 
-      //$this->string($this->testedInstance->getEntitiesRestrictRequest('WHERE', 'glpi_computers'))
-      //   ->isIdenticalTo("WHERE ( `glpi_computers`.`entities_id` IN ('1', '2', '3')  ) ");
+      $this->string($this->testedInstance->getEntitiesRestrictRequest('WHERE', 'glpi_computers'))
+         ->isIdenticalTo("WHERE ( `glpi_computers`.`entities_id` IN ('1', '2', '3')  ) ");
       $it->execute('glpi_computers', $this->testedInstance->getEntitiesRestrictCriteria('glpi_computers'));
       $this->string($it->getSql())
          ->isIdenticalTo('SELECT * FROM `glpi_computers` WHERE `glpi_computers`.`entities_id` IN (\'1\', \'2\', \'3\')');
 
       //keep testing old method from db.function
-      //$this->string(getEntitiesRestrictRequest('WHERE', 'glpi_computers'))
-      //   ->isIdenticalTo("WHERE ( `glpi_computers`.`entities_id` IN ('1', '2', '3')  ) ");
+      $this->string(getEntitiesRestrictRequest('WHERE', 'glpi_computers'))
+         ->isIdenticalTo("WHERE ( `glpi_computers`.`entities_id` IN ('1', '2', '3')  ) ");
       $it->execute('glpi_computers', getEntitiesRestrictCriteria('glpi_computers'));
       $this->string($it->getSql())
          ->isIdenticalTo('SELECT * FROM `glpi_computers` WHERE `glpi_computers`.`entities_id` IN (\'1\', \'2\', \'3\')');
@@ -503,15 +504,15 @@ class DbUtils extends DbTestCase {
       // Root entity
       $this->setEntity('_test_root_entity', false);
 
-      //$this->string($this->testedInstance->getEntitiesRestrictRequest('WHERE', 'glpi_computers'))
-      //   ->isIdenticalTo("WHERE ( `glpi_computers`.`entities_id` IN ('1')  ) ");
+      $this->string($this->testedInstance->getEntitiesRestrictRequest('WHERE', 'glpi_computers'))
+         ->isIdenticalTo("WHERE ( `glpi_computers`.`entities_id` IN ('1')  ) ");
       $it->execute('glpi_computers', $this->testedInstance->getEntitiesRestrictCriteria('glpi_computers'));
       $this->string($it->getSql())
          ->isIdenticalTo('SELECT * FROM `glpi_computers` WHERE `glpi_computers`.`entities_id` IN (\'1\')');
 
       //keep testing old method from db.function
-      //$this->string(getEntitiesRestrictRequest('WHERE', 'glpi_computers'))
-      //   ->isIdenticalTo("WHERE ( `glpi_computers`.`entities_id` IN ('1')  ) ");
+      $this->string(getEntitiesRestrictRequest('WHERE', 'glpi_computers'))
+         ->isIdenticalTo("WHERE ( `glpi_computers`.`entities_id` IN ('1')  ) ");
       $it->execute('glpi_computers', getEntitiesRestrictCriteria('glpi_computers'));
       $this->string($it->getSql())
          ->isIdenticalTo('SELECT * FROM `glpi_computers` WHERE `glpi_computers`.`entities_id` IN (\'1\')');
@@ -519,29 +520,29 @@ class DbUtils extends DbTestCase {
       // Child
       $this->setEntity('_test_child_1', false);
 
-      //$this->string($this->testedInstance->getEntitiesRestrictRequest('WHERE', 'glpi_computers'))
-      //   ->isIdenticalTo("WHERE ( `glpi_computers`.`entities_id` IN ('2')  ) ");
+      $this->string($this->testedInstance->getEntitiesRestrictRequest('WHERE', 'glpi_computers'))
+         ->isIdenticalTo("WHERE ( `glpi_computers`.`entities_id` IN ('2')  ) ");
       $it->execute('glpi_computers', $this->testedInstance->getEntitiesRestrictCriteria('glpi_computers'));
       $this->string($it->getSql())
          ->isIdenticalTo('SELECT * FROM `glpi_computers` WHERE `glpi_computers`.`entities_id` IN (\'2\')');
 
       //keep testing old method from db.function
-      //$this->string(getEntitiesRestrictRequest('WHERE', 'glpi_computers'))
-      //   ->isIdenticalTo("WHERE ( `glpi_computers`.`entities_id` IN ('2')  ) ");
+      $this->string(getEntitiesRestrictRequest('WHERE', 'glpi_computers'))
+         ->isIdenticalTo("WHERE ( `glpi_computers`.`entities_id` IN ('2')  ) ");
       $it->execute('glpi_computers', getEntitiesRestrictCriteria('glpi_computers'));
       $this->string($it->getSql())
          ->isIdenticalTo('SELECT * FROM `glpi_computers` WHERE `glpi_computers`.`entities_id` IN (\'2\')');
 
       // Child without table
-      //$this->string($this->testedInstance->getEntitiesRestrictRequest('WHERE'))
-      //   ->isIdenticalTo("WHERE ( `entities_id` IN ('2')  ) ");
+      $this->string($this->testedInstance->getEntitiesRestrictRequest('WHERE'))
+         ->isIdenticalTo("WHERE ( `entities_id` IN ('2')  ) ");
       $it->execute('glpi_computers', $this->testedInstance->getEntitiesRestrictCriteria());
       $this->string($it->getSql())
          ->isIdenticalTo('SELECT * FROM `glpi_computers` WHERE `entities_id` IN (\'2\')');
 
       //keep testing old method from db.function
-      //$this->string(getEntitiesRestrictRequest('WHERE'))
-      //   ->isIdenticalTo("WHERE ( `entities_id` IN ('2')  ) ");
+      $this->string(getEntitiesRestrictRequest('WHERE'))
+         ->isIdenticalTo("WHERE ( `entities_id` IN ('2')  ) ");
       $it->execute('glpi_computers', getEntitiesRestrictCriteria());
       $this->string($it->getSql())
          ->isIdenticalTo('SELECT * FROM `glpi_computers` WHERE `entities_id` IN (\'2\')');
@@ -549,15 +550,15 @@ class DbUtils extends DbTestCase {
       // Child + parent
       $this->setEntity('_test_child_2', false);
 
-      //$this->string($this->testedInstance->getEntitiesRestrictRequest('WHERE', 'glpi_computers', '', '', true))
-      //   ->isIdenticalTo("WHERE ( `glpi_computers`.`entities_id` IN ('3')  OR (`glpi_computers`.`is_recursive`='1' AND `glpi_computers`.`entities_id` IN ('0','1')) ) ");
+      $this->string($this->testedInstance->getEntitiesRestrictRequest('WHERE', 'glpi_computers', '', '', true))
+         ->isIdenticalTo("WHERE ( `glpi_computers`.`entities_id` IN ('3')  OR (`glpi_computers`.`is_recursive`='1' AND `glpi_computers`.`entities_id` IN ('0','1')) ) ");
       $it->execute('glpi_computers', $this->testedInstance->getEntitiesRestrictCriteria('glpi_computers', '', '', true));
       $this->string($it->getSql())
          ->isIdenticalTo('SELECT * FROM `glpi_computers` WHERE (`glpi_computers`.`entities_id` IN (\'3\') OR (`glpi_computers`.`is_recursive` = \'1\' AND `glpi_computers`.`entities_id` IN (\'0\', \'1\')))');
 
       //keep testing old method from db.function
-      //$this->string(getEntitiesRestrictRequest('WHERE', 'glpi_computers', '', '', true))
-      //   ->isIdenticalTo("WHERE ( `glpi_computers`.`entities_id` IN ('3')  OR (`glpi_computers`.`is_recursive`='1' AND `glpi_computers`.`entities_id` IN ('0','1')) ) ");
+      $this->string(getEntitiesRestrictRequest('WHERE', 'glpi_computers', '', '', true))
+         ->isIdenticalTo("WHERE ( `glpi_computers`.`entities_id` IN ('3')  OR (`glpi_computers`.`is_recursive`='1' AND `glpi_computers`.`entities_id` IN ('0','1')) ) ");
       $it->execute('glpi_computers', getEntitiesRestrictCriteria('glpi_computers', '', '', true));
       $this->string($it->getSql())
          ->isIdenticalTo('SELECT * FROM `glpi_computers` WHERE (`glpi_computers`.`entities_id` IN (\'3\') OR (`glpi_computers`.`is_recursive` = \'1\' AND `glpi_computers`.`entities_id` IN (\'0\', \'1\')))');
@@ -583,8 +584,8 @@ class DbUtils extends DbTestCase {
          ->isIdenticalTo('SELECT * FROM `glpi_computers` WHERE (`glpi_computers`.`entities_id` IN (\'3\') OR (`glpi_computers`.`is_recursive` = \'1\' AND `glpi_computers`.`entities_id` IN (\'0\', \'1\')))');
 
       // Child + parent without table
-      //$this->string($this->testedInstance->getEntitiesRestrictRequest('WHERE', '', '', '', true))
-      //   ->isIdenticalTo("WHERE ( `entities_id` IN ('3')  OR (`is_recursive`='1' AND `entities_id` IN ('0','1')) ) ");
+      $this->string($this->testedInstance->getEntitiesRestrictRequest('WHERE', '', '', '', true))
+         ->isIdenticalTo("WHERE ( `entities_id` IN ('3')  OR (`is_recursive`='1' AND `entities_id` IN ('0','1')) ) ");
       $it->execute('glpi_computers', $this->testedInstance->getEntitiesRestrictCriteria('', '', '', true));
       $this->string($it->getSql())
          ->isIdenticalTo('SELECT * FROM `glpi_computers` WHERE (`entities_id` IN (\'3\') OR (`is_recursive` = \'1\' AND `entities_id` IN (\'0\', \'1\')))');
@@ -598,8 +599,8 @@ class DbUtils extends DbTestCase {
          ->isIdenticalTo('SELECT * FROM `glpi_entities` WHERE `glpi_entities`.`id` = \'7\'');
 
       //keep testing old method from db.function
-      //$this->string(getEntitiesRestrictRequest('WHERE', '', '', '', true))
-      //   ->isIdenticalTo("WHERE ( `entities_id` IN ('3')  OR (`is_recursive`='1' AND `entities_id` IN ('0','1')) ) ");
+      $this->string(getEntitiesRestrictRequest('WHERE', '', '', '', true))
+         ->isIdenticalTo("WHERE ( `entities_id` IN ('3')  OR (`is_recursive`='1' AND `entities_id` IN ('0','1')) ) ");
       $it->execute('glpi_computers', getEntitiesRestrictCriteria('', '', '', true));
       $this->string($it->getSql())
          ->isIdenticalTo('SELECT * FROM `glpi_computers` WHERE (`entities_id` IN (\'3\') OR (`is_recursive` = \'1\' AND `entities_id` IN (\'0\', \'1\')))');

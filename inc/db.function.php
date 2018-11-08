@@ -600,7 +600,6 @@ function getDbRelations() {
 **/
 function getEntitiesRestrictRequest($separator = "AND", $table = "", $field = "", $value = '',
                                     $is_recursive = false, $complete_request = false) {
-   Toolbox::deprecated('Use getEntitiesRestrictCriteria');
    $dbu = new DbUtils();
    return $dbu->getEntitiesRestrictRequest(
       $separator,

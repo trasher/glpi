@@ -490,7 +490,16 @@ final class DbUtils {
    public function getEntitiesRestrictRequest($separator = "AND", $table = "", $field = "", $value = '',
                                        $is_recursive = false, $complete_request = false) {
 
-      Toolbox::deprecated('Use getEntitiesRestrictCriteria');
+      $trace = debug_backtrace();
+      $caller = $trace[2];
+      //FIXME temporary bypass depreciation for some methods... There
+      //are already huhge changes, try to limit
+      if (!Toolbox::startsWith($caller['function'], 'addVisibility')
+         && $caller['class'] != 'Search'
+         && !defined('GLPI_RESTRICT_TESTS')
+      ) {
+         Toolbox::deprecated('Use getEntitiesRestrictCriteria');
+      }
       $query = $separator ." ( ";
 
       // !='0' needed because consider as empty
