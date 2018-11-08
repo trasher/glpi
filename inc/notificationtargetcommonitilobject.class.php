@@ -148,16 +148,25 @@ abstract class NotificationTargetCommonITILObject extends NotificationTarget {
       $fkfield       = $this->obj->getForeignKeyField();
 
       //Look for the user by his id
-      $query =        $this->getDistinctUserSql().",
-                      `$userlinktable`.`use_notification` AS notif,
-                      `$userlinktable`.`alternative_email` AS altemail
-               FROM `$userlinktable`
-               LEFT JOIN `glpi_users` ON (`$userlinktable`.`users_id` = `glpi_users`.`id`)".
-               $this->getProfileJoinSql()."
-               WHERE `$userlinktable`.`$fkfield` = '".$this->obj->fields["id"]."'
-                     AND `$userlinktable`.`type` = '$type'";
+      $criteria = $this->getDistinctUserCriteria() + $this->getProfileJoinCriteria();
+      $criteria['FROM'] = $userlinktable;
+      $criteria['FIELDS'] += [
+         "$userlinktable.use_notification AS notif",
+         "$userlinktable.alternative_email AS altemail"
+      ];
+      $criteria['LEFT JOIN'] = [
+         User::getTable() => [
+            'ON' => [
+               $userlinktable    => 'users_id',
+               User::getTable()  => 'id'
+            ]
+         ]
+      ];
+      $criteria['WHERE']["$userlinktable.$fkfield"] = $this->obj->fields['id'];
+      $criteria['WHERE']["$userlinktable.type"] = $type;
 
-      foreach ($DB->request($query) as $data) {
+      $iterator = $DB->request($criteria);
+      while ($data = $iterator->next()) {
          //Add the user email and language in the notified users list
          if ($data['notif']) {
             $author_email = UserEmail::getDefaultForUser($data['users_id']);
@@ -393,14 +402,20 @@ abstract class NotificationTargetCommonITILObject extends NotificationTarget {
       if (isset($options['validation_id'])) {
          $validationtable = getTableForItemType($this->obj->getType().'Validation');
 
-         $query = $this->getDistinctUserSql()."
-                  FROM `$validationtable`
-                  LEFT JOIN `glpi_users`
-                        ON (`glpi_users`.`id` = `$validationtable`.`users_id_validate`)".
-                  $this->getProfileJoinSql()."
-                  WHERE `$validationtable`.`id` = '".$options['validation_id']."'";
+         $criteria = $this->getDistinctUserCriteria() + $this->getProfileJoinCriteria();
+         $criteria['FROM'] = $validationtable;
+         $criteria['LEFT JOIN'] = [
+            User::getTable() => [
+               'ON' => [
+                  User::getTable()  => 'id',
+                  $validationtable  => 'users_id_validate'
+               ]
+            ]
+         ];
+         $criteria['WHERE']["$validationtable.id"] = $options['validation_id'];
 
-         foreach ($DB->request($query) as $data) {
+         $iterator = $DB->request($criteria);
+         while ($data = $iterator->next()) {
             $this->addToRecipientsList($data);
          }
       }
@@ -419,14 +434,20 @@ abstract class NotificationTargetCommonITILObject extends NotificationTarget {
       if (isset($options['validation_id'])) {
          $validationtable = getTableForItemType($this->obj->getType().'Validation');
 
-         $query = $this->getDistinctUserSql()."
-                  FROM `$validationtable`
-                  LEFT JOIN `glpi_users`
-                        ON (`glpi_users`.`id` = `$validationtable`.`users_id`)".
-                  $this->getProfileJoinSql()."
-                  WHERE `$validationtable`.`id` = '".$options['validation_id']."'";
+         $criteria = $this->getDistinctUserCriteria() + $this->getProfileJoinCriteria();
+         $criteria['FROM'] = $validationtable;
+         $criteria['LEFT JOIN'] = [
+            User::getTable() => [
+               'ON' => [
+                  User::getTable()  => 'id',
+                  $validationtable  => 'users_id'
+               ]
+            ]
+         ];
+         $criteria['WHERE']["$validationtable.id"] = $options['validation_id'];
 
-         foreach ($DB->request($query) as $data) {
+         $iterator = $DB->request($criteria);
+         while ($data = $iterator->next()) {
             $this->addToRecipientsList($data);
          }
       }
@@ -446,14 +467,20 @@ abstract class NotificationTargetCommonITILObject extends NotificationTarget {
       if (isset($options['followup_id'])) {
          $followuptable = getTableForItemType($this->obj->getType().'Followup');
 
-         $query = $this->getDistinctUserSql()."
-                  FROM `$followuptable`
-                  INNER JOIN `glpi_users`
-                        ON (`glpi_users`.`id` = `$followuptable`.`users_id`)".
-                  $this->getProfileJoinSql()."
-                  WHERE `$followuptable`.`id` = '".$options['followup_id']."'";
+         $criteria = $this->getDistinctUserCriteria() + $this->getProfileJoinCriteria();
+         $criteria['FROM'] = $followuptable;
+         $criteria['LEFT JOIN'] = [
+            User::getTable() => [
+               'ON' => [
+                  User::getTable()  => 'id',
+                  $followuptable    => 'users_id'
+               ]
+            ]
+         ];
+         $criteria['WHERE']["$followuptable.id"] = $options['followup_id'];
 
-         foreach ($DB->request($query) as $data) {
+         $iterator = $DB->request($criteria);
+         while ($data = $iterator->next()) {
             $this->addToRecipientsList($data);
          }
       }
@@ -470,26 +497,33 @@ abstract class NotificationTargetCommonITILObject extends NotificationTarget {
    function addTaskAuthor($options = []) {
       global $DB;
 
-            // In case of delete task pass user id
+      // In case of delete task pass user id
       if (isset($options['task_users_id'])) {
-         $query = $this->getDistinctUserSql()."
-                  FROM `glpi_users` ".
-                  $this->getProfileJoinSql()."
-                  WHERE `glpi_users`.`id` = '".$options['task_users_id']."'";
+         $criteria = $this->getDistinctUserCriteria() + $this->getProfileJoinCriteria();
+         $criteria['FROM'] = User::getTable();
+         $criteria['WHERE'][User::getTable() . '.id'] = $options['task_users_id'];
 
-         foreach ($DB->request($query) as $data) {
+         $iterator = $DB->request($criteria);
+         while ($data = $iterator->next()) {
             $this->addToRecipientsList($data);
          }
       } else if (isset($options['task_id'])) {
          $tasktable = getTableForItemType($this->obj->getType().'Task');
 
-         $query = $this->getDistinctUserSql()."
-                  FROM `$tasktable`
-                  INNER JOIN `glpi_users` ON (`glpi_users`.`id` = `$tasktable`.`users_id`)".
-                  $this->getProfileJoinSql()."
-                  WHERE `$tasktable`.`id` = '".$options['task_id']."'";
+         $criteria = $this->getDistinctUserCriteria() + $this->getProfileJoinCriteria();
+         $criteria['FROM'] = $tasktable;
+         $criteria['LEFT JOIN'] = [
+            User::getTable() => [
+               'ON' => [
+                  User::getTable()  => 'id',
+                  $tasktable        => 'users_id'
+               ]
+            ]
+         ];
+         $criteria['WHERE']["$tasktable.id"] = $options['task_id'];
 
-         foreach ($DB->request($query) as $data) {
+         $iterator = $DB->request($criteria);
+         while ($data = $iterator->next()) {
             $this->addToRecipientsList($data);
          }
       }
@@ -508,25 +542,31 @@ abstract class NotificationTargetCommonITILObject extends NotificationTarget {
 
       // In case of delete task pass user id
       if (isset($options['task_users_id_tech'])) {
-         $query = $this->getDistinctUserSql()."
-                  FROM `glpi_users` ".
-                  $this->getProfileJoinSql()."
-                  WHERE `glpi_users`.`id` = '".$options['task_users_id_tech']."'";
+         $criteria = $this->getDistinctUserCriteria() + $this->getProfileJoinCriteria();
+         $criteria['FROM'] = User::getTable();
+         $criteria['WHERE'][User::getTable() . '.id'] = $options['task_users_id_tech'];
 
-         foreach ($DB->request($query) as $data) {
+         $iterator = $DB->request($criteria);
+         while ($data = $iterator->next()) {
             $this->addToRecipientsList($data);
          }
       } else if (isset($options['task_id'])) {
          $tasktable = getTableForItemType($this->obj->getType().'Task');
 
-         $query = $this->getDistinctUserSql()."
-                  FROM `$tasktable`
-                  INNER JOIN `glpi_users`
-                        ON (`glpi_users`.`id` = `$tasktable`.`users_id_tech`)".
-                  $this->getProfileJoinSql()."
-                  WHERE `$tasktable`.`id` = '".$options['task_id']."'";
+         $criteria = $this->getDistinctUserCriteria() + $this->getProfileJoinCriteria();
+         $criteria['FROM'] = $tasktable;
+         $criteria['LEFT JOIN'] = [
+            User::getTable() => [
+               'ON' => [
+                  User::getTable()  => 'id',
+                  $tasktable        => 'users_id_tech'
+               ]
+            ]
+         ];
+         $criteria['WHERE']["$tasktable.id"] = $options['task_id'];
 
-         foreach ($DB->request($query) as $data) {
+         $iterator = $DB->request($criteria);
+         while ($data = $iterator->next()) {
             $this->addToRecipientsList($data);
          }
       }
@@ -603,10 +643,7 @@ abstract class NotificationTargetCommonITILObject extends NotificationTarget {
 
    public function getProfileJoinSql() {
 
-      $query = " INNER JOIN `glpi_profiles_users`
-                     ON (`glpi_profiles_users`.`users_id` = `glpi_users`.`id` ".
-                         getEntitiesRestrictRequest("AND", "glpi_profiles_users", "entities_id",
-                                                    $this->getEntity(), true).")";
+      $query = parent::getProfileJoinSql();
 
       if ($this->isPrivate()) {
          $query .= " INNER JOIN `glpi_profiles`
@@ -621,6 +658,30 @@ abstract class NotificationTargetCommonITILObject extends NotificationTarget {
       }
       return $query;
    }
+
+
+   public function getProfileJoinCriteria() {
+      $criteria = parent::getProfileJoinCriteria();
+
+      if ($this->isPrivate()) {
+         $criteria['INNER JOIN'][Profile::getTable()] = [
+            'ON' => [
+               Profile::getTable()        => 'id',
+               Profile_User::getTable()   => 'profiles_id'
+            ]
+         ];
+         $criteria['INNER JOIN'][ProfileRight::getTable()] = [
+            'ON' => [
+               ProfileRight::getTable()   => 'profiles_id',
+               Profile::getTable()        => 'id'
+            ]
+         ];
+         $criteria['WHERE'][ProfileRight::getTable() . '.name'] = 'followup';
+         $criteria['WHERE'][ProfileRight::getTable() . '.rights'] = ['&', ITILFollowup::SEEPRIVATE];
+      }
+      return $criteria;
+   }
+
 
 
    function isPrivate() {

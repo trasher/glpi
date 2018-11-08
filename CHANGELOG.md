@@ -41,6 +41,9 @@ The following methods have been deprecated:
 - `Ticket::showFormMassiveAction()`
 - `Ticket::showMassiveActionsSubForm()`
 - `DbUtils::getEntitiesRestrictRequest()` and therefore `getEntitiesRestrictRequest()`
+- `NotificationTarget::getProfileJoinSql()`
+- `NotificationTarget::getDistinctUserSql()`
+- `RuleCollection::getRuleListQuery()`
 
 #### Removed
 
