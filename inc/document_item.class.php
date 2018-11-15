@@ -728,31 +728,64 @@ class Document_Item extends CommonDBRelation{
          $linkparam = "&amp;tickets_id=".$item->fields['id'];
       }
 
-      $query = "SELECT `glpi_documents_items`.`id` AS assocID,
-                       `glpi_documents_items`.`date_mod` AS assocdate,
-                       `glpi_entities`.`id` AS entityID,
-                       `glpi_entities`.`completename` AS entity,
-                       `glpi_documentcategories`.`completename` AS headings,
-                       `glpi_documents`.*
-                FROM `glpi_documents_items`
-                LEFT JOIN `glpi_documents`
-                          ON (`glpi_documents_items`.`documents_id`=`glpi_documents`.`id`)
-                LEFT JOIN `glpi_entities` ON (`glpi_documents`.`entities_id`=`glpi_entities`.`id`)
-                LEFT JOIN `glpi_documentcategories`
-                        ON (`glpi_documents`.`documentcategories_id`=`glpi_documentcategories`.`id`)
-                WHERE `glpi_documents_items`.`items_id` = '".$item->getID()."'
-                      AND `glpi_documents_items`.`itemtype` = '".$item->getType()."' ";
+      $criteria = [
+         'SELECT'    => [
+            'glpi_documents_items.id AS assocID',
+            'glpi_documents_items.date_mod AS assocdate',
+            'glpi_entities.id AS entityID',
+            'glpi_entities.completename AS entity',
+            'glpi_documentcategories.completename AS headings',
+            'glpi_documents.*'
+         ],
+         'FROM'      => 'glpi_documents_items',
+         'LEFT JOIN' => [
+            'glpi_documents'  => [
+               'ON' => [
+                  'glpi_documents_items'  => 'documents_id',
+                  'glpi_documents'        => 'id'
+               ]
+            ],
+            'glpi_entities'   => [
+               'ON' => [
+                  'glpi_documents'  => 'entities_id',
+                  'glpi_entities'   => 'id'
+               ]
+            ],
+            'glpi_documentcategories'  => [
+               'ON' => [
+                  'glpi_documentcategories'  => 'id',
+                  'glpi_documents'           => 'documentcategories_id'
+               ]
+            ]
+         ],
+         'WHERE'     => [
+            'glpi_documents_items.items_id'  => $item->getID(),
+            'glpi_documents_items.itemtype'  => $item->getType()
+         ],
+         'ORDERBY'   => [
+            "$sort $order"
+         ]
+      ];
 
       if (Session::getLoginUserID()) {
-         $query .= getEntitiesRestrictRequest(" AND", "glpi_documents", '', '', true);
+         $criteria['WHERE'] = $criteria['WHERE'] + getEntitiesRestrictCriteria('glpi_documents', '', '', true);
       } else {
          // Anonymous access from FAQ
-         $query .= " AND `glpi_documents`.`entities_id`= '0' ";
+         $criteria['WHERE']['glpi_documents.entities_id'] = 0;
       }
 
       // Document : search links in both order using union
       if ($item->getType() == 'Document') {
-         $query .= "UNION
+         $doc_criteria = $criteria;
+         unset($doc_criteria['WHERE']['glpi_documents_items.items_id']);
+         unset($doc_criteria['WHERE']['glpi_documents_items.itemtype']);
+
+         $criteria['WHERE'] = $criteria['WHERE'] + [
+            'glpi_documents_items.documents_id' => $item->getID(),
+            'glpi_documents_items.itemtype'     => $item->getType()
+         ];
+
+         /*$query .= "UNION
                     SELECT `glpi_documents_items`.`id` AS assocID,
                            `glpi_documents_items`.`date_mod` AS assocdate,
                            `glpi_entities`.`id` AS entityID,
@@ -766,17 +799,19 @@ class Document_Item extends CommonDBRelation{
                         ON (`glpi_documents`.`entities_id`=`glpi_entities`.`id`)
                     LEFT JOIN `glpi_documentcategories`
                         ON (`glpi_documents`.`documentcategories_id`=`glpi_documentcategories`.`id`)
+
+
+
+
                     WHERE `glpi_documents_items`.`documents_id` = '".$item->getID()."'
                           AND `glpi_documents_items`.`itemtype` = '".$item->getType()."' ";
-
          if (Session::getLoginUserID()) {
             $query .= getEntitiesRestrictRequest(" AND", "glpi_documents", '', '', true);
          } else {
             // Anonymous access from FAQ
             $query .= " AND `glpi_documents`.`entities_id`='0' ";
-         }
+         }*/
       }
-      $query .= " ORDER BY $sort $order";
 
       $result = $DB->query($query);
       $number = $DB->numrows($result);

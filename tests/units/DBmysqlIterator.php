@@ -717,4 +717,42 @@ class DBmysqlIterator extends DbTestCase {
          ->isInstanceOf('RuntimeException')
          ->hasMessage('Unknown query operator NOONE');
    }
+
+   public function testUnionQuery() {
+      $union_crit = [
+         ['FROM' => 'table1'],
+         ['FROM' => 'table2']
+      ];
+      $union = new \QueryUnion($union_crit);
+      $raw_query = 'SELECT * FROM (SELECT * FROM `table1` UNION ALL SELECT * FROM `table2`)';
+      $it = $this->it->execute(['FROM' => $union]);
+      $this->string($it->getSql())->isIdenticalTo($raw_query);
+
+      $raw_query = 'SELECT (SELECT * FROM `table1` UNION ALL SELECT * FROM `table2`) FROM `table`';
+      $crit = [
+         'SELECT' => $union,
+         'FROM'   => 'table',
+      ];
+      $it = $this->it->execute($crit);
+      $this->string($it->getSql())->isIdenticalTo($raw_query);
+
+      $union = new \QueryUnion($union_crit, true, 'theunion');
+      $raw_query = 'SELECT DISTINCT `theunion`.`field` FROM (SELECT * FROM `table1` UNION ALL SELECT * FROM `table2`) AS `theunion`';
+      $crit = [
+         'SELECT DISTINCT' => 'theunion.field',
+         'FROM'            => $union,
+      ];
+      $it = $this->it->execute($crit);
+      $this->string($it->getSql())->isIdenticalTo($raw_query);
+
+      $union = new \QueryUnion($union_crit, false);
+      $raw_query = 'SELECT DISTINCT `theunion`.`field` FROM (SELECT * FROM `table1` UNION SELECT * FROM `table2`)';
+      $crit = [
+         'SELECT DISTINCT' => 'theunion.field',
+         'FROM'            => $union,
+      ];
+      $it = $this->it->execute($crit);
+      $this->string($it->getSql())->isIdenticalTo($raw_query);
+
+   }
 }
