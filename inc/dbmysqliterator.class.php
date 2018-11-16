@@ -677,15 +677,6 @@ class DBmysqlIterator implements Iterator, Countable {
    }
 
    /**
-    * Get known query operators
-    *
-    * @return array
-    */
-   public function getOperators() {
-      return $this->operators;
-   }
-
-   /**
     * Do we have an operator?
     *
     * @param string $value Value to check
