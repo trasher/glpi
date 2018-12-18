@@ -40,6 +40,9 @@ Config::detectRootDoc();
 $GLPI = new GLPI();
 $GLPI->initLogger();
 
+// To prevent problem of execution time
+ini_set("max_execution_time", "0");
+
 //Print a correct  Html header for application
 function header_html($etape) {
 
