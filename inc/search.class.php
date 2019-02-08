@@ -69,6 +69,7 @@ class Search {
    private $qry_params = [];
    private $current_page;
    private $sub_item = false;
+   private $params = [];
 
    /**
     * Constructor
@@ -346,7 +347,7 @@ class Search {
    public function getData($sub_item = false) {
       $this->sub_item = $sub_item;
       $itemtype = ($this->item instanceof CommonDBTM ? $this->item->getType() : 'AllAssets');
-      $params = self::manageParams($itemtype, $this->raw_params);
+      $this->params = self::manageParams($itemtype, $this->raw_params);
       if ($params['as_map'] == 1) {
          $params['criteria'][] = [
             'link'         => 'AND NOT',
@@ -7931,5 +7932,10 @@ JAVASCRIPT;
     */
    public function getQueryParams() {
       return $this->qry_params;
+   }
+
+   public function getSearchParams()
+   {
+      return $this->params;
    }
 }

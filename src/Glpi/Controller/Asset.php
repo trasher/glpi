@@ -43,7 +43,7 @@ use Toolbox;
 class Asset extends AbstractController implements ControllerInterface
 {
    /**
-    * path: '/itemtype/list'
+    * Get list route param for one itemtype
     *
     * @param Request  $request  Request
     * @param Response $response Response
@@ -53,9 +53,105 @@ class Asset extends AbstractController implements ControllerInterface
     *
     * @Glpi\Annotation\Route(name="list", pattern="/{itemtype}/list[/page/{page:\d+}[/{reset:reset}]]")
     */
-    public function list(Request $request, Response $response, array $args)
+    private function getItemtypeList(Request $request, Response $response, array $args) :array
     {
         global $IS_TWIG;
+        $IS_TWIG = true;
+        $itemtype = $args['itemtype'];
+        $item = $itemtype == 'AllAssets' ? $itemtype : new $itemtype;
+        $params = $request->getQueryParams() + $args;
+        if (isset($args['reset'])) {
+            $params = $args;
+            unset($params['reset']);
+            $this->flash->addMessage('info', __('Search params has been reset'));
+        }
+        if (isset($args['page'])) {
+            $params['start'] = ($args['page'] - 1) * $_SESSION['glpilist_limit'];
+        }
+        $search = new \Search($item, $params);
+        if (isset($args['page'])) {
+            $search->setPage((int)$args['page']);
+        }
+        $data = $search->getData();
+
+        //legacy
+        $get = $request->getQueryParams();
+        $params = $search->getSearchParams();
+        ob_start();
+        Search::showGenericSearch($itemtype, $params);
+        $search_form = ob_get_contents();
+        ob_end_clean();
+        $search_form = preg_replace(
+            '/<\/?form[^>]*?>/',
+            '',
+            $search_form
+        );
+
+        $page_title = 'AllAssets' === $itemtype ?
+           __('Global') :
+           $itemtype::getTypeName(Session::getPluralNumber());
+        $route_params = [
+            'page_title'      => $page_title,
+            'itemtype'        => $itemtype,
+            'search_data'     => $data,
+            'search_form'     => $search_form,
+            'search_options'  => Search::getCleanedOptions($itemtype),
+            'search_params'   => json_encode($params),
+            'params'          => $params
+        ];
+        if ($item !== $itemtype) {
+            $route_params['item'] = $item;
+        }
+
+        $dd_types = \Dropdown::getStandardDropdownItemTypes();
+
+        if ($item instanceof \CommonDevice) {
+            $dev_types = \Dropdown::getDeviceItemTypes();
+            $head_dd = [
+                'type'         => 'select',
+                'name'         => 'devices',
+                'autofocus'    => true,
+                'values'       => $dev_types,
+                'listicon'     => false,
+                'addicon'      => false,
+                'noajax'       => true,
+                'value'        => $item->getType(),
+                'change_func'  => 'onDdListChange',
+                'empty_value'  => true
+            ];
+            $route_params['head_dd'] = $head_dd;
+        } elseif ($item instanceof \CommonDropdown) {
+            $head_dd = [
+                'name'         => 'dropdowns',
+                'autofocus'    => true,
+                'values'       => $dd_types,
+                'listicon'     => false,
+                'addicon'      => false,
+                'noajax'       => true,
+                'value'        => $item->getType(),
+                'change_func'  => 'onDdListChange',
+                'empty_value'  => true
+            ];
+            $route_params['head_dd'] = $head_dd;
+        }
+
+        return $route_params;
+    }
+ 
+    /**
+    * path: '/all/list'
+    *
+    * @param Request  $request  Request
+    * @param Response $response Response
+    * @param array    $args     URL arguments
+    *
+    * @return void
+    *
+    * @Glpi\Annotation\Route(name="listall", pattern="/all/list")
+    */
+    public function listAll(Request $request, Response $response, array $args)
+    {
+        /*global $IS_TWIG;
         $IS_TWIG = true;
         $itemtype = $args['itemtype'];
         $item = $itemtype == 'AllAssets' ? $itemtype : new $itemtype;
@@ -134,12 +230,145 @@ class Asset extends AbstractController implements ControllerInterface
                 'empty_value'  => true
             ];
             $route_params['head_dd'] = $head_dd;
+        }*/
+
+        if (!$this->config['allow_search_global']) {
+            //FIXME: probalby not the better option :)
+            Html::displayRightError();
+        }
+
+        $list = [];
+        if (isset($_GET["globalsearch"])) {
+            $searchtext=trim($_GET["globalsearch"]);
+
+            foreach ($this->config["globalsearch_types"] as $itemtype) {
+                if (($item = getItemForItemtype($itemtype))
+                    && $item->canView()
+                ) {
+                    $args['reset'] = 'reset';
+                    $args['display_type'] = Search::GLOBAL_SEARCH;
+
+                    $params                 = Search::manageParams($itemtype, $_GET, false, true);
+                    $params["display_type"] = Search::GLOBAL_SEARCH;
+
+                    $count                  = count($params["criteria"]);
+
+                    $params["criteria"][$count]["field"]       = 'view';
+                    $params["criteria"][$count]["searchtype"]  = 'contains';
+                    $params["criteria"][$count]["value"]       = $searchtext;
+
+                    $list = [$itemtype] = $this->getItemtypeList($request, $response, $args);
+                }
+            }
         }
 
         return $this->view->render(
             $response,
+            'listall.twig',
+            [
+                'page_title'  => __('Search'),
+                'list'        => $list
+            ]
+        );
+    }
+   /**
+    * path: '/itemtype/list'
+    *
+    * @param Request  $request  Request
+    * @param Response $response Response
+    * @param array    $args     URL arguments
+    *
+    * @return void
+    *
+    * @Glpi\Annotation\Route(name="list", pattern="/{itemtype}/list[/page/{page:\d+}[/{reset:reset}]]")
+    */
+    public function list(Request $request, Response $response, array $args)
+    {
+        /*global $IS_TWIG;
+        $IS_TWIG = true;
+        $itemtype = $args['itemtype'];
+        $item = $itemtype == 'AllAssets' ? $itemtype : new $itemtype;
+        $params = $request->getQueryParams() + $args;
+        if (isset($args['reset'])) {
+            $params = $args;
+            unset($params['reset']);
+            $this->flash->addMessage('info', __('Search params has been reset'));
+        }
+        if (isset($args['page'])) {
+            $params['start'] = ($args['page'] - 1) * $_SESSION['glpilist_limit'];
+        }
+        $search = new \Search($item, $params);
+        if (isset($args['page'])) {
+            $search->setPage((int)$args['page']);
+        }
+        $data = $search->getData();
+
+        //legacy
+        $get = $request->getQueryParams();
+        $params = Search::manageParams($itemtype, $get);
+
+        ob_start();
+        Search::showGenericSearch($itemtype, $params);
+        $search_form = ob_get_contents();
+        ob_end_clean();
+        $search_form = preg_replace(
+            '/<\/?form[^>]*?>/',
+            '',
+            $search_form
+        );
+
+        $page_title = 'AllAssets' === $itemtype ?
+           __('Global') :
+           $itemtype::getTypeName(Session::getPluralNumber());
+        $route_params = [
+            'page_title'      => $page_title,
+            'itemtype'        => $itemtype,
+            'search_data'     => $data,
+            'search_form'     => $search_form,
+            'search_options'  => Search::getCleanedOptions($itemtype),
+            'search_params'   => json_encode($params),
+            'params'          => $params
+        ];
+        if ($item !== $itemtype) {
+            $route_params['item'] = $item;
+        }
+
+        $dd_types = \Dropdown::getStandardDropdownItemTypes();
+
+        if ($item instanceof \CommonDevice) {
+            $dev_types = \Dropdown::getDeviceItemTypes();
+            $head_dd = [
+                'type'         => 'select',
+                'name'         => 'devices',
+                'autofocus'    => true,
+                'values'       => $dev_types,
+                'listicon'     => false,
+                'addicon'      => false,
+                'noajax'       => true,
+                'value'        => $item->getType(),
+                'change_func'  => 'onDdListChange',
+                'empty_value'  => true
+            ];
+            $route_params['head_dd'] = $head_dd;
+        } elseif ($item instanceof \CommonDropdown) {
+            $head_dd = [
+                'name'         => 'dropdowns',
+                'autofocus'    => true,
+                'values'       => $dd_types,
+                'listicon'     => false,
+                'addicon'      => false,
+                'noajax'       => true,
+                'value'        => $item->getType(),
+                'change_func'  => 'onDdListChange',
+                'empty_value'  => true
+            ];
+            $route_params['head_dd'] = $head_dd;
+        }*/
+
+        return $this->view->render(
+            $response,
             'list.twig',
-            $route_params
+            $this->getItemtypeList($request, $response, $args)
         );
     }
 

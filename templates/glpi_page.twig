@@ -639,7 +639,7 @@ permit_select_parent	0
       if ($full === true) {
          /// Search engine
 #}
-<form class="sidebar-form" role="search" method="get" action="{{ CFG_GLPI.root_doc }}/front/search.php">
+<form class="sidebar-form" role="search" method="get" action="{{ path_for('listall') }}">
    {% include "elements/hidden.twig" with {'element': {'name': '_csrf'}} %}
    <div class="input-group">
       <input type="text" class="form-control" id="search-input" placeholder="{{ __('Search') }}" name="globalsearch">
