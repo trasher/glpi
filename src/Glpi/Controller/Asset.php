@@ -88,16 +88,6 @@ class Asset extends AbstractController implements ControllerInterface
             $search_form
         );
 
-       /*ob_start();
-       if ($params['as_map'] == 1) {
-         Search::showMap($itemtype, $params, $data);
-       } else {
-         Search::showList($itemtype, $params, $data);
-       }
-       $contents = ob_get_contents();
-       ob_end_clean();*/
-       //end legacy
-
         $page_title = 'AllAssets' === $itemtype ?
            __('Global') :
            $itemtype::getTypeName(Session::getPluralNumber());
