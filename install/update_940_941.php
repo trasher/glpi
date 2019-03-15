@@ -138,6 +138,25 @@ function update940to941() {
       $migration->addField('glpi_users', 'cookie_token_date', 'datetime', ['after' => 'cookie_token']);
    }
 
+   /** Suppliers restriction */
+   if (!$DB->fieldExists('glpi_suppliers', 'is_active')) {
+      $migration->addField(
+         'glpi_suppliers',
+         'is_active',
+         'bool',
+         ['value' => 0]
+      );
+      $migration->addKey('glpi_suppliers', 'is_active');
+      $migration->addPostQuery(
+         $DB->buildUpdate(
+            'glpi_suppliers',
+            ['is_active' => 1],
+            [true]
+         )
+      );
+   }
+   /** /Suppliers restriction */
+
    // ************ Keep it at the end **************
    $migration->executeMigration();
 
