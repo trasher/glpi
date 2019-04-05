@@ -54,12 +54,24 @@ class DBmysqlIterator extends DbTestCase {
    }
 
    public function testQuery() {
-      $req = 'SELECT Something FROM Somewhere';
-      $it = $this->it->executeRaw($req);
-      $this->string($it->getSql())->isIdenticalTo($req);
-      $req = 'SELECT @@sql_mode as mode';
-      $it = $this->it->executeRaw($req);
-      $this->string($it->getSql())->isIdenticalTo($req);
+      $this->exception(
+         function() {
+            $req = 'SELECT Something FROM Somewhere';
+            $it = $this->it->executeRaw($req);
+            $this->string($it->getSql())->isIdenticalTo($req);
+         }
+      )
+         ->isInstanceOf('RuntimeException')
+         ->message->contains('Deprecated usage of SQL in DB/request (full query)');
+      $this->exception(
+         function() {
+            $req = 'SELECT @@sql_mode as mode';
+            $it = $this->it->executeRaw($req);
+            $this->string($it->getSql())->isIdenticalTo($req);
+         }
+      )
+         ->isInstanceOf('RuntimeException')
+         ->message->contains('Deprecated usage of SQL in DB/request (full query)');
    }
 
    public function testSqlError() {
