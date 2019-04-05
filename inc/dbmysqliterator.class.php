@@ -137,10 +137,7 @@ class DBmysqlIterator implements Iterator, Countable {
       }
 
       if ($is_legacy) {
-         Toolbox::Deprecated("Deprecated usage of SQL in DB/request (full query)");
-         //if ($_SESSION['glpi_use_mode'] == Session::DEBUG_MODE) {
-         //   trigger_error("Deprecated usage of SQL in DB/request (full query)", E_USER_DEPRECATED);
-         //}
+         Toolbox::deprecated("Deprecated usage of SQL in DB/request (full query)");
          $this->sql = $table;
       } else {
          // Modern way
