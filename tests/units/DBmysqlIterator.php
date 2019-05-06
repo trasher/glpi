@@ -57,7 +57,7 @@ class DBmysqlIterator extends DbTestCase {
       $this->exception(
          function() {
             $req = 'SELECT Something FROM Somewhere';
-            $it = $this->it->executeRaw($req);
+            $it = $this->it->execute($req);
             $this->string($it->getSql())->isIdenticalTo($req);
          }
       )
@@ -66,7 +66,7 @@ class DBmysqlIterator extends DbTestCase {
       $this->exception(
          function() {
             $req = 'SELECT @@sql_mode as mode';
-            $it = $this->it->executeRaw($req);
+            $it = $this->it->execute($req);
             $this->string($it->getSql())->isIdenticalTo($req);
          }
       )
