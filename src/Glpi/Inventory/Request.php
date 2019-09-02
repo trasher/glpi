@@ -60,12 +60,15 @@ class Request
     {
         switch ($mode) {
             case self::XML_MODE:
-                $this->response = new \SimpleXMLElement(
-                    "<?xml version='1.0' encoding='UTF-8'?><REPLY></REPLY>"
+                $this->response = new \DomDocument();
+                $this->response->appendChild(
+                    $this->response->createElement('REPLY')
                 );
                 break;
             case self::JSON_MODE:
                 throw new \RuntimeException('JSON is not yet supported');
+            default:
+                throw new \RuntimeException("Unknown mode $mode");
         }
         if (null !== $data) {
             $this->handleRequest($data);
@@ -101,6 +104,7 @@ class Request
     */
     public function handleXMLRequest($data)
     {
+        \Toolbox::logDebug($data);
         $xml = @simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
         if (!$xml) {
             $xml_errors = libxml_get_errors();
@@ -109,8 +113,9 @@ class Request
             return false;
         }
 
-        $this->deviceid = $xml->REQUEST->DEVICEID;
-        $query = $xml->REQUEST->QUERY;
+        $this->deviceid = (string)$xml->DEVICEID;
+        $query = (string)$xml->QUERY;
+
         switch ($query) {
             case 'PROLOG':
                 $this->prolog();
@@ -135,7 +140,7 @@ class Request
     */
     public function handleJSONRequest($data)
     {
-        throw new \RuntimeException('Not yet implemented.');
+        throw new \RuntimeException('JSON is not yet supported');
     }
 
     /**
@@ -157,9 +162,9 @@ class Request
     */
     protected function addToResponse(array $entries)
     {
-        $reply = $this->response->REPLY;
+        $root = $this->response->documentElement;
         foreach ($entries as $name => $content) {
-            $this->addNode($reply, $name, $content);
+            $this->addNode($root, $name, $content);
         }
     }
 
@@ -172,15 +177,24 @@ class Request
     *
     * @return void
     */
-    private function addNode($parent, $name, $content)
+    private function addNode(\DomElement $parent, $name, $content)
     {
         if (is_array($content)) {
-            $node = $parent->addChild($name);
+            $node = $parent->appendChild(
+                $this->response->createElement(
+                    $name
+                )
+            );
             foreach ($content as $sname => $scontent) {
                 $this->addNode($node, $sname, $scontent);
             }
         } else {
-            $parent->addChild($name, $content);
+            $parent->appendChild(
+                $this->response->createElement(
+                    $name,
+                    $content
+                )
+            );
         }
     }
 
@@ -196,6 +210,8 @@ class Request
                 return 'text/xml';
             case self::JSON_MODE:
                 return 'application/json';
+            default:
+                throw new \RuntimeException("Unknown mode $mode");
         }
     }
 
@@ -206,7 +222,14 @@ class Request
     */
     public function getResponse()
     {
-        return $this->response;
+        switch ($this->mode) {
+            case self::XML_MODE:
+                return $this->response->saveXML();
+            case self::JSON_MODE:
+                throw new \RuntimeException('JSON is not yet supported');
+            default:
+                throw new \RuntimeException("Unknown mode $mode");
+        }
     }
 
    /**
@@ -229,6 +252,8 @@ class Request
     */
     public function inventory()
     {
-        throw new \RuntimeException('Not implemented yet!');
+        $this->addToResponse([
+            'ERROR'  => 'Inventory is not yet implemented'
+        ]);
     }
 }

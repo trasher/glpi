@@ -51,14 +51,17 @@ class Inventory extends AbstractController implements ControllerInterface
      *
      * @return void
      *
-     * @Glpi\Annotation\Route(name="inventoryDispatcher", pattern="/inventory")
+     * @Glpi\Annotation\Route(name="inventoryDispatcher", pattern="/inventory", method="POST")
      */
     public function dispatch(Request $request, Response $response, array $args)
     {
         $contents = $request->getBody()->getContents();
-        \Toolbox::logDebug($contents);
         $inventory_request = new \Glpi\Inventory\Request($contents);
 
+        //DEBUG
+        \Toolbox::logWarning(
+            "XML response sent: ".$inventory_request->getResponse()
+        );
         $response->write($inventory_request->getResponse());
         return $response
             ->withHeader('Content-Type', $inventory_request->getContentType())

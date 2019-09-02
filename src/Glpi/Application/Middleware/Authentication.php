@@ -77,7 +77,19 @@ class Authentication
         //die('You shall not pass!')
 
         $route = $request->getAttribute('route');
-        if (!$route || in_array($route->getName(), ['login', 'slash', 'cron', 'asset', 'do-login', 'lost-password'])) {
+        if (!$route
+            || in_array(
+                $route->getName(), [
+                    'login',
+                    'slash',
+                    'cron',
+                    'asset',
+                    'do-login',
+                    'lost-password',
+                    'inventoryDispatcher'
+                ]
+            )
+        ) {
             return $next($request, $response);
         }
 

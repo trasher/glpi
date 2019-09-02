@@ -866,7 +866,7 @@ class Main extends AbstractController implements ControllerInterface
      *
      * @return void
      *
-     * @Glpi\Annotation\Route(name="map-results", pattern="/ajax/map")
+     * @Glpi\Annotation\Route(name="map-results", pattern="/ajax/map", method="POST")
      */
     public function mapResults(Request $request, Response $response, array $args)
     {
