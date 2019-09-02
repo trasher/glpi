@@ -79,7 +79,8 @@ class Authentication
         $route = $request->getAttribute('route');
         if (!$route
             || in_array(
-                $route->getName(), [
+                $route->getName(),
+                [
                     'login',
                     'slash',
                     'cron',
