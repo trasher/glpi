@@ -180,7 +180,8 @@ class Request
      *
      * @return void
      */
-    public function addError($message) {
+    public function addError($message)
+    {
         $this->addToResponse(['ERROR' => $message]);
     }
 
@@ -326,6 +327,5 @@ class Request
         } else {
             $this->addToResponse(['RESPONSE' => 'SEND']);
         }
-    }
     }
 }
