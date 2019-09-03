@@ -2062,6 +2062,8 @@ class Config extends CommonDBTM {
                  'check'   => 'RunTracy\Middlewares\TracyMiddleware' ],
                [ 'name'    => 'twig/twig',
                  'check'   => 'Twig\Twig'],
+               [ 'name'    => 'glpi-project/inventory_format',
+                 'check'   => 'Glpi\Inventory\Converter']
       ];
       if (Toolbox::canUseCAS()) {
          $deps[] = [
