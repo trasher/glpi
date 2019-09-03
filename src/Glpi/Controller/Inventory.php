@@ -56,6 +56,15 @@ class Inventory extends AbstractController implements ControllerInterface
     public function dispatch(Request $request, Response $response, array $args)
     {
         $contents = $request->getBody()->getContents();
+        if (empty($contents)) {
+            $contents = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>
+<REQUEST>
+  <DEVICEID>johanxps-2018-07-09-09-07-13</DEVICEID>
+  <QUERY>INVENTORY</QUERY>
+  <TOKEN>12345678</TOKEN>
+</REQUEST>
+";
+        }
         $inventory_request = new \Glpi\Inventory\Request($contents);
 
         //DEBUG
