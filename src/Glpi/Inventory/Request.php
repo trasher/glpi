@@ -35,6 +35,9 @@ namespace Glpi\Inventory;
 
 /**
  * Handle inventory request
+ * Both XML (legacy) and JSON inventory formats are supported.
+ *
+ * @see https://github.com/glpi-project/inventory_format/blob/master/inventory.schema.json
  */
 class Request
 {
@@ -42,6 +45,9 @@ class Request
 
     const XML_MODE    = 0;
     const JSON_MODE   = 1;
+
+    const PROLOG_QUERY = 'PROLOG';
+    const INVENT_QUERY = 'INVENTORY';
 
    /** @var integer */
     private $mode; //will be usefull when agent will send json
@@ -58,6 +64,7 @@ class Request
     */
     public function __construct($data = null, $mode = self::XML_MODE)
     {
+        $this->mode = $mode;
         switch ($mode) {
             case self::XML_MODE:
                 $this->response = new \DomDocument();
@@ -67,6 +74,7 @@ class Request
                 break;
             case self::JSON_MODE:
                 throw new \RuntimeException('JSON is not yet supported');
+                /*$this->response = [];*/
             default:
                 throw new \RuntimeException("Unknown mode $mode");
         }
@@ -82,17 +90,39 @@ class Request
     *
     * @return boolean
     */
-    public function handleRequest($data)
+    public function handleRequest($data) :bool
     {
        //load and check data
         switch ($this->mode) {
             case self::XML_MODE:
-                $this->handleXMLRequest($data);
-                break;
+                return $this->handleXMLRequest($data);
             case self::JSON_MODE:
-                $this->handleJSONRequest($data);
-                break;
+                return $this->handleJSONRequest($data);
         }
+    }
+
+    /**
+     * Handle Query
+     *
+     * @param string $query   Query mode (one of self::*_QUERY)
+     * @param mixed  $content Contents, optionnal
+     *
+     * @return boolean
+     */
+    private function handleQuery($query, $content = null) :bool
+    {
+        switch ($query) {
+            case self::PROLOG_QUERY:
+                $this->prolog();
+                break;
+            case self::INVENT_QUERY:
+                $this->inventory($content);
+                break;
+            default:
+                $this->addToResponse(['ERROR' => "Query '$query' is not supported."]);
+                return false;
+        }
+        return true;
     }
 
    /**
@@ -102,9 +132,8 @@ class Request
     *
     * @return boolean
     */
-    public function handleXMLRequest($data)
+    public function handleXMLRequest($data) :bool
     {
-        \Toolbox::logDebug($data);
         $xml = @simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
         if (!$xml) {
             $xml_errors = libxml_get_errors();
@@ -112,23 +141,10 @@ class Request
             $this->addToResponse(['ERROR' => 'XML not well formed!']);
             return false;
         }
-
         $this->deviceid = (string)$xml->DEVICEID;
         $query = (string)$xml->QUERY;
 
-        switch ($query) {
-            case 'PROLOG':
-                $this->prolog();
-                break;
-            case 'INVENTORY':
-                $this->inventory();
-                break;
-            default:
-                $this->addToResponse(['ERROR' => "Query '$query' is not supported."]);
-                return false;
-        }
-
-        return true;
+        return $this->handleQuery($query, $xml);
     }
 
    /**
@@ -138,9 +154,13 @@ class Request
     *
     * @return boolean
     */
-    public function handleJSONRequest($data)
+    public function handleJSONRequest($data) :bool
     {
-        throw new \RuntimeException('JSON is not yet supported');
+        $this->addToResponse(['ERROR' => 'JSON is not yet supported']);
+        return false;
+        /*$data = json_decode($data);
+        $this->deviceid = $data['deviceid'];
+        return $this->handleQuery($data['query'], $data);*/
     }
 
     /**
@@ -148,9 +168,20 @@ class Request
      *
      * @return integer One of self::*_MODE
      */
-    public function getMode()
+    public function getMode() :int
     {
         return $this->mode;
+    }
+
+    /**
+     * Adds an error
+     *
+     * @param string $message Error message
+     *
+     * @return void
+     */
+    public function addError($message) {
+        $this->addToResponse(['ERROR' => $message]);
     }
 
    /**
@@ -162,14 +193,20 @@ class Request
     */
     protected function addToResponse(array $entries)
     {
-        $root = $this->response->documentElement;
-        foreach ($entries as $name => $content) {
-            $this->addNode($root, $name, $content);
+        if ($this->mode === self::XML_MODE) {
+            $root = $this->response->documentElement;
+            foreach ($entries as $name => $content) {
+                $this->addNode($root, $name, $content);
+            }
+        } else {
+            foreach ($entries as $name => $content) {
+                $this->addEntry($this->response, $name, $content);
+            }
         }
     }
 
    /**
-    * Add node to response
+    * Add node to response for XML_MODE
     *
     * @param SimpleXMLElement  $parent  Parent element
     * @param string            $name    Element name to create
@@ -198,12 +235,34 @@ class Request
         }
     }
 
+   /**
+    * Add node to response for JSON_MODE
+    *
+    * @param array             $parent  Parent element
+    * @param string            $name    Element name to create
+    * @param string|array|null $content Element contents, if any
+    *
+    * @return void
+    */
+    private function addEntry(array &$parent, $name, $content)
+    {
+        if (is_array($content)) {
+            $node = $parent[$name];
+            foreach ($content as $sname => $scontent) {
+                $this->addNode($node, $sname, $scontent);
+            }
+        } else {
+            $parent[$name] = $content;
+        }
+    }
+
+
     /**
      * Get content-type
      *
      * @return string
      */
-    public function getContentType()
+    public function getContentType() :string
     {
         switch ($this->mode) {
             case self::XML_MODE:
@@ -218,15 +277,15 @@ class Request
    /**
     * Get response
     *
-    * @return object SimpleXMLElement
+    * @return string
     */
-    public function getResponse()
+    public function getResponse() :string
     {
         switch ($this->mode) {
             case self::XML_MODE:
                 return $this->response->saveXML();
             case self::JSON_MODE:
-                throw new \RuntimeException('JSON is not yet supported');
+                return json_encode($this->response);
             default:
                 throw new \RuntimeException("Unknown mode $mode");
         }
@@ -248,12 +307,25 @@ class Request
    /**
     * Handle agent inventory request
     *
+    * @param aray $data Inventory input following specs
+    *
     * @return void
     */
-    public function inventory()
+    public function inventory($data)
     {
-        $this->addToResponse([
-            'ERROR'  => 'Inventory is not yet implemented'
-        ]);
+        $inventory = new Inventory(
+            $data,
+            Inventory::FULL_MODE,
+            $this->mode
+        );
+
+        if ($inventory->inError()) {
+            $this->addToResponse([
+                'ERROR'  => $inventory->getErrors()
+            ]);
+        } else {
+            $this->addToResponse(['RESPONSE' => 'SEND']);
+        }
+    }
     }
 }
