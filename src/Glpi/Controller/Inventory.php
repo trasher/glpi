@@ -56,7 +56,13 @@ class Inventory extends AbstractController implements ControllerInterface
     public function dispatch(Request $request, Response $response, array $args)
     {
         $contents = $request->getBody()->getContents();
-        $inventory_request = new \Glpi\Inventory\Request($contents);
+        $inventory_request = new \Glpi\Inventory\Request();
+
+        $inventory_request->setCompression(
+            $request->hasHeader('Content-Type') ? $request->getHeaderLine('Content-Type') : false,
+            $contents
+        );
+        $inventory_request->handleRequest($contents);
 
         //DEBUG
         \Toolbox::logWarning(

@@ -49,12 +49,18 @@ class Request
     const PROLOG_QUERY = 'PROLOG';
     const INVENT_QUERY = 'INVENTORY';
 
+    const COMPRESS_NONE = 0;
+    const COMPRESS_ZLIB = 1;
+    const COMPRESS_GZIP = 2;
+
    /** @var integer */
     private $mode; //will be usefull when agent will send json
    /** @var string */
     private $deviceid;
    /** @var SimpleXML */
     private $response;
+    /** @var integer */
+    private $compression;
 
    /**
     * @param null|mixed $data Request contents
@@ -65,6 +71,7 @@ class Request
     public function __construct($data = null, $mode = self::XML_MODE)
     {
         $this->mode = $mode;
+
         switch ($mode) {
             case self::XML_MODE:
                 $this->response = new \DomDocument();
@@ -92,7 +99,20 @@ class Request
     */
     public function handleRequest($data) :bool
     {
-       //load and check data
+        if ($this->compression !== self::COMPRESS_NONE) {
+            switch ($this->compression) {
+                case self::COMPRESS_ZLIB:
+                    $data = gzuncompress($data);
+                    break;
+                case self::COMPRESS_GZIP:
+                    $data = gzdecode($data);
+                    break;
+                default:
+                    throw new \UnexpectedValueException("Unknown compression mode" . $this->compression);
+            }
+        }
+
+        //load and check data
         switch ($this->mode) {
             case self::XML_MODE:
                 return $this->handleXMLRequest($data);
@@ -326,6 +346,32 @@ class Request
             ]);
         } else {
             $this->addToResponse(['RESPONSE' => 'SEND']);
+        }
+    }
+
+    /**
+     * Detect compression algorithm from Content-Type header
+     *
+     * @param string     $type Content type
+     * @param null|mixed $data Request contents
+     *
+     * @return void
+     */
+    public function setCompression($type, $data)
+    {
+        switch ($type) {
+            case 'application/xml':
+            case 'application/json':
+                $this->compression = self::COMPRESS_NONE;
+                break;
+            case 'application/x-compress-zlib':
+                $this->compression = self::COMPRESS_ZLIB;
+                break;
+            case 'application/x-compress-gzip':
+                $this->compression = self::COMPRESS_GZIP;
+                break;
+            default:
+                throw new \UnexpectedValueException("Unknown content type $type");
         }
     }
 }
