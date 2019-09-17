@@ -107,6 +107,8 @@ class Request
                 case self::COMPRESS_GZIP:
                     $data = gzdecode($data);
                     break;
+                case null:
+                    throw new \UnexpectedValueException("Compression mode has not been set");
                 default:
                     throw new \UnexpectedValueException("Unknown compression mode" . $this->compression);
             }
