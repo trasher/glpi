@@ -354,12 +354,11 @@ class Request
     /**
      * Detect compression algorithm from Content-Type header
      *
-     * @param string     $type Content type
-     * @param null|mixed $data Request contents
+     * @param string $type Content type
      *
      * @return void
      */
-    public function setCompression($type, $data)
+    public function setCompression($type)
     {
         switch ($type) {
             case 'application/xml':

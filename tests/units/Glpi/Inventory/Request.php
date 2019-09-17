@@ -62,4 +62,12 @@ class Request extends \GLPITestCase {
          ->isInstanceOf('\RuntimeException')
          ->hasMessage('Unknown mode 42');
    }
+
+   public function testProlog() {
+      $data = "<?xml version=\"1.0\"?>\n<REQUEST><DEVICEID>atoumized-device</DEVICEID><QUERY>PROLOG</QUERY></REQUEST>";
+      $request = new \Glpi\Inventory\Request;
+      $request->setCompression(\Glpi\Inventory\Request::COMPRESS_NONE);
+      $request->handleRequest($data);
+      $this->string($request->getResponse())->isIdenticalTo("<?xml version=\"1.0\"?>\n<REPLY><PROLOG_FREQ>24</PROLOG_FREQ><RESPONSE>SEND</RESPONSE></REPLY>\n");
+   }
 }

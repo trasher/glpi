@@ -59,8 +59,7 @@ class Inventory extends AbstractController implements ControllerInterface
         $inventory_request = new \Glpi\Inventory\Request();
 
         $inventory_request->setCompression(
-            $request->hasHeader('Content-Type') ? $request->getHeaderLine('Content-Type') : false,
-            $contents
+            $request->hasHeader('Content-Type') ? $request->getHeaderLine('Content-Type') : false
         );
         $inventory_request->handleRequest($contents);
 
