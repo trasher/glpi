@@ -101,7 +101,7 @@ if (isset($_POST["item_type"]) && is_array($_POST["item_type"])) {
             ]
          ],
          'WHERE'        => getEntitiesRestrictCriteria($itemtable),
-         'ORDERBY'      => ["entname ASC", 'itemdeleted DESC', "itemname ASC"]
+         'ORDERBY'      => []
       ];
 
       if ($DB->fieldExists($itemtable, 'name')) {
@@ -114,7 +114,6 @@ if (isset($_POST["item_type"]) && is_array($_POST["item_type"])) {
             || ($val == 'SoftwareLicense')) {
 
          if ($val == 'SoftwareLicense') {
-            $criteria['ORDERBY'] = ["entname ASC", "itemname ASC"];
             $criteria['SELECT'] = array_merge(
                $criteria['SELECT'],
                ['glpi_infocoms.buy_date', 'glpi_infocoms.warranty_duration']
@@ -131,15 +130,16 @@ if (isset($_POST["item_type"]) && is_array($_POST["item_type"])) {
             ];
          }
          if ($val == 'Project') {
+            $criteria['ORDERBY'] = ["itemdeleted DESC"];
             $criteria['SELECT'][] = "$itemtable.is_deleted AS itemdeleted";
          }
 
          if (isset($_POST["year"][0]) && ($_POST["year"][0] != 0)) {
             $ors = [];
             foreach ($_POST["year"] as $val2) {
-               $ors[] = new QueryExpression('YEAR('.$DB->quoteName('glpi_contracts.begin_date').') = '.$DB->quote($val2));
+               $ors[] = new QueryExpression('YEAR('.$DB->quoteName('glpi_contracts.begin_date').') = '.$DB->quoteValue($val2));
                if ($val == 'SoftwareLicense') {
-                  $ors[] = new QueryExpression('YEAR('.$DB->quoteName('glpi_infocoms.buy_date').') = '.$DB->quote($val2));
+                  $ors[] = new QueryExpression('YEAR('.$DB->quoteName('glpi_infocoms.buy_date').') = '.$DB->quoteValue($val2));
                }
             }
             if (count($ors)) {
@@ -176,14 +176,15 @@ if (isset($_POST["item_type"]) && is_array($_POST["item_type"])) {
 
          if (isset($_POST["year"][0]) && ($_POST["year"][0] != 0)) {
             foreach ($_POST["year"] as $val2) {
-               $ors[] = new QueryExpression('YEAR('.$DB->quoteName('glpi_infocoms.buy_date').') = '.$DB->quoteValue($val2));
-               $ors[] = new QueryExpression('YEAR('.$DB->quoteName('glpi_contracts.begin_date').') = '.$DB->quoteValue($val2));
+               $ors[] = new QueryExpression('YEAR('.$DB->quoteName('glpi_infocoms.buy_date').') = '.$DB->quote($val2));
+               $ors[] = new QueryExpression('YEAR('.$DB->quoteName('glpi_contracts.begin_date').') = '.$DB->quote($val2));
             }
             if (count($ors)) {
                $criteria['WHERE'][] = ['OR' => $ors];
             }
          }
       }
+      $criteria['ORDERBY'] = array_merge($criteria['ORDERBY'], ["entname ASC", "itemname ASC"]);
       $all_criteria[$val] = $criteria;
    }
 }
