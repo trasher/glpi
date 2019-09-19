@@ -517,6 +517,14 @@ function loadDataset() {
             'begin_date'   => '2018-12-29',
             'end_date'     => '2019-01-06'
          ]
+      ], 'Holiday'   => [
+         [
+            'name'         => 'X-Mas',
+            'entities_id'  => '_test_root_entity',
+            'is_recursive' => 1,
+            'begin_date'   => '2018-12-29',
+            'end_date'     => '2019-01-06'
+         ]
       ], 'Glpi\\Dashboard\\Dashboard' => [
          [
             'key'     => 'test_dashboard',

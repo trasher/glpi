@@ -307,6 +307,7 @@ class RuleImportComputer extends Rule {
          'WHERE'  => [], //to fill
       ];
 
+
       foreach ($complex_criterias as $criteria) {
          switch ($criteria->fields['criteria']) {
             case 'name' :
@@ -326,15 +327,15 @@ class RuleImportComputer extends Rule {
 
             case 'model' :
                // search for model, don't create it if not found
-               $options    = ['manufacturer' => addslashes($input['manufacturer'])];
-               $mid        = Dropdown::importExternal('ComputerModel', addslashes($input['model']), -1,
+               $options    = ['manufacturer' => $input['manufacturer']];
+               $mid        = Dropdown::importExternal('ComputerModel', $input['model'], -1,
                                                       $options, '', false);
                $it_criteria['WHERE'][] = ['glpi_computers.computermodels_id' => $mid];
                break;
 
             case 'manufacturer' :
                // search for manufacturer, don't create it if not found
-               $mid        = Dropdown::importExternal('Manufacturer', addslashes($input['manufacturer']), -1,
+               $mid        = Dropdown::importExternal('Manufacturer', $input['manufacturer'], -1,
                                                       [], '', false);
                $it_criteria['WHERE'][] = ['glpi_computers.manufacturers_id' => $mid];
                break;
