@@ -61,8 +61,8 @@ class Search extends DbTestCase {
       $params['reset'] = 'reset';
 
       // do search
-      $params = \Search::manageParams($itemtype, $params);
-      $data   = \Search::getDatas($itemtype, $params, $forcedisplay);
+      $search = new \Search($itemtype, $params);
+      $data   = $search->getData();
 
       // append existing errors to returned data
       $data['last_errors'] = [];
@@ -334,11 +334,11 @@ class Search extends DbTestCase {
          ->contains("OR (`glpi_computers`.`is_recursive`='1'".
                     " AND `glpi_computers`.`entities_id` IN (0))")
          ->contains("`glpi_computers`.`name`  LIKE '%test%'")
-         ->contains("AND (`glpi_softwares`.`id` = '10784')")
+         ->contains("AND (`glpi_softwares`.`id` = 10784)")
          ->contains("OR (`glpi_computers`.`id`  LIKE '%test2%'")
-         ->contains("AND (`glpi_locations`.`id` = '11')")
-         ->contains("(`glpi_users`.`id` = '2')")
-         ->contains("OR (`glpi_users`.`id` = '3')")
+         ->contains("AND (`glpi_locations`.`id` = 11)")
+         ->contains("(`glpi_users`.`id` = 2)")
+         ->contains("OR (`glpi_users`.`id` = 3)")
          // match having
          ->matches("/HAVING\s*\(`ITEM_Budget_2`\s+<>\s+5\)\s+AND NOT\s+\(`ITEM_Printer_1`\s+LIKE\s+'%HP%'\s*\)/");
    }
@@ -397,7 +397,7 @@ class Search extends DbTestCase {
       $this->string($data['sql']['search'])
          ->contains("`glpi_changes`.`id` AS `ITEM_Change_Ticket_3`")
          ->contains("`glpi_changes_tickets`.`changes_id` = `glpi_changes`.`id`")
-         ->contains("`glpi_changes`.`id` = '1'");
+         ->contains("`glpi_changes`.`id` = 1");
    }
 
    public function testUser() {
@@ -868,7 +868,8 @@ class Search extends DbTestCase {
     * @dataProvider addSelectProvider
     */
    public function testAddSelect($provider) {
-      $sql_select = \Search::addSelect($provider['itemtype'], $provider['ID']);
+      $search = new \Search(new $provider['itemtype'], []);
+      $sql_select = $search->addSelect($provider['itemtype'], $provider['ID']);
 
       $this->string($this->cleanSQL($sql_select))
          ->isEqualTo($this->cleanSQL($provider['sql']));
@@ -930,7 +931,8 @@ class Search extends DbTestCase {
    public function testAddLeftJoin($lj_provider) {
       $already_link_tables = [];
 
-      $sql_join = \Search::addLeftJoin(
+      $search = new \Search(new $lj_provider['itemtype'], []);
+      $sql_join = $search->addLeftJoin(
          $lj_provider['itemtype'],
          getTableForItemType($lj_provider['itemtype']),
          $already_link_tables,
@@ -1026,9 +1028,10 @@ class Search extends DbTestCase {
       $this->login('tech', 'tech');
 
       // do search and check presence of the created problem
-      $data = \Search::prepareDatasForSearch('Problem', ['reset' => 'reset']);
-      \Search::constructSQL($data);
-      \Search::constructData($data);
+      $search = new \Search('Problem', ['reset' => 'reset']);
+      $data = $search->prepareDataForSearch('Problem', ['reset' => 'reset']);
+      $search->constructSQL($data);
+      $search->constructData($data);
 
       $this->integer($data['data']['totalcount'])->isEqualTo(1);
       $this->array($data)
@@ -1078,9 +1081,10 @@ class Search extends DbTestCase {
       $this->login('tech', 'tech');
 
       // do search and check presence of the created Change
-      $data = \Search::prepareDatasForSearch('Change', ['reset' => 'reset']);
-      \Search::constructSQL($data);
-      \Search::constructData($data);
+      $search = new \Search('Change', ['reset', 'reset']);
+      $data = $search->prepareDataForSearch('Change', ['reset' => 'reset']);
+      $search->constructSQL($data);
+      $search->constructData($data);
 
       $this->integer($data['data']['totalcount'])->isEqualTo(1);
       $this->array($data)
@@ -1203,7 +1207,8 @@ class Search extends DbTestCase {
     * @dataProvider makeTextSearchValueProvider
     */
    public function testMakeTextSearchValue($value, $expected) {
-      $this->string(\Search::makeTextSearchValue($value))->isIdenticalTo($expected);
+      $search = new \Search(new \Computer(), []);
+      $this->string($search->makeTextSearchValue($value))->isIdenticalTo($expected);
    }
 
    public function providerAddWhere() {
@@ -1216,7 +1221,7 @@ class Search extends DbTestCase {
             'searchtype' => 'equals',
             'val' => '5',
             'meta' => false,
-            'expected' => "   (`glpi_users_users_id_supervisor`.`id` = '5')",
+            'expected' => "   (`glpi_users_users_id_supervisor`.`id` = 5)",
          ],
          [
             'link' => ' AND ',
@@ -1226,7 +1231,7 @@ class Search extends DbTestCase {
             'searchtype' => 'equals',
             'val' => '2',
             'meta' => false,
-            'expected' => "  AND  (`glpi_users_users_id_tech`.`id` = '2') ",
+            'expected' => "  AND  (`glpi_users_users_id_tech`.`id` = 2) ",
          ],
       ];
    }
@@ -1235,7 +1240,8 @@ class Search extends DbTestCase {
     * @dataProvider providerAddWhere
     */
    public function testAddWhere($link, $nott, $itemtype, $ID, $searchtype, $val, $meta, $expected) {
-      $output = \Search::addWhere($link, $nott, $itemtype, $ID, $searchtype, $val, $meta);
+      $search = new \Search($itemtype, []);
+      $output = $search->addWhere($link, $nott, $itemtype, $ID, $searchtype, $val, $meta);
       $this->string($output)->isEqualTo($expected);
 
       if ($meta) {
@@ -1326,8 +1332,8 @@ class Search extends DbTestCase {
          ->contains("`glpi_users_users_id_recipient`.`realname` AS `ITEM_Ticket_22_realname`")
 
          // Check that WHERE criteria applies on corresponding table alias
-         ->contains("`glpi_users_users_id_lastupdater`.`id` = '{$user_tech_id}'")
-         ->contains("`glpi_users_users_id_recipient`.`id` = '{$user_normal_id}'")
+         ->contains("`glpi_users_users_id_lastupdater`.`id` = {$user_tech_id}")
+         ->contains("`glpi_users_users_id_recipient`.`id` = {$user_normal_id}")
 
          // Check that ORDER applies on corresponding table alias
          ->contains("`glpi_users_users_id_recipient`.`name` ASC");

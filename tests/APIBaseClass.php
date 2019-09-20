@@ -345,7 +345,7 @@ abstract class APIBaseClass extends atoum {
          ->startWith('User');
 
       $this->array($data['rawdata'])
-         ->hasSize(9);
+         ->hasSize(10);
 
       $first_user = array_shift($data['data']);
       $second_user = array_shift($data['data']);
@@ -383,7 +383,7 @@ abstract class APIBaseClass extends atoum {
          ->hasKey('rawdata');
 
       $this->array($data['rawdata'])
-         ->hasSize(9);
+         ->hasSize(10);
 
       $first_user = array_shift($data['data']);
       $second_user = array_shift($data['data']);
@@ -433,7 +433,7 @@ abstract class APIBaseClass extends atoum {
          ->startWith('User');
 
       $this->array($data['rawdata'])
-         ->hasSize(9);
+         ->hasSize(10);
       $this->checkEmptyContentRange($data, $data['headers']);
    }
 
@@ -931,7 +931,7 @@ abstract class APIBaseClass extends atoum {
          ->hasSize(1);
 
       // delete ticket
-      $ticket->delete(['id' => $tickets_id], true);
+      $thi->boolean($ticket->delete(['id' => $tickets_id], true))->isTrue('Ticket not deleted');
    }
 
    /**
@@ -1112,10 +1112,10 @@ abstract class APIBaseClass extends atoum {
       $new_id = $data['id'];
 
       $computer = new Computer();
-      $this->boolean((bool)$computer->getFromDB($new_id))->isTrue();
+      $this->boolean((bool)$computer->getFromDB($new_id))->isTrue('Cannot load computer');
 
       //Add SQL injection spotted!
-      $this->boolean($computer->fields['otherserial'] != 'Not hacked')->isFalse();
+      $this->boolean($computer->fields['otherserial'] != 'Not hacked')->isFalse('Serial hacked...');
 
       $data = $this->query('updateItems',
                            ['itemtype' => 'Computer',
@@ -1126,12 +1126,12 @@ abstract class APIBaseClass extends atoum {
                                    'id'     => $new_id,
                                    'serial' => "abcdef', `otherserial`='injected"]]]);
 
-      $this->boolean((bool)$computer->getFromDB($new_id))->isTrue();
+      $this->boolean((bool)$computer->getFromDB($new_id))->isTrue('Cannot load computer');
       //Update SQL injection spotted!
-      $this->boolean($computer->fields['otherserial'] === 'injected')->isFalse();
+      $this->boolean($computer->fields['otherserial'] === 'injected')->isFalse('Injection spotted.');
 
       $computer = new Computer();
-      $computer->delete(['id' => $new_id], true);
+      $this->boolean($computer->delete(['id' => $new_id], true))->isTrue('computer not deleted');
    }
 
    /**
