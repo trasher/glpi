@@ -5677,4 +5677,53 @@ class CommonDBTM extends CommonGLPI {
    public function getNonLoggedFields(): array {
       return [];
    }
+
+
+   /**
+    * Count for one tab
+    *
+    * @since 10.0.0
+    *
+    * @param CommonDBTM $obj Object instance
+    * @param string     $tab Tab ID
+    * @param integer    $deleted Get deleted results. 0 only not deleted, 1 only deleted, 2 both
+    * @param integer    $template Get template results. ° only not templates, 1 only templates, 2 both
+    *
+    * @return integer|false
+    */
+   protected function genericCountForTab($item, $tab, $deleted = 0, $template = 0) {
+      //TODO: override method in classes like CommonDBRelation, CommonDBVisible, etc.
+      $where = [
+         'itemtype'  => $item->getType(),
+         'items_id'  => $item->getID()
+      ];
+
+      if ($this->maybeDeleted()) {
+         switch ($deleted) {
+            case 0:
+               $where['is_deleted'] = 0;
+               break;
+            case 1:
+               $where['is_deleted'] = 1;
+               break;
+         }
+      }
+
+      if ($this->maybeTemplate()) {
+         switch ($deleted) {
+            case 0:
+               $where['is_template'] = 0;
+               break;
+            case 1:
+               $where['is_deleted'] = 1;
+               break;
+         }
+      }
+
+      $count = countElementsInTable(
+         $this->getTable(),
+         $where
+      );
+      return $count;
+   }
 }

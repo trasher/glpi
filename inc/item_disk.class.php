@@ -351,70 +351,85 @@ class Item_Disk extends CommonDBChild {
       echo "</div>";
    }
 
-   function rawSearchOptions() {
+   public function rawSearchOptions() {
+      $tabs = parent::rawSearchOptions();
 
-      $tab = [];
-
-      $tab[] = [
-         'id'                 => 'common',
-         'name'               => __('Characteristics')
-      ];
-
-      $tab[] = [
-         'id'                 => '1',
-         'table'              => $this->getTable(),
-         'field'              => 'name',
-         'name'               => __('Name'),
-         'datatype'           => 'itemlink',
-         'massiveaction'      => false,
+      $tabs[] = [
+         'id'     => 2,
+         'table'  => $this->getTable(),
+         'field'  => 'device',
+         'name'   => __('Partition'),
          'autocomplete'       => true,
       ];
 
-      $tab[] = [
-         'id'                 => '2',
-         'table'              => $this->getTable(),
-         'field'              => 'device',
-         'name'               => __('Partition'),
-         'datatype'           => 'string',
-         'massiveaction'      => false,
+      $tabs[] = [
+         'id'     => 3,
+         'table'  => $this->getTable(),
+         'field'  => 'mountpoint',
+         'name'   => __('Mount point'),
          'autocomplete'       => true,
       ];
 
-      $tab[] = [
-         'id'                 => '3',
-         'table'              => $this->getTable(),
-         'field'              => 'mountpoint',
-         'name'               => __('Mount point'),
-         'datatype'           => 'string',
-         'massiveaction'      => false,
+      $tabs[] = [
+         'id'              => 4,
+         'table'           => FileSystem::getTable(),
+         'field'           => 'name',
+         'name'            => __('File system'),
+         'datatype'        => 'dropdown',
+         'massiveaction'   => false,
+         'joinparams'      => [
+            'table'  => 'glpi_filesystems',
+         ]
+      ];
+
+      $tabs[] =  [
+         'id'        => 5,
+         'table'     => self::getTable(),
+         'field'     => 'totalsize',
+         'name'      => __('Global size'),
+         'datatype'  => 'number',
+         'unit'      => 'auto',
          'autocomplete'       => true,
       ];
 
-      $tab[] = [
-         'id'                 => '4',
-         'table'              => $this->getTable(),
-         'field'              => 'totalsize',
-         'unit'               => 'auto',
-         'name'               => __('Global size'),
-         'datatype'           => 'number',
-         'width'              => 1000,
-         'massiveaction'      => false,
+      $tabs[] = [
+         'id'        => 6,
+         'table'     => self::getTable(),
+         'field'     => 'freesize',
+         'name'      => __('Free size'),
+         'datatype'  => 'number',
+         'unit'      => 'auto',
          'autocomplete'       => true,
       ];
 
-      $tab[] = [
-         'id'                 => '5',
-         'table'              => $this->getTable(),
-         'field'              => 'freesize',
-         'unit'               => 'auto',
-         'name'               => __('Free size'),
-         'datatype'           => 'number',
-         'width'              => 1000,
-         'massiveaction'      => false,
-         'autocomplete'       => true,
+      $tabs[] = [
+         'id'                 => 7,
+         'table'              => self::getTable(),
+         'name'               => __('Free percentage'),
+         'datatype'           => 'progressbar',
+         'field'              => 'freepercent',
+         'width'              => 2,
+         'computation'        => 'ROUND(100*TABLE.freesize/TABLE.totalsize)',
+         'computationgroupby' => true,
+         'unit'               => '%',
       ];
 
-      return $tab;
+      $tabs[] = [
+         'id'                 => '8',
+         'table'              => self::getTable(),
+         'field'              => 'encryption_status',
+         'name'               => __('Encryption status'),
+         'searchtype'         => 'equals',
+         'forcegroupby'       => true,
+         'massiveaction'      => false,
+         'searchequalsonfield' => true,
+         'datatype'           => 'specific',
+         'joinparams'         => [
+            'jointype'           => 'itemtype_item'
+         ]
+      ];
+
+      return $tabs;
    }
 
    public static function rawSearchOptionsToAdd($itemtype) {

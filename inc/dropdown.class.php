@@ -2217,6 +2217,7 @@ class Dropdown {
 
       $table = $item->getTable();
       $datas = [];
+      $search_inst = new Search($item, []);
 
       $displaywith = false;
       if (isset($post['displaywith'])) {
@@ -2299,7 +2300,7 @@ class Dropdown {
             $where["$table.id"] = $one_item;
          } else {
             if (!empty($post['searchText'])) {
-               $search = Search::makeTextSearchValue($post['searchText']);
+               $search = $search_inst->makeTextSearchValue($post['searchText']);
 
                $swhere = [
                   "$table.completename" => ['LIKE', $search],
@@ -2670,7 +2671,7 @@ class Dropdown {
          }
 
          if (!empty($post['searchText'])) {
-            $search = Search::makeTextSearchValue($post['searchText']);
+            $search = $search_inst->makeTextSearchValue($post['searchText']);
             $orwhere = ["$table.$field" => ['LIKE', $search]];
 
             if ($_SESSION['glpiis_ids_visible']
@@ -3007,7 +3008,8 @@ class Dropdown {
       }
 
       if (isset($post['searchText']) && (strlen($post['searchText']) > 0)) {
-         $search = Search::makeTextSearchValue($post['searchText']);
+         $search_inst = new Search($item, []);
+         $search = $search_inst->makeTextSearchValue($post['searchText']);
          $where['OR'] = [
             "$table.name"        => ['LIKE', $search],
             "$table.otherserial" => ['LIKE', $search],
@@ -3200,7 +3202,8 @@ class Dropdown {
       }
 
       if (isset($_POST['searchText']) && (strlen($post['searchText']) > 0)) {
-         $search = ['LIKE', Search::makeTextSearchValue($post['searchText'])];
+         $search_inst = new Search($item, []);
+         $search = ['LIKE', $search_inst->makeTextSearchValue($post['searchText'])];
          $orwhere =[
             'name'   => $search,
             'id'     => $post['searchText']
@@ -3364,9 +3367,11 @@ class Dropdown {
       }
 
       if (isset($post['searchText']) && strlen($post['searchText']) > 0) {
+         $search_inst = new Search(new Netpoint(), []);
+         $search = ['LIKE', $search_inst->makeTextSearchValue($post['searchText'])];
          $criteria['WHERE']['OR'] = [
-            'glpi_netpoints.name'         => ['LIKE', Search::makeTextSearchValue($post['searchText'])],
-            'glpi_locations.completename' => ['LIKE', Search::makeTextSearchValue($post['searchText'])]
+            'glpi_netpoints.name'         => $search,
+            'glpi_locations.completename' => $search
          ];
       }
 

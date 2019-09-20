@@ -721,6 +721,17 @@ class Computer_Item extends CommonDBRelation{
       return '';
    }
 
+   protected function countForTab($item, $tab, $deleted = 0, $template = 0) {
+      switch ($item->getType()) {
+         case 'Phone' :
+         case 'Printer' :
+         case 'Peripheral' :
+         case 'Monitor' :
+            return self::countForItem($item);
+         case 'Computer':
+            return self::countForMainItem($item);
+      }
+   }
 
    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
 
