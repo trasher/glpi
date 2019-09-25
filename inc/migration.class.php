@@ -405,11 +405,10 @@ class Migration {
 
             if ($params['update'] !== '') {
                $this->migrationOneTable($table);
-               $DB->updateOrDie(
-                  $table, [
-                     $field   => $params['update']
-                  ], $params['condition']
-               );
+               $query = "UPDATE `$table`
+                        SET `$field` = ".$params['update']." ".
+                        $params['condition']."";
+               $DB->queryOrDie($query, $this->version." set $field in $table");
             }
             return true;
          }
