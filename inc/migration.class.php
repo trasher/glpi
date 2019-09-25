@@ -655,13 +655,13 @@ class Migration {
          // $query = "FLUSH TABLES `$oldtable`, `$newtable`";
          // $DB->query($query);
 
-         $query = "CREATE TABLE " . $DB->quoteName($newtable) . " LIKE " . $DB->quoteName($oldtable);
+         $query = "CREATE TABLE `$newtable` LIKE `$oldtable`";
          $DB->queryOrDie($query, $this->version." create $newtable");
 
          //nedds DB::insert to support subqeries to get migrated
-         $query = "INSERT INTO " . $DB->quoteName($newtable) . "
+         $query = "INSERT INTO `$newtable`
                           (SELECT *
-                           FROM " . $DB->quoteName($oldtable) . ")";
+                           FROM `$oldtable`)";
          $DB->queryOrDie($query, $this->version." copy from $oldtable to $newtable");
       }
    }
@@ -708,7 +708,7 @@ class Migration {
       global $DB;
 
       if (isset($this->change[$table])) {
-         $query = "ALTER TABLE " . $DB->quoteName($table) . " ".implode($this->change[$table], " ,\n")." ";
+         $query = "ALTER TABLE `$table` ".implode($this->change[$table], " ,\n")." ";
          $this->displayMessage( sprintf(__('Change of the database layout - %s'), $table));
          $DB->queryOrDie($query, $this->version." multiple alter in $table");
          unset($this->change[$table]);
@@ -717,7 +717,7 @@ class Migration {
       if (isset($this->fulltexts[$table])) {
          $this->displayMessage( sprintf(__('Adding fulltext indices - %s'), $table));
          foreach ($this->fulltexts[$table] as $idx) {
-            $query = "ALTER TABLE " . $DB->quoteName($table) . " ".$idx;
+            $query = "ALTER TABLE `$table` ".$idx;
             $DB->queryOrDie($query, $this->version." $idx");
          }
          unset($this->fulltexts[$table]);
@@ -790,16 +790,15 @@ class Migration {
       $rule['description'] = '';
 
       // Compute ranking
-      $iterator = $DB->request([
-         'SELECT' => ['MAX' => 'ranking AS rank'],
-         'FROM'   => 'glpi_rules',
-         'WHERE'  => ['sub_type' => $rule['sub_type']]
-      ]);
+      $sql = "SELECT MAX(`ranking`) AS `rank`
+              FROM `glpi_rules`
+              WHERE `sub_type` = '".$rule['sub_type']."'";
+      $result = $DB->query($sql);
 
       $ranking = 1;
-      if (count($iterator)) {
-         $data = $iterator->next();
-         $ranking = $data["rank"] + 1;
+      if ($DB->numrows($result) > 0) {
+         $datas = $DB->fetchAssoc($result);
+         $ranking = $datas["rank"] + 1;
       }
 
       // The rule itself
@@ -856,36 +855,31 @@ class Migration {
 
             if (count($iterator) > 0) {
                while ($data = $iterator->next()) {
-                  $result = $DB->request([
-                     'SELECT' => ['MAX' => 'rank as maxrank'],
-                     'FROM'   => 'glpi_displaypreferences',
-                     'WHERE'  => [
-                        'users_id'  => $data['users_id'],
-                        'itemtype'  => $type
-                     ]
-                  ])->next();
-
-                  $rank = $result['maxrank'];
-                  ++$rank;
+                  $query = "SELECT MAX(`rank`)
+                              FROM `glpi_displaypreferences`
+                              WHERE `users_id` = '".$data['users_id']."'
+                                    AND `itemtype` = '$type'";
+                  $result = $DB->query($query);
+                  $rank   = $DB->result($result, 0, 0);
+                  $rank++;
 
                   foreach ($tab as $newval) {
-                     $check_iterator = $DB->request([
-                        'FROM'   => 'glpi_displaypreferences',
-                        'WHERE'  => [
-                           'users_id'  => $data['users_id'],
-                           'num'       => $newval,
-                           'itemtype'  => $type
-                        ]
-                     ]);
-                     if (count($check_iterator) == 0) {
-                           $DB->insert(
-                              'glpi_displaypreferences', [
-                                 'itemtype'  => $type,
-                                 'num'       => $newval,
-                                 'rank'      => $rank++,
-                                 'users_id'  => $data['users_id']
-                              ]
-                           );
+                     $query = "SELECT *
+                                 FROM `glpi_displaypreferences`
+                                 WHERE `users_id` = '".$data['users_id']."'
+                                       AND `num` = '$newval'
+                                       AND `itemtype` = '$type'";
+                     if ($result2 = $DB->query($query)) {
+                        if ($DB->numrows($result2) == 0) {
+                              $DB->insert(
+                                 'glpi_displaypreferences', [
+                                    'itemtype'  => $type,
+                                    'num'       => $newval,
+                                    'rank'      => $rank++,
+                                    'users_id'  => $data['users_id']
+                                 ]
+                              );
+                        }
                      }
                   }
                }
