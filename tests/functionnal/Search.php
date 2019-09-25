@@ -59,8 +59,8 @@ class Search extends DbTestCase {
       $params['reset'] = 'reset';
 
       // do search
-      $params = \Search::manageParams($itemtype, $params);
-      $data   = \Search::getDatas($itemtype, $params, $forcedisplay);
+      $search = new \Search($itemtype, $params);
+      $data   = $search->getData();
 
       // append existing errors to returned data
       $data['last_errors'] = [];
@@ -962,7 +962,8 @@ class Search extends DbTestCase {
    public function testAddLeftJoin($lj_provider) {
       $already_link_tables = [];
 
-      $sql_join = \Search::addLeftJoin(
+      $search = new \Search(new $lj_provider['itemtype'], []);
+      $sql_join = $search->addLeftJoin(
          $lj_provider['itemtype'],
          getTableForItemType($lj_provider['itemtype']),
          $already_link_tables,
@@ -1058,9 +1059,10 @@ class Search extends DbTestCase {
       $this->login('tech', 'tech');
 
       // do search and check presence of the created problem
-      $data = \Search::prepareDatasForSearch('Problem', ['reset' => 'reset']);
-      \Search::constructSQL($data);
-      \Search::constructData($data);
+      $search = new \Search('Problem', ['reset' => 'reset']);
+      $data = $search->prepareDataForSearch('Problem', ['reset' => 'reset']);
+      $search->constructSQL($data);
+      $search->constructData($data);
 
       $this->array($data)->array['data']->integer['totalcount']->isEqualTo(1);
       $this->array($data)
@@ -1110,9 +1112,10 @@ class Search extends DbTestCase {
       $this->login('tech', 'tech');
 
       // do search and check presence of the created Change
-      $data = \Search::prepareDatasForSearch('Change', ['reset' => 'reset']);
-      \Search::constructSQL($data);
-      \Search::constructData($data);
+      $search = new \Search('Change', ['reset', 'reset']);
+      $data = $search->prepareDataForSearch('Change', ['reset' => 'reset']);
+      $search->constructSQL($data);
+      $search->constructData($data);
 
       $this->array($data)->array['data']->integer['totalcount']->isEqualTo(1);
       $this->array($data)
@@ -1239,7 +1242,8 @@ class Search extends DbTestCase {
     * @dataProvider makeTextSearchValueProvider
     */
    public function testMakeTextSearchValue($value, $expected) {
-      $this->string(\Search::makeTextSearchValue($value))->isIdenticalTo($expected);
+      $search = new \Search(new \Computer(), []);
+      $this->string($search->makeTextSearchValue($value))->isIdenticalTo($expected);
    }
 
    public function providerAddWhere() {

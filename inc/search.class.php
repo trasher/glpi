@@ -114,7 +114,7 @@ class Search {
     * Display result table for search engine for an type
     *
     * @param string $itemtype item type to manage
-    * @param array  $params   search params passed to prepareDatasForSearch function
+    * @param array  $params   search params passed to prepareDataForSearch function
     * @param array  $data     data if already processed
     *
     * @return void
