@@ -1772,4 +1772,22 @@ class DBmysql {
       $quote = static::getQuoteNameChar();
       return is_string($value) && trim($value, $quote) != $value;
    }
+
+   /**
+    * Quote a value for a specified type
+    * Should be used for PDO, but this will prevent heavy
+    * replacements in the source code in the future.
+    *
+    * @param mixed   $value Value to quote
+    * @param integer $type  Value type, defaults to PDO::PARAM_STR
+    *
+    * @return mixed
+    *
+    * @since 9.5.0
+    */
+   public function quote($value, int $type = 2/*\PDO::PARAM_STR*/) {
+      return "'" . $this->escape($value) . "'";
+      //return $this->dbh->quote($value, $type);
+   }
+
 }
