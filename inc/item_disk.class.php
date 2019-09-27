@@ -403,14 +403,16 @@ class Item_Disk extends CommonDBChild {
          'id'     => 2,
          'table'  => $this->getTable(),
          'field'  => 'device',
-         'name'   => __('Partition')
+         'name'   => __('Partition'),
+         'autocomplete'       => true,
       ];
 
       $tabs[] = [
          'id'     => 3,
          'table'  => $this->getTable(),
          'field'  => 'mountpoint',
-         'name'   => __('Mount point')
+         'name'   => __('Mount point'),
+         'autocomplete'       => true,
       ];
 
       $tabs[] = [
@@ -431,7 +433,8 @@ class Item_Disk extends CommonDBChild {
          'field'     => 'totalsize',
          'name'      => __('Global size'),
          'datatype'  => 'number',
-         'unit'      => 'auto'
+         'unit'      => 'auto',
+         'autocomplete'       => true,
       ];
 
       $tabs[] = [
@@ -440,7 +443,8 @@ class Item_Disk extends CommonDBChild {
          'field'     => 'freesize',
          'name'      => __('Free size'),
          'datatype'  => 'number',
-         'unit'      => 'auto'
+         'unit'      => 'auto',
+         'autocomplete'       => true,
       ];
 
       $tabs[] = [
