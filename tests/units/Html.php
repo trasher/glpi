@@ -371,7 +371,8 @@ class Html extends \GLPITestCase {
          'Report',
          'MigrationCleaner',
          'SavedSearch',
-         'Impact'
+         'Impact',
+         'Glpi\Inventory\Inventory'
       ];
       $this->string($menu['tools']['title'])->isIdenticalTo('Tools');
       $this->array($menu['tools']['types'])->isIdenticalTo($expected);
@@ -417,6 +418,11 @@ class Html extends \GLPITestCase {
       $message = \Html::getCopyrightMessage();
       $this->string($message)
          ->contains(GLPI_VERSION)
+         ->contains(GLPI_YEAR);
+
+      $message = \Html::getCopyrightMessage(false);
+      $this->string($message)
+         ->notContains(GLPI_VERSION)
          ->contains(GLPI_YEAR);
    }
 

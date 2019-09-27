@@ -1492,7 +1492,7 @@ JAVASCRIPT;
             'types' => [
                'Project', 'Reminder', 'RSSFeed', 'KnowbaseItem',
                'ReservationItem', 'Report', 'MigrationCleaner',
-               'SavedSearch', 'Impact'
+               'SavedSearch', 'Impact', 'Glpi\Inventory\Inventory'
             ]
          ],
          'plugins' => [

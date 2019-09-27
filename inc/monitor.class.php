@@ -40,6 +40,7 @@ if (!defined('GLPI_ROOT')) {
 class Monitor extends CommonDBTM {
    use Glpi\Features\DCBreadcrumb;
    use Glpi\Features\Clonable;
+   use Glpi\Features\Inventoriable;
 
    // From CommonDBTM
    public $dohistory                   = true;
@@ -106,6 +107,7 @@ class Monitor extends CommonDBTM {
       $this->addStandardTab('Reservation', $ong, $options);
       $this->addStandardTab('Domain_Item', $ong, $options);
       $this->addStandardTab('Appliance_Item', $ong, $options);
+      $this->addStandardTab('RuleMatchedLog', $ong, $options);
       $this->addStandardTab('Log', $ong, $options);
 
       return $ong;
@@ -321,6 +323,7 @@ class Monitor extends CommonDBTM {
       echo "</td></tr>";
       echo "</table></td></tr>";
 
+      $this->showInventoryInfo();
       $this->showFormButtons($options);
 
       return true;

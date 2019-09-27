@@ -883,7 +883,6 @@ class Item_Devices extends CommonDBRelation {
       }
 
       $criteria = $this->getTableGroupCriteria($item, $peer_type);
-      $fk = $item instanceof CommonDevice ? 'items_id' : $this->getDeviceForeignKey();
 
       if (!empty($peer_type)) {
          $peer = new $peer_type();
