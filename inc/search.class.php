@@ -5538,13 +5538,13 @@ JAVASCRIPT;
                   array_push($already_link_tables2, $to_table);
                   array_push($already_link_tables2, "glpi_softwareversions_$to_type");
                   array_push($already_link_tables2, "glpi_softwarelicenses_$to_type");
-                  return " $LINK ".$this->db->quoteName("glpi_computers_softwareversions")."
-                                    AS ".$this->db->quoteName("glpi_computers_softwareversions_$complexjoin$to_type")."
-                              ON (".$this->db->quoteName("glpi_computers_softwareversions_$complexjoin$to_type.computers_id")."
-                                       = ".$this->db->quoteName("glpi_computers.id")."
-                                  AND ".$this->db->quoteName("glpi_computers_softwareversions_$complexjoin$to_type.is_deleted")." = 0)
+                  return " $LINK ".$this->db->quoteName("glpi_items_softwareversions")."
+                                    AS ".$this->db->quoteName("glpi_items_softwareversions_$complexjoin$to_type")."
+                              ON (".$this->db->quoteName("glpi_items_softwareversions_$complexjoin$to_type.items_id")."
+                                       = ".$this->db->quoteName("glpi_computers.id")." AND ".$this->db->quoteName("glpi_items_softwareversions_$complexjoin$to_type.itemtype")."='Computer'
+                                  AND ".$this->db->quoteName("glpi_items_softwareversions_$complexjoin$to_type.is_deleted")." = 0)
                            $LINK ".$this->db->quoteName("glpi_softwareversions")." AS ".$this->db->quoteName("glpi_softwareversions_$complexjoin$to_type")."
-                              ON (".$this->db->quoteName("glpi_computers_softwareversions_$complexjoin$to_type.softwareversions_id")."
+                              ON (".$this->db->quoteName("glpi_items_softwareversions_$complexjoin$to_type.softwareversions_id")."
                                        = ".$this->db->quoteName("glpi_softwareversions_$complexjoin$to_type.id").")
                            $LINK ".$this->db->quoteName("glpi_softwares")."
                               ON (".$this->db->quoteName("glpi_softwareversions_$complexjoin$to_type.softwares_id")."
@@ -5652,14 +5652,14 @@ JAVASCRIPT;
                   return " $LINK ".$this->db->quoteName("glpi_softwareversions")." AS ".$this->db->quoteName("glpi_softwareversions_$to_type")."
                               ON (".$this->db->quoteName("glpi_softwareversions_$to_type.softwares_id")."
                                        = ".$this->db->quoteName("glpi_softwares.id").")
-                           $LINK ".$this->db->quoteName("glpi_computers_softwareversions")."
-                                    AS ".$this->db->quoteName("glpi_computers_softwareversions_$to_type")."
-                              ON (".$this->db->quoteName("glpi_computers_softwareversions_$to_type.softwareversions_id")."
+                           $LINK ".$this->db->quoteName("glpi_items_softwareversions")."
+                                    AS ".$this->db->quoteName("glpi_items_softwareversions_$to_type")."
+                              ON (".$this->db->quoteName("glpi_items_softwareversions_$to_type.softwareversions_id")."
                                        = ".$this->db->quoteName("glpi_softwareversions_$to_type.id")."
-                                  AND ".$this->db->quoteName("glpi_computers_softwareversions_$to_type.is_deleted")." = 0)
+                                  AND ".$this->db->quoteName("glpi_items_softwareversions_$to_type.is_deleted")." = 0)
                            $LINK ".$this->db->quoteName("glpi_computers")."
-                              ON (".$this->db->quoteName("glpi_computers_softwareversions_$to_type.computers_id")."
-                                       = ".$this->db->quoteName("glpi_computers.id")." ".
+                              ON (".$this->db->quoteName("glpi_items_softwareversions_$to_type.items_id")."
+                                       = ".$this->db->quoteName("glpi_computers.id")." AND ".$this->db->quoteName("glpi_items_softwareversions_$to_type.items_id")."='Computer' ".
                                   getEntitiesRestrictRequest("AND", 'glpi_computers').") ";
             }
             break;

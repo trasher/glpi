@@ -211,7 +211,7 @@ class SoftwareVersion extends CommonDBChild {
 
       $tab[] = [
          'id'                 => '122',
-         'table'              => 'glpi_computers_softwareversions',
+         'table'              => 'glpi_items_softwareversions',
          'field'              => 'date_install',
          'name'               => __('Installation date'),
          'datatype'           => 'datetime',
