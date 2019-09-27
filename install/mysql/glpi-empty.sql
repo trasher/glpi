@@ -7869,3 +7869,34 @@ CREATE TABLE `glpi_domainrecords` (
   KEY `is_deleted` (`is_deleted`),
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+DROP TABLE IF EXISTS `glpi_agenttypes`;
+CREATE TABLE `glpi_agenttypes` (
+   `id` int(11) NOT NULL AUTO_INCREMENT,
+   `name` varchar(255) DEFAULT NULL,
+   PRIMARY KEY (`id`),
+   KEY `name` (`name`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+DROP TABLE IF EXISTS `glpi_agents`;
+CREATE TABLE `glpi_agents` (
+   `id` int(11) NOT NULL AUTO_INCREMENT,
+   `entities_id` int(11) NOT NULL DEFAULT '0',
+   `is_recursive` tinyint(1) NOT NULL DEFAULT '1',
+   `name` varchar(255) DEFAULT NULL,
+   `agenttypes_id` int(11) NOT NULL,
+   `last_contact` timestamp NULL DEFAULT NULL,
+   `version` varchar(255) DEFAULT NULL,
+   `lock` tinyint(1) NOT NULL DEFAULT '0',
+   `itemtype` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+   `items_id` int(11) NOT NULL DEFAULT '0',
+   `token` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+   `useragent` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+   `tag` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+   `agent_port` varchar(6) DEFAULT NULL,
+   PRIMARY KEY (`id`),
+   KEY `name` (`name`),
+   KEY `items_id` (`items_id`),
+   KEY `itemtype` (`itemtype`),
+   FOREIGN KEY (agenttypes_id) REFERENCES glpi_agenttypes (id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

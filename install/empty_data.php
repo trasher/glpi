@@ -7916,4 +7916,11 @@ $tables['glpi_devicefirmwaretypes'] = [
 $tables[DomainRecordType::getTable()] = DomainRecordType::getDefaults();
 $tables[DomainRelation::getTable()] = DomainRelation::getDefaults();
 
+$tables['glpi_agenttypes'] = [
+   [
+      'id'     => 1,
+      'name'   => 'Core'
+   ]
+];
+
 return $tables;
