@@ -82,6 +82,15 @@ function update955to956() {
    }
    /* /Add `date` to glpi_documents_items */
 
+   /** Native inventory */
+   require __DIR__ . '/update_9.5.x_to_10.0.0/cameras.php';
+   require __DIR__ . '/update_9.5.x_to_10.0.0/databases.php';
+   require __DIR__ . '/update_9.5.x_to_10.0.0/devicebattery.php';
+   require __DIR__ . '/update_9.5.x_to_10.0.0/inventory_management.php';
+   require __DIR__ . '/update_9.5.x_to_10.0.0/native_inventory.php';
+   require __DIR__ . '/update_9.5.x_to_10.0.0/uuids.php';
+   /** /Native inventory */
+
    // ************ Keep it at the end **************
    $migration->executeMigration();
 

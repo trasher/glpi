@@ -40,6 +40,7 @@ if (!defined('GLPI_ROOT')) {
 **/
 class Printer  extends CommonDBTM {
    use Glpi\Features\Clonable;
+   use Glpi\Features\Inventoriable;
 
    // From CommonDBTM
    public $dohistory                   = true;
@@ -92,6 +93,7 @@ class Printer  extends CommonDBTM {
       $this->addStandardTab('Item_OperatingSystem', $ong, $options);
       $this->addStandardTab('Item_SoftwareVersion', $ong, $options);
       $this->addStandardTab('Cartridge', $ong, $options);
+      $this->addStandardTab('PrinterLog', $ong, $options);
       $this->addStandardTab('Item_Devices', $ong, $options);
       $this->addStandardTab('Item_Disk', $ong, $options);
       $this->addStandardTab('Computer_Item', $ong, $options);
@@ -109,6 +111,7 @@ class Printer  extends CommonDBTM {
       $this->addStandardTab('Certificate_Item', $ong, $options);
       $this->addStandardTab('Domain_Item', $ong, $options);
       $this->addStandardTab('Appliance_Item', $ong, $options);
+      $this->addStandardTab('RuleMatchedLog', $ong, $options);
       $this->addStandardTab('Log', $ong, $options);
 
       return $ong;
@@ -416,6 +419,12 @@ class Printer  extends CommonDBTM {
       echo "</td></tr>\n";
 
       echo "<tr class='tab_bg_1'>";
+      echo "<td>".__('UUID')."</td>\n";
+      echo "<td>";
+      Html::autocompletionTextField($this, 'uuid');
+      echo "</td></tr>\n";
+
+      echo "<tr class='tab_bg_1'>";
       echo "<td>"._n('Port', 'Ports', Session::getPluralNumber())."</td>";
       echo "<td>\n<table>";
       // serial interface
@@ -440,14 +449,8 @@ class Printer  extends CommonDBTM {
       echo "</td></tr></table>\n";
       echo "</td>";
       echo "</tr>";
-      // Display auto inventory information
-      if (!empty($ID)
-         && $this->fields["is_dynamic"]) {
-         echo "<tr class='tab_bg_1'><td colspan='4'>";
-         Plugin::doHook("autoinventory_information", $this);
-         echo "</td></tr>";
-      }
 
+      $this->showInventoryInfo();
       $this->showFormButtons($options);
 
       return true;
@@ -703,8 +706,8 @@ class Printer  extends CommonDBTM {
          'massiveaction'      => false,
          'joinparams'         => [
             'jointype'           => 'child',
-            'condition'          => 'AND NEWTABLE.`date_use` IS NOT NULL
-                                     AND NEWTABLE.`date_out` IS NULL'
+            'condition'          => ['NOT' => ['NEWTABLE.date_use' => null],
+                                     'NEWTABLE.date_out' => null]
          ]
       ];
 
@@ -719,7 +722,7 @@ class Printer  extends CommonDBTM {
          'massiveaction'      => false,
          'joinparams'         => [
             'jointype'           => 'child',
-            'condition'          => 'AND NEWTABLE.`date_out` IS NOT NULL'
+            'condition'          => ['NOT' => ['NEWTABLE.date_out' => null]]
          ]
       ];
 

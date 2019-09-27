@@ -28,7 +28,7 @@
  * You should have received a copy of the GNU General Public License
  * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
  * ---------------------------------------------------------------------
-* */
+ */
 
 if (!defined('GLPI_ROOT')) {
    die("Sorry. You can't access this file directly");
@@ -218,7 +218,7 @@ class NetworkName extends FQDNLabel {
          'massiveaction'      => false,
          'joinparams'         => [
             'jointype'  => 'mainitemtype_mainitem',
-            'condition' => 'AND NEWTABLE.`is_deleted` = 0'
+            'condition' => ['NEWTABLE.is_deleted' => 0]
          ]
       ];
 

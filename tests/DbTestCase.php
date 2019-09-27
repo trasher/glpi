@@ -124,6 +124,7 @@ class DbTestCase extends \GLPITestCase {
          [
             'TicketFollowup', // Deprecated
             '/^Computer_Software.*/', // Deprecated
+            '/^RuleImportComputer.*/', // Deprecated
          ]
       );
 

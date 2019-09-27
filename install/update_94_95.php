@@ -1529,6 +1529,10 @@ HTML
    require __DIR__ . '/update_94_95/appliances.php';
    /** /Appliances & webapps */
 
+   /** Add new option to mailcollector */
+   $migration->addField("glpi_mailcollectors", "add_cc_to_observer", "boolean");
+   /** /add new option to mailcollector */
+
    /** update project and itil task templates to tinymce content **/
    $template_types = [
       'ProjectTaskTemplate' => 'description',
@@ -1556,10 +1560,6 @@ HTML
       }
    }
    /** /update project and itil task templates **/
-
-   /** Add new option to mailcollector */
-   $migration->addField("glpi_mailcollectors", "add_cc_to_observer", "boolean");
-   /** /add new option to mailcollector */
 
    /** Password expiration policy */
    $migration->addConfig(

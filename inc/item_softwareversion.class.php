@@ -890,12 +890,9 @@ class Item_SoftwareVersion extends CommonDBRelation {
          'glpi_softwareversions.softwares_id',
          'glpi_softwareversions.name AS version',
          'glpi_softwares.is_valid AS softvalid',
-         'glpi_items_softwareversions.date_install AS dateinstall'
+         'glpi_items_softwareversions.date_install AS dateinstall',
+         "$selftable.is_dynamic"
       ];
-
-      if (Plugin::haveImport()) {
-         $select[] = "{$selftable}.is_dynamic";
-      }
 
       $request = [
          'SELECT'    => $select,
@@ -999,7 +996,7 @@ class Item_SoftwareVersion extends CommonDBRelation {
       echo "<table class='tab_cadre_fixe'>";
       echo "<tr class='tab_bg_1'><th colspan='2'>".Software::getTypeName(Session::getPluralNumber())."</th></tr>";
       echo "<tr class='tab_bg_1'><td>";
-      echo __('Category')."</td><td>";
+      echo _n('Category', 'Categories', 1)."</td><td>";
       SoftwareCategory::dropdown(['value'      => $crit,
                                        'toadd'      => ['-1' =>  __('All categories')],
                                        'emptylabel' => __('Uncategorized software'),
@@ -1045,9 +1042,7 @@ class Item_SoftwareVersion extends CommonDBRelation {
          $header_end .= "<th>" . __('Name') . "</th><th>" . __('Status') . "</th>";
          $header_end .= "<th>" ._n('Version', 'Versions', 1)."</th><th>" . SoftwareLicense::getTypeName(1) . "</th>";
          $header_end .="<th>" . __('Installation date') . "</th>";
-         if (Plugin::haveImport()) {
-            $header_end .= "<th>".__('Automatic inventory')."</th>";
-         }
+         $header_end .= "<th>".__('Automatic inventory')."</th>";
          $header_end .= "<th>".SoftwareCategory::getTypeName(1)."</th>";
          $header_end .= "<th>".__('Valid license')."</th>";
          $header_end .= "</tr>\n";

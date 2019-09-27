@@ -40,6 +40,7 @@ if (!defined('GLPI_ROOT')) {
 class Computer extends CommonDBTM {
    use Glpi\Features\DCBreadcrumb;
    use Glpi\Features\Clonable;
+   use Glpi\Features\Inventoriable;
 
    // From CommonDBTM
    public $dohistory                   = true;
@@ -68,7 +69,8 @@ class Computer extends CommonDBTM {
          NetworkPort::class,
          Computer_Item::class,
          Notepad::class,
-         KnowbaseItem_Item::class
+         KnowbaseItem_Item::class,
+         Item_RemoteManagement::class
       ];
    }
 
@@ -98,6 +100,7 @@ class Computer extends CommonDBTM {
          ->addStandardTab('Item_SoftwareVersion', $ong, $options)
          ->addStandardTab('Computer_Item', $ong, $options)
          ->addStandardTab('NetworkPort', $ong, $options)
+         ->addStandardTab('Item_RemoteManagement', $ong, $options)
          ->addStandardTab('Infocom', $ong, $options)
          ->addStandardTab('Contract_Item', $ong, $options)
          ->addStandardTab('Document_Item', $ong, $options)
@@ -114,6 +117,8 @@ class Computer extends CommonDBTM {
          ->addStandardTab('Reservation', $ong, $options)
          ->addStandardTab('Domain_Item', $ong, $options)
          ->addStandardTab('Appliance_Item', $ong, $options)
+         ->addStandardTab('DatabaseInstance_Item', $ong, $options)
+         ->addStandardTab('RuleMatchedLog', $ong, $options)
          ->addStandardTab('Log', $ong, $options);
 
       return $ong;
@@ -473,14 +478,8 @@ class Computer extends CommonDBTM {
       echo "<td >";
       AutoUpdateSystem::dropdown(['value' => $this->fields["autoupdatesystems_id"], 'rand' => $randDropdown]);
       echo "</td></tr>";
-      // Display auto inventory informations
-      if (!empty($ID)
-          && Plugin::haveImport()
-          && $this->fields["is_dynamic"]) {
-         echo "<tr class='tab_bg_1'><td colspan='4'>";
-         Plugin::doHook("autoinventory_information", $this);
-         echo "</td></tr>";
-      }
+
+      $this->showInventoryInfo();
 
       $this->showFormButtons($options);
 

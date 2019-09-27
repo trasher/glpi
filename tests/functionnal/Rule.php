@@ -281,7 +281,7 @@ class Rule extends DbTestCase {
          [\Location::getTypeName(1)               , 'locations_id'],
          ["&nbsp;"                     , 'location'],
          [_n('Type', 'Types', 1)                   , 'type'],
-         [__('Category')               , 'itilcategories_id'],
+         [_n('Category', 'Categories', 1)               , 'itilcategories_id'],
          [_n('Requester', 'Requesters', 1)              , '_users_id_requester'],
          [_n('Requester group', 'Requester groups', 1)        , '_groups_id_requester'],
          [__('Technician')             , '_users_id_assign'],
@@ -497,7 +497,7 @@ class Rule extends DbTestCase {
                 'value' => 1
                ];
       $result = $rule->getMinimalActionText($input);
-      $expected = "<td >Category</td><td >Assign</td><td >FUSION</td>";
+      $expected = "<td >Category</td><td >Assign</td><td >Software from inventories</td>";
       $this->string($result)->isIdenticalTo($expected);
 
       $input = ['field' => '_import_category',

@@ -41,6 +41,7 @@ if (!defined('GLPI_ROOT')) {
 class Peripheral extends CommonDBTM {
    use Glpi\Features\DCBreadcrumb;
    use Glpi\Features\Clonable;
+   use Glpi\Features\Inventoriable;
 
    // From CommonDBTM
    public $dohistory                   = true;
@@ -107,6 +108,7 @@ class Peripheral extends CommonDBTM {
       $this->addStandardTab('Certificate_Item', $ong, $options);
       $this->addStandardTab('Domain_Item', $ong, $options);
       $this->addStandardTab('Appliance_Item', $ong, $options);
+      $this->addStandardTab('RuleMatchedLog', $ong, $options);
       $this->addStandardTab('Log', $ong, $options);
 
       return $ong;
@@ -276,20 +278,20 @@ class Peripheral extends CommonDBTM {
       echo "</textarea></td></tr>\n";
 
       echo "<tr class='tab_bg_1'>";
+      echo "<td>".__('UUID')."</td>\n";
+      echo "<td>";
+      Html::autocompletionTextField($this, 'uuid');
+      echo "</td>\n";
+      echo "</tr>\n";
+
+      echo "<tr class='tab_bg_1'>";
       echo "<td>".__('Brand')."</td>\n";
       echo "<td>";
       Html::autocompletionTextField($this, "brand");
       echo "</td>\n";
       echo "</tr>\n";
 
-      // Display auto inventory information
-      if (!empty($ID)
-         && $this->fields["is_dynamic"]) {
-         echo "<tr class='tab_bg_1'><td colspan='4'>";
-         Plugin::doHook("autoinventory_information", $this);
-         echo "</td></tr>";
-      }
-
+      $this->showInventoryInfo();
       $this->showFormButtons($options);
 
       return true;

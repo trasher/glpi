@@ -178,18 +178,7 @@ class Item_Disk extends CommonDBChild {
       echo "<tr class='tab_bg_1'>";
       echo "<td>"._n('Item', 'Items', 1)."</td>";
       echo "<td>".$item->getLink()."</td>";
-      if (Plugin::haveImport()) {
-         echo "<td>".__('Automatic inventory')."</td>";
-         echo "<td>";
-         if ($ID && $this->fields['is_dynamic']) {
-            Plugin::doHook("autoinventory_information", $this);
-         } else {
-            echo __('No');
-         }
-         echo "</td>";
-      } else {
-         echo "<td colspan='2'></td>";
-      }
+      $this->autoinventoryInformation();
       echo "</tr>\n";
 
       echo "<tr class='tab_bg_1'>";
@@ -314,19 +303,14 @@ class Item_Disk extends CommonDBChild {
 
       $iterator = self::getFromItem($item);
       echo "<table class='tab_cadre_fixehov'>";
-      $colspan = 8;
-      if (Plugin::haveImport()) {
-         $colspan++;
-      }
+      $colspan = 9;
       echo "<tr class='noHover'><th colspan='$colspan'>".self::getTypeName(count($iterator)).
             "</th></tr>";
 
       if (count($iterator)) {
 
          $header = "<tr><th>".__('Name')."</th>";
-         if (Plugin::haveImport()) {
-            $header .= "<th>".__('Automatic inventory')."</th>";
-         }
+         $header .= "<th>".__('Automatic inventory')."</th>";
          $header .= "<th>".__('Partition')."</th>";
          $header .= "<th>".__('Mount point')."</th>";
          $header .= "<th>".Filesystem::getTypeName(1)."</th>";

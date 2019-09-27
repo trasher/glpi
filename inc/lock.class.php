@@ -175,6 +175,52 @@ class Lock extends CommonGLPI {
          }
       }
 
+      $lockedfield = new Lockedfield();
+      if ($lockedfield->isHandled($item)) {
+         echo "<tr><th colspan='2'>".$lockedfield->getTypeName()."</th></tr>";
+
+         //inventory locked fields
+         $locked_iterator = $DB->request([
+            'FROM'   => $lockedfield->getTable(),
+            'WHERE'  => [
+               'itemtype'  => $itemtype,
+               'items_id'  => $ID
+            ]
+         ]);
+
+         //get fields labels
+         $so = $item->rawSearchOptions();
+         $so_fields = [];
+         foreach ($so as $sof) {
+            if (isset($sof['table'])) {
+               $so_fields[$sof['field']] = $sof['name'];
+            }
+         }
+
+         while ($row = $locked_iterator->next()) {
+            echo "<tr class='tab_bg_1'>";
+            echo "<td class='center' width='10'>";
+            if ($lockedfield->can($row['id'], UPDATE) || $lockedfield->can($row['id'], PURGE)) {
+               $header = true;
+               echo "<input type='checkbox' name='Lockedfield[" . $row['id'] . "]'>";
+            }
+            echo "</td>";
+            $field_label = $row['field'];
+            if (isset($so_fields[$row['field']])) {
+               $field_label = $so_fields[$row['field']];
+            } else if (isForeignKeyField($row['field'])) {
+               //on fkey, we can try to retrieve the object
+               $object = getItemtypeForForeignKeyField($row['field']);
+               if ($object != 'UNKNOWN') {
+                  $field_label = $object::getTypeName(1);
+               }
+
+            }
+            echo "<td class='left' width='95%'>" . $field_label . "</td>";
+            echo "</tr>\n";
+         }
+      }
+
       //Software versions
       $item_sv = new Item_SoftwareVersion();
       $item_sv_table = Item_SoftwareVersion::getTable();

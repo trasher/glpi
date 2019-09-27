@@ -1483,7 +1483,7 @@ JAVASCRIPT;
                'Computer', 'Monitor', 'Software',
                'NetworkEquipment', 'Peripheral', 'Printer',
                'CartridgeItem', 'ConsumableItem', 'Phone',
-               'Rack', 'Enclosure', 'PDU', 'PassiveDCEquipment'
+               'Rack', 'Enclosure', 'PDU', 'PassiveDCEquipment', 'Unmanaged'
             ], $CFG_GLPI['devices_in_menu']),
             'default' => '/front/dashboard_assets.php'
          ],
@@ -1500,7 +1500,7 @@ JAVASCRIPT;
             'types' => [
                'SoftwareLicense','Budget', 'Supplier', 'Contact', 'Contract',
                'Document', 'Line', 'Certificate', 'Datacenter', 'Cluster', 'Domain',
-               'Appliance'
+               'Appliance', 'Database'
             ]
          ],
          'tools' => [
@@ -1519,7 +1519,7 @@ JAVASCRIPT;
             'title' => __('Administration'),
             'types' => [
                'User', 'Group', 'Entity', 'Rule',
-               'Profile', 'QueuedNotification', 'Glpi\\Event'
+               'Profile', 'QueuedNotification', 'Glpi\\Event', 'Glpi\Inventory\Inventory'
             ]
          ],
          'config' => [

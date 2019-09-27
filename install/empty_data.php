@@ -316,6 +316,15 @@ foreach ($default_prefs as $name => $value) {
       'value'   => $value,
    ];
 }
+
+foreach (\Glpi\Inventory\Conf::$defaults as $name => $value) {
+   $tables['glpi_configs'][] = [
+      'context' => 'inventory',
+      'name'    => $name,
+      'value'   => $value,
+   ];
+}
+
 $tables['glpi_crontasks'] = [
    [
       'id'            => 2,
@@ -355,7 +364,7 @@ $tables['glpi_crontasks'] = [
       'param'         => null,
       'state'         => 1,
       'mode'          => 1,
-      'lastrun'       => '2010-05-06 09:31:02',
+      'lastrun'       => null,
       'logs_lifetime' => 30,
    ], [
       'id'            => 6,
@@ -365,7 +374,7 @@ $tables['glpi_crontasks'] = [
       'param'         => null,
       'state'         => 1,
       'mode'          => 1,
-      'lastrun'       => '2011-01-18 11:40:43',
+      'lastrun'       => null,
       'logs_lifetime' => 30,
    ], [
       'id'            => 7,
@@ -385,7 +394,7 @@ $tables['glpi_crontasks'] = [
       'param'         => '10',
       'state'         => 1,
       'mode'          => 1,
-      'lastrun'       => '2011-06-28 11:34:37',
+      'lastrun'       => null,
       'logs_lifetime' => 30,
    ], [
       'id'            => 10,
@@ -415,7 +424,7 @@ $tables['glpi_crontasks'] = [
       'param'         => null,
       'state'         => 1,
       'mode'          => 1,
-      'lastrun'       => '2011-08-30 08:22:27',
+      'lastrun'       => null,
       'logs_lifetime' => 30,
    ], [
       'id'            => 13,
@@ -425,7 +434,7 @@ $tables['glpi_crontasks'] = [
       'param'         => null,
       'state'         => 1,
       'mode'          => 1,
-      'lastrun'       => '2011-12-06 09:48:42',
+      'lastrun'       => null,
       'logs_lifetime' => 30,
    ], [
       'id'            => 14,
@@ -435,7 +444,7 @@ $tables['glpi_crontasks'] = [
       'param'         => null,
       'state'         => 1,
       'mode'          => 1,
-      'lastrun'       => '2012-04-05 20:31:57',
+      'lastrun'       => null,
       'logs_lifetime' => 30,
    ], [
       'id'            => 15,
@@ -445,7 +454,7 @@ $tables['glpi_crontasks'] = [
       'param'         => null,
       'state'         => 1,
       'mode'          => 1,
-      'lastrun'       => '2012-04-05 20:31:57',
+      'lastrun'       => null,
       'logs_lifetime' => 30,
    ], [
       'id'            => 16,
@@ -455,7 +464,7 @@ $tables['glpi_crontasks'] = [
       'param'         => null,
       'state'         => 1,
       'mode'          => 1,
-      'lastrun'       => '2014-04-16 15:32:00',
+      'lastrun'       => null,
       'logs_lifetime' => 30,
    ], [
       'id'            => 17,
@@ -465,7 +474,7 @@ $tables['glpi_crontasks'] = [
       'param'         => null,
       'state'         => 1,
       'mode'          => 1,
-      'lastrun'       => '2014-06-18 08:02:00',
+      'lastrun'       => null,
       'logs_lifetime' => 30,
    ], [
       'id'            => 18,
@@ -615,7 +624,7 @@ $tables['glpi_crontasks'] = [
       'param'         => null,
       'state'         => 1,
       'mode'          => 1,
-      'lastrun'       => '2014-06-18 08:02:00',
+      'lastrun'       => null,
       'logs_lifetime' => 30,
    ], [
       'id'            => 33,
@@ -677,31 +686,28 @@ $tables['glpi_crontasks'] = [
       'mode'          => 2,
       'lastrun'       => null,
       'logs_lifetime' => 30,
+   ], [
+      'id'            => 40,
+      'itemtype'      => 'Glpi\Inventory\Inventory',
+      'name'          => 'cleantemp',
+      'frequency'     => 86400,
+      'param'         => null,
+      'state'         => 0,
+      'mode'          => 2,
+      'lastrun'       => null,
+      'logs_lifetime' => 30,
+   ], [
+      'id'            => 41,
+      'itemtype'      => 'Glpi\Inventory\Inventory',
+      'name'          => 'cleanorphans',
+      'frequency'     => 604800,
+      'param'         => null,
+      'state'         => 1,
+      'mode'          => 2,
+      'lastrun'       => null,
+      'logs_lifetime' => 30,
    ],
 ];
-
-$dashboards_data = include_once __DIR__."/update_94_95/dashboards.php";
-$tables['glpi_dashboards_dashboards'] = [];
-$tables['glpi_dashboards_items'] = [];
-$i = $j = 1;
-foreach ($dashboards_data as $default_dashboard) {
-   $items = $default_dashboard['_items'];
-   unset($default_dashboard['_items']);
-   $tables['glpi_dashboards_dashboards'][] = array_merge([
-      'id' => $i
-   ], $default_dashboard);
-
-   foreach ($items as $item) {
-      $tables['glpi_dashboards_items'][] = array_merge([
-         'id' => $j,
-         'dashboards_dashboards_id' => $i,
-      ], $item);
-
-      $j++;
-   }
-
-   $i++;
-}
 
 $tables['glpi_devicememorytypes'] = [
    [
@@ -1693,6 +1699,13 @@ $ADDTODISPLAYPREF['Cluster'] = [31, 19];
 $ADDTODISPLAYPREF['Domain'] = [3, 4, 2, 6, 7];
 $ADDTODISPLAYPREF['DomainRecord'] = [2, 3];
 $ADDTODISPLAYPREF['Appliance'] = [2, 3, 4, 5];
+$ADDTODISPLAYPREF['Lockedfield'] = [3, 13, 5];
+$ADDTODISPLAYPREF['Unmanaged'] = [2, 4, 3, 5, 7, 10, 18, 14, 15, 9];
+$ADDTODISPLAYPREF['NetworkPortType'] = [10, 11, 12];
+$ADDTODISPLAYPREF['NetworkPort'] = [3, 30, 31, 32, 33, 34, 35, 36, 38, 39, 40];
+$ADDTODISPLAYPREF['USBVendor'] = [10, 11];
+$ADDTODISPLAYPREF['PCIVendor'] = [10, 11];
+$ADDTODISPLAYPREF['Agent'] = [2, 4, 10, 8, 11, 6];
 
 foreach ($ADDTODISPLAYPREF as $type => $options) {
    $rank = 1;
@@ -7425,6 +7438,70 @@ $tables['glpi_profilerights'] = [
       'profiles_id' => '8',
       'name'        => 'appliance',
       'rights'      => 1,
+   ], [
+      'profiles_id' => '1',
+      'name'        => 'inventory',
+      'rights'      => 0,
+   ], [
+      'profiles_id' => '2',
+      'name'        => 'inventory',
+      'rights'      => 0,
+   ], [
+      'profiles_id' => '3',
+      'name'        => 'inventory',
+      'rights'      => 1,
+   ], [
+      'profiles_id' => '4',
+      'name'        => 'inventory',
+      'rights'      => 1,
+   ], [
+      'profiles_id' => '5',
+      'name'        => 'inventory',
+      'rights'      => 0,
+   ], [
+      'profiles_id' => '6',
+      'name'        => 'inventory',
+      'rights'      => 0,
+   ], [
+      'profiles_id' => '7',
+      'name'        => 'inventory',
+      'rights'      => 0,
+   ], [
+      'profiles_id' => '8',
+      'name'        => 'inventory',
+      'rights'      => 0,
+   ], [
+      'profiles_id' => '1',
+      'name'        => 'database',
+      'rights'      => 0,
+   ], [
+      'profiles_id' => '2',
+      'name'        => 'database',
+      'rights'      => 1,
+   ], [
+      'profiles_id' => '3',
+      'name'        => 'database',
+      'rights'      => 31,
+   ], [
+      'profiles_id' => '4',
+      'name'        => 'database',
+      'rights'      => 31,
+   ], [
+      'profiles_id' => '5',
+      'name'        => 'database',
+      'rights'      => 0,
+   ], [
+      'profiles_id' => '6',
+      'name'        => 'database',
+      'rights'      => 31,
+   ], [
+      'profiles_id' => '7',
+      'name'        => 'database',
+      'rights'      => 31,
+   ], [
+      'profiles_id' => '8',
+      'name'        => 'database',
+      'rights'      => 1,
    ],
 ];
 
@@ -7436,7 +7513,7 @@ $tables['glpi_profiles'] = [
       'interface'              => 'helpdesk',
       'is_default'             => '1',
       'helpdesk_hardware'      => '1',
-      'helpdesk_item_type'     => '["Computer","Monitor","NetworkEquipment","Peripheral","Phone","Printer","Software", "DCRoom", "Rack", "Enclosure"]',
+      'helpdesk_item_type'     => '["Computer","Monitor","NetworkEquipment","Peripheral","Phone","Printer","Software", "DCRoom", "Rack", "Enclosure", "Database"]',
       'ticket_status'          => '{"1":{"2":0,"3":0,"4":0,"5":0,"6":0},"2":{"1":0,"3":0,"4":0,"5":0,"6":0},"3":{"1":0,"2":0,"4":0,"5":0,"6":0},"4":{"1":0,"2":0,"3":0,"5":0,"6":0},"5":{"1":0,"2":0,"3":0,"4":0},"6":{"1":0,"2":0,"3":0,"4":0,"5":0}}',
       'comment'                => '',
       'problem_status'         => '[]',
@@ -7450,7 +7527,7 @@ $tables['glpi_profiles'] = [
       'interface'              => 'central',
       'is_default'             => '0',
       'helpdesk_hardware'      => '1',
-      'helpdesk_item_type'     => '["Computer","Monitor","NetworkEquipment","Peripheral","Phone","Printer","Software", "DCRoom", "Rack", "Enclosure"]',
+      'helpdesk_item_type'     => '["Computer","Monitor","NetworkEquipment","Peripheral","Phone","Printer","Software", "DCRoom", "Rack", "Enclosure", "Database"]',
       'ticket_status'          => '[]',
       'comment'                => '',
       'problem_status'         => '[]',
@@ -7464,7 +7541,7 @@ $tables['glpi_profiles'] = [
       'interface'              => 'central',
       'is_default'             => '0',
       'helpdesk_hardware'      => '3',
-      'helpdesk_item_type'     => '["Computer","Monitor","NetworkEquipment","Peripheral","Phone","Printer","Software", "DCRoom", "Rack", "Enclosure"]',
+      'helpdesk_item_type'     => '["Computer","Monitor","NetworkEquipment","Peripheral","Phone","Printer","Software", "DCRoom", "Rack", "Enclosure", "Database"]',
       'ticket_status'          => '[]',
       'comment'                => '',
       'problem_status'         => '[]',
@@ -7478,7 +7555,7 @@ $tables['glpi_profiles'] = [
       'interface'              => 'central',
       'is_default'             => '0',
       'helpdesk_hardware'      => '3',
-      'helpdesk_item_type'     => '["Computer","Monitor","NetworkEquipment","Peripheral","Phone","Printer","Software", "DCRoom", "Rack", "Enclosure"]',
+      'helpdesk_item_type'     => '["Computer","Monitor","NetworkEquipment","Peripheral","Phone","Printer","Software", "DCRoom", "Rack", "Enclosure", "Database"]',
       'ticket_status'          => '[]',
       'comment'                => '',
       'problem_status'         => '[]',
@@ -7492,7 +7569,7 @@ $tables['glpi_profiles'] = [
       'interface'              => 'central',
       'is_default'             => '0',
       'helpdesk_hardware'      => '3',
-      'helpdesk_item_type'     => '["Computer","Monitor","NetworkEquipment","Peripheral","Phone","Printer","Software", "DCRoom", "Rack", "Enclosure"]',
+      'helpdesk_item_type'     => '["Computer","Monitor","NetworkEquipment","Peripheral","Phone","Printer","Software", "DCRoom", "Rack", "Enclosure", "Database"]',
       'ticket_status'          => '[]',
       'comment'                => '',
       'problem_status'         => '[]',
@@ -7506,7 +7583,7 @@ $tables['glpi_profiles'] = [
       'interface'              => 'central',
       'is_default'             => '0',
       'helpdesk_hardware'      => '3',
-      'helpdesk_item_type'     => '["Computer","Monitor","NetworkEquipment","Peripheral","Phone","Printer","Software", "DCRoom", "Rack", "Enclosure"]',
+      'helpdesk_item_type'     => '["Computer","Monitor","NetworkEquipment","Peripheral","Phone","Printer","Software", "DCRoom", "Rack", "Enclosure", "Database"]',
       'ticket_status'          => '[]',
       'comment'                => '',
       'problem_status'         => '[]',
@@ -7520,7 +7597,7 @@ $tables['glpi_profiles'] = [
       'interface'              => 'central',
       'is_default'             => '0',
       'helpdesk_hardware'      => '3',
-      'helpdesk_item_type'     => '["Computer","Monitor","NetworkEquipment","Peripheral","Phone","Printer","Software", "DCRoom", "Rack", "Enclosure"]',
+      'helpdesk_item_type'     => '["Computer","Monitor","NetworkEquipment","Peripheral","Phone","Printer","Software", "DCRoom", "Rack", "Enclosure", "Database"]',
       'ticket_status'          => '[]',
       'comment'                => '',
       'problem_status'         => '[]',
@@ -7997,8 +8074,8 @@ $tables['glpi_rules'] = [
 $tables['glpi_softwarecategories'] = [
    [
       'id'           => '1',
-      'name'         => 'FUSION',
-      'completename' => 'FUSION',
+      'name'         => 'Inventoried',
+      'completename' => 'Software from inventories',
       'level'        => '1',
    ],
 ];
@@ -8170,5 +8247,13 @@ $tables['glpi_devicefirmwaretypes'] = [
 
 $tables[DomainRecordType::getTable()] = DomainRecordType::getDefaults();
 $tables[DomainRelation::getTable()] = DomainRelation::getDefaults();
+$tables[NetworkPortType::getTable()] = NetworkPortType::getDefaults();
+
+$tables['glpi_agenttypes'] = [
+   [
+      'id'     => 1,
+      'name'   => 'Core'
+   ]
+];
 
 return $tables;

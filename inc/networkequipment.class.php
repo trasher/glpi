@@ -41,6 +41,7 @@ if (!defined('GLPI_ROOT')) {
 class NetworkEquipment extends CommonDBTM {
    use Glpi\Features\DCBreadcrumb;
    use Glpi\Features\Clonable;
+   use Glpi\Features\Inventoriable;
 
    // From CommonDBTM
    public $dohistory                   = true;
@@ -96,17 +97,6 @@ class NetworkEquipment extends CommonDBTM {
 
 
    /**
-    * @see CommonGLPI::getMenuName()
-    *
-    * @since 0.85
-   **/
-   // bug in translation: https://github.com/glpi-project/glpi/issues/1970
-   /*static function getMenuName() {
-      return _n('Network', 'Networks', Session::getPluralNumber());
-   }*/
-
-
-   /**
     * @since 0.84
     *
     * @see CommonDBTM::cleanDBonPurge()
@@ -159,6 +149,7 @@ class NetworkEquipment extends CommonDBTM {
          ->addStandardTab('Certificate_Item', $ong, $options)
          ->addStandardTab('Domain_Item', $ong, $options)
          ->addStandardTab('Appliance_Item', $ong, $options)
+         ->addStandardTab('RuleMatchedLog', $ong, $options)
          ->addStandardTab('Log', $ong, $options);
 
       return $ong;
@@ -396,12 +387,19 @@ class NetworkEquipment extends CommonDBTM {
       echo "</td></tr>";
 
       // Display auto inventory information
-      if (!empty($ID)
-         && $this->fields["is_dynamic"]) {
-         echo "<tr class='tab_bg_1'><td colspan='4'>";
-         Plugin::doHook("autoinventory_information", $this);
-         echo "</td></tr>";
-      }
+      $randDropdown = mt_rand();
+      echo "<td><label for='dropdown_autoupdatesystems_id$randDropdown'>".AutoUpdateSystem::getTypeName(1)."</label></td>";
+      echo "<td >";
+      AutoUpdateSystem::dropdown(['value' => $this->fields["autoupdatesystems_id"], 'rand' => $randDropdown]);
+      echo "</td></tr>";
+
+      echo "<tr class='tab_bg_1'>";
+      echo "<td>".__('UUID')."</td>";
+      echo "<td>";
+      Html::autocompletionTextField($this, 'uuid');
+      echo "</td></tr>";
+
+      $this->showInventoryInfo();
 
       $this->showFormButtons($options);
 

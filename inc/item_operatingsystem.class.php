@@ -168,6 +168,34 @@ class Item_OperatingSystem extends CommonDBRelation {
       }
 
       $iterator = self::getFromItem($item, $sort, $order);
+      //default options
+      $params = ['rand' => mt_rand()];
+
+      $columns = [
+         __('Name'),
+         _n('Version', 'Versions', 1),
+         _n('Architecture', 'Architectures', 1),
+         OperatingSystemServicePack::getTypeName(1)
+      ];
+
+      if (isset($_GET["order"]) && ($_GET["order"] == "ASC")) {
+         $order = "ASC";
+      } else {
+         $order = "DESC";
+      }
+
+      if ((isset($_GET["sort"]) && !empty($_GET["sort"]))
+         && isset($columns[$_GET["sort"]])) {
+         $sort = $_GET["sort"];
+      } else {
+         $sort = "glpi_items_operatingsystems.id";
+      }
+
+      if (empty($withtemplate)) {
+         $withtemplate = 0;
+      }
+
+      $iterator = self::getFromItem($item, $sort, $order);
       $number = count($iterator);
       $i      = 0;
 

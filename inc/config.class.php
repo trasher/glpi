@@ -737,7 +737,7 @@ class Config extends CommonDBTM {
       echo "<tr class='tab_bg_2'>";
       echo "<td>" . __('SQL server (MariaDB or MySQL)') . "</td>";
       echo "<td><input type='text' name='_dbreplicate_dbhost' size='40' value='$host'></td>";
-      echo "<td>" . __('Database') . "</td>";
+      echo "<td>" . _n('Database', 'Databases', 1) . "</td>";
       echo "<td><input type='text' name='_dbreplicate_dbdefault' value='".$DBslave->dbdefault."'>";
       echo "</td></tr>";
 
@@ -2073,6 +2073,8 @@ class Config extends CommonDBTM {
                  'check'   => 'GuzzleHttp\\Client' ],
                [ 'name'    => 'guzzlehttp/psr7',
                  'check'   => 'GuzzleHttp\\Psr7\\Response' ],
+               [ 'name'    => 'glpi-project/inventory_format',
+                 'check'   => 'Glpi\Inventory\Converter'],
                [ 'name'    => 'wapmorgan/unified-archive',
                  'check'   => 'wapmorgan\\UnifiedArchive\\UnifiedArchive' ],
                [ 'name'    => 'paragonie/sodium_compat',

@@ -345,6 +345,7 @@ class Html extends \GLPITestCase {
          'Enclosure',
          'PDU',
          'PassiveDCEquipment',
+         'Unmanaged',
          'Item_DeviceSimcard'
       ];
       $this->string($menu['assets']['title'])->isIdenticalTo('Assets');
@@ -373,7 +374,8 @@ class Html extends \GLPITestCase {
          'Datacenter',
          'Cluster',
          'Domain',
-         'Appliance'
+         'Appliance',
+         'Database'
       ];
       $this->string($menu['management']['title'])->isIdenticalTo('Management');
       $this->array($menu['management']['types'])->isIdenticalTo($expected);
@@ -403,7 +405,8 @@ class Html extends \GLPITestCase {
          'Rule',
          'Profile',
          'QueuedNotification',
-         'Glpi\\Event'
+         'Glpi\\Event',
+         'Glpi\Inventory\Inventory'
       ];
       $this->string($menu['admin']['title'])->isIdenticalTo('Administration');
       $this->array($menu['admin']['types'])->isIdenticalTo($expected);
@@ -434,6 +437,11 @@ class Html extends \GLPITestCase {
       $this->string($message)
          ->contains(GLPI_VERSION)
          ->contains(GLPI_YEAR);
+
+      $message = \Html::getCopyrightMessage(false);
+      $this->string($message)
+         ->notContains(GLPI_VERSION)
+         ->contains(GLPI_YEAR);
    }
 
    public function testCss() {
@@ -453,7 +461,7 @@ class Html extends \GLPITestCase {
 
       //create test files
       foreach ($fake_files as $fake_file) {
-         touch(GLPI_TMP_DIR . '/' . $fake_file);
+         $this->boolean(touch(GLPI_TMP_DIR . '/' . $fake_file))->isTrue();
       }
 
       //expect minified file

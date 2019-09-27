@@ -939,7 +939,7 @@ class KnowbaseItem extends CommonDBVisible implements ExtraVisibilityCriteria {
              "?knowbaseitemcategories_id=$knowbaseitemcategories_id&forcetab=Knowbase$2'>".
              $fullcategoryname."</a>";
       $out.= "<table class='tab_cadre_fixe'>";
-      $out.= "<tr><th colspan='4'>".sprintf(__('%1$s: %2$s'), __('Category'), $tmp);
+      $out.= "<tr><th colspan='4'>".sprintf(__('%1$s: %2$s'), _n('Category', 'Categories', 1), $tmp);
       $out.= "</th></tr>";
 
       $out.= "<tr><td class='left' colspan='4'><h2>".__('Subject')."</h2>";
@@ -1085,7 +1085,7 @@ class KnowbaseItem extends CommonDBVisible implements ExtraVisibilityCriteria {
          echo "<div>";
          echo "<form method='get' action='".$this->getSearchURL()."'>";
          echo "<table class='tab_cadre_fixe'>";
-         echo "<tr class='tab_bg_2'><td class='right' width='50%'>".__('Category')."&nbsp;";
+         echo "<tr class='tab_bg_2'><td class='right' width='50%'>"._n('Category', 'Categories', 1)."&nbsp;";
          KnowbaseItemCategory::dropdown(['value' => $params["knowbaseitemcategories_id"]]);
          echo "</td><td class='left'>";
          echo "<input type='submit' value=\""._sx('button', 'Post')."\" class='submit'></td>";
@@ -1444,7 +1444,7 @@ class KnowbaseItem extends CommonDBVisible implements ExtraVisibilityCriteria {
       if ($KbCategory->getFromDB($params["knowbaseitemcategories_id"])) {
          $title = (empty($KbCategory->fields['name']) ?"(".$params['knowbaseitemcategories_id'].")"
                                                       : $KbCategory->fields['name']);
-         $title = sprintf(__('%1$s: %2$s'), __('Category'), $title);
+         $title = sprintf(__('%1$s: %2$s'), _n('Category', 'Categories', 1), $title);
       }
 
       Session::initNavigateListItems('KnowbaseItem', $title);
@@ -1507,7 +1507,7 @@ class KnowbaseItem extends CommonDBVisible implements ExtraVisibilityCriteria {
          if ($showwriter) {
             echo Search::showHeaderItem($output_type, __('Writer'), $header_num);
          }
-         echo Search::showHeaderItem($output_type, __('Category'), $header_num);
+         echo Search::showHeaderItem($output_type, _n('Category', 'Categories', 1), $header_num);
 
          if ($output_type == Search::HTML_OUTPUT) {
             echo Search::showHeaderItem($output_type, _n('Associated element', 'Associated elements', Session::getPluralNumber()), $header_num);
@@ -1811,7 +1811,7 @@ class KnowbaseItem extends CommonDBVisible implements ExtraVisibilityCriteria {
          'id'                 => '4',
          'table'              => 'glpi_knowbaseitemcategories',
          'field'              => 'name',
-         'name'               => __('Category'),
+         'name'               => _n('Category', 'Categories', 1),
          'datatype'           => 'dropdown'
       ];
 
