@@ -2296,6 +2296,9 @@ class Toolbox {
             }
          }
 
+         //rules
+         RuleImportComputer::initRules();
+
          // update default language
          Config::setConfigurationValues(
             'core',

@@ -2312,6 +2312,13 @@ class Rule extends CommonDBTM {
                $display = true;
                break;
 
+            case "dropdown_inventory_itemtype" :
+               $types = $CFG_GLPI['state_types'];
+               $types[''] = __('No item type defined');
+               Dropdown::showItemTypes($name, $types, ['value' => $value]);
+               $display = true;
+               break;
+
             case "dropdown_import_type" :
                RuleAsset::dropdownImportType($name, $value);
                $display = true;
@@ -2357,9 +2364,15 @@ class Rule extends CommonDBTM {
          $display = $this->displayAdditionalRuleCondition($condition, $crit, $name, $value, $test);
       }
 
-      if (($condition == self::PATTERN_EXISTS)
-          || ($condition == self::PATTERN_DOES_NOT_EXISTS)) {
-         echo "<input type='hidden' name='$name' value='1'>";
+      $hiddens = [
+         self::PATTERN_EXISTS,
+         self::PATTERN_DOES_NOT_EXISTS,
+         RuleImportComputer::PATTERN_ENTITY_RESTRICT,
+         RuleImportComputer::PATTERN_NETWORK_PORT_RESTRICT,
+         RuleImportComputer::PATTERN_ONLY_CRITERIA_RULE
+      ];
+      if (in_array($condition, $hiddens)) {
+         echo Html::hidden($name, ['value' => 1]);
          $display = true;
       }
 
@@ -2496,7 +2509,9 @@ class Rule extends CommonDBTM {
    /**
     * Function used to add specific params before rule processing
     *
-    * @param $params parameters
+    * @param array $params parameters
+    *
+    * @return array
    **/
    function addSpecificParamsForPreview($params) {
       return $params;

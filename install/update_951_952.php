@@ -116,6 +116,10 @@ function update951to952() {
    //add option to collect only unread mail
    $migration->addField('glpi_mailcollectors', 'collect_only_unread', 'bool', ['value' => 0]);
 
+   /** Native inventory */
+   require __DIR__ . '/update_94_95/native_inventory.php';
+   /** /Native inventory */
+
    // ************ Keep it at the end **************
    $migration->executeMigration();
 

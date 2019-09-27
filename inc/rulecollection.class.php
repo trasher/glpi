@@ -178,7 +178,16 @@ class RuleCollection extends CommonDBTM {
          $criteria['LIMIT'] = (int)$p['limit'];
          $criteria['START'] = (int)$p['start'];
       }
+
       $criteria['WHERE'] = $where;
+
+      if (method_exists($this, 'collectionFilter')) {
+         $filter_opts = [];
+         if (isset($options['_glpi_tab'])) {
+            $filter_opts['_glpi_tab'] = $options['_glpi_tab'];
+         }
+         $criteria = $this->collectionFilter($criteria, $filter_opts);
+      }
 
       return $criteria;
    }
@@ -211,12 +220,22 @@ class RuleCollection extends CommonDBTM {
 
       //Select all the rules of a different type
       $criteria   = $this->getRuleListCriteria($p);
+
       $iterator   = $DB->request($criteria);
+
+      $current_tab = str_replace($this->getType().'$', '', Session::getActiveTab($this->getType()));
+      $tabs = $this->getTabNameForItem($this);
 
       while ($data = $iterator->next()) {
          //For each rule, get a Rule object with all the criterias and actions
          $tempRule               = $this->getRuleClass();
          $tempRule->fields       = $data;
+
+         if (isset($tabs[$current_tab])) {
+            //in a subtab disable sorting
+            $tempRule->can_sort = false;
+         }
+
          $this->RuleList->list[] = $tempRule;
       }
    }
@@ -246,6 +265,8 @@ class RuleCollection extends CommonDBTM {
 
          if (count($iterator)) {
             $this->RuleList->list = [];
+            $current_tab = str_replace($this->getType().'$', '', Session::getActiveTab($this->getType()));
+            $tabs = $this->getTabNameForItem($this);
 
             while ($rule = $iterator->next()) {
                //For each rule, get a Rule object with all the criterias and actions
@@ -253,6 +274,11 @@ class RuleCollection extends CommonDBTM {
 
                if ($tempRule->getRuleWithCriteriasAndActions($rule["id"], $retrieve_criteria,
                                                              $retrieve_action)) {
+
+                  if (!isset($tabs[$current_tab])) {
+                     $tempRule->can_sort = false;
+                  }
+
                   //Add the object to the list of rules
                   $this->RuleList->list[] = $tempRule;
                }
@@ -413,6 +439,7 @@ class RuleCollection extends CommonDBTM {
       $p['childrens'] = 0;
       $p['active']    = false;
       $p['condition'] = 0;
+      $p['_glpi_tab'] = $options['_glpi_tab'];
       $rand           = mt_rand();
 
       foreach (['inherited','childrens', 'condition'] as $param) {
@@ -556,6 +583,14 @@ class RuleCollection extends CommonDBTM {
          $url = $CFG_GLPI["root_doc"];
       }
 
+      //if rules provides an initRules method, then we're able to reset them
+      if (method_exists($this->getRuleClass(), 'initRules')) {
+         echo "<a class='vsubmit' id='reset_rules' href='".$rule->getSearchURL()."?reinit=true' " .
+            //does not work.
+            //"onClick='if(confirm(\"" . __s('All rules will be erased and recreated from scratch. Are you sure?')."\")) { return true } else { return false; };' " .
+            "title='".__s("Remove all equipment import rules and recreate from defaults")."'" .
+            ">" . __('Reset rules') . "</a>&nbsp;";
+      }
       echo "<a class='vsubmit' href='#' onClick=\"".
                   Html::jsGetElementbyID('allruletest'.$rand).".dialog('open'); return false;\">".
                   __('Test rules engine')."</a>";
@@ -1908,6 +1943,14 @@ class RuleCollection extends CommonDBTM {
       return $ong;
    }
 
+   /**
+    * Get label for main tab
+    *
+    * @return string
+    */
+   public function getMainTabLabel() {
+      return _n('Rule', 'Rules', Session::getPluralNumber());
+   }
 
    /**
     * @see CommonGLPI::getTabNameForItem()
@@ -1922,7 +1965,7 @@ class RuleCollection extends CommonDBTM {
                               Dropdown::getDropdownName('glpi_entities',
                                                         $_SESSION['glpiactive_entity']));
          }
-         $title = _n('Rule', 'Rules', Session::getPluralNumber());
+         $title = $item->getMainTabLabel();
          if ($item->isRuleRecursive()) {
             //TRANS: %s is the entity name
             $title = sprintf(__('Local rules: %s'),

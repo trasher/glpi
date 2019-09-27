@@ -32,6 +32,8 @@
 
 ### Dump table glpi_alerts
 
+SET FOREIGN_KEY_CHECKS=0;
+
 DROP TABLE IF EXISTS `glpi_alerts`;
 CREATE TABLE `glpi_alerts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -2557,6 +2559,7 @@ CREATE TABLE `glpi_entities` (
   `latitude` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `longitude` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `altitude` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `transfers_id` int(11) NOT NULL DEFAULT '-2',
   PRIMARY KEY (`id`),
   UNIQUE KEY `unicity` (`entities_id`,`name`),
   KEY `entities_id` (`entities_id`),
@@ -2564,7 +2567,8 @@ CREATE TABLE `glpi_entities` (
   KEY `date_creation` (`date_creation`),
   KEY `tickettemplates_id` (`tickettemplates_id`),
   KEY `changetemplates_id` (`changetemplates_id`),
-  KEY `problemtemplates_id` (`problemtemplates_id`)
+  KEY `problemtemplates_id` (`problemtemplates_id`),
+  KEY `transfers_id` (`transfers_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
@@ -8122,3 +8126,63 @@ CREATE TABLE IF NOT EXISTS `glpi_appliancerelations` (
    KEY `appliances_items_id` (`appliances_items_id`),
    KEY `relations_id` (`relations_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+DROP TABLE IF EXISTS `glpi_agenttypes`;
+CREATE TABLE `glpi_agenttypes` (
+   `id` int(11) NOT NULL AUTO_INCREMENT,
+   `name` varchar(255) DEFAULT NULL,
+   PRIMARY KEY (`id`),
+   KEY `name` (`name`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+DROP TABLE IF EXISTS `glpi_agents`;
+CREATE TABLE `glpi_agents` (
+   `id` int(11) NOT NULL AUTO_INCREMENT,
+   `deviceid` VARCHAR(255) NOT NULL,
+   `entities_id` int(11) NOT NULL DEFAULT '0',
+   `is_recursive` tinyint(1) NOT NULL DEFAULT '0',
+   `name` varchar(255) DEFAULT NULL,
+   `agenttypes_id` int(11) NOT NULL,
+   `last_contact` timestamp NULL DEFAULT NULL,
+   `version` varchar(255) DEFAULT NULL,
+   `locked` tinyint(1) NOT NULL DEFAULT '0',
+   `itemtype` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+   `items_id` int(11) NOT NULL,
+   `useragent` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+   `tag` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+   `port` varchar(6) DEFAULT NULL,
+   PRIMARY KEY (`id`),
+   KEY `name` (`name`),
+   KEY `items_id` (`items_id`),
+   KEY `itemtype` (`itemtype`),
+   UNIQUE KEY `deviceid` (`deviceid`),
+   FOREIGN KEY (agenttypes_id) REFERENCES glpi_agenttypes (id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+DROP TABLE IF EXISTS `glpi_rulematchedlogs`;
+CREATE TABLE `glpi_rulematchedlogs` (
+   `id` int(11) NOT NULL AUTO_INCREMENT,
+   `date` timestamp NULL DEFAULT NULL,
+   `items_id` int(11) NOT NULL DEFAULT '0',
+   `itemtype` varchar(100) DEFAULT NULL,
+   `rules_id` int(11) NULL DEFAULT NULL,
+   `agents_id` int(11) NOT NULL DEFAULT '0',
+   `method` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+   PRIMARY KEY (`id`),
+   KEY `item` (`itemtype`,`items_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+DROP TABLE IF EXISTS `glpi_lockedfields`;
+CREATE TABLE `glpi_lockedfields` (
+   `id` int(11) NOT NULL AUTO_INCREMENT,
+   `itemtype` varchar(100) DEFAULT NULL,
+   `items_id` int(11) NOT NULL DEFAULT '0',
+   `field` varchar(50) NOT NULL,
+   `value` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+   `date_creation` timestamp NULL DEFAULT NULL,
+   PRIMARY KEY (`id`),
+   KEY `item` (`itemtype`,`items_id`),
+   UNIQUE KEY `unicity` (`itemtype`, `items_id`, `field`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+SET FOREIGN_KEY_CHECKS=1;

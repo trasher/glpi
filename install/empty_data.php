@@ -316,6 +316,15 @@ foreach ($default_prefs as $name => $value) {
       'value'   => $value,
    ];
 }
+
+foreach (\Glpi\Inventory\Conf::$defaults as $name => $value) {
+   $tables['glpi_configs'][] = [
+      'context' => 'inventory',
+      'name'    => $name,
+      'value'   => $value,
+   ];
+}
+
 $tables['glpi_crontasks'] = [
    [
       'id'            => 2,
@@ -1703,6 +1712,7 @@ $ADDTODISPLAYPREF['Cluster'] = [31, 19];
 $ADDTODISPLAYPREF['Domain'] = [3, 4, 2, 6, 7];
 $ADDTODISPLAYPREF['DomainRecord'] = [2, 3];
 $ADDTODISPLAYPREF['Appliance'] = [2, 3, 4, 5];
+$ADDTODISPLAYPREF['Lockedfield'] = [3, 13, 5];
 
 foreach ($ADDTODISPLAYPREF as $type => $options) {
    $rank = 1;
@@ -8005,8 +8015,8 @@ $tables['glpi_rules'] = [
 $tables['glpi_softwarecategories'] = [
    [
       'id'           => '1',
-      'name'         => 'FUSION',
-      'completename' => 'FUSION',
+      'name'         => 'Inventoried',
+      'completename' => 'Software from inventories',
       'level'        => '1',
    ],
 ];
@@ -8178,5 +8188,12 @@ $tables['glpi_devicefirmwaretypes'] = [
 
 $tables[DomainRecordType::getTable()] = DomainRecordType::getDefaults();
 $tables[DomainRelation::getTable()] = DomainRelation::getDefaults();
+
+$tables['glpi_agenttypes'] = [
+   [
+      'id'     => 1,
+      'name'   => 'Core'
+   ]
+];
 
 return $tables;
