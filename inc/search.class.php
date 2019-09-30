@@ -369,10 +369,6 @@ class Search {
          ];
       }
 
-      if ($this->current_page === null) {
-         $this->current_page = 1;
-      }
-
       $data = $this->prepareDataForSearch($itemtype, $params, $this->sub_item);
       $this->constructSQL($data, $this->sub_item);
       $this->constructData($data);
@@ -380,65 +376,6 @@ class Search {
       if (!isset($data['data']['totalcount'])) {
          Toolbox::logError("Something went wrong during $itemtype search");
          return;
-      }
-
-      if ($params['as_map'] != 1) {
-         //no need for pagination with map view
-         $limit = $_SESSION['glpilist_limit'];
-         $count = $data['data']['totalcount'];
-
-         $this->pages = $count / $limit;
-         if ($count > 0) {
-            $last = ceil($count / $limit);
-            $previous = $this->current_page - 1;
-            if ($previous < 1) {
-                $previous = false;
-            }
-
-            $next = $this->current_page +1;
-            if ($next > $last) {
-                $next = $last;
-            }
-         } else {
-            $previous = $next = $first = $last = false;
-         }
-         $pagination = [
-            'start'           => $data['search']['start'],
-            'limit'           => $limit,
-            'count'           => $count,
-            'current_page'    => $this->current_page,
-            'previous_page'   => $previous,
-            'next_page'       => $next,
-            'last_page'       => $last,
-            'pages'           => []
-         ];
-
-         $idepart = $this->current_page - 2;
-         if ($idepart< 1) {
-            $idepart = 1;
-         }
-
-         $ifin = $this->current_page + 2;
-         if ($ifin > $last) {
-            $ifin = $last;
-         }
-
-         for ($i = $idepart; $i <= $ifin; $i++) {
-            $page = [
-               'value' => $i,
-               'title' => preg_replace("(%i)", $i, __("Page %i"))
-            ];
-            if ($i == $this->current_page) {
-               $page['current'] = true;
-               $page['title'] = preg_replace(
-                  "(%i)",
-                  $i,
-                  __("Current page (%i)")
-               );
-            }
-            $pagination['pages'][] = $page;
-         }
-         $data['pagination'] = $pagination;
       }
 
       return $data;
@@ -3992,15 +3929,11 @@ JAVASCRIPT;
 
       switch ($itemtype) {
          case 'Reminder' :
-            $restrict = Reminder::addVisibilityRestrict();
-            $condition = $restrict['sql'];
-            //$this->addQueryParams($restrict['params']);
+            $condition = Reminder::addVisibilityRestrict();
             break;
 
          case 'RSSFeed' :
-            $restrict = RSSFeed::addVisibilityRestrict();
-            $condition = $restrict['sql'];
-            //$this->addQueryParams($restrict['params']);
+            $condition = RSSFeed::addVisibilityRestrict();
             break;
 
          case 'Notification' :
@@ -4194,12 +4127,6 @@ JAVASCRIPT;
 
          case 'SavedSearch':
             $restrict = SavedSearch::addVisibilityRestrict();
-            if (count($restrict)) {
-               $condition = $restrict['sql'];
-               //$this->addQueryParams($restrict['params']);
-            } else {
-               $condition = '';
-            }
             break;
 
          case 'TicketTask':
@@ -4997,7 +4924,7 @@ JAVASCRIPT;
             // Same structure in addDefaultWhere
             $out = '';
             if (!Session::haveRight("ticket", Ticket::READALL)) {
-               $searchopt = &self::getOptions($itemtype);
+               $searchopt = &$this->getOptions($itemtype);
 
                // show mine : requester
                $out .= $this->addLeftJoin($itemtype, $ref_table, $already_link_tables,
@@ -7937,11 +7864,7 @@ JAVASCRIPT;
             global $DB;
             $dbi = new DBMysqlIterator($DB);
             $sql_clause = $dbi->analyseCrit($joinparams['condition']);
-            $sql_expr = $DB->mergeStatementWithParams(
-               $sql_clause,
-               $dbi->getParameters()
-            );
-            $complexjoin .= ' AND ' . $sql_expr; //TODO: and should came from conf
+            $complexjoin .= ' AND ' . $sql_clause; //TODO: and should came from conf
          }
          }
       }
@@ -7967,11 +7890,7 @@ JAVASCRIPT;
                   global $DB;
                   $dbi = new DBMysqlIterator($DB);
                   $sql_clause = $dbi->analyseCrit($tab['joinparams']['condition']);
-                  $sql_expr = $DB->mergeStatementWithParams(
-                     $sql_clause,
-                     $dbi->getParameters()
-                  );
-                  $complexjoin .= ' AND ' . $sql_expr; //TODO: and should came from conf
+                  $complexjoin .= ' AND ' . $sql_clause; //TODO: and should came from conf
                }
                }
             }

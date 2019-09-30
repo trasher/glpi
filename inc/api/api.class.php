@@ -146,7 +146,7 @@ abstract class API extends CommonGLPI {
 
       // check if api is enabled
       if (!$CFG_GLPI['enable_api']) {
-         $this->returnError(__("API disabled"), "", "", false);
+         $this->returnError(__("API disabled"), 403, "", false);
          exit;
       }
 
@@ -1171,6 +1171,7 @@ abstract class API extends CommonGLPI {
 
       $this->initEndpoint();
       $itemtype = $this->handleDepreciation($itemtype);
+      $search = new \Search(new $itemtype(), $params);
 
       // default params
       $default = ['expand_dropdowns' => false,
@@ -1219,8 +1220,8 @@ abstract class API extends CommonGLPI {
 
       //specific case for restriction
       $already_linked_table = [];
-      $join = Search::addDefaultJoin($itemtype, $table, $already_linked_table);
-      $where = Search::addDefaultWhere($itemtype);
+      $join = $search->addDefaultJoin($itemtype, $table, $already_linked_table);
+      $where = $search->addDefaultWhere($itemtype);
       if ($where == '') {
          $where = "1=1 ";
       }
@@ -1291,7 +1292,7 @@ abstract class API extends CommonGLPI {
          // make text search
          foreach ($params['searchText']  as $filter_field => $filter_value) {
             if (!empty($filter_value)) {
-               $search_value = Search::makeTextSearch($DB->escape($filter_value));
+               $search_value = $search->makeTextSearch($filter_value);
                $where.= " AND (".$DB->quoteName("$table.$filter_field")." $search_value)";
             }
          }
@@ -1701,7 +1702,8 @@ abstract class API extends CommonGLPI {
       $_SESSION['glpi_use_mode'] = Session::DEBUG_MODE;
 
       // call Core Search method
-      $rawdata = Search::getDatas($itemtype, $params, $params['forcedisplay']);
+      $search = new \Search(new $itemtype(), $params);
+      $rawdata = $search->getData();
 
       // probably a sql error
       if (!isset($rawdata['data']) || count($rawdata['data']) === 0) {
@@ -1853,7 +1855,7 @@ abstract class API extends CommonGLPI {
          $failed       = 0;
          $index        = 0;
          foreach ($input as $object) {
-            $object      = self::inputObjectToArray($object);
+            $object      = $this->inputObjectToArray($object);
             $current_res = [];
 
             //check rights
@@ -1872,7 +1874,7 @@ abstract class API extends CommonGLPI {
                $object["_add"] = true;
 
                //add current item
-               $object = Toolbox::sanitize($object);
+               $object = Toolbox::clean_cross_side_scripting_deep($object);
                $new_id = $item->add($object);
                if ($new_id === false) {
                   $failed++;
@@ -1928,7 +1930,7 @@ abstract class API extends CommonGLPI {
 
       if (is_array($input)) {
          foreach ($input as &$sub_input) {
-            $sub_input = self::inputObjectToArray($sub_input);
+            $sub_input = $this->inputObjectToArray($sub_input);
          }
       }
 
@@ -1999,7 +2001,7 @@ abstract class API extends CommonGLPI {
                   }
 
                   //update item
-                  $object = Toolbox::sanitize((array)$object);
+                  $object = Toolbox::clean_cross_side_scripting_deep((array)$object);
                   $update_return = $item->update($object);
                   if ($update_return === false) {
                      $failed++;
@@ -2217,9 +2219,9 @@ abstract class API extends CommonGLPI {
       }
       $this->checkAppToken();
       $this->logEndpointUsage($endpoint);
-      self::checkSessionToken();
+      $this->checkSessionToken();
       if ($unlock_session) {
-         self::unlockSessionIfPossible();
+         $this->unlockSessionIfPossible();
       }
    }
 
@@ -2413,7 +2415,7 @@ abstract class API extends CommonGLPI {
     * @return void
     */
    public function inlineDocumentation($file) {
-      self::header(true, __("API Documentation"));
+      $this->header(true, __("API Documentation"));
       echo Html::css("public/lib/prismjs.css");
       echo Html::script("public/lib/prismjs.js");
 
