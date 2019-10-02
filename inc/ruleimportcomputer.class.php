@@ -248,8 +248,6 @@ class RuleImportComputer extends Rule {
       global $DB, $PLUGIN_HOOKS;
 
       $complex_criterias = [];
-      $sql_where         = '';
-      $sql_from          = '';
       $continue          = true;
       $global_criteria   = ['manufacturer', 'model', 'name', 'serial'];
 
@@ -311,9 +309,6 @@ class RuleImportComputer extends Rule {
          'ORDER'  => 'glpi_computers.is_deleted ASC'
       ];
 
-      $sql_where = '1';
-      $sql_from  = '';
-
       foreach ($complex_criterias as $criteria) {
          switch ($criteria->fields['criteria']) {
             case 'name' :
@@ -366,8 +361,8 @@ class RuleImportComputer extends Rule {
                $params      = ['where_entity' => $where_entity,
                                     'input'        => $input,
                                     'criteria'     => $complex_criterias,
-                                    'sql_where'    => $sql_where,
-                                    'sql_from'     => $sql_from];
+                                    'sql_where'    => $it_criteria['WHERE'],
+                                    'sql_from'     => $it_criteria['FROM']];
                $sql_results = Plugin::doOneHook($plugin, "ruleImportComputer_getSqlRestriction",
                                                 $params);
                $it_criteria = array_merge_recursive($it_criteria, $sql_results);
