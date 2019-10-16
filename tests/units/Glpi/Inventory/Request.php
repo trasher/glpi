@@ -40,7 +40,7 @@ class Request extends \GLPITestCase {
       $request = new \Glpi\Inventory\Request;
       $this->integer($request->getMode())->isIdenticalTo(\Glpi\Inventory\Request::XML_MODE);
       $this->string($request->getResponse())->isIdenticalTo("<?xml version=\"1.0\"?>\n<REPLY/>\n");
-      $this->string($request->getContentType())->isIdenticalTo('text/xml');
+      $this->string($request->getContentType())->isIdenticalTo('application/xml');
 
       $this->exception(
          function () {
