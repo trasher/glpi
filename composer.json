@@ -23,6 +23,7 @@
         "blueimp/jquery-file-upload": "^10.2",
         "elvanto/litemoji": "^1.4 || ^2.0",
         "fossar/htmlawed": "1.2.4.1",
+        "glpi-project/inventory_format": "dev-master",
         "iamcal/lib_autolink": "^1.7",
         "michelf/php-markdown": "^1.6",
         "monolog/monolog": "^1.23",
