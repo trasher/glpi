@@ -61,6 +61,8 @@ class Request
    private $response;
     /** @var integer */
    private $compression;
+   /** @var boolean */
+   private $error = false;
 
    /**
     * @param null|mixed $data Request contents
@@ -197,7 +199,8 @@ class Request
      * @return void
      */
    public function addError($message) {
-       $this->addToResponse(['ERROR' => $message]);
+      $this->error = true;
+      $this->addToResponse(['ERROR' => $message]);
    }
 
    /**
@@ -278,11 +281,11 @@ class Request
    public function getContentType() :string {
       switch ($this->mode) {
          case self::XML_MODE:
-              return 'text/xml';
+            return 'application/xml';
          case self::JSON_MODE:
-              return 'application/json';
+            return 'application/json';
          default:
-              throw new \RuntimeException("Unknown mode $mode");
+            throw new \RuntimeException("Unknown mode " . $this->mode);
       }
    }
 
@@ -294,11 +297,11 @@ class Request
    public function getResponse() :string {
       switch ($this->mode) {
          case self::XML_MODE:
-              return $this->response->saveXML();
+            return $this->response->saveXML();
          case self::JSON_MODE:
-              return json_encode($this->response);
+            return json_encode($this->response);
          default:
-              throw new \RuntimeException("Unknown mode $mode");
+            throw new \RuntimeException("Unknown mode " . $this->mode);
       }
    }
 
@@ -359,5 +362,14 @@ class Request
          default:
             throw new \UnexpectedValueException("Unknown content type $type");
       }
+   }
+
+   /**
+    * Is current request in error?
+    *
+    * @return boolean
+    */
+   public function inError() {
+      return $this->error;
    }
 }
