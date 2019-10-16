@@ -2034,6 +2034,8 @@ class Config extends CommonDBTM {
                  'check'   => 'UploadHandler' ],
                [ 'name'    => 'ramsey/uuid',
                  'check'   => 'Ramsey\\Uuid\\Uuid' ],
+               [ 'name'    => 'glpi-project/inventory_format',
+                 'check'   => 'Glpi\Inventory\Converter'],
       ];
       if (Toolbox::canUseCAS()) {
          $deps[] = [
