@@ -104,8 +104,8 @@ class Inventory
       }
 
        $this->metadata = [
-           'agent_id'  => $this->raw_data['deviceid'],
-           'version'   => $this->raw_data['versionclient']
+           'agent_id'  => $this->raw_data->deviceid,
+           'version'   => $this->raw_data->content->versionclient
        ];
 
        return $this->metadata;
@@ -117,23 +117,25 @@ class Inventory
      * @return array
      */
    public function doInventory() {
-       //check
+      global $DB;
+
+      //check
       if ($this->inError()) {
-          throw new \RuntimeException('Previous error(s) exists!');
+         throw new \RuntimeException('Previous error(s) exists!');
       }
 
       try {
-          $DB->beginTransaction();
+         $DB->beginTransaction();
 
-          //TODO: the magic!
-          $this->errors[] = 'Inventory is not yet implemented';
+         //TODO: the magic!
+         $this->errors[] = 'Inventory is not yet implemented';
 
-          $DB->commit();
+         $DB->commit();
       } catch (\Exception $e) {
-          $DB->rolback();
+         $DB->rolback();
       }
 
-       return [];
+      return [];
    }
 
     /**

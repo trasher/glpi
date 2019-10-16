@@ -85,7 +85,7 @@ class Request
               throw new \RuntimeException("Unknown mode $mode");
       }
       if (null !== $data) {
-          $this->handleRequest($data);
+          return $this->handleRequest($data);
       }
    }
 
@@ -115,9 +115,9 @@ class Request
        //load and check data
       switch ($this->mode) {
          case self::XML_MODE:
-              return $this->handleXMLRequest($data);
+            return $this->handleXMLRequest($data);
          case self::JSON_MODE:
-              return $this->handleJSONRequest($data);
+            return $this->handleJSONRequest($data);
       }
    }
 
@@ -133,13 +133,13 @@ class Request
       switch ($query) {
          case self::PROLOG_QUERY:
             $this->prolog();
-              break;
+            break;
          case self::INVENT_QUERY:
-             $this->inventory($content);
-              break;
+            $this->inventory($content);
+            break;
          default:
-             $this->addToResponse(['ERROR' => "Query '$query' is not supported."]);
-              return false;
+            $this->addError("Query '$query' is not supported.");
+            return false;
       }
        return true;
    }
@@ -152,17 +152,17 @@ class Request
     * @return boolean
     */
    public function handleXMLRequest($data) :bool {
-       $xml = @simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
+      $xml = @simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
       if (!$xml) {
-          $xml_errors = libxml_get_errors();
-          \Toolbox::logWarning('Invalid XML: ' . print_r($xml_errors, true));
-          $this->addToResponse(['ERROR' => 'XML not well formed!']);
-          return false;
+         $xml_errors = libxml_get_errors();
+         \Toolbox::logWarning('Invalid XML: ' . print_r($xml_errors, true));
+         $this->addError('XML not well formed!');
+         return false;
       }
-       $this->deviceid = (string)$xml->DEVICEID;
-       $query = (string)$xml->QUERY;
+      $this->deviceid = (string)$xml->DEVICEID;
+      $query = (string)$xml->QUERY;
 
-       return $this->handleQuery($query, $xml);
+      return $this->handleQuery($query, $xml);
    }
 
    /**
@@ -173,7 +173,7 @@ class Request
     * @return boolean
     */
    public function handleJSONRequest($data) :bool {
-       $this->addToResponse(['ERROR' => 'JSON is not yet supported']);
+       $this->addError('JSON is not yet supported');
        return false;
        /*$data = json_decode($data);
        $this->deviceid = $data['deviceid'];
@@ -329,9 +329,9 @@ class Request
        );
 
       if ($inventory->inError()) {
-          $this->addToResponse([
-              'ERROR'  => $inventory->getErrors()
-          ]);
+         foreach ($inventory->getErrors() as $error) {
+            $this->addError($error);
+         }
       } else {
           $this->addToResponse(['RESPONSE' => 'SEND']);
       }
@@ -348,16 +348,16 @@ class Request
       switch ($type) {
          case 'application/xml':
          case 'application/json':
-             $this->compression = self::COMPRESS_NONE;
-              break;
+            $this->compression = self::COMPRESS_NONE;
+            break;
          case 'application/x-compress-zlib':
-             $this->compression = self::COMPRESS_ZLIB;
-              break;
+            $this->compression = self::COMPRESS_ZLIB;
+            break;
          case 'application/x-compress-gzip':
-             $this->compression = self::COMPRESS_GZIP;
-              break;
+            $this->compression = self::COMPRESS_GZIP;
+            break;
          default:
-              throw new \UnexpectedValueException("Unknown content type $type");
+            throw new \UnexpectedValueException("Unknown content type $type");
       }
    }
 }
