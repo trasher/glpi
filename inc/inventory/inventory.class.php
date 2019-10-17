@@ -131,13 +131,10 @@ class Inventory
          $schema = json_decode(file_get_contents($converter->getSchemaPath()), true);
 
          $properties = array_keys($schema['properties']['content']['properties']);
+         unset($properties['versionclient']); //already handled in extractMetadata
          $contents = $this->raw_data->content;
 
          //create/load agent
-         unset($properties['versionclient']);
-         $raw_agent = [
-            'raw_version'  => $contents->versionclient
-         ];
 
          $data = [];
          //parse schema properties and handle if it exists in raw_data
@@ -202,5 +199,28 @@ class Inventory
      */
    public function inError() :bool {
        return (bool)count($this->errors);
+   }
+
+   static function getMenuContent() {
+
+      $menu = [
+         'title'  => __('Inventory'),
+         'page'   => '/front/inventory.conf.php',
+         'options'   => [
+            'agent' => [
+               'title' => Agent::getTypeName(\Session::getPluralNumber()),
+               'page'  => Agent::getSearchURL(false),
+               'links' => [
+                  'add'    => '/front/agent.form.php',
+                  'search' => '/front/agent.php',
+               ]
+            ]
+         ]
+      ];
+
+      if (count($menu)) {
+         return $menu;
+      }
+      return false;
    }
 }

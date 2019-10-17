@@ -369,7 +369,8 @@ class Html extends \GLPITestCase {
          'Report',
          'MigrationCleaner',
          'SavedSearch',
-         'Impact'
+         'Impact',
+         'Glpi\Inventory\Inventory'
       ];
       $this->string($menu['tools']['title'])->isIdenticalTo('Tools');
       $this->array($menu['tools']['types'])->isIdenticalTo($expected);

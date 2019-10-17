@@ -1448,7 +1448,7 @@ JAVASCRIPT;
       $menu['tools']['title']        = __('Tools');
       $menu['tools']['types']        = ['Project', 'Reminder', 'RSSFeed', 'KnowbaseItem',
                                              'ReservationItem', 'Report', 'MigrationCleaner',
-                                             'SavedSearch', 'Impact'];
+                                             'SavedSearch', 'Impact', 'Glpi\Inventory\Inventory'];
 
       $menu['plugins']['title']      = _n('Plugin', 'Plugins', Session::getPluralNumber());
       $menu['plugins']['types']      = [];
