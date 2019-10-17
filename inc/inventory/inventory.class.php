@@ -127,12 +127,60 @@ class Inventory
       try {
          $DB->beginTransaction();
 
+         $converter = new Converter;
+         $schema = json_decode(file_get_contents($converter->getSchemaPath()), true);
+
+         $properties = array_keys($schema['properties']['content']['properties']);
+         $contents = $this->raw_data->content;
+
+         //create/load agent
+         unset($properties['versionclient']);
+         $raw_agent = [
+            'raw_version'  => $contents->versionclient
+         ];
+
+         $data = [];
+         //parse schema properties and handle if it exists in raw_data
+         foreach ($properties as $property) {
+            if (property_exists($contents, $property)) {
+               $this->metadata['provider'] = [];
+               $sub_properties = [];
+               if (isset($schema['properties']['content']['properties'][$property]['properties'])) {
+                  $sub_properties = array_keys($schema['properties']['content']['properties'][$property]['properties']);
+               }
+
+               switch ($property) {
+                  case 'versionprovider':
+                     foreach ($sub_properties as $sub_property) {
+                        if (property_exists($contents->$property, $sub_property)) {
+                           $this->metadata['provider'][$sub_property] = $contents->$property->$sub_property;
+                        }
+                     }
+                     break;
+                  default:
+                     if (count($sub_properties)) {
+                        $data[$property] = [];
+                        foreach ($sub_properties as $sub_property) {
+                           if (property_exists($contents->$property, $sub_property)) {
+                              $data[$property][$sub_property] = $contents->$property->$sub_property;
+                           }
+                        }
+                     } else {
+                        $data[$property] = $contents->$property;
+                     }
+                     break;
+               }
+            }
+         }
+
          //TODO: the magic!
          $this->errors[] = 'Inventory is not yet implemented';
 
          $DB->commit();
       } catch (\Exception $e) {
+         \Toolbox::logError($e);
          $DB->rolback();
+         throw $e;
       }
 
       return [];
