@@ -47,47 +47,54 @@ class Request extends \GLPITestCase {
       parent::beforeTestMethod($method);
    }
 
+   /**
+    * Check a response
+    *
+    * @param Response $res   Request response
+    * @param string   $reply Reply tag contents
+    *
+    * @return void
+    */
+   private function checkResponse (GuzzleHttp\Psr7\Response $res, $reply) {
+      $this->integer($res->getStatusCode())->isIdenticalTo(200);
+      $this->string($res->getHeader('content-type')[0])->isIdenticalTo('application/xml');
+      $this->string((string)$res->getBody())
+         ->isIdenticalTo("<?xml version=\"1.0\"?>\n<REPLY>$reply</REPLY>\n");
+
+   }
+
    public function testRequestNoContentType() {
-      $this->exception(
-         function () {
-            $this->http_client->request(
-               'POST',
-               $this->base_uri . 'front/inventory.php'
-            );
-         }
-      )->message->contains('500 Internal Server Error');
+      $res = $this->http_client->request(
+         'POST',
+         $this->base_uri . 'front/inventory.php'
+      );
+      $this->checkResponse($res, '<ERROR>Unknown content type </ERROR>');
    }
 
    public function testWrongHttpMethod() {
-      $this->exception(
-         function () {
-            $this->http_client->request(
-               'GET',
-               $this->base_uri . 'front/inventory.php',
-               [
-                  'headers' => [
-                     'Content-Type' => 'application/xml'
-                  ]
-               ]
-            );
-         }
-      )->message->contains('<ERROR>Method not allowed</ERROR>');
+      $res = $this->http_client->request(
+         'GET',
+         $this->base_uri . 'front/inventory.php',
+         [
+            'headers' => [
+               'Content-Type' => 'application/xml'
+            ]
+         ]
+      );
+      $this->checkResponse($res, '<ERROR>Method not allowed</ERROR>');
    }
 
    public function testRequestInvalidContent() {
-      $this->exception(
-         function () {
-            $this->http_client->request(
-               'POST',
-               $this->base_uri . 'front/inventory.php',
-               [
-                  'headers' => [
-                     'Content-Type' => 'application/xml'
-                  ]
-               ]
-            );
-         }
-      )->message->contains('<ERROR>XML not well formed!</ERROR>');
+      $res = $this->http_client->request(
+         'POST',
+         $this->base_uri . 'front/inventory.php',
+         [
+            'headers' => [
+               'Content-Type' => 'application/xml'
+            ]
+         ]
+      );
+      $this->checkResponse($res, '<ERROR>XML not well formed!</ERROR>');
    }
 
    public function testPrologRequest() {

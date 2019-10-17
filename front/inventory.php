@@ -34,15 +34,19 @@ include ('../inc/includes.php');
 
 $inventory_request = new \Glpi\Inventory\Request();
 
-if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-   $inventory_request->addError('Method not allowed');
-} else {
-   $inventory_request->setCompression(
-      isset($_SERVER['CONTENT_TYPE']) ? $_SERVER['CONTENT_TYPE'] : false
-   );
+try {
+   if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+      $inventory_request->addError('Method not allowed');
+   } else {
+      $inventory_request->setCompression(
+         isset($_SERVER['CONTENT_TYPE']) ? $_SERVER['CONTENT_TYPE'] : false
+      );
 
-   $contents = file_get_contents("php://input");
-   $inventory_request->handleRequest($contents);
+      $contents = file_get_contents("php://input");
+      $inventory_request->handleRequest($contents);
+   }
+} catch (\Exception $e) {
+   $inventory_request->addError($e->getMessage());
 }
 
 //DEBUG
@@ -54,9 +58,5 @@ header('Content-Type: ' . $inventory_request->getContentType());
 header('Cache-Control: no-cacheno-store');
 header('Pragma: no-cache');
 header('Connection: close');
-
-if ($inventory_request->inError()) {
-   http_response_code('500');
-}
 
 echo $inventory_request->getResponse();
