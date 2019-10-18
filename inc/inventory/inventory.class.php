@@ -104,7 +104,7 @@ class Inventory
       }
 
        $this->metadata = [
-           'agent_id'  => $this->raw_data->deviceid,
+           'deviceid'  => $this->raw_data->deviceid,
            'version'   => $this->raw_data->content->versionclient
        ];
 
@@ -134,13 +134,12 @@ class Inventory
          unset($properties['versionclient']); //already handled in extractMetadata
          $contents = $this->raw_data->content;
 
-         //create/load agent
-
          $data = [];
          //parse schema properties and handle if it exists in raw_data
          foreach ($properties as $property) {
             if (property_exists($contents, $property)) {
                $this->metadata['provider'] = [];
+
                $sub_properties = [];
                if (isset($schema['properties']['content']['properties'][$property]['properties'])) {
                   $sub_properties = array_keys($schema['properties']['content']['properties'][$property]['properties']);
@@ -169,6 +168,10 @@ class Inventory
                }
             }
          }
+
+         //create/load agent
+         $agent = new \Agent();
+         $agent->handleAgent($this->metadata);
 
          //TODO: the magic!
          $this->errors[] = 'Inventory is not yet implemented';
@@ -208,8 +211,8 @@ class Inventory
          'page'   => '/front/inventory.conf.php',
          'options'   => [
             'agent' => [
-               'title' => Agent::getTypeName(\Session::getPluralNumber()),
-               'page'  => Agent::getSearchURL(false),
+               'title' => \Agent::getTypeName(\Session::getPluralNumber()),
+               'page'  => \Agent::getSearchURL(false),
                'links' => [
                   'add'    => '/front/agent.form.php',
                   'search' => '/front/agent.php',

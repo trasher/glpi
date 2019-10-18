@@ -93,17 +93,17 @@ class Agent extends CommonDBTM {
          ], [
             'id'            => '5',
             'table'         => $this->getTable(),
-            'field'         => 'lock',
-            'name'          => __('locked'),
+            'field'         => 'locked',
+            'name'          => __('Locked'),
             'datatype'      => 'bool',
          ], [
             'id'            => '6',
             'table'         => $this->getTable(),
-            'field'         => 'device_id',
-            'name'          => __('Device_id'),
+            'field'         => 'deviceid',
+            'name'          => __('Device id'),
             'datatype'      => 'text',
             'massiveaction' => false,
-         ], [
+         ], /*[
             'id'            => '7',
             'table'         => 'glpi_computers',
             'field'         => 'name',
@@ -111,18 +111,11 @@ class Agent extends CommonDBTM {
             'datatype'      => 'itemlink',
             'itemlink_type' => 'Computer',
             'massiveaction' => false,
-         ], [
+         ],*/ [
             'id'            => '8',
             'table'         => $this->getTable(),
             'field'         => 'version',
             'name'          => __('Version'),
-            'datatype'      => 'text',
-            'massiveaction' => false,
-         ], [
-            'id'            => '9',
-            'table'         => $this->getTable(),
-            'field'         => 'token',
-            'name'          => __('Token'),
             'datatype'      => 'text',
             'massiveaction' => false,
          ], [
@@ -142,7 +135,7 @@ class Agent extends CommonDBTM {
          ], [
             'id'            => '14',
             'table'         => $this->getTable(),
-            'field'         => 'agent_port',
+            'field'         => 'port',
             'name'          => __('Port'),
             'datatype'      => 'integer',
          ]
@@ -192,15 +185,22 @@ class Agent extends CommonDBTM {
       echo "</td>";
       echo "<td>".__('Locked')."</td>";
       echo "<td align='center'>";
-      Dropdown::showYesNo('lock', $this->fields["lock"]);
+      Dropdown::showYesNo('locked', $this->fields["locked"]);
       echo "</td>";
       echo "</tr>";
 
       echo "<tr class='tab_bg_1'>";
+      echo "<td><label for='deviceid'>".__('Device id')."</label></td>";
+      echo "<td align='center'>";
+      echo "<input type='text' name='deviceid' id='deviceid' value='".$this->fields['deviceid']."' required='required'/>";
+      echo "</td>";
       echo "<td>".__('Port')."</td>";
       echo "<td align='center'>";
-      echo "<input type='text' name='agent_port' value='".$this->fields['agent_port']."'/>";
+      echo "<input type='text' name='port' value='".$this->fields['port']."'/>";
       echo "</td>";
+      echo "</tr>";
+
+      echo "<tr class='tab_bg_1'>";
       echo "<td><label for='agenttypes_id'>".AgentType::getTypeName(1)."</label></td>";
       echo "<td align='center'>";
 
@@ -211,6 +211,10 @@ class Agent extends CommonDBTM {
       echo "</tr>";
 
       echo "<tr class='tab_bg_1'>";
+      echo "<td>".__('Item type')."</td>";
+      echo "<td align='center'>";
+      Dropdown::showFromArray('itemtype', $CFG_GLPI['inventory_types'], ['value' => $this->fields['itemtype']]);
+      echo "</td>";
       echo "<td>".__('Item link')."</td>";
       echo "<td align='center'>";
       if (!empty($this->fields["items_id"])) {
@@ -226,7 +230,7 @@ class Agent extends CommonDBTM {
       } else {
          //TODO: not only computers
          echo "<input type='hidden' name='itemtype' value='Computer'/>";
-         Computer_Item::dropdownConnect("Computer", "Computer", 'itemss_id',
+         Computer_Item::dropdownConnect("Computer", "Computer", 'items_id',
             $this->fields['entities_id']);
       }
       echo "</td>";
@@ -241,9 +245,9 @@ class Agent extends CommonDBTM {
             echo "<strong>".$module. "</strong>: ".$version."<br/>";
          }
          echo "</td>";
-         echo "<td>".__('Token')."</td>";
+         echo "<td>".__('Tag')."</td>";
          echo "<td align='center'>";
-         echo $this->fields["token"];
+         echo $this->fields["tag"];
          echo "</td>";
          echo "</tr>";
 
@@ -259,10 +263,6 @@ class Agent extends CommonDBTM {
          echo "</tr>";
 
          echo "<tr class='tab_bg_1'>";
-         echo "<td>".__('Tag')."</td>";
-         echo "<td align='center'>";
-         echo $this->fields["tag"];
-         echo "</td>";
          echo "<td colspan='2'>";
          echo "</td>";
          echo "</tr>";
@@ -271,5 +271,68 @@ class Agent extends CommonDBTM {
       $this->showFormButtons($options);
 
       return true;
+   }
+
+   /**
+    * Handle agent
+    *
+    * @param array $metadata Agents metadata from Inventory
+    *
+    * @return integer
+    */
+   public function handleAgent($metadata) {
+      $deviceid = $metadata['deviceid'];
+      $aid = false;
+      if ($this->getFromDBByCrit(['deviceid' => $deviceid])) {
+         $aid = $this->fields['id'];
+      }
+
+      $atype = new AgentType();
+      $atypes_id = $atype->getFromDBByCrit(['name' => 'Core']);
+
+      $input = [
+         'deviceid'     => $deviceid,
+         'name'         => $deviceid,
+         'last_contact' => date('Y-m-d H:i:s'),
+         'useragent'    => $_SERVER['HTTP_USER_AGENT'] ?? null,
+         'agenttypes_id'=> $atypes_id,
+         'itemtype'     => 'Computer'
+      ];
+
+      if (isset($metadata['provider']['version'])) {
+         $input['version'] = $metadata['provider']['version'];
+      }
+
+      if ($aid) {
+         $input['id'] = $aid;
+         $this->update($input);
+      } else {
+         $aid = $this->add($input);
+      }
+
+      return $aid;
+   }
+
+   /**
+    * Preapre input for add and update
+    *
+    * @param array $input Input
+    *
+    * @return array|false
+    */
+   public function prepareInputs(array $input) {
+      if (!isset($input['deviceid']) || empty($input['deviceid'])) {
+         Session::addMessageAfterRedirect(_('"deviceid" is mandatory!'), false, ERROR);
+         return false;
+      }
+      return $input;
+   }
+
+   public function prepareInputForAdd($input) {
+      return $this->prepareInputs($input);
+   }
+
+   public function prepareInputForUpdate($input) {
+      return $this->prepareInputs($input);
    }
 }
