@@ -95,6 +95,7 @@ class Inventory
       }
 
        $this->raw_data = json_decode($data);
+       file_put_contents(GLPI_TMP_DIR . '/local_inv.json', $data);
        return true;
    }
 
