@@ -321,7 +321,7 @@ class Agent extends CommonDBTM {
     * @return array|false
     */
    public function prepareInputs(array $input) {
-      if (!isset($input['deviceid']) || empty($input['deviceid'])) {
+      if ($this->isNewItem() && (!isset($input['deviceid']) || empty($input['deviceid']))) {
          Session::addMessageAfterRedirect(_('"deviceid" is mandatory!'), false, ERROR);
          return false;
       }
