@@ -1153,6 +1153,33 @@ function update94to95() {
    }
    /** /Domain records */
    /** Native inventory */
+   $inventory_prefs = [
+      'import_software'                => 1,
+      'import_volume'                  => 1,
+      'import_antivirus'               => 1,
+      'import_registry'                => 1,
+      'import_process'                 => 1,
+      'import_vm'                      => 1,
+      'import_monitor_on_partial_sn'   => 0,
+      'component_processor'            => 1,
+      'component_memory'               => 1,
+      'component_harddrive'            => 1,
+      'component_networkcard'          => 1,
+      'component_graphiccard'          => 1,
+      'component_soundcard'            => 1,
+      'component_drive'                => 1,
+      'component_networkdrive'         => 1,
+      'component_networkcardvirtual'   => 1,
+      'component_control'              => 1,
+      'component_battery'              => 1,
+      'states_id_default'              => 0,
+      'location'                       => 0,
+      'group'                          => 0,
+      'manage_osname'                  => 0
+   ];
+
+   $migration->addConfig($inventory_prefs, 'inventory');
+
    if (!$DB->tableExists('glpi_agenttypes')) {
       $query = "CREATE TABLE `glpi_agenttypes` (
             `id` int(11) NOT NULL AUTO_INCREMENT,
