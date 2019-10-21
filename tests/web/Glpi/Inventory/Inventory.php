@@ -108,7 +108,7 @@ class Inventory extends \GLPITestCase {
       ];
 
       foreach ($expected as $key => $value) {
-         $this->variable($agent->fields[$key])->isEqualTo($value);
+         $this->variable($agent->fields[$key])->isEqualTo($value, "$key differs");
       }
    }
 }
