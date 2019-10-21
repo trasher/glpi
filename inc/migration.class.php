@@ -983,7 +983,7 @@ class Migration {
    }
 
    /**
-    * Add configuration value(s) to current context; @see Migration::setContext()
+    * Add configuration value(s) to current context; @see Migration::addConfig()
     *
     * @since 9.2
     *
@@ -1025,27 +1025,16 @@ class Migration {
             if (count($config)) {
                Config::setConfigurationValues($context, $config);
                $this->displayMessage(sprintf(
-                  __('Configuration values added for %1$s.'),
-                  implode(', ', array_keys($config))
+                  __('Configuration values added for %1$s (%2$s).'),
+                  implode(', ', array_keys($config)),
+                  $context
                ));
             }
          }
+         unset($this->configs[$context]);
       }
    }
 
-   /**
-    * Set configuration context
-    *
-    * @since 9.2
-    *
-    * @param string $context Configuration context
-    *
-    * @return Migration
-    */
-   public function setContext($context) {
-      $this->context = $context;
-      return $this;
-   }
 
    /**
     * Add new right to profiles that match rights requirements
