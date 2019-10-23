@@ -1595,7 +1595,7 @@ class RuleCollection extends CommonDBTM {
    **/
    function testAllRules($input = [], $output = [], $params = [], $condition = 0) {
 
-      // Get Collection datas
+      // Get Collection data
       $this->getCollectionDatas(1, 1, $condition);
 
       $output["_no_rule_matches"] = true;

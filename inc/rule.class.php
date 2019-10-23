@@ -2325,6 +2325,13 @@ class Rule extends CommonDBTM {
                $display = true;
                break;
 
+            case "dropdown_inventory_itemtype" :
+               $types = $CFG_GLPI['state_types'];
+               $types[''] = __('No item type defined');
+               Dropdown::showItemTypes($name, $types, ['value' => $value]);
+               $display = true;
+               break;
+
             case "dropdown_import_type" :
                RuleAsset::dropdownImportType($name, $value);
                $display = true;

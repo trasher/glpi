@@ -49,10 +49,7 @@ class RuleImportComputerCollection extends RuleCollection {
     * @return boolean
    **/
    function canList() {
-      if (Plugin::haveImport()) {
-         return static::canView();
-      }
-      return false;
+      return static::canView();
    }
 
 
