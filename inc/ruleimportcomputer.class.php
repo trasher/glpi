@@ -39,6 +39,8 @@ class RuleImportComputer extends Rule {
 
    const RULE_ACTION_LINK_OR_IMPORT    = 0;
    const RULE_ACTION_LINK_OR_NO_IMPORT = 1;
+   const RULE_ACTION_LINK              = 3;
+   const RULE_ACTION_DENIED            = 2;
 
    const PATTERN_ENTITY_RESTRICT       = 202;
 
@@ -100,13 +102,7 @@ class RuleImportComputer extends Rule {
       $criteria['IPADDRESS']['name']            = __('IP address');*/
 
       $criteria['name'] = [
-         'name'            => __("Item name"),
-         'allow_condition' => [
-            Rule::PATTERN_IS,
-            Rule::PATTERN_IS_NOT,
-            Rule::PATTERN_IS_EMPTY,
-            Rule::PATTERN_FIND
-         ]
+         'name'            => __("Item name")
       ];
 
       /** Seems related to OCS
@@ -193,10 +189,11 @@ class RuleImportComputer extends Rule {
 
    static function getRuleActionValues() {
 
-      return [self::RULE_ACTION_LINK_OR_IMPORT
-                                          => __('Link if possible'),
-                   self::RULE_ACTION_LINK_OR_NO_IMPORT
-                                          => __('Link if possible, otherwise imports declined')];
+      return [
+         self::RULE_ACTION_LINK_OR_IMPORT    => __('Link if possible'),
+         self::RULE_ACTION_LINK_OR_NO_IMPORT => __('Link if possible, otherwise imports declined'),
+         self::RULE_ACTION_DENIED            => __('Import denied (no log)')
+      ];
    }
 
 
@@ -245,7 +242,7 @@ class RuleImportComputer extends Rule {
 
       return [Rule::PATTERN_FIND     => __('is already present in GLPI'),
                    Rule::PATTERN_IS_EMPTY => __('is empty in GLPI'),
-                   self::PATTERN_ENTITY_RESTRICT => __('Yes')]];
+                   self::PATTERN_ENTITY_RESTRICT => __('Yes')];
    }
 
 
@@ -343,7 +340,7 @@ class RuleImportComputer extends Rule {
       $continue          = true;
       $entityRestrict    = false;
       $nb_crit_find      = 0;
-      $global_criteria   = ['manufacturer', 'model', 'name', 'serial', 'otherserial', 'mac', 'ip'
+      $global_criteria   = ['manufacturer', 'model', 'name', 'serial', 'otherserial', 'mac', 'ip',
          'uuid', 'device_id', 'itemtype', 'domains_id',
          'entity_restrict', 'oscomment'
       ];
@@ -501,7 +498,7 @@ class RuleImportComputer extends Rule {
 
                case 'ip':
                   $it_criteria['LEFT JOIN']['glpi_networkports'] = [
-                     'ON'  = [
+                     'ON'  => [
                         $itemtable           => 'id',
                         'glpi_networkports'  => 'items_id', [
                            'glpi_networkports.itemtype' => $itemtype
@@ -539,7 +536,7 @@ class RuleImportComputer extends Rule {
                      /*&& $pfConfig->getValue('import_monitor_on_partial_sn') == 1*/
                      && strlen($input["serial"]) >= 4
                   ) {
-                     $serial = ['LIKE', '%'.$input['serial'].'%']
+                     $serial = ['LIKE', '%'.$input['serial'].'%'];
                   }
 
                   $it_criteria['WHERE'][] = ["$itemtable.serial" => $serial];
@@ -622,14 +619,14 @@ class RuleImportComputer extends Rule {
                   break;
 
                case 'domains_id':
-                  $it_criteria['LEFT JOIN']['glpi_domains'] => [
+                  $it_criteria['LEFT JOIN']['glpi_domains'] = [
                      'ON'  => [
                         'glpi_domains' => 'id',
                         $itemtable     => 'domains_id'
                      ]
                   ];
                   $it_criteria['WHERE'][] = [
-                     'glpi_domains.name'  => $input['domains_id'];
+                     'glpi_domains.name'  => $input['domains_id']
                   ];
                   break;
             }
@@ -717,7 +714,7 @@ class RuleImportComputer extends Rule {
 
       \Toolbox::logDebug(
          self::__METHOD__ . "\n     output:\n" . print_r($output, true) . "\n     params:\n" .
-         print_r($params, true) . "\n     actions:\n" . count($this->actions);
+         print_r($params, true) . "\n     actions:\n" . count($this->actions)
       );
 
       if (count($this->actions)) {
@@ -861,4 +858,868 @@ class RuleImportComputer extends Rule {
       }
    }
 
+   /**
+    * Create rules (initialisation)
+    *
+    * @param boolean $reset        Whether to reset before adding new rules, defaults to true
+    * @param boolean $with_plugins Use plugins rules or not
+    *
+    * @return boolean
+    */
+   public static function initRules($reset = true, $with_plugins = true) {
+      global $PLUGIN_HOOKS;
+
+      //FIXME: will reset plugins additions aswell...
+      if ($reset) {
+         $grule = new Rule();
+         $a_rules = $grule->find(['sub_type' => 'RuleImportComputer']);
+         foreach ($a_rules as $data) {
+            $grule->delete($data);
+         }
+      }
+
+      $rules = [];
+
+      $rules[] = [
+         'name'      => 'Computer constraint (name)',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Computer'
+            ],
+            [
+               'criteria'  => 'name',
+               'condition' => 9,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion2'
+      ];
+
+      $rules[] = [
+         'name'      => 'Computer update (by serial + uuid)',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Computer'
+            ],
+            [
+               'criteria'  => 'serial',
+               'condition' => 10,
+               'pattern'   => 1
+            ],
+            [
+               'criteria'  => 'serial',
+               'condition' => 8,
+               'pattern'   => 1
+            ],
+            [
+               'criteria'  => 'uuid',
+               'condition' => 10,
+               'pattern'   => 1
+            ],
+            [
+               'criteria'  => 'uuid',
+               'condition' => 8,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion1'
+      ];
+      $rules[] = [
+         'name'      => 'Computer update (by serial)',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Computer'
+            ],
+            [
+               'criteria'  => 'serial',
+               'condition' => 10,
+               'pattern'   => 1
+            ],
+            [
+               'criteria'  => 'serial',
+               'condition' => 8,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion1'
+      ];
+
+      $rules[] = [
+         'name'      => 'Computer update (by uuid)',
+         'match'     => 'AND',
+         'is_active' => 0,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Computer'
+            ],
+            [
+               'criteria'  => 'uuid',
+               'condition' => 10,
+               'pattern'   => 1
+            ],
+            [
+               'criteria'  => 'uuid',
+               'condition' => 8,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion1'
+      ];
+
+      $rules[] = [
+         'name'      => 'Computer update (by mac)',
+         'match'     => 'AND',
+         'is_active' => 0,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Computer'
+            ],
+            [
+               'criteria'  => 'mac',
+               'condition' => 10,
+               'pattern'   => 1
+            ],
+            [
+               'criteria'  => 'mac',
+               'condition' => 8,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion1'
+      ];
+
+      $rules[] = [
+         'name'      => 'Computer update (by name)',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Computer'
+            ],
+            [
+               'criteria'  => 'name',
+               'condition' => 10,
+               'pattern'   => 1
+            ],
+            [
+               'criteria'  => 'name',
+               'condition' => 8,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion1'
+      ];
+
+      $rules[] = [
+         'name'      => 'Computer import (by serial + uuid)',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Computer'
+            ],
+            [
+               'criteria'  => 'uuid',
+               'condition' => 8,
+               'pattern'   => 1
+            ],
+            [
+               'criteria'  => 'serial',
+               'condition' => 8,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion1'
+      ];
+
+      $rules[] = [
+         'name'      => 'Computer import (by serial)',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Computer'
+            ],
+            [
+               'criteria'  => 'serial',
+               'condition' => 8,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion1'
+      ];
+
+      $rules[] = [
+         'name'      => 'Computer import (by uuid)',
+         'match'     => 'AND',
+         'is_active' => 0,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Computer'
+            ],
+            [
+               'criteria'  => 'uuid',
+               'condition' => 8,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion1'
+      ];
+
+      $rules[] = [
+         'name'      => 'Computer import (by mac)',
+         'match'     => 'AND',
+         'is_active' => 0,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Computer'
+            ],
+            [
+               'criteria'  => 'mac',
+               'condition' => 8,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion1'
+      ];
+
+      $rules[] = [
+         'name'      => 'Computer import (by name)',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Computer'
+            ],
+            [
+               'criteria'  => 'name',
+               'condition' => 8,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion1'
+      ];
+
+      $rules[] = [
+         'name'      => 'Computer import denied',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Computer'
+            ]
+         ],
+         'action'    => '_fusion2'
+      ];
+
+      $rules[] = [
+         'name'      => 'Printer constraint (name)',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Printer'
+            ],
+            [
+               'criteria'  => 'name',
+               'condition' => 9,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion2'
+      ];
+
+      $rules[] = [
+         'name'      => 'Printer update (by serial)',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Printer'
+            ],
+            [
+               'criteria'  => 'serial',
+               'condition' => 8,
+               'pattern'   => 1
+            ],
+            [
+               'criteria'  => 'serial',
+               'condition' => 10,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion1'
+      ];
+
+      $rules[] = [
+         'name'      => 'Printer update (by mac)',
+         'match'     => 'AND',
+         'is_active' => 0,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Printer'
+            ],
+            [
+               'criteria'  => 'mac',
+               'condition' => 8,
+               'pattern'   => 1
+            ],
+            [
+               'criteria'  => 'mac',
+               'condition' => 10,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion1'
+      ];
+
+      $rules[] = [
+         'name'      => 'Printer import (by serial)',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Printer'
+            ],
+            [
+               'criteria'  => 'serial',
+               'condition' => 8,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion1'
+      ];
+
+      $rules[] = [
+         'name'      => 'Printer import (by mac)',
+         'match'     => 'AND',
+         'is_active' => 0,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Printer'
+            ],
+            [
+               'criteria'  => 'mac',
+               'condition' => 8,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion1'
+      ];
+
+      $rules[] = [
+         'name'      => 'Printer import denied',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Printer'
+            ]
+         ],
+         'action'    => '_fusion2'
+      ];
+
+      $rules[] = [
+         'name'      => 'NetworkEquipment constraint (name)',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'NetworkEquipment'
+            ],
+            [
+               'criteria'  => 'name',
+               'condition' => 9,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion2'
+      ];
+
+      $rules[] = [
+         'name'      => 'NetworkEquipment update (by serial)',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'NetworkEquipment'
+            ],
+            [
+               'criteria'  => 'serial',
+               'condition' => 8,
+               'pattern'   => 1
+            ],
+            [
+               'criteria'  => 'serial',
+               'condition' => 10,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion1'
+      ];
+
+      $rules[] = [
+         'name'      => 'NetworkEquipment update (by mac)',
+         'match'     => 'AND',
+         'is_active' => 0,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'NetworkEquipment'
+            ],
+            [
+               'criteria'  => 'mac',
+               'condition' => 8,
+               'pattern'   => 1
+            ],
+            [
+               'criteria'  => 'mac',
+               'condition' => 10,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion1'
+      ];
+
+      $rules[] = [
+         'name'      => 'NetworkEquipment import (by serial)',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'NetworkEquipment'
+            ],
+            [
+               'criteria'  => 'serial',
+               'condition' => 8,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion1'
+      ];
+
+      $rules[] = [
+         'name'      => 'NetworkEquipment import (by mac)',
+         'match'     => 'AND',
+         'is_active' => 0,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'NetworkEquipment'
+            ],
+            [
+               'criteria'  => 'mac',
+               'condition' => 8,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion1'
+      ];
+
+      $rules[] = [
+         'name'      => 'NetworkEquipment import denied',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'NetworkEquipment'
+            ]
+         ],
+         'action'    => '_fusion2'
+      ];
+
+      $rules[] = [
+         'name'      => 'Peripheral update (by serial)',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Peripheral'
+            ],
+            [
+               'criteria'  => 'serial',
+               'condition' => 8,
+               'pattern'   => 1
+            ],
+            [
+               'criteria'  => 'serial',
+               'condition' => 10,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion1'
+      ];
+
+      $rules[] = [
+         'name'      => 'Peripheral import (by serial)',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Peripheral'
+            ],
+            [
+               'criteria'  => 'serial',
+               'condition' => 8,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion1'
+      ];
+
+      $rules[] = [
+         'name'      => 'Peripheral import denied',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Peripheral'
+            ]
+         ],
+         'action'    => '_fusion2'
+      ];
+
+      $rules[] = [
+         'name'      => 'Monitor update (by serial)',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Monitor'
+            ],
+            [
+               'criteria'  => 'serial',
+               'condition' => 8,
+               'pattern'   => 1
+            ],
+            [
+               'criteria'  => 'serial',
+               'condition' => 10,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion1'
+      ];
+
+      $rules[] = [
+         'name'      => 'Monitor import (by serial)',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Monitor'
+            ],
+            [
+               'criteria'  => 'serial',
+               'condition' => 8,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion1'
+      ];
+
+      $rules[] = [
+         'name'      => 'Monitor import denied',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Monitor'
+            ]
+         ],
+         'action'    => '_fusion2'
+      ];
+
+      $rules[] = [
+         'name'      => 'Phone constraint (name)',
+         'match'     => 'AND',
+         'is_active' => 0,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Phone'
+            ],
+            [
+               'criteria'  => 'name',
+               'condition' => 9,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion2'
+      ];
+
+      $rules[] = [
+         'name'      => 'Phone update (by mac)',
+         'match'     => 'AND',
+         'is_active' => 0,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Phone'
+            ],
+            [
+               'criteria'  => 'mac',
+               'condition' => 10,
+               'pattern'   => 1
+            ],
+            [
+               'criteria'  => 'mac',
+               'condition' => 8,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion1'
+      ];
+
+      $rules[] = [
+         'name'      => 'Phone import (by mac)',
+         'match'     => 'AND',
+         'is_active' => 0,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Phone'
+            ],
+            [
+               'criteria'  => 'mac',
+               'condition' => 8,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion1'
+      ];
+
+      $rules[] = [
+         'name'      => 'Phone import denied',
+         'match'     => 'AND',
+         'is_active' => 0,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Phone'
+            ]
+         ],
+         'action'    => '_fusion2'
+      ];
+
+      $rules[] = [
+         'name'      => 'Global constraint (name)',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'name',
+               'condition' => 9,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion2'
+      ];
+
+      $rules[] = [
+         'name'      => 'Global update (by serial)',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'serial',
+               'condition' => 8,
+               'pattern'   => 1
+            ],
+            [
+               'criteria'  => 'serial',
+               'condition' => 10,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion1'
+      ];
+
+      $rules[] = [
+         'name'      => 'Global update (by mac)',
+         'match'     => 'AND',
+         'is_active' => 0,
+         'criteria'  => [
+            [
+               'criteria'  => 'mac',
+               'condition' => 8,
+               'pattern'   => 1
+            ],
+            [
+               'criteria'  => 'mac',
+               'condition' => 10,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion1'
+      ];
+
+      $rules[] = [
+         'name'      => 'Global import (by serial)',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'serial',
+               'condition' => 8,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion1'
+      ];
+
+      $rules[] = [
+         'name'      => 'Global import (by mac)',
+         'match'     => 'AND',
+         'is_active' => 0,
+         'criteria'  => [
+            [
+               'criteria'  => 'mac',
+               'condition' => 8,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_fusion1'
+      ];
+
+      $rules[] = [
+         'name'      => 'Global import denied',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => ''
+            ]
+         ],
+         'action'    => '_fusion2'
+      ];
+
+      if ($with_plugins && isset($PLUGIN_HOOKS['add_rules'])) {
+         foreach ($PLUGIN_HOOKS['add_rules'] as $plugin => $val) {
+            if (!Plugin::isPluginLoaded($plugin)) {
+               continue;
+            }
+            //FIXME: make that work, maybe not the correct hook type
+            /*$rules = array_merge(
+               $rules,
+               Plugin::doOneHook(
+                  $plugin,
+                  "ruleImportComputer_addGlobalCriteria",
+                  $global_criteria
+               )
+            );*/
+         }
+      }
+
+      $ranking = 0;
+      foreach ($rules as $rule) {
+         $rulecollection = new RuleImportComputerCollection();
+         $input = [
+            'is_active' => $rule['is_active'],
+            'name'      => $rule['name'],
+            'match'     => $rule['match'],
+            'sub_type'  => self::getType(),
+            'ranking'   => $ranking
+         ];
+         $rule_id = $rulecollection->add($input);
+
+         // Add criteria
+         $rulefi = $rulecollection->getRuleClass();
+         foreach ($rule['criteria'] as $criteria) {
+            $rulecriteria = new RuleCriteria(get_class($rulefi));
+            $criteria['rules_id'] = $rule_id;
+            $rulecriteria->add($criteria);
+         }
+
+         // Add action
+         $ruleaction = new RuleAction(get_class($rulefi));
+         $input = [];
+         $input['rules_id'] = $rule_id;
+         $input['action_type'] = 'assign';
+         if ($rule['action'] == '_fusion1') {
+            $input['field'] = '_inventory';
+            $input['value'] = self::RULE_ACTION_LINK_OR_IMPORT;
+         } else if ($rule['action'] == '_fusion2') {
+            $input['field'] = '_inventory';
+            $input['value'] = self::RULE_ACTION_DENIED;
+         } else if ($rule['action'] == '_ignore_import') {
+            $input['field'] = '_ignore_import';
+            $input['value'] = '1';
+         }
+         $ruleaction->add($input);
+
+         $ranking++;
+      }
+      return true;
+   }
 }

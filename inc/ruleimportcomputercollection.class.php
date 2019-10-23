@@ -58,4 +58,32 @@ class RuleImportComputerCollection extends RuleCollection {
    }
 
 
+   /**
+    * Get name of this rule class
+    *
+    * @return string
+    */
+   function getRuleClassName() {
+      $rule_class = [];
+      if (preg_match('/(.*)Collection/', get_class($this), $rule_class)) {
+         return $rule_class[1];
+      }
+      return "";
+   }
+
+
+   /**
+    * Get an instance of the class to manipulate rule of this collection
+    *
+    * @return null|object
+    */
+   function getRuleClass() {
+      $name = $this->getRuleClassName();
+      if ($name !=  '') {
+         return new $name();
+      } else {
+         return null;
+      }
+   }
+
 }
