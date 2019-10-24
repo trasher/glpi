@@ -52,7 +52,8 @@ class RuleImportComputer extends Rule {
 
 
    function getTitle() {
-      return __('Rules for import and link computers');
+      $col = new RuleImportComputerCollection;
+      return $col->getTitle();
    }
 
 
@@ -436,6 +437,7 @@ class RuleImportComputer extends Rule {
             }
          }
          $itemtypeselected[] = "InventoryUnmanaged";
+         $itemtypeselected[] = "Peripheral";//used for networkinventory
       }
 
       $found = false;

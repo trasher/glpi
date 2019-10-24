@@ -49,8 +49,11 @@ if (isset($_POST["action"])) {
    $rulecollection->checkGlobal(UPDATE);
    $rulecollection->changeRuleOrder($_POST["id"], $_POST["action"], $_POST['condition']);
    Html::back();
-   // POST and GET needed to manage reload
+} else if (isset($_POST["reinit"])) {
+   //reinitialize current rules
+   RuleImportComputer::initRules($reset = true, $with_plugins = true);
 } else if (isset($_POST["replay_rule"]) || isset($_GET["replay_rule"])) {
+   // POST and GET needed to manage reload
    $rulecollection->checkGlobal(UPDATE);
 
    // Current time

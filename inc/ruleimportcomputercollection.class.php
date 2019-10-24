@@ -42,12 +42,35 @@ class RuleImportComputerCollection extends RuleCollection {
    static $rightname           = 'rule_import';
    public $menu_option         = 'linkcomputer';
 
+   function defineTabs($options = []) {
+      $ong = parent::defineTabs();
 
-   /**
-    * @since 0.84
-    *
-    * @return boolean
-   **/
+      $this->addStandardTab(__CLASS__, $ong, $options);
+
+      return $ong;
+   }
+
+   function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
+      global $CFG_GLPI;
+
+      if (!$withtemplate) {
+         switch ($item->getType()) {
+            case __CLASS__ :
+               $ong    = [];
+               $types = $CFG_GLPI['state_types'];
+               foreach ($types as $type) {
+                  if (class_exists($type)) {
+                     $ong[$type] = $type::getTypeName();
+                  }
+               }
+               $ong[] = "Peripheral";//used for networkinventory
+               $ong['_global'] = __('Global');
+               return $ong;
+         }
+      }
+      return '';
+   }
+
    function canList() {
       return static::canView();
    }
@@ -86,4 +109,42 @@ class RuleImportComputerCollection extends RuleCollection {
       }
    }
 
+   public function collectionFilter($criteria) {
+      //current tab
+      $current_tab = str_replace(__CLASS__.'$', '', Session::getActiveTab($this->getType()));
+      $tabs = $this->getTabNameForItem($this);
+
+      if (!isset($tabs[$current_tab])) {
+         return $criteria;
+      }
+
+      $criteria['LEFT JOIN']['glpi_rulecriterias AS crit'] = [
+         'ON'  => [
+            'crit'         => 'rules_id',
+            'glpi_rules'   => 'id'
+         ]
+      ];
+      $criteria['GROUPBY'] = ['glpi_rules.id'];
+
+      if ($current_tab != '_global') {
+         $where = [
+            'crit.criteria'   => 'itemtype',
+            'crit.pattern'    => getSingular($tabs[$current_tab])
+         ];
+         $criteria['WHERE']  += $where;
+      } else {
+         //FIXME: dunno how to get rules without criteria/pattern
+         if (!is_array($criteria['SELECT'])) {
+            $criteria['SELECT'] = [$criteria['SELECT']];
+         }
+         $criteria['SELECT'][] = new QueryExpression("COUNT(IF(crit.criteria = 'itemtype', IF(crit.pattern IN ('".implode("', '", array_keys($tabs))."'), 1, NULL), NULL)) AS is_itemtype");
+         $where = [];
+         $criteria['HAVING'] = ['is_itemtype' => 0];
+      }
+      return $criteria;
+   }
+
+   public function getMainTabLabel() {
+      return __('All');
+   }
 }

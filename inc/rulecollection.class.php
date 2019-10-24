@@ -89,21 +89,21 @@ class RuleCollection extends CommonDBTM {
    /**
     * Get Collection Size : retrieve the number of rules
     *
-    * @param $recursive (true by default)
-    * @param $condition (0 by default)
+    * @param boolean $recursive (true by default)
+    * @param integer $condition (0 by default)
     *
     * @return : number of rules
    **/
    function getCollectionSize($recursive = true, $condition = 0) {
+      global $DB;
 
-      $restrict = [
-         'sub_type'  => $this->getRuleClassName()
-      ] + getEntitiesRestrictCriteria('glpi_rules', 'entities_id', $this->entity, $recursive);
+      $restrict = $this->getRuleListCriteria([
+         'condition' => $condition,
+         'active'    => false
+      ]);
 
-      if ($condition > 0) {
-         $restrict['condition'] = ['&', (int)$condition];
-      }
-      return countElementsInTable("glpi_rules", $restrict);
+      $iterator = $DB->request($restrict);
+      return count($iterator);
    }
 
 
@@ -178,7 +178,12 @@ class RuleCollection extends CommonDBTM {
          $criteria['LIMIT'] = (int)$p['limit'];
          $criteria['START'] = (int)$p['start'];
       }
+
       $criteria['WHERE'] = $where;
+
+      if (method_exists($this, 'collectionFilter')) {
+         $criteria = $this->collectionFilter($criteria);
+      }
 
       return $criteria;
    }
@@ -211,6 +216,7 @@ class RuleCollection extends CommonDBTM {
 
       //Select all the rules of a different type
       $criteria   = $this->getRuleListCriteria($p);
+
       $iterator   = $DB->request($criteria);
 
       while ($data = $iterator->next()) {
@@ -1975,6 +1981,14 @@ class RuleCollection extends CommonDBTM {
       return $ong;
    }
 
+   /**
+    * Get label for main tab
+    *
+    * @return string
+    */
+   public function getMainTabLabel() {
+      return _n('Rule', 'Rules', Session::getPluralNumber());
+   }
 
    /**
     * @see CommonGLPI::getTabNameForItem()
@@ -1989,7 +2003,7 @@ class RuleCollection extends CommonDBTM {
                               Dropdown::getDropdownName('glpi_entities',
                                                         $_SESSION['glpiactive_entity']));
          }
-         $title = _n('Rule', 'Rules', Session::getPluralNumber());
+         $title = $item->getMainTabLabel();
          if ($item->isRuleRecursive()) {
             //TRANS: %s is the entity name
             $title = sprintf(__('Local rules: %s'),

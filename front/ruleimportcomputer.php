@@ -34,7 +34,4 @@ include ('../inc/includes.php');
 
 $rulecollection = new RuleImportComputerCollection();
 
-if (isset($_GET['reset'])) {
-   RuleImportComputer::initRules($reset = true, $with_plugins = true);
-}
 include (GLPI_ROOT . "/front/rule.common.php");
