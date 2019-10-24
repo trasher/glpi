@@ -54,7 +54,7 @@ class RuleImportComputerCollection extends RuleCollection {
 
 
    function getTitle() {
-      return __('Rules for import and link computers');
+      return __('Rules for import and link equipments');
    }
 
 
