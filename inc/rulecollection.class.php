@@ -578,6 +578,14 @@ class RuleCollection extends CommonDBTM {
          $url = $CFG_GLPI["root_doc"];
       }
 
+      //if rules provides an initRules method, then we're able to reset them
+      if (method_exists($this->getRuleClass(), 'initRules')) {
+         echo "<a class='vsubmit' id='reset_rules' href='".$rule->getSearchURL()."?reinit=true' " .
+            //does not work.
+            //"onClick='if(confirm(\"" . __s('All rules will be erased and recreated from scratch. Are you sure?')."\")) { return true } else { return false; };' " .
+            "title='".__s("Remove all equipment import rules and recreate from defaults")."'" .
+            ">" . __('Reset rules') . "</a>&nbsp;";
+      }
       echo "<a class='vsubmit' href='#' onClick=\"".
                   Html::jsGetElementbyID('allruletest'.$rand).".dialog('open'); return false;\">".
                   __('Test rules engine')."</a>";
