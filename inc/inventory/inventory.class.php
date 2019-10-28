@@ -176,6 +176,7 @@ class Inventory
             }
          }
 
+         $this->data = $data;
          //create/load agent
          $agent = new \Agent();
          $agent->handleAgent($this->metadata);
@@ -192,10 +193,9 @@ class Inventory
             $this->item->getFromDB($agent->fields['items_id']);
          }
 
-         $this->data = $data;
-         $this->handleInventory();
+         $this->processInventoryData();
+         $this->handleDevices();
 
-         //TODO: the magic!
          $this->errors[] = 'Inventory is not yet implemented';
 
          $DB->commit();
@@ -250,17 +250,17 @@ class Inventory
    }
 
    /**
-    * Handle inventoried devices
+    * Process and enhance data
     *
     * @return void
     */
-   public function handleInventory() {
+   public function processInventoryData() {
       global $DB;
 
       $hdd = [];
       $ports = [];
 
-      foreach ($this->data as $key => $value) {
+      foreach ($this->data as $key => &$value) {
          $itemdevicetype = false;
          switch ($key) {
             case 'accesslog':
@@ -294,7 +294,24 @@ class Inventory
             case 'drives':
             case 'envs':
             case 'firewalls':
+               break;
             case 'hardware':
+               $mapping = [
+                  'NAME'           => 'name',
+                  'WINPRODID'      => 'licenseid',
+                  'WINPRODKEY'     => 'license_number',
+                  'WORKGROUP'      => 'domains_id',
+                  'UUID'           => 'uuid',
+                  'LASTLOGGEDUSER' => 'users_id',
+               ];
+
+               $val = (object)$value;
+               foreach ($mapping as $origin => $dest) {
+                  if (property_exists($val, $origin)) {
+                     $val->$dest = $val->$origin;
+                  }
+               }
+               break;
             case 'inputs':
             case 'local_groups':
             case 'local_users':
@@ -512,6 +529,8 @@ class Inventory
                      }
                   }
                }
+               $suffix = '__ports';
+               $this->data[$key . $suffix] = $ports;
                break;
             case 'operatingsystem':
             case 'ports':
@@ -580,6 +599,9 @@ class Inventory
                      unset($value[$k]);
                   }
                }
+               $suffix = 'hdd';
+               $this->data[$key . $suffix] = $hdd;
+               $altitemdevicetype = 'Item_DeviceHardDrive';
                break;
             case 'usbdevices':
                break;
@@ -621,6 +643,7 @@ class Inventory
                break;
             case 'batteries':
                $itemdevicetype = 'Item_DeviceBattery';
+               $this->devices[$itemdevicetype] = $key;
                $mapping = [
                   'name'         => 'designation',
                   'manufacturer' => 'manufacturers_id',
@@ -673,6 +696,7 @@ class Inventory
                break;
             case 'controllers':
                $itemdevicetype = 'Item_DeviceControl';
+               $this->devices[$itemdevicetype] = $key;
                $mapping = [
                   'name'          => 'designation',
                   'manufacturer'  => 'manufacturers_id',
@@ -732,18 +756,17 @@ class Inventory
                //no mapping needed
                break;
             default:
-               throw new \RuntimeException($key);
                //unhandled
+               throw new \RuntimeException("Unhandled schema entry $key");
                break;
          }
 
-         $this->devicetypes = \Item_Devices::getItemAffinities($this->item->getType());
-         $this->handleDevices($itemdevicetype, $value);
-         if ($itemdevicetype === 'Item_DeviceDrive' && count($hdd)) {
-            $this->handleDevices('Item_DeviceHardDrive', $hdd);
-         }
-         if (count($ports)) {
-            $this->manageNetworkPort($ports/*, $no_history*/);
+         //create mapping for existing devices
+         if ($itemdevicetype !== false) {
+            $this->devices[$itemdevicetype] = $key;
+            if (isset($suffix)) {
+               $this->devices[$altitemdevicetype] = $key . $suffix;
+            }
          }
       }
    }
@@ -751,58 +774,64 @@ class Inventory
    /**
     * Handle devices
     *
-    * @param string   $itemdevicetype Item device object type
-    * @param stdClass $value          Current entry values
-    *
     * @return void
     */
-   public function handleDevices($itemdevicetype, $value) {
+   public function handleDevices() {
       global $DB;
 
-      if ($itemdevicetype !== false && in_array($itemdevicetype, $this->devicetypes)) {
-         $itemdevice = new $itemdevicetype;
+      $this->devicetypes = \Item_Devices::getItemAffinities($this->item->getType());
 
-         $itemdevicetable = getTableForItemType($itemdevicetype);
-         $devicetype      = $itemdevicetype::getDeviceType();
-         $device          = new $devicetype;
-         $devicetable     = getTableForItemType($devicetype);
-         $fk              = getForeignKeyFieldForTable($devicetable);
+      foreach ($this->devices as $itemdevicetype => $value) {
+         if ($itemdevicetype !== false && in_array($itemdevicetype, $this->devicetypes)) {
+            $itemdevice = new $itemdevicetype;
 
-         $iterator = $DB->request([
-            'SELECT'    => [
-               "$itemdevicetable.$fk",
-            ],
-            'FROM'      => $itemdevicetable,
-            'WHERE'     => [
-               "$itemdevicetable.items_id"     => $this->item->fields['id'],
-               "$itemdevicetable.itemtype"     => $this->item->getType(),
-               "$itemdevicetable.is_dynamic"   => 1
-            ]
-         ]);
+            $itemdevicetable = getTableForItemType($itemdevicetype);
+            $devicetype      = $itemdevicetype::getDeviceType();
+            $device          = new $devicetype;
+            $devicetable     = getTableForItemType($devicetype);
+            $fk              = getForeignKeyFieldForTable($devicetable);
 
-         $existing = [];
-         while ($row = $iterator->next()) {
-            $existing[$row[$fk]] = $row[$fk];
-         }
+            $iterator = $DB->request([
+               'SELECT'    => [
+                  "$itemdevicetable.$fk",
+               ],
+               'FROM'      => $itemdevicetable,
+               'WHERE'     => [
+                  "$itemdevicetable.items_id"     => $this->item->fields['id'],
+                  "$itemdevicetable.itemtype"     => $this->item->getType(),
+                  "$itemdevicetable.is_dynamic"   => 1
+               ]
+            ]);
 
-         foreach ($value as $val) {
-            if (!isset($val->designation) || $val->designation == '') {
-               //cannot be empty
-               $val->designation = $itemdevice->getTypeName(1);
+            $existing = [];
+            while ($row = $iterator->next()) {
+               $existing[$row[$fk]] = $row[$fk];
             }
 
-            $device_id = $device->import((array)$val);
-            if (!in_array($device_id, $existing)) {
-               $itemdevice_data = [
-                  $fk                  => $device_id,
-                  'itemtype'           => $this->item->getType(),
-                  'items_id'           => $this->item->fields['id'],
-                  'is_dynamic'         => 1,
-                  //'_no_history'        => $no_history
-               ] + (array)$val;
-               $itemdevice->add($itemdevice_data, []/*, !$no_history*/);
+            foreach ($value as $val) {
+               if (!isset($val->designation) || $val->designation == '') {
+                  //cannot be empty
+                  $val->designation = $itemdevice->getTypeName(1);
+               }
+
+               $device_id = $device->import((array)$val);
+               if (!in_array($device_id, $existing)) {
+                  $itemdevice_data = [
+                     $fk                  => $device_id,
+                     'itemtype'           => $this->item->getType(),
+                     'items_id'           => $this->item->fields['id'],
+                     'is_dynamic'         => 1,
+                     //'_no_history'        => $no_history
+                  ] + (array)$val;
+                  $itemdevice->add($itemdevice_data, []/*, !$no_history*/);
+               }
             }
          }
+
+         if ($itemdevicetype === 'Item_DeviceNetworkCard' && count($this->data['networks__ports'])) {
+            $this->handleNetworkPort($this->data['networks__ports']/*, $no_history*/);
+         }
+
       }
    }
 
@@ -845,7 +874,7 @@ class Inventory
     *
     * @return void
     */
-   public function manageNetworkPort($inventory_networkports, $no_history = true) {
+   public function handleNetworkPort($inventory_networkports, $no_history = true) {
       global $DB;
 
       $_SESSION["plugin_fusioninventory_entity"] = 0;//FIXME: HACK
