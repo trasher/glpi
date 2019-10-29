@@ -197,6 +197,7 @@ class Inventory
 
          $this->handleAssets();
          $this->handleDevices();
+         $this->handleNetworkPorts();
 
          $this->errors[] = 'Inventory is WIP';
 
@@ -595,7 +596,6 @@ class Inventory
                break;
             case 'batteries':
                $itemdevicetype = 'Item_DeviceBattery';
-               $this->devices[$itemdevicetype] = $key;
                $mapping = [
                   'name'         => 'designation',
                   'manufacturer' => 'manufacturers_id',
@@ -648,7 +648,6 @@ class Inventory
                break;
             case 'controllers':
                $itemdevicetype = 'Item_DeviceControl';
-               $this->devices[$itemdevicetype] = $key;
                $mapping = [
                   'name'          => 'designation',
                   'manufacturer'  => 'manufacturers_id',
@@ -786,10 +785,6 @@ class Inventory
                   $itemdevice->add($itemdevice_data, []/*, !$no_history*/);
                }
             }
-
-            if ($itemdevicetype === 'Item_DeviceNetworkCard' && count($this->data['networks__ports'])) {
-               $this->handleNetworkPort($this->data['networks__ports']/*, $no_history*/);
-            }
          }
 
       }
@@ -828,14 +823,13 @@ class Inventory
    /**
     * Manage network ports
     *
-    * @param array   $inventory_networkports
-    * @param integer $computers_id
-    * @param boolean $no_history
-    *
     * @return void
     */
-   public function handleNetworkPort($inventory_networkports, $no_history = true) {
+   public function handleNetworkPorts() {
       global $DB;
+
+      $inventory_networkports = $this->data['networks__ports'];
+      $no_history = true;
 
       $_SESSION["plugin_fusioninventory_entity"] = 0;//FIXME: HACK
       $computers_id = $this->item->fields['id'];
@@ -1130,11 +1124,11 @@ class Inventory
 
    public function handleItem() {
 
-      $computer_input = [];
+      $item_input = [];
       if (isset($this->data['hardware'])) {
          $hardware = (object)$this->data['hardware'][0];
          foreach ($hardware as $key => $property) {
-            $computer_input[$key] = $property;
+            $item_input[$key] = $property;
          }
       }
 
@@ -1143,46 +1137,57 @@ class Inventory
          $bios = (object)$this->data['bios'][0];
          if (property_exists($bios, 'assettag')
                && !empty($bios->assettag)) {
-            $computer_input['otherserial'] = $bios->assettag;
+            $item_input['otherserial'] = $bios->assettag;
          }
          if (property_exists($bios, 'smanufacturer')
                && !empty($bios->smanufacturer)) {
-            $computer_input['manufacturers_id'] = $bios->smanufacturer;
+            $item_input['manufacturers_id'] = $bios->smanufacturer;
          } else if (property_exists($bios, 'mmanufacturer')
                && !empty($bios->mmanufacturer)) {
-            $computer_input['manufacturers_id'] = $bios->mmanufacturer;
-            $computer_input['mmanufacturer'] = $bios->mmanufacturer;
+            $item_input['manufacturers_id'] = $bios->mmanufacturer;
+            $item_input['mmanufacturer'] = $bios->mmanufacturer;
          } else if (property_exists($bios, 'bmanufacturer')
                && !empty($bios->bmanufacturer)) {
-            $computer_input['manufacturers_id'] = $bios->bmanufacturer;
-            $computer_input['bmanufacturer'] = $bios->bmanufacturer;
+            $item_input['manufacturers_id'] = $bios->bmanufacturer;
+            $item_input['bmanufacturer'] = $bios->bmanufacturer;
          }
 
          if (property_exists($bios, 'smodel') && $bios->smodel != '') {
-            $computer_input['computermodels_id'] = $bios->smodel;
+            $item_input['computermodels_id'] = $bios->smodel;
          } else if (property_exists($bios, 'mmodel') && $bios->mmodel != '') {
-            $computer_input['computermodels_id'] = $bios->mmodel;
-            $computer_input['model'] = $bios->mmodel;
+            $item_input['computermodels_id'] = $bios->mmodel;
+            $item_input['model'] = $bios->mmodel;
          }
 
          if (property_exists($bios, 'ssn')) {
-            $computer_input['serial'] = trim($bios->ssn);
+            $item_input['serial'] = trim($bios->ssn);
             // HP patch for serial begin with 'S'
-            if (isset($computer_input['manufacturers_id'])
-                  && strstr($computer_input['manufacturers_id'], "ewlett")
-                  && preg_match("/^[sS]/", $computer_input['serial'])) {
-               $computer_input['serial'] = trim(
+            if (isset($item_input['manufacturers_id'])
+                  && strstr($item_input['manufacturers_id'], "ewlett")
+                  && preg_match("/^[sS]/", $item_input['serial'])) {
+               $item_input['serial'] = trim(
                   preg_replace(
                      "/^[sS]/",
                      "",
-                     $computer_input['serial']
+                     $item_input['serial']
                   )
                );
             }
          }
 
          if (property_exists($bios, 'msn')) {
-            $computer_input['mserial'] = $bios->msn;
+            $item_input['mserial'] = $bios->msn;
+         }
+      }
+
+      // otherserial (on tag) if defined in config
+      // TODO: andle config
+      if (!isset($item_input['otherserial'])) {
+         if (isset($this->data['accountinfo'])) {
+            $ainfos = (object)$this->data['accountinfo'];
+            if ($ainfos->keyname == 'TAG' && $ainfos->keyvalue != '') {
+               $item_input['otherserial'] = $ainfos->keyvalue;
+            }
          }
       }
 
@@ -1193,13 +1198,13 @@ class Inventory
             && $hardware->vmsystem != 'Physical'
          ) {
             //First the HARDWARE/VMSYSTEM is not Physical : then it's a virtual machine
-            $computer_input['computertypes_id'] = $hardware->vmsystem;
+            $item_input['computertypes_id'] = $hardware->vmsystem;
             // HACK FOR BSDJail, remove serial and UUID (because it's of host, not contener)
             if ($hardware->vmsystem == 'BSDJail') {
-               if (isset($computer_input['serial'])) {
-                  $computer_input['serial'] = '';
+               if (isset($item_input['serial'])) {
+                  $item_input['serial'] = '';
                }
-               $computer_input['uuid'] .= '-' . $computer_input['name'];
+               $item_input['uuid'] .= '-' . $item_input['name'];
             }
 
          } else {
@@ -1210,21 +1215,21 @@ class Inventory
             //4 - HARDWARE/VMSYSTEM (should not go there)
             if (property_exists($hardware, 'chassis_type')
                   && !empty($hardware->chassis_type)) {
-               $computer_input['computertypes_id'] = $hardware->chassis_type;
+               $item_input['computertypes_id'] = $hardware->chassis_type;
             } else if (isset($bios) && property_exists($bios, 'type')
                   && !empty($bios->type)) {
-               $computer_input['computertypes_id'] = $bios->type;
+               $item_input['computertypes_id'] = $bios->type;
             } else if (isset($bios) && property_exists($bios, 'mmodel')
                   && !empty($bios->mmodel)) {
-               $computer_input['computertypes_id'] = $bios->mmodel;
+               $item_input['computertypes_id'] = $bios->mmodel;
             } else if (property_exists($hardware, 'vmsystem')
                   && !empty($hardware->vmsystem)) {
-               $computer_input['computertypes_id'] = $hardware->vmsystem;
+               $item_input['computertypes_id'] = $hardware->vmsystem;
             }
          }
       }
 
-      $this->data['glpi_' . $this->item->getType()] = $computer_input;
+      $this->data['glpi_' . $this->item->getType()] = $item_input;
 
       // * Hacks
 
@@ -1246,28 +1251,6 @@ class Inventory
          $arrayinventory['CONTENT']['SOFTWARES'][] = $inputos;
       }*/
 
-      // Hack for USB Printer serial
-      /*if (isset($arrayinventory['CONTENT']['PRINTERS'])) {
-         foreach ($arrayinventory['CONTENT']['PRINTERS'] as $key=>$printer) {
-            if ((isset($printer['SERIAL']))
-                    AND (preg_match('/\/$/', $printer['SERIAL']))) {
-               $arrayinventory['CONTENT']['PRINTERS'][$key]['SERIAL'] =
-                     preg_replace('/\/$/', '', $printer['SERIAL']);
-            }
-         }
-      }*/
-
-      // Hack to remove Memories with Flash types see ticket
-      // http://forge.fusioninventory.org/issues/1337
-      /*if (isset($arrayinventory['CONTENT']['MEMORIES'])) {
-         foreach ($arrayinventory['CONTENT']['MEMORIES'] as $key=>$memory) {
-            if ((isset($memory['TYPE']))
-                    AND (preg_match('/Flash/', $memory['TYPE']))) {
-
-               unset($arrayinventory['CONTENT']['MEMORIES'][$key]);
-            }
-         }
-      }*/
       // End hack
 
       //$a_computerinventory = PluginFusioninventoryFormatconvert::computerInventoryTransformation( $arrayinventory['CONTENT']);
@@ -1303,14 +1286,14 @@ class Inventory
 
       // Global criterias
 
-      if (isset($computer_input['serial']) && !empty($computer_input['serial'])) {
-         $input['serial'] = $computer_input['serial'];
+      if (isset($item_input['serial']) && !empty($item_input['serial'])) {
+         $input['serial'] = $item_input['serial'];
       }
-      if (isset($computer_input['otherserial']) && !empty($computer_input['otherserial'])) {
-         $input['otherserial'] = $computer_input['otherserial'];
+      if (isset($item_input['otherserial']) && !empty($item_input['otherserial'])) {
+         $input['otherserial'] = $item_input['otherserial'];
       }
-      if (isset($computer_input['uuid']) && !empty($computer_input['uuid'])) {
-         $input['uuid'] = $computer_input['uuid'];
+      if (isset($item_input['uuid']) && !empty($item_input['uuid'])) {
+         $input['uuid'] = $item_input['uuid'];
       }
       if (isset($this->device_id) && !empty($this->device_id)) {
          $input['device_id'] = $this->device_id;
@@ -1367,21 +1350,21 @@ class Inventory
                AND (!empty($a_computerinventory['fusioninventorycomputer']['oscomment']))) {
          $input['oscomment'] = $a_computerinventory['fusioninventorycomputer']['oscomment'];
       }*/
-      if (isset($computer_input['computermodels_id'])
-            && !empty($computer_input['computermodels_id'])
+      if (isset($item_input['computermodels_id'])
+            && !empty($item_input['computermodels_id'])
       ) {
-         $input['model'] = $computer_input['computermodels_id'];
+         $input['model'] = $item_input['computermodels_id'];
       }
-      if (isset($computer_input['domains_id'])
-            && !empty($computer_input['domains_id'])
+      if (isset($item_input['domains_id'])
+            && !empty($item_input['domains_id'])
       ) {
-         $input['domains_id'] = $computer_input['domains_id'];
+         $input['domains_id'] = $item_input['domains_id'];
       }
 
       //$input['tag'] = $tagAgent;
 
-      if (isset($computer_input['name']) && !empty($computer_input['name'])) {
-         $input['name'] = $computer_input['name'];
+      if (isset($item_input['name']) && !empty($item_input['name'])) {
+         $input['name'] = $item_input['name'];
       } else {
          $input['name'] = '';
       }
@@ -1441,19 +1424,17 @@ class Inventory
       }
       */
 
+      //call rules on current collected data to find item
+      //a callback on rulepassed() will be done if one is found.
       $rule = new \RuleImportComputerCollection();
-
-      // * Reload rules (required for unit tests)
       $rule->getCollectionPart();
-
-      \Toolbox::logWarning($input);
-
       $data = $rule->processAllRules($input, [], ['class' => $this]);
-      \Toolbox::logWarning($data);
 
       if (isset($data['_no_rule_matches']) AND ($data['_no_rule_matches'] == '1')) {
+         //no rule matched, this is a new one
          $this->rulepassed(0, $this->item->getType());
       } else if (!isset($data['found_inventories'])) {
+         //nothing found, this seems an unmanaged device
          $this->errors[] = 'Not managed device are not handled yet.';
          /*$pfIgnoredimportdevice = new PluginFusioninventoryIgnoredimportdevice();
          $inputdb = [];
@@ -1520,6 +1501,10 @@ class Inventory
       $setdynamic = 1;
       $item_input = $this->data['glpi_' . $this->item->getType()];
       $entities_id = 0; //FIXME: should not be hardcoded
+      $_SESSION['glpiactiveentities']        = [$entities_id];
+      $_SESSION['glpiactiveentities_string'] = $entities_id;
+      $_SESSION['glpiactive_entity']         = $entities_id;
+
       //$entities_id = $_SESSION["plugin_fusioninventory_entity"];
 
       if ($items_id == 0) {
@@ -1569,7 +1554,7 @@ class Inventory
             $_SESSION['glpiactiveentities_string'] = $entities_id;
             $_SESSION['glpiactive_entity']         = $entities_id;*/
          } else {
-            /*$computer_input = $this->data['glpi_' . $this->item->getType()];
+            /*$item_input = $this->data['glpi_' . $this->item->getType()];
             $a_computerinventory['Computer']['states_id'] = $computer->fields['states_id'];
             $input = [];
             $input = PluginFusioninventoryToolbox::addDefaultStateIfNeeded('computer', $input);
