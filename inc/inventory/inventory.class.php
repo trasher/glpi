@@ -53,8 +53,6 @@ class Inventory
    private $errors = [];
    /** @var CommonDBTM */
    private $item;
-   /** @var array */
-   private $devicetypes;
    /** @var Agent */
    private $agent;
    /** @var InventoryAsset[] */
@@ -194,10 +192,7 @@ class Inventory
 
          $this->processInventoryData();
          $this->handleItem();
-
          $this->handleAssets();
-         $this->handleDevices();
-         $this->handleNetworkPorts();
 
          $this->errors[] = 'Inventory is WIP';
 
@@ -260,11 +255,9 @@ class Inventory
    public function processInventoryData() {
       global $DB;
 
-      $hdd = [];
       $ports = [];
 
       foreach ($this->data as $key => &$value) {
-         $itemdevicetype = false;
          $assettype = false;
 
          switch ($key) {
@@ -310,401 +303,80 @@ class Inventory
                $assettype = '\Glpi\Inventory\Asset\Monitor';
                break;
             case 'networks':
-               $itemdevicetype = 'Item_DeviceNetworkCard';
-               $mapping = [
-                  'name'          => 'designation',
-                  'manufacturer'  => 'manufacturers_id',
-                  'macaddr'       => 'mac'
-               ];
-               $mapping_ports = [
-                  'description' => 'name',
-                  'macaddr'     => 'mac',
-                  'type'        => 'instantiation_type',
-                  'ipaddress'   => 'ip',
-                  'virtualdev'  => 'virtualdev',
-                  'ipsubnet'    => 'subnet',
-                  'ssid'        => 'ssid',
-                  'ipgateway'   => 'gateway',
-                  'ipmask'      => 'netmask',
-                  'ipdhcp'      => 'dhcpserver',
-                  'wwn'         => 'wwn',
-                  'speed'       => 'speed'
-               ];
-
-               foreach ($value as $k => &$val) {
-                  if (!property_exists($val, 'description')) {
-                     unset($value[$k]);
-                  } else {
-                     foreach ($mapping as $origin => $dest) {
-                        if (property_exists($val, $origin)) {
-                           $val->$dest = $val->$origin;
-                        }
-                     }
-
-                     if (isset($this->data['controllers'])) {
-                        $found_controller = false;
-                        foreach ($this->data['controllers'] as $controller) {
-                           if (property_exists($controller, 'type')
-                              && ($val->description == $controller->type
-                                 || strtolower($val->description." controller") ==
-                                          strtolower($controller->type))
-                                 /*&& !isset($ignorecontrollers[$a_controllers['NAME']])*/) {
-                              $found_controller = $controller;
-                              if (property_exists($val, 'macaddr')) {
-                                 $found_controller->macaddr = $val->macaddr;
-                                 break; //found, exit loop
-                              }
-                           }
-                        }
-
-                        if ($found_controller) {
-                           /*if (isset($a_found['PCIID'])) {
-                              $a_PCIData =
-                                    PluginFusioninventoryInventoryExternalDB::getDataFromPCIID(
-                                    $a_found['PCIID']
-                                    );
-                              if (isset($a_PCIData['manufacturer'])) {
-                                 $array_tmp['manufacturers_id'] = $a_PCIData['manufacturer'];
-                              }
-                              if (isset($a_PCIData['name'])) {
-                                 $array_tmp['designation'] = $a_PCIData['name'];
-                              }
-                              $array_tmp['designation'] = Toolbox::addslashes_deep($array_tmp['designation']);
-                           }*/
-                           if (property_exists($val, 'mac')) {
-                              $val->mac = strtolower($val->mac);
-                           }
-                        }
-                     }
-                  }
-
-                  //network ports
-                  $val_port = clone $val;
-                  $ports = [];
-                  foreach ($mapping_ports as $origin => $dest) {
-                     if (property_exists($val_port, $origin)) {
-                        $val_port->$dest = $val_port->$origin;
-                     }
-                  }
-
-                  if (property_exists($val_port, 'name')
-                     && $val_port->name != ''
-                     || property_exists($val_port, 'mac')
-                     && $val_port->mac != ''
-                  ) {
-                     $val_port->logical_number = 1;
-                     if (property_exists($val_port, 'virtualdev')) {
-                        if ($val_port->virtualdev != 1) {
-                           $val_port->virtualdev = 0;
-                        } else {
-                           $val_port->logical_number = 0;
-                        }
-                     }
-
-                     if (property_exists($val_port, 'mac')) {
-                        $val_port->mac = strtolower($val_port->mac);
-                        $portkey = $val_port->name . '-' . $val_port->mac;
-                     } else {
-                        $portkey = $val_port->name; //FIXME: not sure for this one
-                     }
-
-                     if (isset($ports[$portkey])) {
-                        if (property_exists($val_port, 'ip') && $val_port->ip != '') {
-                           if (!in_array($val_port->ip, $ports[$portkey]->ipaddress)) {
-                              $ports[$portkey]->ipaddress[] = $val_port->ip;
-                           }
-                        }
-                        if (property_exists($val_port, 'ipaddress6') && $val_port->ipaddress6 != '') {
-                           if (!in_array($val_port->ipaddress6, $ports[$portkey]->ipaddress)) {
-                              $ports[$portkey]->ipaddress[] = $val_port->ipaddress6;
-                           }
-                        }
-                     } else {
-                        if (property_exists($val_port, 'ip')) {
-                           if ($val_port->ip != '') {
-                              $val_port->ipaddress = [$val_port->ip];
-                           }
-                           unset($val_port->ip);
-                        } else if (property_exists($val_port, 'ipaddress6') && $val_port->ipaddress6 != '') {
-                           $val_port->ipaddress = [$val_port->ipaddress6];
-                        } else {
-                           $val_port->ipaddress = [];
-                        }
-
-                        if (property_exists($val_port, 'instantiation_type')) {
-                           switch ($val_port->instantiation_type) {
-                              case 'Ethernet':
-                                 $val_port->instantiation_type = 'NetworkPortEthernet';
-                                 break;
-                              case 'wifi':
-                                 $val_port->instantiation_type = 'NetworkPortWifi';
-                                 break;
-                              case 'fibrechannel':
-                              case 'fiberchannel':
-                                 $val_port->instantiation_type = 'NetworkPortFiberchannel';
-                                 break;
-                              default:
-                                 if (property_exists($val_port, 'wwn') && !empty($val_port->wwn)) {
-                                    $val_port->instantiation_type = 'NetworkPortFiberchannel';
-                                 } else if (property_exists($val_port, 'mac') && $val_port->mac != '') {
-                                    $val_port->instantiation_type = 'NetworkPortEthernet';
-                                 } else {
-                                    $val_port->instantiation_type = 'NetworkPortLocal';
-                                 }
-                                 break;
-                           }
-                        }
-
-                        // Test if the provided network speed is an integer number
-                        if (property_exists($val_port, 'speed')
-                           && ctype_digit (strval($val_port->speed))
-                        ) {
-                           // Old agent version have speed in b/s instead Mb/s
-                           if ($val_port->speed > 100000) {
-                              $val_port->speed = $val_port->speed / 1000000;
-                           }
-                        } else {
-                           $val_port->speed = 0;
-                        }
-
-                        $uniq = '';
-                        if (property_exists($val_port, 'mac') && !empty($val_port->mac)) {
-                           $uniq = $val_port->mac;
-                        } else if (property_exists($val_port, 'wwn') && !empty($val_port->wwn)) {
-                           $uniq = $val_port->wwn;
-                        }
-                        $ports[$val_port->name.'-'.$uniq] = $val_port;
-                     }
-                  }
-               }
-               $suffix = '__ports';
-               $this->data[$key . $suffix] = $ports;
-               break;
-            case 'networks__ports':
-               //nothing to do, this one has been created from 'networks'
+               $assettype = '\Glpi\Inventory\Asset\Network';
                break;
             case 'operatingsystem':
+               break;
             case 'ports':
+               break;
             case 'printers':
+               $rulecollection = new \RuleDictionnaryPrinterCollection();
+
+               foreach ($value as $k => &$val) {
+                  $val->is_dynamic = 1;
+                  if (strstr($val->port, "USB")) {
+                     $val->have_usb = 1;
+                  } else {
+                     $val->have_usb = 0;
+                  }
+                  unset($val->port);
+
+                  // Hack for USB Printer serial
+                  if (property_exists($val, 'serial')
+                        && preg_match('/\/$/', $val->serial)) {
+                     $val->serial = preg_replace('/\/$/', '', $val->serial);
+                  }
+
+                  $res_rule = $rulecollection->processAllRules(['name' => $val->name]);
+                  if ((!isset($res_rule['_ignore_ocs_import']) || $res_rule['_ignore_ocs_import'] != "1")
+                     && (!isset($res_rule['_ignore_import']) || $res_rule['_ignore_import'] != "1")
+                  ) {
+                     if (isset($res_rule['name'])) {
+                        $val->name = $res_rule['name'];
+                     }
+                     if (isset($res_rule['manufacturer'])) {
+                        $val->manufacturers_id = $res_rule['manufacturer'];
+                     }
+                     $this->linked_items['Printer'][] = $val;
+                  }
+               }
+               break;
             case 'processes':
+               break;
             case 'remote_mgmt':
+               break;
             case 'slots':
+               break;
             case 'softwares':
                break;
             case 'sounds':
-               $itemdevicetype = 'Item_DeviceSoundCard';
-               $mapping = [
-                  'name'          => 'designation',
-                  'manufacturer'  => 'manufacturers_id',
-                  'description'   => 'comment'
-               ];
-               foreach ($value as $k => &$val) {
-                  foreach ($mapping as $origin => $dest) {
-                     if (property_exists($val, $origin)) {
-                        $val->$dest = $val->$origin;
-                     }
-                  }
-               }
+               $assettype = '\Glpi\Inventory\Asset\SoundCard';
                break;
             case 'storages':
-               $itemdevicetype = 'Item_DeviceDrive';
-
-               $mapping_drive = [
-                  'serialnumber' => 'serial',
-                  'name'         => 'designation',
-                  'type'         => 'interfacetypes_id',
-                  'manufacturer' => 'manufacturers_id',
-               ];
-               $mapping = [
-                  'disksize'      => 'capacity',
-                  'interface'     => 'interfacetypes_id',
-                  'manufacturer'  => 'manufacturers_id',
-                  'model'         => 'designation',
-                  'serialnumber'  => 'serial'
-               ];
-
-               $hdd = [];
-               foreach ($value as $k => &$val) {
-                  if ($this->isDrive($val)) { // it's cd-rom / dvd
-                     foreach ($mapping_drive as $origin => $dest) {
-                        if (property_exists($val, $origin)) {
-                           $val->$dest = $val->$origin;
-                        }
-                     }
-
-                     if (property_exists($val, 'description')) {
-                        $val->designation = $val->description;
-                     }
-                  } else { // it's harddisk
-                     foreach ($mapping as $origin => $dest) {
-                        if (property_exists($val, $origin)) {
-                           $val->$dest = $val->$origin;
-                        }
-                     }
-
-                     if ((!property_exists($val, 'model') || $val->model == '') && property_exists($val, 'name')) {
-                        $val->designation = $val->name;
-                     }
-
-                     $hdd[] = $val;
-                     unset($value[$k]);
-                  }
-               }
-               $suffix = '__hdd';
-               $this->data[$key . $suffix] = $hdd;
-               $altitemdevicetype = 'Item_DeviceHardDrive';
-               break;
-            case 'storages__hdd':
-               //nothing to do, this one has been created from 'storages'
+               $assettype = '\Glpi\Inventory\Asset\Drive';
                break;
             case 'usbdevices':
                break;
             case 'antivirus':
                break;
             case 'bios':
-               $itemdevicetype = 'Item_DeviceFirmware';
-               $mapping = [
-                  'bdate'           => 'date',
-                  'bversion'        => 'version',
-                  'bmanufacturer'   => 'manufacturers_id',
-                  'biosserial'      => 'serial'
-               ];
-
-               $val = (object)$value;
-               foreach ($mapping as $origin => $dest) {
-                  if (property_exists($val, $origin)) {
-                     $val->$dest = $val->$origin;
-                  }
-               }
-
-               $val->designation = sprintf(
-                  __('%1$s BIOS'),
-                  property_exists($val, 'bmanufacturer') ? $val->bmanufacturer : ''
-               );
-
-               if (property_exists($val, 'date')) {
-                  $matches = [];
-                  preg_match("/^(\d{2})\/(\d{2})\/(\d{4})$/", $val->date, $matches);
-                  if (count($matches) == 4) {
-                     $val->date = $matches[3]."-".$matches[1]."-".$matches[2];
-                  } else {
-                     unset($val->date);
-                  }
-               }
-
-               $value = [$val];
+               $assettype = '\Glpi\Inventory\Asset\Firmware';
                break;
             case 'batteries':
-               $itemdevicetype = 'Item_DeviceBattery';
-               $mapping = [
-                  'name'         => 'designation',
-                  'manufacturer' => 'manufacturers_id',
-                  'serial'       => 'serial',
-                  'date'         => 'manufacturing_date',
-                  'capacity'     => 'capacity',
-                  'chemistry'    => 'devicebatterytypes_id',
-                  'voltage'      => 'voltage'
-               ];
-
-               foreach ($value as $k => &$val) {
-                  foreach ($mapping as $origin => $dest) {
-                     if (property_exists($val, $origin)) {
-                        $val->$dest = $val->$origin;
-                     }
-                  }
-
-                  if (!isset($val->voltage) || $val->voltage == '') {
-                     //a numeric value is expected here
-                     $val->voltage = 0;
-                  }
-
-                  $val->designation = sprintf(
-                     __('%1$s BIOS'),
-                     property_exists($val, 'bmanufacturer') ? $val->bmanufacturer : ''
-                  );
-
-                  if (property_exists($val, 'date')) {
-                     $matches = [];
-                     preg_match("/^(\d{2})\/(\d{2})\/(\d{4})$/", $val->date, $matches);
-                     if (count($matches) == 4) {
-                        $val->date = $matches[3]."-".$matches[1]."-".$matches[2];
-                     } else {
-                        unset($val->date);
-                     }
-
-                     // test date_install
-                     $matches = [];
-                     if (property_exists($val, 'manufacturing_date')) {
-                        preg_match("/^(\d{2})\/(\d{2})\/(\d{4})$/", $val->manufacturing_date, $matches);
-                        if (count($matches) == 4) {
-                           $val->manufacturing_date = $matches[3]."-".$matches[2]."-".$matches[1];
-                        } else {
-                           unset($val->manufacturing_date);
-                        }
-                     }
-                  }
-               }
-
+               $assettype = '\Glpi\Inventory\Asset\Battery';
                break;
             case 'controllers':
-               $itemdevicetype = 'Item_DeviceControl';
-               $mapping = [
-                  'name'          => 'designation',
-                  'manufacturer'  => 'manufacturers_id',
-                  'type'          => 'interfacetypes_id'
-               ];
-               foreach ($value as $k => &$val) {
-                  if (property_exists($val, 'name')) {
-                     foreach ($mapping as $origin => $dest) {
-                        if (property_exists($val, $origin)) {
-                           $val->$dest = $val->$origin;
-                        }
-
-                        /*if (property_exists($val, 'pciid')) {
-                           $a_PCIData =
-                                 /** FIXME: Whaaaaat?! oO
-                                 PluginFusioninventoryInventoryExternalDB::getDataFromPCIID(
-                                    $a_controllers['PCIID']
-                                 );
-                           if (isset($a_PCIData['manufacturer'])) {
-                              $array_tmp['manufacturers_id'] = $a_PCIData['manufacturer'];
-                           }
-                           if (isset($a_PCIData['name'])) {
-                              $array_tmp['designation'] = $a_PCIData['name'];
-                           }
-                           $array_tmp['designation'] = Toolbox::addslashes_deep($array_tmp['designation']);
-                        }*/
-                     }
-                  } else {
-                     unset($value[$k]);
-                  }
-               }
+               $assettype = '\Glpi\Inventory\Asset\Controller';
                break;
             case 'videos':
-               $itemdevicetype = 'Item_DeviceGraphicCard';
-               $mapping = [
-                  'name'   => 'designation',
-                  'memory' => 'memory'
-               ];
-
-               foreach ($value as $k => &$val) {
-                  if (property_exists($val, 'name')) {
-                     foreach ($mapping as $origin => $dest) {
-                        if (property_exists($val, $origin)) {
-                           $val->$dest = $val->$origin;
-                        }
-                     }
-                  } else {
-                     unset($value[$k]);
-                  }
-               }
+               $assettype = '\Glpi\Inventory\Asset\GraphicCard';
+               break;
             case 'users':
             case 'versionclient':
             case 'versionprovider':
                break;
             case 'simcards':
-               $itemdevicetype = 'Item_DeviceSimcard';
-               //no mapping needed
+               $assettype = '\Glpi\Inventory\Asset\Simcard';
                break;
             default:
                //unhandled
@@ -717,407 +389,6 @@ class Inventory
             $asset = new $assettype($this->item, $value);
             $value = $asset->prepare();
             $this->assets[$assettype][] = $asset;
-         }
-
-         //create mapping for existing devices
-         if ($itemdevicetype !== false) {
-            $this->devices[$itemdevicetype] = $key;
-            if (isset($altitemdevicetype)) {
-               $this->devices[$altitemdevicetype] = $key . $suffix;
-            }
-         }
-      }
-   }
-
-   /**
-    * Handle devices
-    *
-    * @return void
-    */
-   public function handleDevices() {
-      global $DB;
-
-      $this->devicetypes = \Item_Devices::getItemAffinities($this->item->getType());
-
-      foreach ($this->devices as $itemdevicetype => $key) {
-         if ($itemdevicetype !== false && in_array($itemdevicetype, $this->devicetypes)) {
-            $value = $this->data[$key];
-            $itemdevice = new $itemdevicetype;
-
-            $itemdevicetable = getTableForItemType($itemdevicetype);
-            $devicetype      = $itemdevicetype::getDeviceType();
-            $device          = new $devicetype;
-            $devicetable     = getTableForItemType($devicetype);
-            $fk              = getForeignKeyFieldForTable($devicetable);
-
-            $iterator = $DB->request([
-               'SELECT'    => [
-                  "$itemdevicetable.$fk",
-               ],
-               'FROM'      => $itemdevicetable,
-               'WHERE'     => [
-                  "$itemdevicetable.items_id"     => $this->item->fields['id'],
-                  "$itemdevicetable.itemtype"     => $this->item->getType(),
-                  "$itemdevicetable.is_dynamic"   => 1
-               ]
-            ]);
-
-            $existing = [];
-            while ($row = $iterator->next()) {
-               $existing[$row[$fk]] = $row[$fk];
-            }
-
-            foreach ($value as $val) {
-               if (!isset($val->designation) || $val->designation == '') {
-                  //cannot be empty
-                  $val->designation = $itemdevice->getTypeName(1);
-               }
-
-               $device_id = $device->import((array)$val);
-               if (!in_array($device_id, $existing)) {
-                  $itemdevice_data = [
-                     $fk                  => $device_id,
-                     'itemtype'           => $this->item->getType(),
-                     'items_id'           => $this->item->fields['id'],
-                     'is_dynamic'         => 1,
-                     //'_no_history'        => $no_history
-                  ] + (array)$val;
-                  $itemdevice->add($itemdevice_data, []/*, !$no_history*/);
-               }
-            }
-         }
-
-      }
-   }
-
-   /**
-    * Is current data a drive
-    *
-    * @return boolean
-    */
-   public function isDrive($data) {
-      $drives_regex = [
-         'rom',
-         'dvd',
-         'blu[\s-]*ray',
-         'reader',
-         'sd[\s-]*card',
-         'micro[\s-]*sd',
-         'mmc'
-      ];
-
-      foreach ($drives_regex as $regex) {
-         foreach (['type', 'model', 'name'] as $field) {
-            if (property_exists($data, $field)
-               && !empty($data->$field)
-               && preg_match("/".$regex."/i", $data->$field)
-            ) {
-               return true;
-            }
-         }
-      }
-
-      return false;
-   }
-
-   /**
-    * Manage network ports
-    *
-    * @return void
-    */
-   public function handleNetworkPorts() {
-      global $DB;
-
-      $inventory_networkports = $this->data['networks__ports'];
-      $no_history = true;
-
-      $_SESSION["plugin_fusioninventory_entity"] = 0;//FIXME: HACK
-      $computers_id = $this->item->fields['id'];
-      $networkPort = new \NetworkPort();
-      $networkName = new \NetworkName();
-      $iPAddress   = new \IPAddress();
-      $iPNetwork   = new \IPNetwork();
-      $item_DeviceNetworkCard = new \Item_DeviceNetworkCard();
-
-      foreach ($inventory_networkports as $a_networkport) {
-         $a_networkport = (array)$a_networkport;
-         if (isset($a_networkport['mac']) && $a_networkport['mac'] != '') {
-            $a_networkports = $networkPort->find(
-                  ['mac'      => $a_networkport['mac'],
-                   'itemtype' => 'PluginFusioninventoryUnmanaged'],
-                  [], 1);
-            if (count($a_networkports) > 0) {
-               $input = current($a_networkports);
-               $unmanageds_id = $input['items_id'];
-               $input['logical_number'] = $a_networkport['logical_number'];
-               $input['itemtype'] = 'Computer';
-               $input['items_id'] = $computers_id;
-               $input['is_dynamic'] = 1;
-               $input['name'] = $a_networkport['name'];
-               $networkPort->update($input, !$no_history);
-               $pfUnmanaged = new PluginFusioninventoryUnmanaged();
-               $pfUnmanaged->delete(['id'=>$unmanageds_id], 1);
-            }
-         }
-      }
-      // end get port from unknwon device
-
-      $db_networkport = [];
-      if ($no_history === false) {
-         $iterator = $DB->request([
-            'SELECT' => ['id', 'name', 'mac', 'instantiation_type', 'logical_number'],
-            'FROM'   => 'glpi_networkports',
-            'WHERE'  => [
-               'items_id'     => $computers_id,
-               'itemtype'     => 'Computer',
-               'is_dynamic'   => 1
-            ]
-         ]);
-         while ($data = $iterator->next()) {
-            $idtmp = $data['id'];
-            unset($data['id']);
-            if (is_null($data['mac'])) {
-               $data['mac'] = '';
-            }
-            if (preg_match("/[^a-zA-Z0-9 \-_\(\)]+/", $data['name'])) {
-               $data['name'] = \Toolbox::addslashes_deep($data['name']);
-            }
-            $db_networkport[$idtmp] = array_map('strtolower', $data);
-         }
-      }
-      $simplenetworkport = [];
-      foreach ($inventory_networkports as $key => $a_networkport) {
-         $a_networkport = (array)$a_networkport;
-         // Add ipnetwork if not exist
-         if (isset($a_networkport['gateway']) && $a_networkport['gateway'] != ''
-                 && isset($a_networkport['netmask']) && $a_networkport['netmask'] != ''
-                 && isset($a_networkport['subnet']) && $a_networkport['subnet']  != '') {
-            if (countElementsInTable('glpi_ipnetworks',
-                  [
-                     'address'     => $a_networkport['subnet'],
-                     'netmask'     => $a_networkport['netmask'],
-                     'gateway'     => $a_networkport['gateway'],
-                     'entities_id' => $_SESSION["plugin_fusioninventory_entity"],
-                  ]) == 0) {
-
-               $input_ipanetwork = [
-                   'name'    => $a_networkport['subnet'].'/'.
-                                $a_networkport['netmask'].' - '.
-                                $a_networkport['gateway'],
-                   'network' => $a_networkport['subnet'].' / '.
-                                $a_networkport['netmask'],
-                   'gateway' => $a_networkport['gateway'],
-                   'entities_id' => $_SESSION["plugin_fusioninventory_entity"]
-               ];
-               $iPNetwork->add($input_ipanetwork, [], !$no_history);
-            }
-         }
-
-         // End add ipnetwork
-         $a_field = ['name', 'mac', 'instantiation_type'];
-         foreach ($a_field as $field) {
-            if (isset($a_networkport[$field])) {
-               $simplenetworkport[$key][$field] = $a_networkport[$field];
-            }
-         }
-      }
-      foreach ($simplenetworkport as $key => $arrays) {
-         $arrayslower = array_map('strtolower', $arrays);
-         foreach ($db_networkport as $keydb => $arraydb) {
-            $logical_number = $arraydb['logical_number'];
-            unset($arraydb['logical_number']);
-            if ($arrayslower == $arraydb) {
-               if ($inventory_networkports[$key]->logical_number != $logical_number) {
-                  $input = [];
-                  $input['id'] = $keydb;
-                  $input['logical_number'] = $inventory_networkports[$key]->logical_number;
-                  $networkPort->update($input, !$no_history);
-               }
-
-               // Add / update instantiation_type
-               if (isset($inventory_networkports[$key]->instantiation_type)) {
-                  $instantiation_type = $inventory_networkports[$key]->instantiation_type;
-                  if (in_array($instantiation_type, ['NetworkPortEthernet',
-                                                          'NetworkPortFiberchannel'])) {
-
-                     $instance = new $instantiation_type;
-                     $portsinstance = $instance->find(['networkports_id' => $keydb], [], 1);
-                     if (count($portsinstance) == 1) {
-                        $portinstance = current($portsinstance);
-                        $input = $portinstance;
-                     } else {
-                        $input = [
-                           'networkports_id' => $keydb
-                        ];
-                     }
-
-                     if (isset($inventory_networkports[$key]->speed)) {
-                        $input['speed'] = $inventory_networkports[$key]->speed;
-                        $input['speed_other_value'] = $inventory_networkports[$key]->speed;
-                     }
-                     if (isset($inventory_networkports[$key]->wwn)) {
-                        $input['wwn'] = $inventory_networkports[$key]->wwn;
-                     }
-                     if (isset($inventory_networkports[$key]->mac)) {
-                        $networkcards = $item_DeviceNetworkCard->find(
-                                ['mac'      => $inventory_networkports[$key]->mac,
-                                 'itemtype' => 'Computer',
-                                 'items_id' => $computers_id],
-                                [], 1);
-                        if (count($networkcards) == 1) {
-                           $networkcard = current($networkcards);
-                           $input['items_devicenetworkcards_id'] = $networkcard['id'];
-                        }
-                     }
-                     $input['_no_history'] = $no_history;
-                     if (isset($input['id'])) {
-                        $instance->update($input);
-                     } else {
-                        $instance->add($input);
-                     }
-                  }
-               }
-
-               // Get networkname
-               $a_networknames_find = current($networkName->find(
-                     ['items_id' => $keydb,
-                      'itemtype' => 'NetworkPort'],
-                     [], 1));
-               if (!isset($a_networknames_find['id'])) {
-                  $a_networkport['entities_id'] = $_SESSION["plugin_fusioninventory_entity"];
-                  $a_networkport['items_id'] = $computers_id;
-                  $a_networkport['itemtype'] = "Computer";
-                  $a_networkport['is_dynamic'] = 1;
-                  $a_networkport['_no_history'] = $no_history;
-                  $a_networkport['items_id'] = $keydb;
-                  unset($a_networkport['_no_history']);
-                  $a_networkport['is_recursive'] = 0;
-                  $a_networkport['itemtype'] = 'NetworkPort';
-                  unset($a_networkport['name']);
-                  $a_networkport['_no_history'] = $no_history;
-                  $a_networknames_id = $networkName->add($a_networkport, [], !$no_history);
-                  $a_networknames_find['id'] = $a_networknames_id;
-               }
-
-               // Same networkport, verify ipaddresses
-               $db_addresses = [];
-               $iterator = $DB->request([
-                  'SELECT' => ['id', 'name'],
-                  'FROM'   => 'glpi_ipaddresses',
-                  'WHERE'  => [
-                     'items_id'  => $a_networknames_find['id'],
-                     'itemtype'  => 'NetworkName'
-                  ]
-               ]);
-               while ($data = $iterator->next()) {
-                  $db_addresses[$data['id']] = $data['name'];
-               }
-               $a_computerinventory_ipaddress = $inventory_networkports[$key]->ipaddress;
-               $nb_ip = count($a_computerinventory_ipaddress);
-               foreach ($a_computerinventory_ipaddress as $key2 => $arrays2) {
-                  foreach ($db_addresses as $keydb2 => $arraydb2) {
-                     if ($arrays2 == $arraydb2) {
-                        unset($a_computerinventory_ipaddress[$key2]);
-                        unset($db_addresses[$keydb2]);
-                        break;
-                     }
-                  }
-               }
-               if (count($a_computerinventory_ipaddress) || count($db_addresses)) {
-                  if (count($db_addresses) != 0 AND $nb_ip > 0) {
-                     // Delete ip address in DB
-                     foreach (array_keys($db_addresses) as $idtmp) {
-                        $iPAddress->delete(['id'=>$idtmp], 1);
-                     }
-                  }
-                  if (count($a_computerinventory_ipaddress) != 0) {
-                     foreach ($a_computerinventory_ipaddress as $ip) {
-                        $input = [];
-                        $input['items_id']   = $a_networknames_find['id'];
-                        $input['itemtype']   = 'NetworkName';
-                        $input['name']       = $ip;
-                        $input['is_dynamic'] = 1;
-                        $iPAddress->add($input, [], !$no_history);
-                     }
-                  }
-               }
-
-               unset($db_networkport[$keydb]);
-               unset($simplenetworkport[$key]);
-               unset($inventory_networkports[$key]);
-               break;
-            }
-         }
-      }
-
-      if (count($inventory_networkports) == 0
-         AND count($db_networkport) == 0) {
-         // Nothing to do
-         $coding_std = true;
-      } else {
-         if (count($db_networkport) != 0) {
-            // Delete networkport in DB
-            foreach ($db_networkport as $idtmp => $data) {
-               $networkPort->delete(['id'=>$idtmp], 1);
-            }
-         }
-         if (count($inventory_networkports) != 0) {
-            foreach ($inventory_networkports as $a_networkport) {
-               $a_networkport = (array)$a_networkport;
-               $a_networkport['entities_id'] = $_SESSION["plugin_fusioninventory_entity"];
-               $a_networkport['items_id'] = $computers_id;
-               $a_networkport['itemtype'] = "Computer";
-               $a_networkport['is_dynamic'] = 1;
-               $a_networkport['_no_history'] = $no_history;
-               $a_networkport['items_id'] = $networkPort->add($a_networkport, [], !$no_history);
-               unset($a_networkport['_no_history']);
-               $a_networkport['is_recursive'] = 0;
-               $a_networkport['itemtype'] = 'NetworkPort';
-               unset($a_networkport['name']);
-               $a_networkport['_no_history'] = $no_history;
-               $a_networknames_id = $networkName->add($a_networkport, [], !$no_history);
-
-               //\Toolbox::logWarning($a_networkport);
-               foreach ($a_networkport['ipaddress'] as $ip) {
-                  $input = [];
-                  $input['items_id']   = $a_networknames_id;
-                  $input['itemtype']   = 'NetworkName';
-                  $input['name']       = $ip;
-                  $input['is_dynamic'] = 1;
-                  $input['_no_history'] = $no_history;
-                  $iPAddress->add($input, [], !$no_history);
-               }
-               if (isset($a_networkport['instantiation_type'])) {
-                  $instantiation_type = $a_networkport['instantiation_type'];
-                  if (in_array($instantiation_type, ['NetworkPortEthernet',
-                                                          'NetworkPortFiberchannel'])) {
-                     $instance = new $instantiation_type;
-                     $input = [
-                        'networkports_id' => $a_networkport['items_id']
-                     ];
-                     if (isset($a_networkport['speed'])) {
-                        $input['speed'] = $a_networkport['speed'];
-                        $input['speed_other_value'] = $a_networkport['speed'];
-                     }
-                     if (isset($a_networkport['wwn'])) {
-                        $input['wwn'] = $a_networkport['wwn'];
-                     }
-                     if (isset($a_networkport['mac'])) {
-                        $networkcards = $item_DeviceNetworkCard->find(
-                                ['mac'      => $a_networkport['mac'],
-                                 'itemtype' => 'Computer',
-                                 'items_id' => $computers_id],
-                                [], 1);
-                        if (count($networkcards) == 1) {
-                           $networkcard = current($networkcards);
-                           $input['items_devicenetworkcards_id'] = $networkcard['id'];
-                        }
-                     }
-                     $input['_no_history'] = $no_history;
-                     $instance->add($input);
-                  }
-               }
-            }
          }
       }
    }
@@ -1299,8 +570,9 @@ class Inventory
          $input['device_id'] = $this->device_id;
       }
 
-      if (isset($this->data['networks__ports'])) {
-         foreach ($this->data['networks__ports'] as $network) {
+      if (isset($this->assets['\Glpi\Inventory\Asset\Drive'])) {
+         $netports = $this->assets['\Glpi\Inventory\Asset\Drive']->getNetworkPorts();
+         foreach ($netports as $network) {
             if (property_exists($network, 'virtualdev')
                && $network->virtualdev != 1
                || !property_exists($network, 'virtualdev')
@@ -1322,7 +594,7 @@ class Inventory
          // Case of virtualmachines
          if (!isset($input['mac'])
                   && !isset($input['ip'])) {
-            foreach ($this->data['networks__ports'] as $network) {
+            foreach ($netports as $network) {
                if (property_exists($network, 'mac') && !empty($network->mac)) {
                   $input['mac'][] = $network->mac;
                }
@@ -1750,7 +1022,6 @@ class Inventory
          $class->update($input);*/
       }
    }
-
 
    public function handleAssets() {
       foreach ($this->assets as $type => $assets) {
