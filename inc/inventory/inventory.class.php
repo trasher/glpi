@@ -57,6 +57,8 @@ class Inventory
    private $devicetypes;
    /** @var Agent */
    private $agent;
+   /** @var InventoryAsset[] */
+   private $assets;
 
     /**
      * @param mixed   $data   Inventory data, optionnal
@@ -193,6 +195,7 @@ class Inventory
          $this->processInventoryData();
          $this->handleItem();
 
+         $this->handleAssets();
          $this->handleDevices();
 
          $this->errors[] = 'Inventory is WIP';
@@ -261,34 +264,14 @@ class Inventory
 
       foreach ($this->data as $key => &$value) {
          $itemdevicetype = false;
+         $assettype = false;
+
          switch ($key) {
             case 'accesslog':
             case 'accountinfo':
                break;
             case 'cpus':
-               $itemdevicetype = 'Item_DeviceProcessor';
-               $mapping = [
-                  'speed'        => 'frequency',
-                  'manufacturer' => 'manufacturers_id',
-                  'serial'       => 'serial',
-                  'name'         => 'designation',
-                  'core'         => 'nbcores',
-                  'thread'       => 'nbthreads'
-               ];
-               foreach ($value as &$val) {
-                  foreach ($mapping as $origin => $dest) {
-                     if (property_exists($val, $origin)) {
-                        $val->$dest = $val->$origin;
-                     }
-                  }
-                  if (property_exists($val, 'frequency')) {
-                     $val->frequency_default = $val->frequency;
-                     $val->frequence = $val->frequency;
-                  }
-                  if (property_exists($val, 'type')) {
-                     $val->designation = $val->type;
-                  }
-               }
+               $assettype = '\Glpi\Inventory\Asset\Processor';
                break;
             case 'drives':
             case 'envs':
@@ -320,51 +303,10 @@ class Inventory
             case 'logical_volumes':
                break;
             case 'memories':
-               $itemdevicetype = 'Item_DeviceMemory';
-               $mapping = [
-                  'capacity'     => 'size',
-                  'speed'        => 'frequence',
-                  'type'         => 'devicememorytypes_id',
-                  'serialnumber' => 'serial',
-                  'numslots'     => 'busID'
-               ];
-
-               foreach ($value as $k => &$val) {
-                  if ($val->capacity > 0) {
-                     foreach ($mapping as $origin => $dest) {
-                        if (property_exists($val, $origin)) {
-                           $val->$dest = $val->$origin;
-                        }
-                     }
-                  } else {
-                     unset($value[$k]);
-                     continue;
-                  }
-
-                  $designation = '';
-                  if (property_exists($val, 'type')
-                     && $val->type != 'Empty Slot'
-                     && $val->type != 'Unknown'
-                  ) {
-                     $designation = $val->type;
-                  }
-                  if (property_exists($val, 'description')) {
-                     if ($designation != '') {
-                        $designation .= ' - ';
-                     }
-                     $designation .= $val->description;
-                  }
-
-                  if ($designation != '') {
-                     $val->designation = $designation;
-                  }
-
-                  if (property_exists($val, 'frequence')) {
-                     $val->frequence = str_replace([' MHz', ' MT/s'], '', $val->frequence);
-                  }
-               }
+               $assettype = '\Glpi\Inventory\Asset\Memory';
                break;
             case 'monitors':
+               $assettype = '\Glpi\Inventory\Asset\Monitor';
                break;
             case 'networks':
                $itemdevicetype = 'Item_DeviceNetworkCard';
@@ -769,6 +711,13 @@ class Inventory
                //unhandled
                throw new \RuntimeException("Unhandled schema entry $key");
                break;
+         }
+
+         //TODO: all types should pass here?
+         if ($assettype !== false) {
+            $asset = new $assettype($this->item, $value);
+            $value = $asset->prepare();
+            $this->assets[$assettype][] = $asset;
          }
 
          //create mapping for existing devices
@@ -1814,6 +1763,15 @@ class Inventory
             $input['serial'] = $a_computerinventory['Computer']['serial'];
          }
          $class->update($input);*/
+      }
+   }
+
+
+   public function handleAssets() {
+      foreach ($this->assets as $type => $assets) {
+         foreach ($assets as $asset) {
+            $asset->handle();
+         }
       }
    }
 }
