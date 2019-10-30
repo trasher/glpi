@@ -897,7 +897,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion2'
+         'action'    => '_deny'
       ];
 
       $rules[] = [
@@ -931,7 +931,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion1'
+         'action'    => '_link'
       ];
       $rules[] = [
          'name'      => 'Computer update (by serial)',
@@ -954,7 +954,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion1'
+         'action'    => '_link'
       ];
 
       $rules[] = [
@@ -978,7 +978,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion1'
+         'action'    => '_link'
       ];
 
       $rules[] = [
@@ -1002,7 +1002,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion1'
+         'action'    => '_link'
       ];
 
       $rules[] = [
@@ -1026,7 +1026,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion1'
+         'action'    => '_link'
       ];
 
       $rules[] = [
@@ -1050,7 +1050,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion1'
+         'action'    => '_link'
       ];
 
       $rules[] = [
@@ -1069,7 +1069,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion1'
+         'action'    => '_link'
       ];
 
       $rules[] = [
@@ -1088,7 +1088,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion1'
+         'action'    => '_link'
       ];
 
       $rules[] = [
@@ -1107,7 +1107,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion1'
+         'action'    => '_link'
       ];
 
       $rules[] = [
@@ -1126,7 +1126,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion1'
+         'action'    => '_link'
       ];
 
       $rules[] = [
@@ -1140,7 +1140,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 'Computer'
             ]
          ],
-         'action'    => '_fusion2'
+         'action'    => '_deny'
       ];
 
       $rules[] = [
@@ -1159,7 +1159,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion2'
+         'action'    => '_deny'
       ];
 
       $rules[] = [
@@ -1183,7 +1183,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion1'
+         'action'    => '_link'
       ];
 
       $rules[] = [
@@ -1207,7 +1207,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion1'
+         'action'    => '_link'
       ];
 
       $rules[] = [
@@ -1226,7 +1226,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion1'
+         'action'    => '_link'
       ];
 
       $rules[] = [
@@ -1245,7 +1245,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion1'
+         'action'    => '_link'
       ];
 
       $rules[] = [
@@ -1259,7 +1259,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 'Printer'
             ]
          ],
-         'action'    => '_fusion2'
+         'action'    => '_deny'
       ];
 
       $rules[] = [
@@ -1278,7 +1278,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion2'
+         'action'    => '_deny'
       ];
 
       $rules[] = [
@@ -1302,7 +1302,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion1'
+         'action'    => '_link'
       ];
 
       $rules[] = [
@@ -1326,7 +1326,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion1'
+         'action'    => '_link'
       ];
 
       $rules[] = [
@@ -1345,7 +1345,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion1'
+         'action'    => '_link'
       ];
 
       $rules[] = [
@@ -1364,7 +1364,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion1'
+         'action'    => '_link'
       ];
 
       $rules[] = [
@@ -1378,7 +1378,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 'NetworkEquipment'
             ]
          ],
-         'action'    => '_fusion2'
+         'action'    => '_deny'
       ];
 
       $rules[] = [
@@ -1402,7 +1402,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion1'
+         'action'    => '_link'
       ];
 
       $rules[] = [
@@ -1421,7 +1421,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion1'
+         'action'    => '_link'
       ];
 
       $rules[] = [
@@ -1435,7 +1435,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 'Peripheral'
             ]
          ],
-         'action'    => '_fusion2'
+         'action'    => '_deny'
       ];
 
       $rules[] = [
@@ -1459,7 +1459,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion1'
+         'action'    => '_link'
       ];
 
       $rules[] = [
@@ -1478,7 +1478,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion1'
+         'action'    => '_link'
       ];
 
       $rules[] = [
@@ -1492,7 +1492,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 'Monitor'
             ]
          ],
-         'action'    => '_fusion2'
+         'action'    => '_deny'
       ];
 
       $rules[] = [
@@ -1511,7 +1511,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion2'
+         'action'    => '_deny'
       ];
 
       $rules[] = [
@@ -1535,7 +1535,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion1'
+         'action'    => '_link'
       ];
 
       $rules[] = [
@@ -1554,7 +1554,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion1'
+         'action'    => '_link'
       ];
 
       $rules[] = [
@@ -1568,7 +1568,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 'Phone'
             ]
          ],
-         'action'    => '_fusion2'
+         'action'    => '_deny'
       ];
 
       $rules[] = [
@@ -1582,7 +1582,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion2'
+         'action'    => '_deny'
       ];
 
       $rules[] = [
@@ -1601,7 +1601,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion1'
+         'action'    => '_link'
       ];
 
       $rules[] = [
@@ -1620,7 +1620,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion1'
+         'action'    => '_link'
       ];
 
       $rules[] = [
@@ -1634,7 +1634,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion1'
+         'action'    => '_link'
       ];
 
       $rules[] = [
@@ -1648,7 +1648,7 @@ class RuleImportComputer extends Rule {
                'pattern'   => 1
             ]
          ],
-         'action'    => '_fusion1'
+         'action'    => '_link'
       ];
 
       $rules[] = [
@@ -1662,9 +1662,10 @@ class RuleImportComputer extends Rule {
                'pattern'   => ''
             ]
          ],
-         'action'    => '_fusion2'
+         'action'    => '_deny'
       ];
 
+      //load default rules from plugins
       if ($with_plugins && isset($PLUGIN_HOOKS['add_rules'])) {
          foreach ($PLUGIN_HOOKS['add_rules'] as $plugin => $val) {
             if (!Plugin::isPluginLoaded($plugin)) {
@@ -1707,10 +1708,10 @@ class RuleImportComputer extends Rule {
          $input = [];
          $input['rules_id'] = $rule_id;
          $input['action_type'] = 'assign';
-         if ($rule['action'] == '_fusion1') {
+         if ($rule['action'] == '_link') {
             $input['field'] = '_inventory';
             $input['value'] = self::RULE_ACTION_LINK_OR_IMPORT;
-         } else if ($rule['action'] == '_fusion2') {
+         } else if ($rule['action'] == '_deny') {
             $input['field'] = '_inventory';
             $input['value'] = self::RULE_ACTION_DENIED;
          } else if ($rule['action'] == '_ignore_import') {
