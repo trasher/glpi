@@ -50,9 +50,11 @@ try {
 }
 
 //DEBUG
-\Toolbox::logWarning(
-   "XML response sent: ".$inventory_request->getResponse()
-);
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+   \Toolbox::logWarning(
+      "XML response sent: ".$inventory_request->getResponse()
+   );
+}
 
 header('Content-Type: ' . $inventory_request->getContentType());
 header('Cache-Control: no-cacheno-store');
