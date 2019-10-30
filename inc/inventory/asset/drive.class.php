@@ -67,7 +67,7 @@ class Drive extends Device
          }
       }
       if (count($hdd)) {
-         $this->harddrives = new HardDrive($hdd);
+         $this->harddrives = new HardDrive($this->item, $hdd);
          $this->harddrives->prepare();
       }
 

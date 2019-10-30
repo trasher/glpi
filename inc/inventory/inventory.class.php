@@ -303,7 +303,7 @@ class Inventory
                $assettype = '\Glpi\Inventory\Asset\Monitor';
                break;
             case 'networks':
-               $assettype = '\Glpi\Inventory\Asset\Network';
+               $assettype = '\Glpi\Inventory\Asset\NetworkCard';
                break;
             case 'operatingsystem':
                break;
@@ -570,41 +570,43 @@ class Inventory
          $input['device_id'] = $this->device_id;
       }
 
-      if (isset($this->assets['\Glpi\Inventory\Asset\Drive'])) {
-         $netports = $this->assets['\Glpi\Inventory\Asset\Drive']->getNetworkPorts();
-         foreach ($netports as $network) {
-            if (property_exists($network, 'virtualdev')
-               && $network->virtualdev != 1
-               || !property_exists($network, 'virtualdev')
-            ) {
-               if (property_exists($network, 'mac') && !empty($network->mac)) {
-                  $input['mac'][] = $network->mac;
-               }
-               foreach ($network->ipaddress as $ip) {
-                  if ($ip != '127.0.0.1' && $ip != '::1') {
-                     $input['ip'][] = $ip;
+      if (isset($this->assets['\Glpi\Inventory\Asset\NetworkCard'])) {
+         foreach ($this->assets['\Glpi\Inventory\Asset\NetworkCard'] as $networkcard) {
+            $netports = $networkcard->getNetworkPorts();
+            foreach ($netports as $network) {
+               if (property_exists($network, 'virtualdev')
+                  && $network->virtualdev != 1
+                  || !property_exists($network, 'virtualdev')
+               ) {
+                  if (property_exists($network, 'mac') && !empty($network->mac)) {
+                     $input['mac'][] = $network->mac;
                   }
-               }
-               if (property_exists($network, 'subnet') && !empty($network->subnet)) {
-                  $input['subnet'][] = $network->subnet;
+                  foreach ($network->ipaddress as $ip) {
+                     if ($ip != '127.0.0.1' && $ip != '::1') {
+                        $input['ip'][] = $ip;
+                     }
+                  }
+                  if (property_exists($network, 'subnet') && !empty($network->subnet)) {
+                     $input['subnet'][] = $network->subnet;
+                  }
                }
             }
-         }
 
-         // Case of virtualmachines
-         if (!isset($input['mac'])
-                  && !isset($input['ip'])) {
-            foreach ($netports as $network) {
-               if (property_exists($network, 'mac') && !empty($network->mac)) {
-                  $input['mac'][] = $network->mac;
-               }
-               foreach ($network->ipaddress as $ip) {
-                  if ($ip != '127.0.0.1' && $ip != '::1') {
-                     $input['ip'][] = $ip;
+            // Case of virtualmachines
+            if (!isset($input['mac'])
+                     && !isset($input['ip'])) {
+               foreach ($netports as $network) {
+                  if (property_exists($network, 'mac') && !empty($network->mac)) {
+                     $input['mac'][] = $network->mac;
                   }
-               }
-               if (property_exists($network, 'subnet') && !empty($network->subnet)) {
-                  $input['subnet'][] = $network->subnet;
+                  foreach ($network->ipaddress as $ip) {
+                     if ($ip != '127.0.0.1' && $ip != '::1') {
+                        $input['ip'][] = $ip;
+                     }
+                  }
+                  if (property_exists($network, 'subnet') && !empty($network->subnet)) {
+                     $input['subnet'][] = $network->subnet;
+                  }
                }
             }
          }
@@ -773,6 +775,7 @@ class Inventory
       $setdynamic = 1;
       $item_input = $this->data['glpi_' . $this->item->getType()];
       $entities_id = 0; //FIXME: should not be hardcoded
+      $item_input['entities_id'] = $entities_id;
       $_SESSION['glpiactiveentities']        = [$entities_id];
       $_SESSION['glpiactiveentities_string'] = $entities_id;
       $_SESSION['glpiactive_entity']         = $entities_id;
