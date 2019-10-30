@@ -40,10 +40,13 @@ class Firmware extends Device
    }
 
    public function prepare() :array {
+      $fwTypes = new \DeviceFirmwareType();
+      $fwTypes->getFromDBByCrit([
+         'name' => 'BIOS'
+      ]);
+      $type_id = $fwTypes->getID();
 
-      $itemdevicetype = 'Item_DeviceFirmware';
       $mapping = [
-         'bdate'           => 'date',
          'bversion'        => 'version',
          'bmanufacturer'   => 'manufacturers_id',
          'biosserial'      => 'serial'
@@ -60,16 +63,7 @@ class Firmware extends Device
          __('%1$s BIOS'),
          property_exists($val, 'bmanufacturer') ? $val->bmanufacturer : ''
       );
-
-      if (property_exists($val, 'date')) {
-         $matches = [];
-         preg_match("/^(\d{2})\/(\d{2})\/(\d{4})$/", $val->date, $matches);
-         if (count($matches) == 4) {
-            $val->date = $matches[3]."-".$matches[1]."-".$matches[2];
-         } else {
-            unset($val->date);
-         }
-      }
+      $val->devicefirmwaretypes_id = $type_id;
 
       $this->data = [$val];
       return $this->data;
