@@ -47,6 +47,7 @@ class Firmware extends Device
       $type_id = $fwTypes->getID();
 
       $mapping = [
+         'bdate'           => 'date',
          'bversion'        => 'version',
          'bmanufacturer'   => 'manufacturers_id',
          'biosserial'      => 'serial'
