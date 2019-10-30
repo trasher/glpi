@@ -92,7 +92,7 @@ class Inventory extends \GLPITestCase {
       $this->string($res->getHeader('content-type')[0])->isIdenticalTo('application/xml');
       //FIXME: should send something else obviously
       $this->string((string)$res->getBody())
-         ->isIdenticalTo("<?xml version=\"1.0\"?>\n<REPLY><ERROR>Inventory is not yet implemented</ERROR></REPLY>\n");
+         ->isIdenticalTo("<?xml version=\"1.0\"?>\n<REPLY><ERROR>Inventory is WIP</ERROR></REPLY>\n");
 
       //check agent in database
       $agent = new \Agent();
