@@ -387,6 +387,7 @@ class Inventory
          //TODO: all types should pass here?
          if ($assettype !== false) {
             $asset = new $assettype($this->item, $value);
+            $asset->setExtraData($this->data);
             $value = $asset->prepare();
             $this->assets[$assettype][] = $asset;
          }

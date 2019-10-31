@@ -36,6 +36,7 @@ namespace Glpi\Inventory\Asset;
 class NetworkCard extends Device
 {
    private $ports = [];
+   protected $extra_data = ['controllers' => null];
 
    public function __construct(\CommonDBTM $item, array $data = null) {
       parent::__construct($item, $data, 'Item_DeviceNetworkCard');
@@ -70,20 +71,24 @@ class NetworkCard extends Device
          'wwn'         => 'wwn',
          'speed'       => 'speed'
       ];
+      $pciids = [];
 
       foreach ($this->data as $k => &$val) {
          if (!property_exists($val, 'description')) {
-            unset($value[$k]);
+            unset($this->data[$k]);
          } else {
+            $val_port = clone $val;
             foreach ($mapping as $origin => $dest) {
                if (property_exists($val, $origin)) {
                   $val->$dest = $val->$origin;
                }
             }
 
-            if (isset($this->data['controllers'])) {
+            //FIXME: this->data contains only a sub data part, controllers are not present
+            if (isset($this->extra_data['controllers'])) {
                $found_controller = false;
-               foreach ($this->data['controllers'] as $controller) {
+               // Search in controller if find NAME = CONTROLLER TYPE
+               foreach ($this->extra_data['controllers'] as $controller) {
                   if (property_exists($controller, 'type')
                      && ($val->description == $controller->type
                         || strtolower($val->description." controller") ==
@@ -98,28 +103,36 @@ class NetworkCard extends Device
                }
 
                if ($found_controller) {
-                  /*if (isset($a_found['PCIID'])) {
-                     $a_PCIData =
-                           PluginFusioninventoryInventoryExternalDB::getDataFromPCIID(
-                           $a_found['PCIID']
-                           );
-                     if (isset($a_PCIData['manufacturer'])) {
-                        $array_tmp['manufacturers_id'] = $a_PCIData['manufacturer'];
+                  if (property_exists($found_controller, 'pciid')) {
+                     if (!count($pciids)) {
+                        $pciids = json_decode(__DIR__ . '/../../../inventory-reference/pciid.json');
                      }
-                     if (isset($a_PCIData['name'])) {
-                        $array_tmp['designation'] = $a_PCIData['name'];
+                     $exploded = explode(":", $found_controller->pciids);
+
+                     //manufacturer
+                     $manufacturer = null;
+                     if (isset($pciids[$exploded[0]])) {
+                        $manufacturer = $pciids[$exploded[0]];
+                        $found_controller->manufacturers_id = $manufacturer;
                      }
-                     $array_tmp['designation'] = Toolbox::addslashes_deep($array_tmp['designation']);
-                  }*/
+                     //device
+                     if (isset($pciids[$manufacturer . '::' . $exploded[1]])) {
+                        $device = $pciids[$manufacturer . '::' . $exploded[1]];
+                        $found_controller->designation = $device;
+                     }
+                  }
+
                   if (property_exists($val, 'mac')) {
                      $val->mac = strtolower($val->mac);
                   }
+                  //$ignorecontrollers[$a_found['NAME']] = 1;
+               } else {
+                  unset($this->data[$k]);
                }
             }
          }
 
          //network ports
-         $val_port = clone $val;
          $ports = [];
          foreach ($mapping_ports as $origin => $dest) {
             if (property_exists($val_port, $origin)) {

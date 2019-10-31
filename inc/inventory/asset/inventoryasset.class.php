@@ -39,6 +39,8 @@ abstract class InventoryAsset
    protected $data;
    /** @var CommonDBTM */
    protected $item;
+   /** @var array */
+   protected $extra_data = [];
 
    /**
     * Constructor
@@ -73,4 +75,18 @@ abstract class InventoryAsset
     * Handle in database
     */
    abstract public function handle();
+
+   /**
+    * Set extra sub parts of interest
+    *
+    * @param array $data Processed data
+    *
+    * @return InventoryAsset
+    */
+   public function setExtraData($data) {
+      foreach (array_keys($this->extra_data) as $extra) {
+         $this->extra_data[$extra] = $data[$extra];
+      }
+      return $this;
+   }
 }
