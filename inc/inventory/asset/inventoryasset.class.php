@@ -78,6 +78,7 @@ abstract class InventoryAsset
 
    /**
     * Set extra sub parts of interest
+    * Only declared types in subclass extra_data are handled
     *
     * @param array $data Processed data
     *
@@ -85,8 +86,21 @@ abstract class InventoryAsset
     */
    public function setExtraData($data) {
       foreach (array_keys($this->extra_data) as $extra) {
-         $this->extra_data[$extra] = $data[$extra];
+         if (isset($data[$extra])) {
+            $this->extra_data[$extra] = $data[$extra];
+         }
       }
       return $this;
+   }
+
+   /**
+    * Get ignore list declared from asset
+    *
+    * @param string $type Ignore type ("controllers" only for now)
+    *
+    * @return array
+    */
+   public function getIgnored($type) {
+      return $this->ignored[$type] ?? [];
    }
 }

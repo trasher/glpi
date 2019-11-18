@@ -37,6 +37,7 @@ class NetworkCard extends Device
 {
    private $ports = [];
    protected $extra_data = ['controllers' => null];
+   protected $ignored = ['controllers' => null];
 
    public function __construct(\CommonDBTM $item, array $data = null) {
       parent::__construct($item, $data, 'Item_DeviceNetworkCard');
@@ -84,7 +85,6 @@ class NetworkCard extends Device
                }
             }
 
-            //FIXME: this->data contains only a sub data part, controllers are not present
             if (isset($this->extra_data['controllers'])) {
                $found_controller = false;
                // Search in controller if find NAME = CONTROLLER TYPE
@@ -93,7 +93,7 @@ class NetworkCard extends Device
                      && ($val->description == $controller->type
                         || strtolower($val->description." controller") ==
                                  strtolower($controller->type))
-                        /*&& !isset($ignorecontrollers[$a_controllers['NAME']])*/) {
+                        && !isset($this->ignored['controllers'][$controller->name])) {
                      $found_controller = $controller;
                      if (property_exists($val, 'macaddr')) {
                         $found_controller->macaddr = $val->macaddr;
@@ -125,7 +125,8 @@ class NetworkCard extends Device
                   if (property_exists($val, 'mac')) {
                      $val->mac = strtolower($val->mac);
                   }
-                  //$ignorecontrollers[$a_found['NAME']] = 1;
+
+                  $this->ignored['controllers'][$val->name] = $val->name;
                } else {
                   unset($this->data[$k]);
                }

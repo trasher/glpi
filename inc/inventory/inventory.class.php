@@ -1028,10 +1028,27 @@ class Inventory
    }
 
    public function handleAssets() {
-      foreach ($this->assets as $type => $assets) {
+      $assets_list = $this->assets;
+      if (isset($assets_list['\Glpi\Inventory\Asset\Controller'])) {
+         //ensure controllers are done last, some components will
+         //remove their associated constoller
+         $controllers = $assets_list['\Glpi\Inventory\Asset\Controller'];
+         unset($assets_list['\Glpi\Inventory\Asset\Controller']);
+      }
+
+      $ignored_controllers = [];
+      foreach ($assets_list as $type => $assets) {
          foreach ($assets as $asset) {
             $asset->handle();
+            $ignored_controllers = array_merge($ignored_controllers, $asset->getIgnored('controllers'));
          }
+      }
+
+      //do controlers
+      foreach ($controllers as $asset) {
+         //do not handle ignored controllers
+         $asset->setExtraData(['ignored' => $ignored_controllers]);
+         $asset->handle();
       }
    }
 }

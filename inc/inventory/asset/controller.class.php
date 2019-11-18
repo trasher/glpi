@@ -35,6 +35,8 @@ namespace Glpi\Inventory\Asset;
 
 class Controller extends Device
 {
+   protected $extra_data = ['ignored' => null];
+
    public function __construct(\CommonDBTM $item, array $data = null) {
       parent::__construct($item, $data, 'Item_DeviceControl');
    }
@@ -73,5 +75,18 @@ class Controller extends Device
          }
       }
       return $this->data;
+   }
+
+   public function handle() {
+      $data = $this->data;
+
+      foreach ($data as $k => $asset) {
+         if (property_exists($asset, 'name') && isset($this->extra_data['ignored'][$asset->name])) {
+            unset($data[$k]);
+         }
+      }
+
+      $this->data = $data;
+      parent::handle();
    }
 }

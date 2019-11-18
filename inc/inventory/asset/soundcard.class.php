@@ -35,6 +35,8 @@ namespace Glpi\Inventory\Asset;
 
 class Soundcard extends Device
 {
+   protected $ignored = ['controllers' => null];
+
    public function __construct(\CommonDBTM $item, array $data = null) {
       parent::__construct($item, $data, 'Item_DeviceSoundCard');
    }
@@ -51,6 +53,7 @@ class Soundcard extends Device
                $val->$dest = $val->$origin;
             }
          }
+         $this->ignored['controllers'][$val->name] = $val->name;
       }
       return $this->data;
    }

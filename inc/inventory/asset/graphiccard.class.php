@@ -35,6 +35,8 @@ namespace Glpi\Inventory\Asset;
 
 class GraphicCard extends Device
 {
+   protected $ignored = ['controllers' => null];
+
    public function __construct(\CommonDBTM $item, array $data = null) {
       parent::__construct($item, $data, 'Item_DeviceGraphicCard');
    }
@@ -50,6 +52,11 @@ class GraphicCard extends Device
                if (property_exists($val, $origin)) {
                   $val->$dest = $val->$origin;
                }
+            }
+
+            $this->ignored['controllers'][$val->name] = $val->name;
+            if (isset($val->chipset)) {
+               $this->ignored['controllers'][$val->chipset] = $val->chipset;
             }
          } else {
             unset($this->data[$k]);
