@@ -268,6 +268,8 @@ class Inventory
                $assettype = '\Glpi\Inventory\Asset\Processor';
                break;
             case 'drives':
+               $assettype = '\Glpi\Inventory\Asset\Volume';
+               break;
             case 'envs':
             case 'firewalls':
                break;
