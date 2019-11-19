@@ -89,7 +89,7 @@ abstract class Device extends InventoryAsset
             }
 
             $device_id = $device->import((array)$val);
-            if (!in_array($device_id, $existing)) {
+            if ($device_id && !in_array($device_id, $existing)) {
                $itemdevice_data = [
                   $fk                  => $device_id,
                   'itemtype'           => $this->item->getType(),

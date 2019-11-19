@@ -36,4 +36,13 @@ include ('../inc/includes.php');
 
 Html::header(_('Inventory'), $_SERVER['PHP_SELF'], "tools", "glpi\inventory\inventory");
 
+$conf = new \Glpi\Inventory\Conf();
+
+if (isset($_FILES['importfile']) && $_FILES['importfile']['tmp_name'] != '') {
+   $conf->importFile($_FILES);
+   //Html::back();
+}
+
+$conf->showUploadForm();
+
 Html::footer();

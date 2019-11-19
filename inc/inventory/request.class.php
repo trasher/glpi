@@ -71,7 +71,7 @@ class Request
     * @return void
     */
    public function __construct($data = null, $mode = self::XML_MODE) {
-       $this->mode = $mode;
+      $this->mode = $mode;
 
       switch ($mode) {
          case self::XML_MODE:

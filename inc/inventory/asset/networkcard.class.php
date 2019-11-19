@@ -105,7 +105,7 @@ class NetworkCard extends Device
                if ($found_controller) {
                   if (property_exists($found_controller, 'pciid')) {
                      if (!count($pciids)) {
-                        $pciids = json_decode(__DIR__ . '/../../../inventory-reference/pciid.json');
+                        $pciids = json_decode(file_get_contents(__DIR__ . '/../../../inventory-vendors/pciid.json'), true);
                      }
                      $exploded = explode(":", $found_controller->pciids);
 
@@ -126,7 +126,9 @@ class NetworkCard extends Device
                      $val->mac = strtolower($val->mac);
                   }
 
-                  $this->ignored['controllers'][$val->name] = $val->name;
+                  if (property_exists($val, 'name')) {
+                     $this->ignored['controllers'][$val->name] = $val->name;
+                  }
                } else {
                   unset($this->data[$k]);
                }

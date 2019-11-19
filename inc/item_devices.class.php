@@ -1439,7 +1439,15 @@ class Item_Devices extends CommonDBRelation {
       global $DB, $CFG_GLPI;
 
       if (!isset($input[static::$items_id_2]) || !$input[static::$items_id_2]) {
-         Session::addMessageAfterRedirect(__('A device ID is mandatory'), false, ERROR);
+         Session::addMessageAfterRedirect(
+            sprintf(
+               __('%1$s: %2$s'),
+               static::getTypeName(),
+               __('A device ID is mandatory')
+            ),
+            false,
+            ERROR
+         );
          return false;
       }
 

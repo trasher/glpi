@@ -292,6 +292,8 @@ class Inventory
                $value = [$val];
                break;
             case 'inputs':
+               //handled from peripheral
+               break;
             case 'local_groups':
             case 'local_users':
             case 'physical_volumes':
@@ -358,6 +360,7 @@ class Inventory
                $assettype = '\Glpi\Inventory\Asset\Drive';
                break;
             case 'usbdevices':
+               $assettype = '\Glpi\Inventory\Asset\Peripheral';
                break;
             case 'antivirus':
                break;
@@ -386,7 +389,6 @@ class Inventory
                break;
          }
 
-         //TODO: all types should pass here?
          if ($assettype !== false) {
             $asset = new $assettype($this->item, $value);
             $asset->setExtraData($this->data);
@@ -1031,14 +1033,17 @@ class Inventory
 
    public function handleAssets() {
       $assets_list = $this->assets;
+
+      $controllers = [];
+      $ignored_controllers = [];
+
+      //ensure controllers are done last, some components will
+      //ask to ignore their associated constoller
       if (isset($assets_list['\Glpi\Inventory\Asset\Controller'])) {
-         //ensure controllers are done last, some components will
-         //remove their associated constoller
          $controllers = $assets_list['\Glpi\Inventory\Asset\Controller'];
          unset($assets_list['\Glpi\Inventory\Asset\Controller']);
       }
 
-      $ignored_controllers = [];
       foreach ($assets_list as $type => $assets) {
          foreach ($assets as $asset) {
             $asset->handle();
