@@ -283,12 +283,12 @@ class Inventory
                break;
             case 'hardware':
                $mapping = [
-                  'NAME'           => 'name',
-                  'WINPRODID'      => 'licenseid',
-                  'WINPRODKEY'     => 'license_number',
-                  'WORKGROUP'      => 'domains_id',
-                  'UUID'           => 'uuid',
-                  'LASTLOGGEDUSER' => 'users_id',
+                  'name'           => 'name',
+                  'winprodid'      => 'licenseid',
+                  'winprodkey'     => 'license_number',
+                  'workgroup'      => 'domains_id',
+                  'uuid'           => 'uuid',
+                  'lastloggeduser' => 'users_id',
                ];
 
                $val = (object)$value;
@@ -332,7 +332,7 @@ class Inventory
                $assettype = '\Glpi\Inventory\Asset\NetworkCard';
                break;
             case 'operatingsystem':
-               //TODO
+               $assettype = '\Glpi\Inventory\Asset\OperatingSystem';
                break;
             case 'ports':
                //not used
