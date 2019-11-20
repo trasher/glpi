@@ -49,7 +49,7 @@ class Memory extends Device
       ];
 
       foreach ($this->data as $k => &$val) {
-         if ($val->capacity > 0) {
+         if (property_exists($val, 'capacity') && $val->capacity > 0) {
             foreach ($mapping as $origin => $dest) {
                if (property_exists($val, $origin)) {
                   $val->$dest = $val->$origin;

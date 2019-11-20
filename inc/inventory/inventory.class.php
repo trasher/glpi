@@ -262,7 +262,11 @@ class Inventory
 
          switch ($key) {
             case 'accesslog':
+               //not used
+               unset($this->data[$key]);
+               break;
             case 'accountinfo':
+               //handled from handleItem
                break;
             case 'cpus':
                $assettype = '\Glpi\Inventory\Asset\Processor';
@@ -271,6 +275,9 @@ class Inventory
                $assettype = '\Glpi\Inventory\Asset\Volume';
                break;
             case 'envs':
+               //not used
+               unset($this->data[$key]);
+               break;
             case 'firewalls':
                break;
             case 'hardware':
@@ -295,10 +302,24 @@ class Inventory
                //handled from peripheral
                break;
             case 'local_groups':
+               //not used
+               unset($this->data[$key]);
+               break;
             case 'local_users':
+               //not used
+               unset($this->data[$key]);
+               break;
             case 'physical_volumes':
+               //not used
+               unset($this->data[$key]);
+               break;
             case 'volume_groups':
+               //not used
+               unset($this->data[$key]);
+               break;
             case 'logical_volumes':
+               //not used
+               unset($this->data[$key]);
                break;
             case 'memories':
                $assettype = '\Glpi\Inventory\Asset\Memory';
@@ -310,8 +331,11 @@ class Inventory
                $assettype = '\Glpi\Inventory\Asset\NetworkCard';
                break;
             case 'operatingsystem':
+               //TODO
                break;
             case 'ports':
+               //not used
+               unset($this->data[$key]);
                break;
             case 'printers':
                $rulecollection = new \RuleDictionnaryPrinterCollection();
@@ -346,10 +370,15 @@ class Inventory
                }
                break;
             case 'processes':
+               //not used
+               unset($this->data[$key]);
                break;
             case 'remote_mgmt':
+               //TODO
                break;
             case 'slots':
+               //not used
+               unset($this->data[$key]);
                break;
             case 'softwares':
                break;
@@ -377,11 +406,21 @@ class Inventory
                $assettype = '\Glpi\Inventory\Asset\GraphicCard';
                break;
             case 'users':
+               //handled from handleItem
+               break;
             case 'versionclient':
+               //not used
+               unset($this->data[$key]);
+               break;
             case 'versionprovider':
+               //not used
+               unset($this->data[$key]);
                break;
             case 'simcards':
                $assettype = '\Glpi\Inventory\Asset\Simcard';
+               break;
+            case 'virtualmachines':
+               $assettype = '\Glpi\Inventory\Asset\VirtualMachine';
                break;
             default:
                //unhandled
