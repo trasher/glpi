@@ -279,6 +279,7 @@ class Inventory
                unset($this->data[$key]);
                break;
             case 'firewalls':
+               //not used
                break;
             case 'hardware':
                $mapping = [
@@ -374,13 +375,15 @@ class Inventory
                unset($this->data[$key]);
                break;
             case 'remote_mgmt':
-               //TODO
+               //not used - implemented in FI only
+               unset($this->data[$key]);
                break;
             case 'slots':
                //not used
                unset($this->data[$key]);
                break;
             case 'softwares':
+               //TODO
                break;
             case 'sounds':
                $assettype = '\Glpi\Inventory\Asset\SoundCard';
@@ -392,6 +395,7 @@ class Inventory
                $assettype = '\Glpi\Inventory\Asset\Peripheral';
                break;
             case 'antivirus':
+               $assettype = '\Glpi\Inventory\Asset\Antivirus';
                break;
             case 'bios':
                $assettype = '\Glpi\Inventory\Asset\Firmware';
@@ -422,6 +426,15 @@ class Inventory
             case 'virtualmachines':
                $assettype = '\Glpi\Inventory\Asset\VirtualMachine';
                break;
+            case 'licenseinfos':
+               //not used - implemented in FI only
+               unset($this->data[$key]);
+               break;
+            case 'modems':
+               //not used - implemented in FI only
+               unset($this->data[$key]);
+               break;
+
             default:
                //unhandled
                throw new \RuntimeException("Unhandled schema entry $key");
