@@ -383,7 +383,7 @@ class Inventory
                unset($this->data[$key]);
                break;
             case 'softwares':
-               //TODO
+               $assettype = '\Glpi\Inventory\Asset\Software';
                break;
             case 'sounds':
                $assettype = '\Glpi\Inventory\Asset\SoundCard';
