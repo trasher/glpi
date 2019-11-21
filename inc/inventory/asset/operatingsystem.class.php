@@ -77,7 +77,7 @@ class OperatingSystem extends InventoryAsset
          preg_match("/.+ Windows (XP |\d\.\d |\d{1,4} |Vista(™)? )(.*)/", $val->full_name, $matches);
          if (count($matches) == 4) {
             $val->operatingsystemeditions_id = $matches[3];
-            if ($val->operatingsystemversions_id == '') {
+            if (!property_exists($val, 'operatingsystemversions_id') || $val->operatingsystemversions_id == '') {
                $matches[1] = trim($matches[1]);
                if ($matches[2] != '') {
                   $matches[1] = trim($matches[1], $matches[2]);
