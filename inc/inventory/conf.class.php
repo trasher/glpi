@@ -40,6 +40,32 @@ use Session;
  */
 class Conf extends \CommonGLPI
 {
+   public static $defaults = [
+      'import_software'                => 1,
+      'import_volume'                  => 1,
+      'import_antivirus'               => 1,
+      'import_registry'                => 1,
+      'import_process'                 => 1,
+      'import_vm'                      => 1,
+      'import_monitor_on_partial_sn'   => 0,
+      'component_processor'            => 1,
+      'component_memory'               => 1,
+      'component_harddrive'            => 1,
+      'component_networkcard'          => 1,
+      'component_graphiccard'          => 1,
+      'component_soundcard'            => 1,
+      'component_drive'                => 1,
+      'component_networkdrive'         => 1,
+      'component_networkcardvirtual'   => 1,
+      'component_control'              => 1,
+      'component_battery'              => 1,
+      'states_id_default'              => 0,
+      'location'                       => 0,
+      'group'                          => 0,
+      'manage_osname'                  => 0
+   ];
+
+
    /**
     * Display form for import the XML
     *
@@ -107,8 +133,8 @@ class Conf extends \CommonGLPI
             );
          } else {
             while ($zip_entry = zip_read($zip)) {
+               //FIXME: not tested
                if (zip_entry_open($zip, $zip_entry, "r")) {
-                  $this->importContentFile();
                   $contents = zip_entry_read($zip_entry, zip_entry_filesize($zip_entry));
                   //$inventory_request->setCompression(finfo_file($finfo, $zip_entry));
                   $this->importContentFile($inventory_request, $contents);

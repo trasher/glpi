@@ -330,7 +330,7 @@ $default_inventory_prefs = [
    'manage_osname'                  => 0
 ];
 
-foreach ($default_inventory_prefs as $name => $value) {
+foreach (\Glpi\Inventory\Conf::$defaults as $name => $value) {
    $tables['glpi_configs'][] = [
       'context' => 'inventory',
       'name'    => $name,
