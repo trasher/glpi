@@ -43,6 +43,7 @@ if (isset($_FILES['importfile']) && $_FILES['importfile']['tmp_name'] != '') {
    //Html::back();
 }
 
-$conf->showUploadForm();
+//$conf->showUploadForm();
+$conf->display(['id' => 1]);
 
 Html::footer();

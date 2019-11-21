@@ -175,4 +175,48 @@ class Conf extends \CommonGLPI
          throw $e;
       }
    }
+
+   function defineTabs($options = []) {
+
+      $ong = [];
+      $this->addStandardTab(__CLASS__, $ong, $options);
+
+      return $ong;
+   }
+
+   /**
+    * Print the config form for display
+    *
+    * @return void
+   **/
+   function showConfigForm() {
+   }
+
+   function getTabNameForItem(\CommonGLPI $item, $withtemplate = 0) {
+
+      switch ($item->getType()) {
+         case __CLASS__ :
+            $tabs = [
+               1 => __('Configuration'),
+               2 => __('Import from file')
+            ];
+            return $tabs;
+      }
+      return '';
+   }
+
+   static function displayTabContentForItem(\CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
+      if ($item->getType() == __CLASS__) {
+         switch ($tabnum) {
+            case 1 :
+               $item->showConfigForm();
+               break;
+
+            case 2 :
+               $item->showUploadForm();
+               break;
+         }
+      }
+      return true;
+   }
 }
