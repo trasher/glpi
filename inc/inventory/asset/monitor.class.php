@@ -33,6 +33,8 @@
 
 namespace Glpi\Inventory\Asset;
 
+use \Glpi\Inventory\Conf;
+
 class Monitor extends InventoryAsset
 {
    private $import_monitor_on_partial_sn = false;

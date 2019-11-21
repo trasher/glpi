@@ -33,6 +33,8 @@
 
 namespace Glpi\Inventory\Asset;
 
+use \Glpi\Inventory\Conf;
+
 class Antivirus extends InventoryAsset
 {
    public function prepare() :array {

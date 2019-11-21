@@ -33,6 +33,8 @@
 
 namespace Glpi\Inventory\Asset;
 
+use \Glpi\Inventory\Conf;
+
 class Soundcard extends Device
 {
    protected $ignored = ['controllers' => null];

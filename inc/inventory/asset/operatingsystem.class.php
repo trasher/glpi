@@ -33,6 +33,8 @@
 
 namespace Glpi\Inventory\Asset;
 
+use \Glpi\Inventory\Conf;
+
 class OperatingSystem extends InventoryAsset
 {
    protected $extra_data = ['hardware' => null];
@@ -167,8 +169,8 @@ class OperatingSystem extends InventoryAsset
          'operatingsystemarchitectures_id'   => $val->operatingsystemarchitectures_id,
          'operatingsystemkernelversions_id'  => $val->operatingsystemkernelversions_id,
          'operatingsystems_id'               => $val->operatingsystems_id,
-         'operatingsystemversions_id'        => $val->operatingsystemversions_id,
-         'operatingsystemservicepacks_id'    => $val->operatingsystemservicepacks_id ?? '',
+         'operatingsystemversions_id'        => $val->operatingsystemversions_id ?? 0,
+         'operatingsystemservicepacks_id'    => $val->operatingsystemservicepacks_id ?? 0,
          'operatingsystemeditions_id'        => $val->operatingsystemeditions_id,
          'licenseid'                         => $val->licenseid ?? '',
          'license_number'                    => $val->license_number ?? '',

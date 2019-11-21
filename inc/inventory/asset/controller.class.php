@@ -33,6 +33,8 @@
 
 namespace Glpi\Inventory\Asset;
 
+use \Glpi\Inventory\Conf;
+
 class Controller extends Device
 {
    protected $extra_data = ['ignored' => null];

@@ -33,6 +33,8 @@
 
 namespace Glpi\Inventory\Asset;
 
+use \Glpi\Inventory\Conf;
+
 class VirtualMachine extends InventoryAsset
 {
    use NetworkPort;

@@ -33,6 +33,8 @@
 
 namespace Glpi\Inventory\Asset;
 
+use \Glpi\Inventory\Conf;
+
 class Simcard extends Device
 {
    public function __construct(\CommonDBTM $item, array $data = null) {

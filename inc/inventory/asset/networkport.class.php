@@ -32,6 +32,8 @@
 
 namespace Glpi\Inventory\Asset;
 
+use \Glpi\Inventory\Conf;
+
 trait NetworkPort {
    protected $ports = [];
 

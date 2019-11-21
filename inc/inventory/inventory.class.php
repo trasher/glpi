@@ -67,7 +67,7 @@ class Inventory
      */
    public function __construct($data = null, $mode = self::FULL_MODE, $format = Request::JSON_MODE) {
        $this->mode = $mode;
-       $this->config = new Conf();
+       $this->conf = new Conf();
 
       if (null !== $data) {
           $this->setData($data, $format);
@@ -95,7 +95,6 @@ class Inventory
           $converter->validate($data);
       } catch (\RuntimeException $e) {
           $this->errors[] = $e->getMessage();
-          \Toolbox::logError($e->printStackTrace());
           return false;
       }
 

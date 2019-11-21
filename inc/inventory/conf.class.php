@@ -608,7 +608,7 @@ class Conf extends \CommonGLPI
          $config = \Config::getConfigurationValues('Inventory');
          $this->currents = $config;
       }
-      if (in_array($name, array_keys($this->defaults))) {
+      if (in_array($name, array_keys(self::$defaults))) {
          return $this->currents[$name];
       }
    }

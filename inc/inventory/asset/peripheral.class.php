@@ -33,6 +33,8 @@
 
 namespace Glpi\Inventory\Asset;
 
+use \Glpi\Inventory\Conf;
+
 class Peripheral extends InventoryAsset
 {
    protected $extra_data = ['inputs' => null];
