@@ -43,6 +43,17 @@ if (isset($_FILES['importfile']) && $_FILES['importfile']['tmp_name'] != '') {
    //Html::back();
 }
 
+if (isset($_POST['update'])) {
+   unset($_POST['update']);
+   $conf->saveConf($_POST);
+   \Session::addMessageAfterRedirect(
+      __('Configuration has been updated'),
+      false,
+      INFO
+   );
+   \Html::back();
+}
+
 //$conf->showUploadForm();
 $conf->display(['id' => 1]);
 
