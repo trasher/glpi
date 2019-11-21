@@ -260,4 +260,8 @@ class VirtualMachine extends InventoryAsset
          }
       //}
    }
+
+   public function checkConf(Conf $conf) {
+      return $conf->import_vm == 1;
+   }
 }

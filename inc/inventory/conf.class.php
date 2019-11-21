@@ -40,6 +40,7 @@ use Session;
  */
 class Conf extends \CommonGLPI
 {
+   private $currents = [];
    public static $defaults = [
       'import_software'                => 1,
       'import_volume'                  => 1,
@@ -600,5 +601,15 @@ class Conf extends \CommonGLPI
          $to_process[$prop] = $values[$prop] ?? 0;
       }
       \Config::setConfigurationValues('inventory', $to_process);
+   }
+
+   public function __get($name) {
+      if (!count($this->currents)) {
+         $config = \Config::getConfigurationValues('Inventory');
+         $this->currents = $config;
+      }
+      if (in_array($name, array_keys($this->defaults))) {
+         return $this->currents[$name];
+      }
    }
 }

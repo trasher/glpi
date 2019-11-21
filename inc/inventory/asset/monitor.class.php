@@ -35,6 +35,8 @@ namespace Glpi\Inventory\Asset;
 
 class Monitor extends InventoryAsset
 {
+   private $import_monitor_on_partial_sn = false;
+
    public function prepare() :array {
       $serials = [];
       $mapping = [
@@ -82,5 +84,10 @@ class Monitor extends InventoryAsset
 
    public function handle() {
       //TODO
+   }
+
+   public function checkConf(Conf $conf) {
+      $this->import_monitor_on_partial_sn = $conf->import_monitor_on_partial_sn;
+      return true;
    }
 }

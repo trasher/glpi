@@ -107,4 +107,8 @@ class Drive extends Device
       parent::handle();
       $this->harddrives->handle();
    }
+
+   public function checkConf(Conf $conf) {
+      return $conf->component_drive == 1;
+   }
 }

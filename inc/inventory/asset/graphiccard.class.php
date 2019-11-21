@@ -64,4 +64,8 @@ class GraphicCard extends Device
       }
       return $this->data;
    }
+
+   public function checkConf(Conf $conf) {
+      return $conf->component_graphiccard == 1;
+   }
 }

@@ -43,4 +43,8 @@ class Simcard extends Device
       //no mapping needed
       return $this->data;
    }
+
+   public function checkConf(Conf $conf) {
+      return $conf->component_simcard == 1;
+   }
 }

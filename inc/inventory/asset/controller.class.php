@@ -89,4 +89,8 @@ class Controller extends Device
       $this->data = $data;
       parent::handle();
    }
+
+   public function checkConf(Conf $conf) {
+      return $conf->component_control == 1;
+   }
 }

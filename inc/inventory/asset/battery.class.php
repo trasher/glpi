@@ -90,4 +90,8 @@ class Battery extends Device
       }
       return $this->data;
    }
+
+   public function checkConf(Conf $conf) {
+      return $conf->component_battery == 1;
+   }
 }

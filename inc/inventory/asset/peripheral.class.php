@@ -241,4 +241,8 @@ class Peripheral extends InventoryAsset
          }
       }
    }
+
+   public function checkConf(Conf $conf) {
+      return true;
+   }
 }

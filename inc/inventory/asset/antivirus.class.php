@@ -125,4 +125,8 @@ class Antivirus extends InventoryAsset
          }
       }
    }
+
+   public function checkConf(Conf $conf) {
+      return $conf->import_antivirus == 1;
+   }
 }

@@ -229,4 +229,8 @@ class NetworkCard extends Device
       $this->ports = $ports;
       return $this->data;
    }
+
+   public function checkConf(Conf $conf) {
+      return $conf->component_networkcard == 1;
+   }
 }

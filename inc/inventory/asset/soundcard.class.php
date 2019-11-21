@@ -57,4 +57,8 @@ class Soundcard extends Device
       }
       return $this->data;
    }
+
+   public function checkConf(Conf $conf) {
+      return $conf->component_soundcard == 1;
+   }
 }

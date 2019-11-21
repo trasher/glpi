@@ -57,6 +57,8 @@ class Inventory
    private $agent;
    /** @var InventoryAsset[] */
    private $assets;
+   /** @var \Glpi\Inventory\Conf */
+   private $conf;
 
     /**
      * @param mixed   $data   Inventory data, optionnal
@@ -65,6 +67,7 @@ class Inventory
      */
    public function __construct($data = null, $mode = self::FULL_MODE, $format = Request::JSON_MODE) {
        $this->mode = $mode;
+       $this->config = new Conf();
 
       if (null !== $data) {
           $this->setData($data, $format);
@@ -443,9 +446,13 @@ class Inventory
 
          if ($assettype !== false) {
             $asset = new $assettype($this->item, $value);
-            $asset->setExtraData($this->data);
-            $value = $asset->prepare();
-            $this->assets[$assettype][] = $asset;
+            if ($asset->checkConf($this->conf)) {
+               $asset->setExtraData($this->data);
+               $value = $asset->prepare();
+               $this->assets[$assettype][] = $asset;
+            } else {
+               unset($this->data[$key]);
+            }
          }
       }
    }

@@ -62,4 +62,8 @@ class HardDrive extends Device
 
       return $this->data;
    }
+
+   public function checkConf(Conf $conf) {
+      return $conf->component_harddrive == 1;
+   }
 }

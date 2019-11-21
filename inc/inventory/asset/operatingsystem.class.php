@@ -36,6 +36,7 @@ namespace Glpi\Inventory\Asset;
 class OperatingSystem extends InventoryAsset
 {
    protected $extra_data = ['hardware' => null];
+   private $manage_osname = false;
 
    public function prepare() :array {
       if ($this->item->getType() != 'Computer') {
@@ -72,7 +73,7 @@ class OperatingSystem extends InventoryAsset
       }
 
       $val->operatingsystemeditions_id = '';
-      if (property_exists($val, 'full_name')/* && $pfConfig->getValue('manage_osname') == 1*/) {
+      if (property_exists($val, 'full_name') && $this->manage_osname == true) {
          $matches = [];
          preg_match("/.+ Windows (XP |\d\.\d |\d{1,4} |Vista(™)? )(.*)/", $val->full_name, $matches);
          if (count($matches) == 4) {
@@ -191,5 +192,10 @@ class OperatingSystem extends InventoryAsset
          //$input_os['_no_history'] = $no_history;
          $ios->add($input_os);
       }
+   }
+
+   public function checkConf(Conf $conf) {
+      $this->manage_osname = $conf->manage_osname;
+      return true;
    }
 }

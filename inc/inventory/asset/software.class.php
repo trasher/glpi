@@ -786,4 +786,7 @@ class Software extends InventoryAsset
       mysqli_stmt_close($stmt);
    }
 
+   public function checkConf(Conf $conf) {
+      return $conf->import_software == 1;
+   }
 }

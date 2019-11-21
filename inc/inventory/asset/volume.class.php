@@ -157,4 +157,8 @@ class Volume extends InventoryAsset
          }
       }
    }
+
+   public function checkConf(Conf $conf) {
+      return $conf->import_volume == 1;
+   }
 }

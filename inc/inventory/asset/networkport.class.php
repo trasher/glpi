@@ -360,4 +360,8 @@ trait NetworkPort {
          }
       }
    }
+
+   public function checkConf(Conf $conf) {
+      return $conf->component_networkcard == 1;
+   }
 }

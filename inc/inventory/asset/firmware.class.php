@@ -69,4 +69,8 @@ class Firmware extends Device
       $this->data = [$val];
       return $this->data;
    }
+
+   public function checkConf(Conf $conf) {
+      return true;
+   }
 }

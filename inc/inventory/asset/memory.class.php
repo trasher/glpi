@@ -92,4 +92,8 @@ class Memory extends Device
       }
       return $this->data;
    }
+
+   public function checkConf(Conf $conf) {
+      return $conf->component_memory == 1;
+   }
 }

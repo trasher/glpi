@@ -33,6 +33,8 @@
 
 namespace Glpi\Inventory\Asset;
 
+use \Glpi\Inventory\Conf;
+
 abstract class InventoryAsset
 {
    /** @var array */
@@ -103,4 +105,13 @@ abstract class InventoryAsset
    public function getIgnored($type) {
       return $this->ignored[$type] ?? [];
    }
+
+   /**
+    * Check if configuration allows that part
+    *
+    * @param Conf $conf Conf instance
+    *
+    * @return boolean
+    */
+   abstract public function checkConf(Conf $conf);
 }
