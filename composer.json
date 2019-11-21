@@ -23,7 +23,7 @@
         "blueimp/jquery-file-upload": "^10.2",
         "elvanto/litemoji": "^1.4 || ^2.0",
         "fossar/htmlawed": "1.2.4.1",
-        "glpi-project/inventory_format": "dev-master",
+        "glpi-project/inventory_format": "dev-feature/hw_files",
         "iamcal/lib_autolink": "^1.7",
         "michelf/php-markdown": "^1.6",
         "monolog/monolog": "^1.23",
@@ -77,10 +77,12 @@
         "cs":  "vendor/bin/phpcs -d memory_limit=512M -p --standard=vendor/glpi-project/coding-standard/GlpiStandard/ --ignore=/vendor/,/plugins/,/files/,/lib/,/config/,/tests/config,/css/tiny_mce,/.git ./",
         "lint":  "vendor/bin/parallel-lint  --exclude files --exclude plugins --exclude vendor --exclude tools/vendor .",
         "post-install-cmd": [
-            "@php -r \"file_put_contents('.composer.hash', sha1_file('composer.lock'));\""
+            "@php -r \"file_put_contents('.composer.hash', sha1_file('composer.lock'));\"",
+            "@php -f vendor/bin/build_hw_jsons"
         ],
         "post-update-cmd": [
-            "@php -r \"file_put_contents('.composer.hash', sha1_file('composer.lock'));\""
+            "@php -r \"file_put_contents('.composer.hash', sha1_file('composer.lock'));\"",
+            "@php -f vendor/bin/build_hw_jsons"
         ]
     }
 }

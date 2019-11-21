@@ -97,7 +97,8 @@ class NetworkCard extends Device
                if ($found_controller) {
                   if (property_exists($found_controller, 'pciid')) {
                      if (!count($pciids)) {
-                        $pciids = json_decode(file_get_contents(__DIR__ . '/../../../inventory-vendors/pciid.json'), true);
+                        $jsonfile = new \Glpi\Inventory\FilesToJSON();
+                        $pciids = json_decode(file_get_contents($jsonfile->getPathFor('pci')), true);
                      }
                      $exploded = explode(":", $found_controller->pciids);
 

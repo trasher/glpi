@@ -61,7 +61,8 @@ class Peripheral extends InventoryAsset
                && $val->vendorid != ''
             ) {
                if (!count($usbids)) {
-                  $usbids = json_decode(file_get_contents(__DIR__ . '/../../../inventory-vendors/usbid.json'), true);
+                  $jsonfile = new \Glpi\Inventory\FilesToJSON();
+                  $usbids = json_decode(file_get_contents($jsonfile->getPathFor('usb')), true);
                }
 
                //manufacturer

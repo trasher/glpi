@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "abf74ed7c5a1d60410743b789916c208",
+    "content-hash": "6880884493441a9fa3fcb97346de4793",
     "packages": [
         {
             "name": "blueimp/jquery-file-upload",
@@ -182,16 +182,16 @@
         },
         {
             "name": "glpi-project/inventory_format",
-            "version": "dev-master",
+            "version": "dev-feature/hw_files",
             "source": {
                 "type": "git",
                 "url": "https://github.com/glpi-project/inventory_format.git",
-                "reference": "255ee7bb23899125694a43b5f8094bc7ab1be4f8"
+                "reference": "5b2e679ebedb962333ede19cb922ddfa725990a3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/glpi-project/inventory_format/zipball/255ee7bb23899125694a43b5f8094bc7ab1be4f8",
-                "reference": "255ee7bb23899125694a43b5f8094bc7ab1be4f8",
+                "url": "https://api.github.com/repos/glpi-project/inventory_format/zipball/5b2e679ebedb962333ede19cb922ddfa725990a3",
+                "reference": "5b2e679ebedb962333ede19cb922ddfa725990a3",
                 "shasum": ""
             },
             "require": {
@@ -202,12 +202,14 @@
                 "atoum/atoum": "dev-master"
             },
             "bin": [
-                "bin/convert"
+                "bin/convert",
+                "bin/build_hw_jsons"
             ],
             "type": "library",
             "autoload": {
                 "files": [
-                    "lib/php/Converter.php"
+                    "lib/php/Converter.php",
+                    "lib/php/FilesToJSON.php"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -226,7 +228,7 @@
                 "automatic inventory",
                 "glpi"
             ],
-            "time": "2019-12-02T14:20:46+00:00"
+            "time": "2019-12-02T14:22:01+00:00"
         },
         {
             "name": "iamcal/lib_autolink",

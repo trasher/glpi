@@ -31,3 +31,4 @@ phpunit.xml
 .package.hash
 /public/build/
 /public/lib/
+/inventory-vendors/*.json
