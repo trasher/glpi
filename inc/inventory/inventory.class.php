@@ -446,7 +446,8 @@ class Inventory
             $asset = new $assettype($this->item, $value);
             if ($asset->checkConf($this->conf)) {
                $asset->setExtraData($this->data);
-               $value = $asset->prepare();
+               $asset->prepare();
+               $value = $asset->handleLinks();
                $this->assets[$assettype][] = $asset;
             } else {
                unset($this->data[$key]);
@@ -880,9 +881,11 @@ class Inventory
          "pluginFusioninventory-rules",
          "Rule passed : ".$items_id.", ".$itemtype."\n"
       );*/
-      /*$pfFormatconvert = new \PluginFusioninventoryFormatconvert();
+      /*$pfFormatconvert = new \PluginFusioninventoryFormatconvert();*/
 
-      $a_computerinventory = $pfFormatconvert->replaceids(
+      //FIXME should be handle in a Computer asset
+      //$this->data = $this->handleLinks($this->data, $itemtype, $items_id);
+      /*$a_computerinventory = $pfFormatconvert->replaceids(
          $this->data,
          $itemtype,
          $items_id

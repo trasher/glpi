@@ -114,4 +114,81 @@ abstract class InventoryAsset
     * @return boolean
     */
    abstract public function checkConf(Conf $conf);
+
+   /**
+    * Handle links (manufacturers, models, users, ...), create items if needed
+    *
+    * @return array
+    */
+   public function handleLinks() {
+      //$a_lockable = PluginFusioninventoryLock::getLockFields(getTableForItemType($itemtype), $items_id);
+
+      $ignored = [
+         'software',
+         'ipaddress',
+         'internalport'
+      ];
+
+      foreach ($this->data as &$value) {
+         // save raw manufacture name before its replacement by id for importing model
+         // (we need manufacturers name in when importing model in dictionary)
+         $manufacture_name = "";
+         if (property_exists($value, 'manufacturers_id')) {
+            $manufacture_name = $value->manufacturers_id;
+         }
+
+         foreach ($value as $key => $val) {
+            if (true/*!PluginFusioninventoryLock::isFieldLocked($a_lockable, $key)*/) {
+               if ($key == "manufacturers_id" || $key == 'bios_manufacturers_id') {
+                  $manufacturer = new \Manufacturer();
+                  $value->$key  = $manufacturer->processName($value->$key);
+                  if ($key == 'bios_manufacturers_id') {
+                     $this->foreignkey_itemtype[$key] = getItemtypeForForeignKeyField('manufacturers_id');
+                  } else {
+                     /*if (isset($CFG_GLPI['plugin_fusioninventory_computermanufacturer'][$value])) {
+                        $CFG_GLPI['plugin_fusioninventory_computermanufacturer'][$value] = $array[$key];
+                     }*/
+                  }
+               }
+               if (!is_numeric($key)) {
+                  $entities_id = 0;
+                  /*if (isset($_SESSION["plugin_fusioninventory_entity"])) {
+                     $entities_id = $_SESSION["plugin_fusioninventory_entity"];
+                  }*/
+                  if ($key == "locations_id") {
+                     $value->$key = \Dropdown::importExternal('Location', $value->$key, $entities_id);
+                  } else if ($key == "computermodels_id") {
+                     // computer model need manufacturer relation for dictionary import
+                     // see \CommonDCModelDropdown::$additional_fields_for_dictionnary
+                     $value->$key = \Dropdown::importExternal('ComputerModel', $value->$key, $entities_id, [
+                        'manufacturer' => $manufacture_name
+                     ]);
+                  } else if (isset($this->foreignkey_itemtype[$key])) {
+                     $value->$key = \Dropdown::importExternal($this->foreignkey_itemtype[$key], $value->$key, $entities_id);
+                  } else if (isForeignKeyField($key) && $key != "users_id") {
+                     $this->foreignkey_itemtype[$key] = getItemtypeForForeignKeyField($key);
+                     $value->$key = \Dropdown::importExternal($this->foreignkey_itemtype[$key], $value->$key, $entities_id);
+
+                     if ($key == 'operatingsystemkernelversions_id'
+                        && property_exists($value, 'operatingsystemkernels_id')
+                        && (int)$value->$key > 0
+                     ) {
+                        $kversion = new \OperatingSystemKernelVersion();
+                        $kversion->getFromDB($value->$key);
+                        if ($kversion->fields['operatingsystemkernels_id'] != $value->operatingsystemkernels_id) {
+                           $kversion->update([
+                              'id'                          => $kversion->getID(),
+                              'operatingsystemkernels_id'   => $value->operatingsystemkernels_id
+                           ]);
+                        }
+                     }
+                  }
+               }
+            } else {
+               unset($value->$key);
+            }
+         }
+      }
+      return $this->data;
+   }
 }
