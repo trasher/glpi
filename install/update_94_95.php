@@ -1198,6 +1198,23 @@ function update94to95() {
          ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
       $DB->queryOrDie($query, "9.5 add table glpi_agents");
    }
+
+   if (!$DB->tableExists('glpi_rulematchedlogs')) {
+      $query = "CREATE TABLE `glpi_rulematchedlogs` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `date` timestamp NULL DEFAULT NULL,
+            `items_id` int(11) NOT NULL DEFAULT '0',
+            `itemtype` varchar(100) DEFAULT NULL,
+            `rules_id` int(11) NOT NULL DEFAULT '0',
+            `agents_id` int(11) NOT NULL DEFAULT '0',
+            `method` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+            PRIMARY KEY (`id`),
+            KEY `item` (`itemtype`,`items_id`),
+            FOREIGN KEY (rules_id) REFERENCES glpi_rules (id) ON DELETE CASCADE ON UPDATE CASCADE,
+            FOREIGN KEY (agents_id) REFERENCES glpi_agents (id) ON DELETE CASCADE ON UPDATE CASCADE
+         ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
+      $DB->queryOrDie($query, "9.5 add table glpi_rulematchedlogs");
+   }
    /** /Native inventory */
    // ************ Keep it at the end **************
    foreach ($ADDTODISPLAYPREF as $type => $tab) {

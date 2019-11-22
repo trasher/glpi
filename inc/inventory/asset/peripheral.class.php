@@ -247,4 +247,15 @@ class Peripheral extends InventoryAsset
    public function checkConf(Conf $conf) {
       return true;
    }
+
+   /**
+    * Get agent
+    *
+    * @return \Agent
+    */
+   public function getAgent() {
+      $agent = new \Agent();
+      $agent->getFromDB($this->item->fields['id']);
+      return $agent;
+   }
 }

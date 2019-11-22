@@ -140,6 +140,7 @@ class NetworkEquipment extends CommonDBTM {
          ->addStandardTab('Reservation', $ong, $options)
          ->addStandardTab('Certificate_Item', $ong, $options)
          ->addStandardTab('Domain_Item', $ong, $options)
+         ->addStandardTab('RuleMatchedLog', $ong, $options)
          ->addStandardTab('Log', $ong, $options);
 
       return $ong;

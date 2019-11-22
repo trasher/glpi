@@ -457,7 +457,7 @@ class Inventory
 
    public function handleItem() {
 
-      $item_input = [];
+      $item_input = ['is_dynamic' => 1];
       if (isset($this->data['hardware'])) {
          $hardware = (object)$this->data['hardware'][0];
          foreach ($hardware as $key => $property) {
@@ -821,6 +821,15 @@ class Inventory
    }
 
    /**
+    * Get agent
+    *
+    * @return \Agent
+    */
+   public function getAgent() {
+      return $this->agent;
+   }
+
+   /**
     * After rule engine passed, update task (log) and create item if required
     *
     * @global object $DB
@@ -829,8 +838,9 @@ class Inventory
     * @global array $CFG_GLPI
     * @param integer $items_id id of the item (0 = not exist in database)
     * @param string $itemtype
+    * @param integer $rules_id
     */
-   public function rulepassed($items_id, $itemtype) {
+   public function rulepassed($items_id, $itemtype, $rules_id) {
       global $DB, $PLUGIN_FUSIONINVENTORY_XML, $PF_ESXINVENTORY, $CFG_GLPI;
 
       $no_history = false;
@@ -995,6 +1005,7 @@ class Inventory
          if (isset($_SESSION['glpi_fusionionventory_nolock'])) {
             unset($_SESSION['glpi_fusionionventory_nolock']);
          }
+          */
 
          // * For benchs
          //Toolbox::logInFile("exetime", (microtime(TRUE) - $start)." (".$items_id.")\n".
@@ -1003,29 +1014,27 @@ class Inventory
          //  memory_get_peak_usage()."\n".
          //  memory_get_peak_usage()."\n");
 
+         //FIXME: was conditionned like:
          /*if (isset($_SESSION['plugin_fusioninventory_rules_id'])) {
-            $pfRulematchedlog = new PluginFusioninventoryRulematchedlog();
-            $inputrulelog = [];
-            $inputrulelog['date'] = date('Y-m-d H:i:s');
-            $inputrulelog['rules_id'] = $_SESSION['plugin_fusioninventory_rules_id'];
-            if (isset($_SESSION['plugin_fusioninventory_agents_id'])) {
-               $inputrulelog['plugin_fusioninventory_agents_id'] =
-                              $_SESSION['plugin_fusioninventory_agents_id'];
-            }
-            $inputrulelog['items_id'] = $items_id;
-            $inputrulelog['itemtype'] = $itemtype;
-            $inputrulelog['method'] = 'inventory';
-            $pfRulematchedlog->add($inputrulelog, [], false);
-            $pfRulematchedlog->cleanOlddata($items_id, $itemtype);
+           //do the job
             unset($_SESSION['plugin_fusioninventory_rules_id']);
          }*/
-         // Write XML file
-         /*if (!empty($PLUGIN_FUSIONINVENTORY_XML)) {
-            PluginFusioninventoryToolbox::writeXML(
-                    $items_id,
-                    $PLUGIN_FUSIONINVENTORY_XML->asXML(),
-                    'computer');
+         $rulesmatched = new \RuleMatchedLog();
+         $inputrulelog = [
+            'date'      => date('Y-m-d H:i:s'),
+            'rules_id'  => $rules_id,
+            'items_id'  => $items_id,
+            'itemtype'  => $itemtype,
+            'agents_id' => $this->agent->fields['id'],
+            'method'    => 'inventory'
+
+         ];
+         /*if (isset($_SESSION['plugin_fusioninventory_agents_id'])) {
+            $inputrulelog['plugin_fusioninventory_agents_id'] =
+                           $_SESSION['plugin_fusioninventory_agents_id'];
          }*/
+         $rulesmatched->add($inputrulelog, [], false);
+         $rulesmatched->cleanOlddata($items_id, $itemtype);
 
          // Write inventory file
          $dir = GLPI_INVENTORY_DIR . '/' . $itemtype;

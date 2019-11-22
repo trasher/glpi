@@ -698,20 +698,27 @@ class RuleImportComputer extends Rule {
       return $output;*/
 
       $class = $params['class'];
+      $rules_id = $this->fields['id'];
 
-      /*$pfRulematchedlog = new PluginFusioninventoryRulematchedlog();
-      $inputrulelog = [];
-      $inputrulelog['date'] = date('Y-m-d H:i:s');
-      $inputrulelog['rules_id'] = $this->fields['id'];
+      $rulesmatched = new RuleMatchedLog();
+      $inputrulelog = [
+         'date'      => date('Y-m-d H:i:s'),
+         'rules_id'  => $rules_id
+      ];
+
+      if (method_exists($class, 'getAgent')) {
+         $inputrulelog['agents_id'] = $class->getAgent()->fields['id'];
+      }
+
       if (!isset($params['return'])) {
          //if (isset($_SESSION['plugin_fusioninventory_classrulepassed'])) {
-            //$inputrulelog['method'] = $class->getMethod();
+            $inputrulelog['method'] = 'inventory'; //$class->getMethod();
          //}
-         if (isset($_SESSION['plugin_fusioninventory_agents_id'])) {
-            $inputrulelog['plugin_fusioninventory_agents_id'] =
+         /*if (isset($_SESSION['plugin_fusioninventory_agents_id'])) {
+            $inputrulelog['agents_id'] =
                            $_SESSION['plugin_fusioninventory_agents_id'];
-         }
-      }*/
+         }*/
+      }
 
       /*\Toolbox::logDebug(
          __METHOD__ . "\n     output:\n" . print_r($output, true) . "\n     params:\n" .
@@ -730,11 +737,13 @@ class RuleImportComputer extends Rule {
                         $output['found_inventories'] = [$items_id, $itemtype];
                         //if (isset($_SESSION['plugin_fusioninventory_classrulepassed'])) {
                            if (!isset($params['return'])) {
-                              /*$inputrulelog['items_id'] = $items_id;
-                              $inputrulelog['itemtype'] = $itemtype;
-                              $pfRulematchedlog->add($inputrulelog);
-                              $pfRulematchedlog->cleanOlddata($items_id, $itemtype);*/
-                              $class->rulepassed($items_id, $itemtype);
+                              $inputrulelog = $inputrulelog + [
+                                 'items_id'  => $items_id,
+                                 'itemtype'  => $itemtype
+                              ];
+                              $rulesmatched->add($inputrulelog);
+                              $rulesmatched->cleanOlddata($items_id, $itemtype);
+                              $class->rulepassed($items_id, $itemtype, $rules_id);
                            }
                         /*} else {
                            $_SESSION['plugin_fusioninventory_rules_id'] = $this->fields['id'];
@@ -753,7 +762,7 @@ class RuleImportComputer extends Rule {
                                  if (!isset($params['return'])) {
                                     $_SESSION['plugin_fusioninventory_rules_id'] =
                                                    $this->fields['id'];
-                                    $class->rulepassed("0", $itemtype);
+                                    $class->rulepassed("0", $itemtype, $rules_id);
                                  }
                                  $output['found_inventories'] = [0, $itemtype];
                               /*} else {
@@ -770,7 +779,7 @@ class RuleImportComputer extends Rule {
                         //if (isset($_SESSION['plugin_fusioninventory_classrulepassed'])) {
                            if (!isset($params['return'])) {
                               $_SESSION['plugin_fusioninventory_rules_id'] = $this->fields['id'];
-                              $class->rulepassed("0", "PluginFusioninventoryUnmanaged");
+                              $class->rulepassed("0", "PluginFusioninventoryUnmanaged", $rules_id);
                            }
                            $output['found_inventories'] = [0, "PluginFusioninventoryUnmanaged"];
                            return $output;
@@ -803,7 +812,7 @@ class RuleImportComputer extends Rule {
                         //if (isset($_SESSION['plugin_fusioninventory_classrulepassed'])) {
                            if (!isset($params['return'])) {
                               $_SESSION['plugin_fusioninventory_rules_id'] = $this->fields['id'];
-                              $class->rulepassed("0", $itemtype);
+                              $class->rulepassed("0", $itemtype, $rules_id);
                            }
                            $output['found_inventories'] = [0, $itemtype];
                            return $output;
@@ -820,7 +829,7 @@ class RuleImportComputer extends Rule {
                   //if (isset($_SESSION['plugin_fusioninventory_classrulepassed'])) {
                      if (!isset($params['return'])) {
                         $_SESSION['plugin_fusioninventory_rules_id'] = $this->fields['id'];
-                        $class->rulepassed("0", "PluginFusioninventoryUnmanaged");
+                        $class->rulepassed("0", "PluginFusioninventoryUnmanaged", $rules_id);
                      }
                      $output['found_inventories'] = [0, 'PluginFusioninventoryUnmanaged'];
                      return $output;
