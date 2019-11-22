@@ -99,7 +99,6 @@ class Inventory
       }
 
        $this->raw_data = json_decode($data);
-       file_put_contents(GLPI_TMP_DIR . '/local_inv.json', $data);
        return true;
    }
 
@@ -997,10 +996,6 @@ class Inventory
             unset($_SESSION['glpi_fusionionventory_nolock']);
          }
 
-         $plugin = new Plugin();
-         if ($plugin->isActivated('monitoring')) {
-            Plugin::doOneHook("monitoring", "ReplayRulesForItem", ['Computer', $items_id]);
-         }*/
          // * For benchs
          //Toolbox::logInFile("exetime", (microtime(TRUE) - $start)." (".$items_id.")\n".
          //  memory_get_usage()."\n".
@@ -1031,6 +1026,13 @@ class Inventory
                     $PLUGIN_FUSIONINVENTORY_XML->asXML(),
                     'computer');
          }*/
+
+         // Write inventory file
+         $dir = GLPI_INVENTORY_DIR . '/' . $itemtype;
+         if (!is_dir($dir)) {
+            mkdir($dir);
+         }
+         file_put_contents($dir . '/'. $items_id . '.json', json_encode($this->raw_data, JSON_PRETTY_PRINT));
       } else if ($itemtype == 'PluginFusioninventoryUnmanaged') {
 
          /*$a_computerinventory = $pfFormatconvert->computerSoftwareTransformation(

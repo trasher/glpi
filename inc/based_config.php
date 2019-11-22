@@ -140,6 +140,12 @@ if (!defined("GLPI_SCRIPT_DIR")) {
    define("GLPI_SCRIPT_DIR", GLPI_ROOT . "/scripts");
 }
 
+// Path for inventory files
+if (!defined("GLPI_INVENTORY_DIR")) {
+   define("GLPI_INVENTORY_DIR", GLPI_VAR_DIR . "/_inventories");
+}
+
+
 // Install mode for telemetry
 if (!defined('GLPI_INSTALL_MODE')) {
    if (is_dir(GLPI_ROOT . '/.git')) {
