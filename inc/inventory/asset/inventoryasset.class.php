@@ -43,6 +43,8 @@ abstract class InventoryAsset
    protected $item;
    /** @var array */
    protected $extra_data = [];
+   /** @var \Agent */
+   protected $agent;
 
    /**
     * Constructor
@@ -190,5 +192,26 @@ abstract class InventoryAsset
          }
       }
       return $this->data;
+   }
+
+   /**
+    * Set agent
+    *
+    * @param Agent $agent Agent instance
+    *
+    * @return $this
+    */
+   public function setAgent(\Agent $agent) {
+      $this->agent = $agent;
+      return $this;
+   }
+
+   /**
+    * Get agent
+    *
+    * @return \Agent
+    */
+   public function getAgent() {
+      return $this->agent;
    }
 }

@@ -154,7 +154,7 @@ class Peripheral extends InventoryAsset
             'serial'       => $val->serial ?? '',
             'entities_id'  => $this->item->fields['entities_id']
          ];
-         $data = $rule->processAllRules($input, [], ['class'=>$this, 'return' => true]);
+         $data = $rule->processAllRules($input, [], ['class' => $this, 'return' => true]);
 
          if (isset($data['found_inventories'])) {
             if ($data['found_inventories'][0] == 0) {
@@ -246,16 +246,5 @@ class Peripheral extends InventoryAsset
 
    public function checkConf(Conf $conf) {
       return true;
-   }
-
-   /**
-    * Get agent
-    *
-    * @return \Agent
-    */
-   public function getAgent() {
-      $agent = new \Agent();
-      $agent->getFromDB($this->item->fields['id']);
-      return $agent;
    }
 }

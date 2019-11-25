@@ -445,6 +445,7 @@ class Inventory
          if ($assettype !== false) {
             $asset = new $assettype($this->item, $value);
             if ($asset->checkConf($this->conf)) {
+               $asset->setAgent($this->getAgent());
                $asset->setExtraData($this->data);
                $asset->prepare();
                $value = $asset->handleLinks();
