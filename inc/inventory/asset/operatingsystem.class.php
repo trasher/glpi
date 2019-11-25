@@ -60,18 +60,12 @@ class OperatingSystem extends InventoryAsset
          }
       }
 
-      //FIXME: original code did unset original licenseid key, dunno if it is stull mandatory
-      if (isset($this->extra_data['winprodid'])) {
-         $val->licenseid = $this->extra_data['winprodid'];
-      } else if (isset($this->extra_data[0]['winprodid'])) {
-         $val->licenseid = $this->extra_data[0]['winprodid'];
+      if (property_exists($this->extra_data['hardware'], 'winprodid')) {
+         $val->licenseid = $this->extra_data['hardware']['winprodid'];
       }
 
-      //FIXME: original code did unset original licenseid number, dunno if it is stull mandatory
-      if (isset($this->extra_data['winprodid'])) {
-         $val->license_number = $this->extra_data['winprodkey'];
-      } else if (isset($this->extra_data[0]['winprodkey'])) {
-         $val->license_number = $this->extra_data[0]['winprodkey'];
+      if (property_exists($this->extra_data['hardware'], 'winprodkey')) {
+         $val->license_number = $this->extra_data['hardware']['winprodkey'];
       }
 
       $val->operatingsystemeditions_id = '';

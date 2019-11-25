@@ -45,6 +45,7 @@ class Computer extends InventoryAsset
       'assets'       => null
    ];
    private $raw_data;
+   private $hardware;
 
    public function __construct(\CommonDBTM $item, $data) {
       $this->item = $item;
@@ -53,14 +54,61 @@ class Computer extends InventoryAsset
    }
 
    public function prepare() :array {
+      global $DB;
+
       $mapping = [];
 
       $val = new \stdClass();
 
       if (isset($this->extra_data['hardware'])) {
          $hardware = (object)$this->extra_data['hardware'];
+
+         $hw_mapping = [
+            'name'           => 'name',
+            'winprodid'      => 'licenseid',
+            'winprodkey'     => 'license_number',
+            'workgroup'      => 'domains_id',
+            'uuid'           => 'uuid',
+            'lastloggeduser' => 'users_id',
+         ];
+
+         foreach ($hw_mapping as $origin => $dest) {
+            if (property_exists($hardware, $origin)) {
+               $hardware->$dest = $hardware->$origin;
+            }
+         }
+         $this->hardware = $hardware;
+
          foreach ($hardware as $key => $property) {
             $val->$key = $property;
+         }
+      }
+
+      if (property_exists($val, 'users_id')) {
+         if ($val->users_id == '') {
+            unset($val->users_id);
+         } else {
+            $val->contact = $val->users_id;
+            $split_user = explode("@", $val->users_id);
+            $iterator = $DB->request([
+               'SELECT' => 'id',
+               'FROM'   => 'glpi_users',
+               'WHERE'  => [
+                  'name'   => $split_user[0]
+               ],
+               'LIMIT'  => 1
+            ]);
+            $result = $iterator->next();
+            $query = "SELECT `id`
+                      FROM `glpi_users`
+                      WHERE `name` = '" . $split_user[0] . "'
+                      LIMIT 1";
+            if (count($iterator)) {
+               $result = $DB->query($query);
+               $val->users_id = $result['id'];
+            } else {
+               $val->users_id = 0;
+            }
          }
       }
 
@@ -157,6 +205,75 @@ class Computer extends InventoryAsset
                   && !empty($hardware->vmsystem)) {
                $val->computertypes_id = $hardware->vmsystem;
             }
+         }
+      }
+
+      // * USERS
+      $cnt = 0;
+      if (isset($this->extra_data['users'])) {
+         if (count($this->extra_data['users']) > 0) {
+            $user_temp = '';
+            if (property_exists($val, 'contact')) {
+               $user_temp = $val->contact;
+            }
+            $val->contact = '';
+         }
+         foreach ($this->extra_data['users'] as $a_users) {
+            $user = '';
+            if (property_exists($a_users, 'login')) {
+               $user = $a_users->login;
+               if (property_exists($a_users, 'domain')
+                       && !empty($a_users->domain)) {
+                  $user .= "@" . $a_users->domain;
+               }
+            }
+            if ($cnt == 0) {
+               if (property_exists($a_users, 'login')) {
+                  // Search on domain
+                  $where_add = [];
+                  if (property_exists($a_users, 'domain')
+                          && !empty($a_users->domain)) {
+                     $ldaps = $DB->request('glpi_authldaps',
+                           ['WHERE'  => ['inventory_domain' => $a_users->domain]]
+                     );
+                     $ldaps_ids = [];
+                     foreach ($ldaps as $data_LDAP) {
+                        $ldaps_ids[] = $data_LDAP['id'];
+                     }
+                     if (count($ldaps_ids)) {
+                        $where_add['authtype'] = Auth::LDAP;
+                        $where_add['auths_id'] = $ldaps_ids;
+                     }
+                  }
+                  $iterator = $DB->request([
+                     'SELECT' => ['id'],
+                     'FROM'   => 'glpi_users',
+                     'WHERE'  => [
+                        'name'   => $a_users->login
+                     ] + $where_add,
+                     'LIMIT'  => 1
+                  ]);
+                  if ($row = $iterator->next()) {
+                     $val->users_id = $row['id'];
+                  }
+               }
+            }
+
+            if ($user != '') {
+               if (property_exists($val, 'contact')) {
+                  if ($val->contact == '') {
+                     $val->contact = $user;
+                  } else {
+                     $val->contact .= "/" . $user;
+                  }
+               } else {
+                  $val->contact = $user;
+               }
+            }
+            $cnt++;
+         }
+         if (empty($val->contact)) {
+            $val->contact = $user_temp;
          }
       }
 
@@ -792,5 +909,14 @@ class Computer extends InventoryAsset
          }
          $class->update($input);*/
       }
+   }
+
+   /**
+    * Get modified hardware
+    *
+    * @return stdClass
+    */
+   public function getHardware() {
+      return $this->hardware;
    }
 }

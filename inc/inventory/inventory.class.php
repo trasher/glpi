@@ -271,6 +271,10 @@ class Inventory
       $main->setExtraData($this->data);
       $main->prepare();
       $this->mainasset = $main;
+      if (isset($this->data['hardware'])) {
+         //hardware is handled in computer, but may be used outside
+         $this->data['hardware'] = $main->getHardware();
+      }
 
       foreach ($this->data as $key => &$value) {
          $assettype = false;
@@ -281,7 +285,7 @@ class Inventory
                unset($this->data[$key]);
                break;
             case 'accountinfo':
-               //handled from handleItem
+               //handled from Asset\Computer
                break;
             case 'cpus':
                $assettype = '\Glpi\Inventory\Asset\Processor';
@@ -297,25 +301,10 @@ class Inventory
                //not used
                break;
             case 'hardware':
-               $mapping = [
-                  'name'           => 'name',
-                  'winprodid'      => 'licenseid',
-                  'winprodkey'     => 'license_number',
-                  'workgroup'      => 'domains_id',
-                  'uuid'           => 'uuid',
-                  'lastloggeduser' => 'users_id',
-               ];
-
-               $val = (object)$value;
-               foreach ($mapping as $origin => $dest) {
-                  if (property_exists($val, $origin)) {
-                     $val->$dest = $val->$origin;
-                  }
-               }
-               $value = [$val];
+               //handled from Asset\Computer
                break;
             case 'inputs':
-               //handled from peripheral
+               //handled from Asset\Peripheral
                break;
             case 'local_groups':
                //not used
@@ -354,36 +343,7 @@ class Inventory
                unset($this->data[$key]);
                break;
             case 'printers':
-               $rulecollection = new \RuleDictionnaryPrinterCollection();
-
-               foreach ($value as $k => &$val) {
-                  $val->is_dynamic = 1;
-                  if (strstr($val->port, "USB")) {
-                     $val->have_usb = 1;
-                  } else {
-                     $val->have_usb = 0;
-                  }
-                  unset($val->port);
-
-                  // Hack for USB Printer serial
-                  if (property_exists($val, 'serial')
-                        && preg_match('/\/$/', $val->serial)) {
-                     $val->serial = preg_replace('/\/$/', '', $val->serial);
-                  }
-
-                  $res_rule = $rulecollection->processAllRules(['name' => $val->name]);
-                  if ((!isset($res_rule['_ignore_ocs_import']) || $res_rule['_ignore_ocs_import'] != "1")
-                     && (!isset($res_rule['_ignore_import']) || $res_rule['_ignore_import'] != "1")
-                  ) {
-                     if (isset($res_rule['name'])) {
-                        $val->name = $res_rule['name'];
-                     }
-                     if (isset($res_rule['manufacturer'])) {
-                        $val->manufacturers_id = $res_rule['manufacturer'];
-                     }
-                     $this->linked_items['Printer'][] = $val;
-                  }
-               }
+               $assettype = '\Glpi\Inventory\Asset\Printer';
                break;
             case 'processes':
                //not used
@@ -425,7 +385,7 @@ class Inventory
                $assettype = '\Glpi\Inventory\Asset\GraphicCard';
                break;
             case 'users':
-               //handled from handleItem
+               //handled from sset\Computer
                break;
             case 'versionclient':
                //not used
