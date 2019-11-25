@@ -303,6 +303,11 @@ class Agent extends CommonDBTM {
          $input['version'] = $metadata['provider']['version'];
       }
 
+      if (isset($metadata['provider']['tag'])) {
+         $input['tag'] = $metadata['provider']['tag'];
+      }
+
+      $input = \Toolbox::addslashes_deep($input);
       if ($aid) {
          $input['id'] = $aid;
          $this->update($input);
