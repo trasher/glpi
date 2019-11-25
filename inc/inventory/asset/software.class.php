@@ -727,7 +727,7 @@ class Software extends InventoryAsset
     */
    private function addSoftware($a_software, $options) {
       $software = new \Software();
-      $a_softwares_id = $software->add((array)$a_software, $options, false);
+      $a_softwares_id = $software->add(\Toolbox::addslashes_deep((array)$a_software), $options, false);
       //$this->addPrepareLog($a_softwares_id, 'Software');
 
       $this->softList[$a_software->name.self::SEPARATOR.$a_software->manufacturers_id] = $a_softwares_id;
@@ -748,7 +748,7 @@ class Software extends InventoryAsset
       $a_software->name          = $a_software->version;
       $a_software->softwares_id  = $softwares_id;
       $a_software->_no_history   = true;
-      $softwareversions_id = $softwareVersion->add((array)$a_software, $options, false);
+      $softwareversions_id = $softwareVersion->add(\Toolbox::addslashes_deep((array)$a_software), $options, false);
       //$this->addPrepareLog($softwareversions_id, 'SoftwareVersion');
       $this->softVersionList[strtolower($a_software->version)."$$$$".$softwares_id."$$$$".$a_software->operatingsystems_id] = $softwareversions_id;
    }

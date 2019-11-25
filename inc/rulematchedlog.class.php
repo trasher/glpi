@@ -187,13 +187,18 @@ class RuleMatchedLog extends CommonDBTM {
    function cleanOlddata($items_id, $itemtype) {
       global $DB;
 
-      $query = "SELECT `id` FROM `glpi_plugin_fusioninventory_rulematchedlogs`
-            WHERE `items_id` = '".$items_id."'
-               AND `itemtype` = '".$itemtype."'
-            ORDER BY `date` DESC
-            LIMIT 30, 50000";
-      $result = $DB->query($query);
-      while ($data=$DB->fetchArray($result)) {
+      $iterator = $DB->request([
+         'SELECT' => 'id',
+         'FROM'   => self::getTable(),
+         'WHERE'  => [
+            'items_id'   => $items_id,
+            'itemtype'  => $itemtype
+         ],
+         'ORDER'  => 'date DESC',
+         'START'  => 30,
+         'LIMIT'  => '50000'
+      ]);
+      while ($data = $iterator->next()) {
          $this->delete(['id'=>$data['id']]);
       }
    }
