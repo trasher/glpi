@@ -59,6 +59,8 @@ class Inventory
    private $assets;
    /** @var \Glpi\Inventory\Conf */
    private $conf;
+   /** @var array */
+   private $benchs = [];
 
     /**
      * @param mixed   $data   Inventory data, optionnal
@@ -147,6 +149,8 @@ class Inventory
       }
 
       try {
+         //bench
+         $main_start = microtime(true);
          $DB->beginTransaction();
 
          $converter = new Converter;
@@ -214,6 +218,10 @@ class Inventory
          \Toolbox::logError($e);
          $DB->rollback();
          throw $e;
+      } finally {
+         // * For benchs
+         $this->addBench($this->item->getType() . ' #'.$this->item->fields['id'], 'full', $main_start);
+         $this->printBenchResults();
       }
 
       return [];
@@ -269,7 +277,11 @@ class Inventory
       $main = new Asset\Computer($this->item, $this->raw_data);//FIXME; what if not a computer?
       $main->setAgent($this->getAgent());
       $main->setExtraData($this->data);
+
+      $item_start = microtime(true);
       $main->prepare();
+      $this->addBench($this->item->getType(), 'prepare', $item_start);
+
       $this->mainasset = $main;
       if (isset($this->data['hardware'])) {
          //hardware is handled in computer, but may be used outside
@@ -421,8 +433,10 @@ class Inventory
             if ($asset->checkConf($this->conf)) {
                $asset->setAgent($this->getAgent());
                $asset->setExtraData($this->data);
+               $asset_start = microtime(true);
                $asset->prepare();
                $value = $asset->handleLinks();
+               $this->addBench($assettype, 'prepare', $asset_start);
                $this->assets[$assettype][] = $asset;
             } else {
                unset($this->data[$key]);
@@ -434,7 +448,9 @@ class Inventory
    public function handleItem() {
       //inject converted assets
       $this->mainasset->setExtraData($this->data);
+      $item_start = microtime(true);
       $this->mainasset->handle();
+      $this->addBench($this->item->getType(), 'handle', $item_start);
       return;
    }
 
@@ -462,16 +478,87 @@ class Inventory
 
       foreach ($assets_list as $type => $assets) {
          foreach ($assets as $asset) {
+            $asset_start = microtime(true);
             $asset->handle();
+            $this->addBench($type, 'handle', $asset_start);
             $ignored_controllers = array_merge($ignored_controllers, $asset->getIgnored('controllers'));
          }
       }
 
       //do controlers
       foreach ($controllers as $asset) {
+         $asset_start = microtime(true);
          //do not handle ignored controllers
          $asset->setExtraData(['ignored' => $ignored_controllers]);
          $asset->handle();
+         $this->addBench('\Glpi\Inventory\Asset\Controller', 'handle', $asset_start);
       }
+   }
+
+   /**
+    * Add bench value
+    *
+    * @param string  $asset Asset
+    * @param string  $type Either prepare or handle
+    * @param integer $start Start time
+    *
+    * @return void
+    */
+   private function addBench($asset, $type, $start) {
+      $exec_time = round(microtime(true) - $start, 5);
+      $this->benchs[$asset][$type] = [
+         'exectime'  => $exec_time,
+         'mem'       => \Toolbox::getSize(memory_get_usage()),
+         'mem_real'  => \Toolbox::getSize(memory_get_usage(true)),
+         'mem_peak'  => \Toolbox::getSize(memory_get_peak_usage())
+
+      ];
+   }
+
+   /**
+    * Display bench results
+    *
+    * @return void
+    */
+   public function printBenchResults() {
+      $output = '';
+      foreach ($this->benchs as $asset => $types) {
+         $output .= "$asset:\n";
+         foreach ($types as $type => $data) {
+            $output .= "\t$type:\n";
+            foreach ($data as $key => $value) {
+               $label = $key;
+               switch ($label) {
+                  case 'exectime':
+                     $output .= "\t\tExcution time:       ";
+                     break;
+                  case 'mem':
+                     $output .= "\t\tMemory usage:        ";
+                     break;
+                  case 'mem_real':
+                     $output .= "\t\tMemory usage (real): ";
+                     break;
+                  case 'mem_peak':
+                     $output .= "\t\tMemory peak:         ";
+                     break;
+               }
+
+               if ($key == 'exectime') {
+                  $output .= sprintf(
+                     _n('%s second', '%s seconds', $value),
+                     $value
+                  );
+               } else {
+                  $output .= \Toolbox::getSize($value);
+               }
+               $output .= "\n";
+            }
+         }
+      }
+
+      \Toolbox::logInFile(
+         "bench_inventory",
+         $output
+      );
    }
 }
