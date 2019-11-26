@@ -68,6 +68,20 @@ class OperatingSystem extends InventoryAsset
          $val->license_number = $this->extra_data['hardware']['winprodkey'];
       }
 
+      if (property_exists($this->extra_data['hardware'], 'osname')) {
+         $val->full_name = $this->extra_data['hardware']->osname;
+      }
+
+      if (property_exists($this->extra_data['hardware']->osversion)) {
+         $val->version = $this->extra_data['hardware']->osversion;
+      }
+
+      if (property_exists($this->extra_data['hardware']->oscomments)
+               && $this->extra_data['hardware']->oscomments != ''
+               && !strstr($this->extra_data['hardware']->oscomments, 'UTC')) {
+         $val->service_pack = $this->extra_data['hardware']->oscomments;
+      }
+
       $val->operatingsystemeditions_id = '';
       if (property_exists($val, 'full_name') && $this->manage_osname == true) {
          $matches = [];

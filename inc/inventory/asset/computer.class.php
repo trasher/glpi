@@ -68,7 +68,6 @@ class Computer extends InventoryAsset
             'winprodid'      => 'licenseid',
             'winprodkey'     => 'license_number',
             'workgroup'      => 'domains_id',
-            'uuid'           => 'uuid',
             'lastloggeduser' => 'users_id',
          ];
 
