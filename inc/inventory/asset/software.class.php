@@ -633,18 +633,18 @@ class Software extends InventoryAsset
       $nbSoft = 0;
       if (count($this->softList) == 0) {
          foreach ($this->data as $a_software) {
-            $a_softSearch[] = "'".$a_software->name.self::SEPARATOR.$a_software->manufacturers_id."'";
+            $a_softSearch[] = $a_software->name.self::SEPARATOR.$a_software->manufacturers_id;
             $nbSoft++;
          }
       } else {
          foreach ($this->data as $a_software) {
             if (!isset($this->softList[$a_software->name.self::SEPARATOR.$a_software->manufacturers_id])) {
-               $a_softSearch[] = "'".$a_software->name.self::SEPARATOR.$a_software->manufacturers_id."'";
+               $a_softSearch[] = $a_software->name.self::SEPARATOR.$a_software->manufacturers_id;
                $nbSoft++;
             }
          }
       }
-      $whereid .= " AND CONCAT_WS('".self::SEPARATOR."', `name`, `manufacturers_id`) IN (".implode(",", $a_softSearch).")";
+      $whereid .= " AND CONCAT_WS('".self::SEPARATOR."', `name`, `manufacturers_id`) IN ('".implode("', '", \Toolbox::addslashes_deep($a_softSearch))."')";
 
       $sql     = "SELECT max( id ) AS max FROM `glpi_softwares`";
       $result  = $DB->query($sql);
@@ -655,6 +655,11 @@ class Software extends InventoryAsset
          return $lastid;
       }
 
+      /*$iterator = $DB->request([
+         'SELECT' => ['id', 'name', 'manufacturers_id'],
+         'FROM'   => 'glpi_softwares',
+         'WHERE' => ['entities_id' => $entities_id]
+      ]);*/
       $sql = "SELECT `id`, `name`, `manufacturers_id`
               FROM `glpi_softwares`
               WHERE `entities_id`='".$entities_id."'".$whereid;

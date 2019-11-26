@@ -76,9 +76,10 @@ class Printer extends InventoryAsset
       global $DB;
 
       // * Printers
-      $rule = new RuleImportComputerCollection();
+      $rule = new \RuleImportComputerCollection();
       $printer = new \Printer();
       $printers = [];
+      $entities_id = 0; //FIXME
       foreach ($this->data as $key => $val) {
          $input = [
             'itemtype' => "Printer",
@@ -106,11 +107,11 @@ class Printer extends InventoryAsset
                   $inputrulelog['plugin_fusioninventory_agents_id'] =
                                  $_SESSION['plugin_fusioninventory_agents_id'];
                }
-               $inputrulelog['items_id'] = end($a_printers);
+               $inputrulelog['items_id'] = end($printers);
                $inputrulelog['itemtype'] = "Printer";
                $inputrulelog['method'] = 'inventory';
                $pfRulematchedlog->add($inputrulelog, [], false);
-               $pfRulematchedlog->cleanOlddata(end($a_printers), "Printer");
+               $pfRulematchedlog->cleanOlddata(end($printers), "Printer");
                unset($_SESSION['plugin_fusioninventory_rules_id']);
             }*/
 
@@ -146,7 +147,7 @@ class Printer extends InventoryAsset
          $db_printers[$idtmp] = $data['id'];
       }
       if (count($db_printers) == 0) {
-         foreach ($a_printers as $printers_id) {
+         foreach ($printers as $printers_id) {
             $input['entities_id'] = $entities_id;
             $input['computers_id']   = $this->item->fields['id'];
             $input['itemtype']       = 'Printer';
@@ -157,10 +158,10 @@ class Printer extends InventoryAsset
          }
       } else {
          // Check all fields from source:
-         foreach ($a_printers as $key => $printers_id) {
+         foreach ($printers as $key => $printers_id) {
             foreach ($db_printers as $keydb => $prints_id) {
                if ($printers_id == $prints_id) {
-                  unset($a_printers[$key]);
+                  unset($printers[$key]);
                   unset($db_printers[$keydb]);
                   break;
                }
@@ -172,7 +173,7 @@ class Printer extends InventoryAsset
             $computer_Item->delete(['id'=>$idtmp], 1);
          }
 
-         foreach ($a_printers as $printers_id) {
+         foreach ($printers as $printers_id) {
             $input['entities_id'] = $entities_id;
             $input['computers_id']   = $this->item->fields['id'];
             $input['itemtype']       = 'Printer';
