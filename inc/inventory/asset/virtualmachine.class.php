@@ -107,7 +107,6 @@ class VirtualMachine extends InventoryAsset
          }
          $this->vms[] = $vm_val;
 
-         $array_tmp['networkport'] = [];
          if (property_exists($vm_val, 'networks') && is_array($vm_val->networks)) {
             foreach ($vm_val->networks as $net_key => $net_value) {
                foreach ($net_mapping as $origin => $dest) {
