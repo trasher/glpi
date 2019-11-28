@@ -549,7 +549,7 @@ class Computer extends InventoryAsset
       $_SESSION['glpiactiveentities_string'] = $entities_id;
       $_SESSION['glpiactive_entity']         = $entities_id;
 
-      $val->states_id = $this->states_id_default ?? $this->item->fields['states_id'];
+      $val->states_id = $this->states_id_default ?? $this->item->fields['states_id'] ?? 0;
 
       if ($items_id == 0) {
          $items_id = $this->item->add(\Toolbox::addslashes_deep((array)$val));

@@ -742,12 +742,13 @@ class Software extends InventoryAsset
       $options['disable_unicity_check'] = true;
 
       $softwareVersion = new \SoftwareVersion();
-      $a_software->name          = $a_software->version;
-      $a_software->softwares_id  = $softwares_id;
-      $a_software->_no_history   = true;
-      $softwareversions_id = $softwareVersion->add(\Toolbox::addslashes_deep((array)$a_software), $options, false);
+      $a_version = clone $a_software;
+      $a_version->name          = $a_version->version;
+      $a_version->softwares_id  = $softwares_id;
+      $a_version->_no_history   = true;
+      $softwareversions_id = $softwareVersion->add(\Toolbox::addslashes_deep((array)$a_version), $options, false);
       //$this->addPrepareLog($softwareversions_id, 'SoftwareVersion');
-      $this->softVersionList[strtolower($a_software->version)."$$$$".$softwares_id."$$$$".$a_software->operatingsystems_id] = $softwareversions_id;
+      $this->softVersionList[strtolower($a_version->version)."$$$$".$softwares_id."$$$$".$a_version->operatingsystems_id] = $softwareversions_id;
    }
 
    /**
