@@ -65,8 +65,6 @@ trait NetworkPort {
       $networkports = $this->ports;
       $no_history = true;
 
-      $_SESSION["plugin_fusioninventory_entity"] = 0;//FIXME: HACK
-
       if ($items_id === null) {
          $items_id = $this->item->fields['id'];
       }
@@ -138,7 +136,7 @@ trait NetworkPort {
                      'address'     => $a_networkport['subnet'],
                      'netmask'     => $a_networkport['netmask'],
                      'gateway'     => $a_networkport['gateway'],
-                     'entities_id' => $_SESSION["plugin_fusioninventory_entity"],
+                     'entities_id' => $this->entities_id,
                   ]) == 0) {
 
                $input_ipanetwork = [
@@ -148,7 +146,7 @@ trait NetworkPort {
                    'network' => $a_networkport['subnet'].' / '.
                                 $a_networkport['netmask'],
                    'gateway' => $a_networkport['gateway'],
-                   'entities_id' => $_SESSION["plugin_fusioninventory_entity"]
+                   'entities_id' => $this->entities_id
                ];
                $iPNetwork->add($input_ipanetwork, [], !$no_history);
             }
@@ -225,7 +223,7 @@ trait NetworkPort {
                       'itemtype' => 'NetworkPort'],
                      [], 1));
                if (!isset($a_networknames_find['id'])) {
-                  $a_networkport['entities_id'] = $_SESSION["plugin_fusioninventory_entity"];
+                  $a_networkport['entities_id'] = $this->entities_id;
                   $a_networkport['items_id'] = $items_id;
                   $a_networkport['itemtype'] = $itemtype;
                   $a_networkport['is_dynamic'] = 1;
@@ -305,7 +303,7 @@ trait NetworkPort {
          if (count($networkports) != 0) {
             foreach ($networkports as $a_networkport) {
                $a_networkport = (array)$a_networkport;
-               $a_networkport['entities_id'] = $_SESSION["plugin_fusioninventory_entity"];
+               $a_networkport['entities_id'] = $this->entities_id;
                $a_networkport['items_id'] = $items_id;
                $a_networkport['itemtype'] = $itemtype;
                $a_networkport['is_dynamic'] = 1;

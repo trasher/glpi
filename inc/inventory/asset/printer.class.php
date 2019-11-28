@@ -79,7 +79,7 @@ class Printer extends InventoryAsset
       $rule = new \RuleImportComputerCollection();
       $printer = new \Printer();
       $printers = [];
-      $entities_id = 0; //FIXME
+      $entities_id = $this->entities_id;
       foreach ($this->data as $key => $val) {
          $input = [
             'itemtype' => "Printer",
@@ -90,8 +90,8 @@ class Printer extends InventoryAsset
          if (isset($data['found_inventories'])) {
             if ($data['found_inventories'][0] == 0) {
                // add printer
-               /*$val->entities_id = $entities_id;
-               $val->otherserial = PluginFusioninventoryToolbox::setInventoryNumber(
+               $val->entities_id = $entities_id;
+               /*$val->otherserial = PluginFusioninventoryToolbox::setInventoryNumber(
                   'Printer', '', $entities_id);*/
                $printers[] = $printer->add(\Toolbox::addslashes_deep((array)$val));
             } else {
@@ -148,7 +148,7 @@ class Printer extends InventoryAsset
       }
       if (count($db_printers) == 0) {
          foreach ($printers as $printers_id) {
-            $input['entities_id'] = $entities_id;
+            $input['entities_id']    = $entities_id;
             $input['computers_id']   = $this->item->fields['id'];
             $input['itemtype']       = 'Printer';
             $input['items_id']       = $printers_id;
@@ -174,7 +174,7 @@ class Printer extends InventoryAsset
          }
 
          foreach ($printers as $printers_id) {
-            $input['entities_id'] = $entities_id;
+            $input['entities_id']    = $entities_id;
             $input['computers_id']   = $this->item->fields['id'];
             $input['itemtype']       = 'Printer';
             $input['items_id']       = $printers_id;

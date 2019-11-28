@@ -160,7 +160,7 @@ class Peripheral extends InventoryAsset
             if ($data['found_inventories'][0] == 0) {
                // add peripheral
                $val->is_dynamic = 1;
-               $val->entities_id = 0;//FIXME: $entities_id;
+               $val->entities_id = $this->entities_id;
                $peripherals[] = $peripheral->add((array)$val);
             } else {
                $peripherals[] = $data['found_inventories'][0];
@@ -186,7 +186,7 @@ class Peripheral extends InventoryAsset
          'WHERE'     => [
             'itemtype'                          => 'Peripheral',
             'computers_id'                      => $this->item->fields['id'],
-            'entities_id'                       => $this->item->fields['entities_id'],//FIXME: $entities_id,
+            'entities_id'                       => $this->entities_id,
             'glpi_computers_items.is_dynamic'   => 1,
             'glpi_peripherals.is_global'           => 0
          ]

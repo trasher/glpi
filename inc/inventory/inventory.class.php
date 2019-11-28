@@ -433,6 +433,7 @@ class Inventory
             if ($asset->checkConf($this->conf)) {
                $asset->setAgent($this->getAgent());
                $asset->setExtraData($this->data);
+               $asset->setEntityID($this->mainasset->getEntityID());
                $asset_start = microtime(true);
                $asset->prepare();
                $value = $asset->handleLinks();

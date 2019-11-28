@@ -307,9 +307,6 @@ class Computer extends InventoryAsset
    }
 
    public function handle() {
-      $val = $this->data[0];
-      $val->is_dynamic = 1;
-
       /*$pfBlacklist = new PluginFusioninventoryInventoryComputerBlacklist();
       $a_computerinventory = $pfBlacklist->cleanBlacklist($a_computerinventory);
 
@@ -417,49 +414,42 @@ class Computer extends InventoryAsset
       // (see http://forge.fusioninventory.org/issues/1503)
 
       // * entity rules
-      // FIXME: Q&D hack
-      $input['entities_id'] = 0;
-      /*$inputent = $input;
-      if ((isset($a_computerinventory['Computer']['domains_id']))
-                    AND (!empty($a_computerinventory['Computer']['domains_id']))) {
-         $inputent['domain'] = $a_computerinventory['Computer']['domains_id'];
-      }
-      if (isset($inputent['serial'])) {
-         $inputent['serialnumber'] = $inputent['serial'];
-      }
-      $ruleEntity = new PluginFusioninventoryInventoryRuleEntityCollection();
+      $input['entities_id'] = $this->entities_id;
+      $entity_input = $input;
 
+      if (property_exists($val, 'domains_id') && (!empty($val->domains_id))) {
+         $entity_input['domain'] = $val->domains_id;
+      }
+
+      if (isset($entity_input['serial'])) {
+         $entity_input['serialnumber'] = $entity_input['serial'];
+      }
+
+      $ruleEntity = new \RuleImportEntityCollection();
       // * Reload rules (required for unit tests)
       $ruleEntity->getCollectionPart();
+      $dataEntity = $ruleEntity->processAllRules($entity_input, []);
 
-      $dataEntity = $ruleEntity->processAllRules($inputent, []);
       if (isset($dataEntity['_ignore_import'])) {
          return;
       }
 
-      if (isset($dataEntity['entities_id'])
-                    && $dataEntity['entities_id'] >= 0) {
-         $_SESSION["plugin_fusioninventory_entity"] = $dataEntity['entities_id'];
-         $input['entities_id'] = $dataEntity['entities_id'];
-
-      } else if (isset($dataEntity['entities_id'])
-                    && $dataEntity['entities_id'] == -1) {
+      if (!isset($dataEntity['entities_id']) || $dataEntity['entities_id'] == -1) {
          $input['entities_id'] = 0;
-         $_SESSION["plugin_fusioninventory_entity"] = -1;
       } else {
-         $input['entities_id'] = 0;
-         $_SESSION["plugin_fusioninventory_entity"] = 0;
+         $input['entities_id'] = $dataEntity['entities_id'];
       }
+      $this->entities_id = $input['entities_id'];
 
-      if (isset($dataEntity['locations_id'])) {
+      /*if (isset($dataEntity['locations_id'])) {
          $_SESSION['plugin_fusioninventory_locations_id'] = $dataEntity['locations_id'];
-      }
+      }*/
          // End entity rules
-      $_SESSION['plugin_fusioninventory_classrulepassed'] =
-                     "PluginFusioninventoryInventoryComputerInventory";
+      /*$_SESSION['plugin_fusioninventory_classrulepassed'] =
+         "PluginFusioninventoryInventoryComputerInventory";*/
 
       //Add the location if needed (play rule locations engine)
-      $output = [];
+      /*$output = [];
       $output = PluginFusioninventoryToolbox::addLocation($input, $output);
       if (isset($output['locations_id'])) {
          $_SESSION['plugin_fusioninventory_locations_id'] =
@@ -549,13 +539,12 @@ class Computer extends InventoryAsset
       $setdynamic = 1;
 
       $val = $this->data[0];
-      $entities_id = 0; //FIXME: should not be hardcoded
+      $entities_id = $this->entities_id;
+      $val->is_dynamic = 1;
       $val->entities_id = $entities_id;
       $_SESSION['glpiactiveentities']        = [$entities_id];
       $_SESSION['glpiactiveentities_string'] = $entities_id;
       $_SESSION['glpiactive_entity']         = $entities_id;
-
-      //$entities_id = $_SESSION["plugin_fusioninventory_entity"];
 
       if ($items_id == 0) {
          /*$input = [];
@@ -579,43 +568,25 @@ class Computer extends InventoryAsset
 
       $val->id = $this->item->fields['id'];
 
-      /*PluginFusioninventoryToolbox::logIfExtradebug(
-         "pluginFusioninventory-rules",
-         "Rule passed : ".$items_id.", ".$itemtype."\n"
-      );*/
-      /*$pfFormatconvert = new \PluginFusioninventoryFormatconvert();*/
-
       $this->data = $this->handleLinks($this->data, $itemtype, $items_id);
 
-      //$pfInventoryComputerLib = new PluginFusioninventoryInventoryComputerLib();
-      //$pfAgent                = new PluginFusioninventoryAgent();
+      if ($entities_id == -1) {
+         $entities_id = $this->item->fields['entities_id'];
+      }
+      $val->entities_id = $entities_id;
 
-      if ($items_id == '0') {
-         if ($entities_id == -1) {
-            $entities_id = 0;
-            //$_SESSION["plugin_fusioninventory_entity"] = 0;
-         }
-         //FIXME: maybe is there a better way...
-         $_SESSION['glpiactiveentities']        = [$entities_id];
-         $_SESSION['glpiactiveentities_string'] = $entities_id;
-         $_SESSION['glpiactive_entity']         = $entities_id;
-      } else {
+      //FIXME: maybe is there a better way... Ths would override current SESSION values.
+      $_SESSION['glpiactiveentities']        = [$entities_id];
+      $_SESSION['glpiactiveentities_string'] = $entities_id;
+      $_SESSION['glpiactive_entity']         = $entities_id;
+
+      if ($items_id != '0') {
          /*$$a_computerinventory['Computer']['states_id'] = $computer->fields['states_id'];
          $input = [];
          $input = PluginFusioninventoryToolbox::addDefaultStateIfNeeded('computer', $input);
          if (isset($input['states_id'])) {
                $a_computerinventory['Computer']['states_id'] = $input['states_id'];
          }*/
-
-         if ($entities_id == -1) {
-            $entities_id = $computer->fields['entities_id'];
-            //$_SESSION["plugin_fusioninventory_entity"] = $computer->fields['entities_id'];
-         }
-
-         //FIXME: maybe is there a better way...
-         $_SESSION['glpiactiveentities']        = [$entities_id];
-         $_SESSION['glpiactiveentities_string'] = $entities_id;
-         $_SESSION['glpiactive_entity']         = $entities_id;
 
          //TODO?
          /*if ($computer->fields['entities_id'] != $entities_id) {
@@ -650,17 +621,11 @@ class Computer extends InventoryAsset
       }
       */
 
-      // * New
-
       /*if (isset($_SESSION['plugin_fusioninventory_locations_id'])) {
             $a_computerinventory['Computer']['locations_id'] =
                               $_SESSION['plugin_fusioninventory_locations_id'];
             unset($_SESSION['plugin_fusioninventory_locations_id']);
       }*/
-
-      /*$serialized = gzcompress(serialize($a_computerinventory));
-      $a_computerinventory['fusioninventorycomputer']['serialized_inventory'] =
-         Toolbox::addslashes_deep($serialized);*/
 
       /*if (!$PF_ESXINVENTORY) {
          $pfAgent->setAgentWithComputerid($items_id, $this->device_id, $entities_id);
@@ -693,7 +658,6 @@ class Computer extends InventoryAsset
          'itemtype'  => $itemtype,
          'agents_id' => $this->agent->fields['id'],
          'method'    => 'inventory'
-
       ];
       $rulesmatched->add($inputrulelog, [], false);
       $rulesmatched->cleanOlddata($items_id, $itemtype);
@@ -715,5 +679,14 @@ class Computer extends InventoryAsset
     */
    public function getHardware() {
       return $this->hardware;
+   }
+
+   /**
+    * Retrieve computer entities id
+    *
+    * @return integer
+    */
+   public function getEntityID() {
+      return $this->entities_id;
    }
 }

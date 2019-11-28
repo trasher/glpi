@@ -45,6 +45,8 @@ abstract class InventoryAsset
    protected $extra_data = [];
    /** @var \Agent */
    protected $agent;
+   /** @var integer */
+   protected $entities_id = 0;//FIXME? Is that a good default?
 
    /**
     * Constructor
@@ -153,10 +155,7 @@ abstract class InventoryAsset
                   }
                }
                if (!is_numeric($key)) {
-                  $entities_id = 0;
-                  /*if (isset($_SESSION["plugin_fusioninventory_entity"])) {
-                     $entities_id = $_SESSION["plugin_fusioninventory_entity"];
-                  }*/
+                  $entities_id = $this->entities_id;
                   if ($key == "locations_id") {
                      $value->$key = \Dropdown::importExternal('Location', $value->$key, $entities_id);
                   } else if ($key == "computermodels_id") {
@@ -213,5 +212,17 @@ abstract class InventoryAsset
     */
    public function getAgent() {
       return $this->agent;
+   }
+
+   /**
+    * Set entity id from main asset
+    *
+    * @param integer $id Entity ID
+    *
+    * @return $this
+    */
+   public function setEntityID($id) {
+      $this->entities_id = $id;
+      return $this;
    }
 }

@@ -61,11 +61,11 @@ class OperatingSystem extends InventoryAsset
       }
 
       if (property_exists($this->extra_data['hardware'], 'winprodid')) {
-         $val->licenseid = $this->extra_data['hardware']['winprodid'];
+         $val->licenseid = $this->extra_data['hardware']->winprodid;
       }
 
       if (property_exists($this->extra_data['hardware'], 'winprodkey')) {
-         $val->license_number = $this->extra_data['hardware']['winprodkey'];
+         $val->license_number = $this->extra_data['hardware']->winprodkey;
       }
 
       if (property_exists($this->extra_data['hardware'], 'osname')) {

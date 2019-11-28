@@ -43,20 +43,40 @@ class RuleImportEntityCollection extends RuleCollection {
    public $menu_option         = 'importentity';
 
 
-   /**
-    * @see RuleCollection::canList()
-   **/
-   function canList() {
-      if (Plugin::haveImport()) {
-         return static::canView();
+   function defineTabs($options = []) {
+      $ong = parent::defineTabs();
+
+      $this->addStandardTab(__CLASS__, $ong, $options);
+
+      return $ong;
+   }
+
+   function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
+      global $CFG_GLPI;
+
+      if (!$withtemplate) {
+         switch ($item->getType()) {
+            case __CLASS__ :
+               $ong    = [];
+               $types = $CFG_GLPI['state_types'];
+               foreach ($types as $type) {
+                  if (class_exists($type)) {
+                     $ong[$type] = $type::getTypeName();
+                  }
+               }
+               $ong[] = "Peripheral";//used for networkinventory
+               $ong['_global'] = __('Global');
+               return $ong;
+         }
       }
-      return false;
+      return '';
+   }
+
+   function canList() {
+      return static::canView();
    }
 
 
-   /**
-    * @see RuleCollection::getTitle()
-   **/
    function getTitle() {
       return __('Rules for assigning an item to an entity');
    }

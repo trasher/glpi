@@ -85,7 +85,7 @@ class Monitor extends InventoryAsset
    public function handle() {
       global $DB;
 
-      $entities_id = 0;//FIXME
+      $entities_id = $this->entities_id;
       $monitor = new \Monitor();
       $computer_Item = new \Computer_Item();
       $rule = new \RuleImportComputerCollection();

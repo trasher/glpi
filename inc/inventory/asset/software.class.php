@@ -72,9 +72,8 @@ class Software extends InventoryAsset
          $operatingsystems_id = $a_inventory['fusioninventorycomputer']['items_operatingsystems_id']['operatingsystems_id'];
       }*/
 
-      //Get the default entity for softwares, as defined in the entity's
-      //configuration
-      $entities_id = 0; //FIXME
+      //Get the default entity for softwares, as defined in entity configuration
+      $entities_id = $this->entities_id;
       $entities_id_software = \Entity::getUsedConfig(
          'entities_id_software',
          $entities_id
@@ -169,14 +168,10 @@ class Software extends InventoryAsset
                ) {
                   //Add the current manufacturer to the cache of manufacturers
                   if (!isset($manufacturers[$val->manufacturers_id])) {
-                     $entities_id = 0;
-                     /*if (isset($_SESSION["plugin_fusioninventory_entity"])) {
-                        $entities_id = $_SESSION["plugin_fusioninventory_entity"];
-                     }*/
                      $new_value = \Dropdown::importExternal(
                         'Manufacturer',
                         $val->manufacturers_id,
-                        $entities_id
+                        $this->entities_id
                      );
                      $manufacturers[$val->manufacturers_id] = $new_value;
                   }
@@ -197,8 +192,7 @@ class Software extends InventoryAsset
 
                //The entity has not been modified and is not set :
                //use the computer's entity
-               if (!property_exists($val, 'entities_id')
-                        || $val->entities_id == '') {
+               if (!property_exists($val, 'entities_id') || $val->entities_id == '') {
                   $val->entities_id = $entities_id_software;
                }
                //version is undefined, set it to blank
@@ -274,9 +268,7 @@ class Software extends InventoryAsset
 
       //By default entity  = root
       $entities_id  = 0;
-      $computers_id = $this->item->fields['id'];
 
-      $software                = new \Software();
       $softwareversion         = new \SoftwareVersion();
       $computerSoftwareversion = new \Item_SoftwareVersion();
 
