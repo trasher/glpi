@@ -699,6 +699,7 @@ class RuleImportComputer extends Rule {
 
       $class = $params['class'];
       $rules_id = $this->fields['id'];
+      $output['rules_id'] = $rules_id;
 
       $rulesmatched = new RuleMatchedLog();
       $inputrulelog = [
@@ -760,8 +761,8 @@ class RuleImportComputer extends Rule {
                               $itemtype = $criterion->fields['pattern'];
                               //if (isset($_SESSION['plugin_fusioninventory_classrulepassed'])) {
                                  if (!isset($params['return'])) {
-                                    $_SESSION['plugin_fusioninventory_rules_id'] =
-                                                   $this->fields['id'];
+                                    /*$_SESSION['plugin_fusioninventory_rules_id'] =
+                                       $this->fields['id'];*/
                                     $class->rulepassed("0", $itemtype, $rules_id);
                                  }
                                  $output['found_inventories'] = [0, $itemtype];
@@ -778,7 +779,7 @@ class RuleImportComputer extends Rule {
                      if ($itemtype_found == "0") {
                         //if (isset($_SESSION['plugin_fusioninventory_classrulepassed'])) {
                            if (!isset($params['return'])) {
-                              $_SESSION['plugin_fusioninventory_rules_id'] = $this->fields['id'];
+                              /*$_SESSION['plugin_fusioninventory_rules_id'] = $this->fields['id'];*/
                               $class->rulepassed("0", "PluginFusioninventoryUnmanaged", $rules_id);
                            }
                            $output['found_inventories'] = [0, "PluginFusioninventoryUnmanaged"];
@@ -792,13 +793,13 @@ class RuleImportComputer extends Rule {
                   }
                } else if ($action->fields["value"] == self::RULE_ACTION_DENIED) {
                   \Toolbox::logDebug("Action denied");
-                  $_SESSION['plugin_fusioninventory_rules_id'] = $this->fields['id'];
+                  //$_SESSION['plugin_fusioninventory_rules_id'] = $this->fields['id'];
                   $output['action'] = self::LINK_RESULT_DENIED;
                   return $output;
                }
             } else if ($action->fields['field'] == '_ignore_import') {
                \Toolbox::logDebug("Import ignored");
-               $_SESSION['plugin_fusioninventory_rules_id'] = $this->fields['id'];
+               //$_SESSION['plugin_fusioninventory_rules_id'] = $this->fields['id'];
                $output['action'] = self::LINK_RESULT_DENIED;
                return $output;
             } else {
@@ -811,7 +812,7 @@ class RuleImportComputer extends Rule {
                         $itemtype = $criterion->fields['pattern'];
                         //if (isset($_SESSION['plugin_fusioninventory_classrulepassed'])) {
                            if (!isset($params['return'])) {
-                              $_SESSION['plugin_fusioninventory_rules_id'] = $this->fields['id'];
+                              //$_SESSION['plugin_fusioninventory_rules_id'] = $this->fields['id'];
                               $class->rulepassed("0", $itemtype, $rules_id);
                            }
                            $output['found_inventories'] = [0, $itemtype];
@@ -828,7 +829,7 @@ class RuleImportComputer extends Rule {
                if ($itemtype_found == "0") {
                   //if (isset($_SESSION['plugin_fusioninventory_classrulepassed'])) {
                      if (!isset($params['return'])) {
-                        $_SESSION['plugin_fusioninventory_rules_id'] = $this->fields['id'];
+                        //$_SESSION['plugin_fusioninventory_rules_id'] = $this->fields['id'];
                         $class->rulepassed("0", "PluginFusioninventoryUnmanaged", $rules_id);
                      }
                      $output['found_inventories'] = [0, 'PluginFusioninventoryUnmanaged'];

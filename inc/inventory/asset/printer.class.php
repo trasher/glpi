@@ -97,24 +97,18 @@ class Printer extends InventoryAsset
             } else {
                $printers[] = $data['found_inventories'][0];
             }
-            /** TODO
-            if (isset($_SESSION['plugin_fusioninventory_rules_id'])) {
-               $pfRulematchedlog = new PluginFusioninventoryRulematchedlog();
-               $inputrulelog = [];
-               $inputrulelog['date'] = date('Y-m-d H:i:s');
-               $inputrulelog['rules_id'] = $_SESSION['plugin_fusioninventory_rules_id'];
-               if (isset($_SESSION['plugin_fusioninventory_agents_id'])) {
-                  $inputrulelog['plugin_fusioninventory_agents_id'] =
-                                 $_SESSION['plugin_fusioninventory_agents_id'];
-               }
-               $inputrulelog['items_id'] = end($printers);
-               $inputrulelog['itemtype'] = "Printer";
-               $inputrulelog['method'] = 'inventory';
-               $pfRulematchedlog->add($inputrulelog, [], false);
-               $pfRulematchedlog->cleanOlddata(end($printers), "Printer");
-               unset($_SESSION['plugin_fusioninventory_rules_id']);
-            }*/
 
+            $rulesmatched = new \RuleMatchedLog();
+            $inputrulelog = [
+               'date'      => date('Y-m-d H:i:s'),
+               'rules_id'  => $data['rules_id'],
+               'items_id'  => end($printers),
+               'itemtype'  => 'Printer',
+               'agents_id' => $this->agent->fields['id'],
+               'method'    => 'inventory'
+            ];
+            $rulesmatched->add($inputrulelog, [], false);
+            $rulesmatched->cleanOlddata(end($printers), 'Printer');
          }
       }
       $db_printers = [];
