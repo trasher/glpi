@@ -32,6 +32,8 @@
 
 ### Dump table glpi_alerts
 
+SET FOREIGN_KEY_CHECKS=0;
+
 DROP TABLE IF EXISTS `glpi_alerts`;
 CREATE TABLE `glpi_alerts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -7870,9 +7872,7 @@ CREATE TABLE `glpi_domainrecords` (
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-SET FOREIGN_KEY_CHECKS=0;
 DROP TABLE IF EXISTS `glpi_agenttypes`;
-SET FOREIGN_KEY_CHECKS=1;
 CREATE TABLE `glpi_agenttypes` (
    `id` int(11) NOT NULL AUTO_INCREMENT,
    `name` varchar(255) DEFAULT NULL,
@@ -7918,3 +7918,4 @@ CREATE TABLE `glpi_rulematchedlogs` (
    FOREIGN KEY (rules_id) REFERENCES glpi_rules (id) ON DELETE CASCADE ON UPDATE CASCADE,
    FOREIGN KEY (agents_id) REFERENCES glpi_agents (id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+SET FOREIGN_KEY_CHECKS=1;
