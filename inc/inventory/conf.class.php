@@ -63,7 +63,7 @@ class Conf extends \CommonGLPI
       'states_id_default'              => 0,
       'location'                       => 0,
       'group'                          => 0,
-      'manage_osname'                  => 0
+      'manage_osname'                  => 1
    ];
 
 
@@ -327,8 +327,7 @@ class Conf extends \CommonGLPI
          'State', [
             'name'   => 'states_id_default',
             'id'     => 'states_id_default',
-            'value'  => $config['states_id_default'
-         ]
+            'value'  => $config['states_id_default']
          ]);
       echo "</td>";
 

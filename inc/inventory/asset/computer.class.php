@@ -51,6 +51,8 @@ class Computer extends InventoryAsset
    private $hardware;
    /** @var boolean */
    private $write_file = true; //TODO: conf parameter?
+   /** @var integer */
+   private $states_id_default;
 
    public function __construct(\CommonDBTM $item, $data) {
       $this->item = $item;
@@ -518,6 +520,7 @@ class Computer extends InventoryAsset
    }
 
    public function checkConf(Conf $conf) {
+      $this->states_id_default = $conf->states_id_default;
       return true;
    }
 
@@ -546,16 +549,9 @@ class Computer extends InventoryAsset
       $_SESSION['glpiactiveentities_string'] = $entities_id;
       $_SESSION['glpiactive_entity']         = $entities_id;
 
-      if ($items_id == 0) {
-         /*$input = [];
-         $input['entities_id'] = $entities_id;
-         $input = PluginFusioninventoryToolbox::addDefaultStateIfNeeded('computer', $input);
-         if (isset($input['states_id'])) {
-               $a_computerinventory['Computer']['states_id'] = $input['states_id'];
-         } else {
-               $a_computerinventory['Computer']['states_id'] = 0;
-         }*/
+      $val->states_id = $this->states_id_default ?? $this->item->fields['states_id'];
 
+      if ($items_id == 0) {
          $items_id = $this->item->add(\Toolbox::addslashes_deep((array)$val));
          $this->agent->update(['id' => $this->agent->fields['id'], 'items_id' => $items_id]);
 
@@ -581,13 +577,6 @@ class Computer extends InventoryAsset
       $_SESSION['glpiactive_entity']         = $entities_id;
 
       if ($items_id != '0') {
-         /*$$a_computerinventory['Computer']['states_id'] = $computer->fields['states_id'];
-         $input = [];
-         $input = PluginFusioninventoryToolbox::addDefaultStateIfNeeded('computer', $input);
-         if (isset($input['states_id'])) {
-               $a_computerinventory['Computer']['states_id'] = $input['states_id'];
-         }*/
-
          //TODO?
          /*if ($computer->fields['entities_id'] != $entities_id) {
             $pfEntity = new PluginFusioninventoryEntity();
