@@ -121,8 +121,8 @@ class Inventory
        ];
 
          // Get tag if defined
-       if (isset($this->data['accountinfo'])) {
-          $ainfos = $this->data['accountinfo'];
+       if (property_exists($this->raw_data->content, 'accountinfo')) {
+          $ainfos = $this->raw_data->content->accountinfo;
           if (property_exists($ainfos, 'keyname')
              && $ainfos->keyname == 'TAG'
              && property_exists($ainfos, 'keyvalue')

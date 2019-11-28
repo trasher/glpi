@@ -320,7 +320,9 @@ class Computer extends InventoryAsset
       }*/
       //$this->fillArrayInventory($a_computerinventory);
 
-      $input = [];
+      $input = [
+         'tag' => $this->getAgent()->fields['tag']
+      ];
 
       // Global criteria
       $val = $this->data[0];
@@ -403,8 +405,6 @@ class Computer extends InventoryAsset
       ) {
          $input['domains_id'] = $val->domains_id;
       }
-
-      //$input['tag'] = $tagAgent;
 
       if (property_exists($val, 'name') && !empty($val->name)) {
          $input['name'] = $val->name;

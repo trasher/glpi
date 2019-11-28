@@ -303,8 +303,8 @@ class Agent extends CommonDBTM {
          $input['version'] = $metadata['provider']['version'];
       }
 
-      if (isset($metadata['provider']['tag'])) {
-         $input['tag'] = $metadata['provider']['tag'];
+      if (isset($metadata['tag'])) {
+         $input['tag'] = $metadata['tag'];
       }
 
       $input = \Toolbox::addslashes_deep($input);
