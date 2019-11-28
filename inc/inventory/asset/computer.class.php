@@ -319,9 +319,11 @@ class Computer extends InventoryAsset
       }*/
       //$this->fillArrayInventory($a_computerinventory);
 
-      $input = [
-         'tag' => $this->getAgent()->fields['tag']
-      ];
+      $input = [];
+
+      if (isset($this->getAgent()->fields['tag'])) {
+         $input['tag'] = $this->getAgent()->fields['tag'];
+      }
 
       // Global criteria
       $val = $this->data[0];
