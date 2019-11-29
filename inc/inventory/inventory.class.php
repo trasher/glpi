@@ -112,7 +112,7 @@ class Inventory
    public function extractMetadata() :array {
        //check
       if ($this->inError()) {
-          throw new \RuntimeException('Previous error(s) exists!');
+          throw new \RuntimeException(print_r($this->getErrors(), true));
       }
 
        $this->metadata = [
@@ -145,7 +145,7 @@ class Inventory
 
       //check
       if ($this->inError()) {
-         throw new \RuntimeException('Previous error(s) exists!');
+         throw new \RuntimeException(print_r($this->getErrors(), true));
       }
 
       try {
