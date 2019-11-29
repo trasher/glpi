@@ -421,7 +421,9 @@ class Inventory
                //not used - implemented in FI only
                unset($this->data[$key]);
                break;
-
+            case 'sensors':
+               $assettype = '\Glpi\Inventory\Asset\Sensor';
+               break;
             default:
                //unhandled
                throw new \RuntimeException("Unhandled schema entry $key");
