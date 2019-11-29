@@ -37,7 +37,7 @@ use \Glpi\Inventory\Conf;
 
 class Drive extends Device
 {
-   private $harddrives = [];
+   private $harddrives;
 
    public function __construct(\CommonDBTM $item, array $data = null) {
       parent::__construct($item, $data, 'Item_DeviceDrive');
@@ -107,7 +107,9 @@ class Drive extends Device
    }
    public function handle() {
       parent::handle();
-      $this->harddrives->handle();
+      if ($this->harddrives !== null) {
+         $this->harddrives->handle();
+      }
    }
 
    public function checkConf(Conf $conf) {
