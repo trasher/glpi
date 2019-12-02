@@ -40,7 +40,7 @@ $conf = new \Glpi\Inventory\Conf();
 
 if (isset($_FILES['importfile']) && $_FILES['importfile']['tmp_name'] != '') {
    $conf->importFile($_FILES);
-   //Html::back();
+   Html::back();
 }
 
 if (isset($_POST['update'])) {

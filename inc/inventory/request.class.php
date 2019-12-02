@@ -154,7 +154,8 @@ class Request
     * @return boolean
     */
    public function handleXMLRequest($data) :bool {
-      $xml = @simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
+      libxml_use_internal_errors(true);
+      $xml = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
       if (!$xml) {
          $xml_errors = libxml_get_errors();
          \Toolbox::logWarning('Invalid XML: ' . print_r($xml_errors, true));

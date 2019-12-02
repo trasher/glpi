@@ -167,10 +167,19 @@ class Conf extends \CommonGLPI
          }
          $inventory_request->setCompression($mime);
          $inventory_request->handleRequest($contents);
-         Session::addMessageAfterRedirect(
-            __('File has been successfully imported!'),
-            INFO
-         );
+         if ($inventory_request->inError()) {
+            Session::addMessageAfterRedirect(
+               __('File has not been imported:') . " " . $inventory_request->getResponse(),
+               true,
+               ERROR
+            );
+         } else {
+            Session::addMessageAfterRedirect(
+               __('File has been successfully imported!'),
+               true,
+               INFO
+            );
+         }
       } catch (\Exception $e) {
          throw $e;
       }
