@@ -167,6 +167,7 @@ class VirtualMachine extends InventoryAsset
          foreach ($value as $val) {
             $input = (array)$val;
             $input['computers_id'] = $this->item->fields['id'];
+            $input['is_dynamic']  = 1;
             $computerVirtualmachine->add($input, []/*, !$no_history*/);
          }
       } else {
@@ -178,9 +179,12 @@ class VirtualMachine extends InventoryAsset
                   'virtualmachinesystems_id' => $val->virtualmachinesystems_id ?? ''
                ];
                if ($sinput == $arraydb) {
-                  $input = ['id' => $keydb];
+                  $input = [
+                     'id'           => $keydb,
+                     'is_dynamic'   => 1
+                  ];
 
-                  foreach (['vcpu', 'ram', 'virtualmachinetypes_id', 'virtualmachinestates_id'] as $prop) {
+                  foreach (['vcpu', 'memory', 'virtualmachinetypes_id', 'virtualmachinestates_id'] as $prop) {
                      if (property_exists($val, $prop)) {
                         $input[$prop] = $val->$prop;
                      }
