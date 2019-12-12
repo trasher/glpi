@@ -211,8 +211,6 @@ class Inventory
          $this->handleItem();
          $this->handleAssets();
 
-         $this->errors[] = 'Inventory is WIP';
-
          $DB->commit();
       } catch (\Exception $e) {
          \Toolbox::logError($e);
