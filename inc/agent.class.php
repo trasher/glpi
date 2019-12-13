@@ -296,7 +296,7 @@ class Agent extends CommonDBTM {
          'last_contact' => date('Y-m-d H:i:s'),
          'useragent'    => $_SERVER['HTTP_USER_AGENT'] ?? null,
          'agenttypes_id'=> $atypes_id,
-         'itemtype'     => 'Computer'
+         'itemtype'     => $metadata['itemtype'] ?? 'Computer'
       ];
 
       if (isset($metadata['provider']['version'])) {

@@ -42,23 +42,23 @@ class Inventory
     const INCR_MODE = 1;
 
     /** @var integer */
-   private $mode;
+   protected $mode;
     /** @var stdClass */
-   private $raw_data = null;
+   protected $raw_data = null;
    /** @var array */
-   private $data = [];
+   protected $data = [];
     /** @var array */
    private $metadata;
     /** @var array */
    private $errors = [];
    /** @var CommonDBTM */
-   private $item;
+   protected $item;
    /** @var Agent */
    private $agent;
    /** @var InventoryAsset[] */
-   private $assets;
+   protected $assets = [];
    /** @var \Glpi\Inventory\Conf */
-   private $conf;
+   protected $conf;
    /** @var array */
    private $benchs = [];
 
@@ -117,7 +117,8 @@ class Inventory
 
        $this->metadata = [
            'deviceid'  => $this->raw_data->deviceid,
-           'version'   => $this->raw_data->content->versionclient
+           'version'   => $this->raw_data->content->versionclient,
+           'itemtype'   => $this->raw_data->itemtype ?? 'Computer'
        ];
 
          // Get tag if defined
@@ -218,7 +219,8 @@ class Inventory
          throw $e;
       } finally {
          // * For benchs
-         $this->addBench($this->item->getType() . ' #'.$this->item->fields['id'], 'full', $main_start);
+         $id = $this->item->fields['id'] ?? 0;
+         $this->addBench($this->item->getType() . ' #' . $id, 'full', $main_start);
          $this->printBenchResults();
       }
 
@@ -505,7 +507,7 @@ class Inventory
     *
     * @return void
     */
-   private function addBench($asset, $type, $start) {
+   protected function addBench($asset, $type, $start) {
       $exec_time = round(microtime(true) - $start, 5);
       $this->benchs[$asset][$type] = [
          'exectime'  => $exec_time,
