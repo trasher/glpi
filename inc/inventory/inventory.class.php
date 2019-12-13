@@ -454,6 +454,9 @@ class Inventory
       $item_start = microtime(true);
       $this->mainasset->handle();
       $this->addBench($this->item->getType(), 'handle', $item_start);
+      $link_start = microtime(true);
+      $this->mainasset->handleLinks();
+      $this->addBench($this->item->getType(), 'handle', $link_start);
       return;
    }
 
