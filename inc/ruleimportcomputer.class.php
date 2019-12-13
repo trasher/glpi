@@ -1582,6 +1582,120 @@ class RuleImportComputer extends Rule {
       ];
 
       $rules[] = [
+         'name'      => 'Cluster update (by uuid)',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Cluster'
+            ],
+            [
+               'criteria'  => 'uuid',
+               'condition' => 8,
+               'pattern'   => 1
+            ],
+            [
+               'criteria'  => 'uuid',
+               'condition' => 10,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_link'
+      ];
+
+      $rules[] = [
+         'name'      => 'Cluster import (by uuid)',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Cluster'
+            ],
+            [
+               'criteria'  => 'uuid',
+               'condition' => 8,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_link'
+      ];
+
+      $rules[] = [
+         'name'      => 'Cluster import denied',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Cluster'
+            ]
+         ],
+         'action'    => '_deny'
+      ];
+
+      $rules[] = [
+         'name'      => 'Enclosure update (by serial)',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Enclosure'
+            ],
+            [
+               'criteria'  => 'serial',
+               'condition' => 8,
+               'pattern'   => 1
+            ],
+            [
+               'criteria'  => 'serial',
+               'condition' => 10,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_link'
+      ];
+
+      $rules[] = [
+         'name'      => 'Enclosure import (by serial)',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Enclosure'
+            ],
+            [
+               'criteria'  => 'serial',
+               'condition' => 8,
+               'pattern'   => 1
+            ]
+         ],
+         'action'    => '_link'
+      ];
+
+      $rules[] = [
+         'name'      => 'Enclosure import denied',
+         'match'     => 'AND',
+         'is_active' => 1,
+         'criteria'  => [
+            [
+               'criteria'  => 'itemtype',
+               'condition' => 0,
+               'pattern'   => 'Enclosure'
+            ]
+         ],
+         'action'    => '_deny'
+      ];
+
+      $rules[] = [
          'name'      => 'Global constraint (name)',
          'match'     => 'AND',
          'is_active' => 1,

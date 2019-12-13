@@ -164,6 +164,18 @@ abstract class InventoryAsset
                      $value->$key = \Dropdown::importExternal('ComputerModel', $value->$key, $entities_id, [
                         'manufacturer' => $manufacture_name
                      ]);
+                  } else if ($key == "enclosuremodels_id") {
+                     // computer model need manufacturer relation for dictionary import
+                     // see \CommonDCModelDropdown::$additional_fields_for_dictionnary
+                     $value->$key = \Dropdown::importExternal('EnclosureModel', $value->$key, $entities_id, [
+                        'manufacturer' => $manufacture_name
+                     ]);
+                  } else if ($key == "clustermodels_id") {
+                     // computer model need manufacturer relation for dictionary import
+                     // see \CommonDCModelDropdown::$additional_fields_for_dictionnary
+                     $value->$key = \Dropdown::importExternal('ClusterModel', $value->$key, $entities_id, [
+                        'manufacturer' => $manufacture_name
+                     ]);
                   } else if (isset($this->foreignkey_itemtype[$key])) {
                      $value->$key = \Dropdown::importExternal($this->foreignkey_itemtype[$key], $value->$key, $entities_id);
                   } else if (isForeignKeyField($key) && $key != "users_id") {

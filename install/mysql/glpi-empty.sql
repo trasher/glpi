@@ -7910,7 +7910,7 @@ CREATE TABLE `glpi_rulematchedlogs` (
    `date` timestamp NULL DEFAULT NULL,
    `items_id` int(11) NOT NULL DEFAULT '0',
    `itemtype` varchar(100) DEFAULT NULL,
-   `rules_id` int(11) NOT NULL DEFAULT '0',
+   `rules_id` int(11) NULL DEFAULT NULL,
    `agents_id` int(11) NOT NULL DEFAULT '0',
    `method` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
    PRIMARY KEY (`id`),
