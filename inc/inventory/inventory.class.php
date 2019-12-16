@@ -269,12 +269,24 @@ class Inventory
    }
 
    /**
+    * Retrieve main inventoried object class
+    *
+    * @return string
+    */
+   public function getMainClass() {
+      $agent = $this->getAgent();
+      $main_class = '\Glpi\Inventory\Asset\\' . $agent->fields['itemtype'];
+      return $main_class;
+   }
+
+   /**
     * Process and enhance data
     *
     * @return void
     */
-   public function processInventoryData() {
-      $main = new Asset\Computer($this->item, $this->raw_data);//FIXME; what if not a computer?
+   public final function processInventoryData() {
+      $main_class = $this->getMainClass();
+      $main = new $main_class($this->item, $this->raw_data);
       $main->setAgent($this->getAgent());
       $main->setExtraData($this->data);
 
@@ -425,8 +437,13 @@ class Inventory
                $assettype = '\Glpi\Inventory\Asset\Sensor';
                break;
             default:
-               //unhandled
-               throw new \RuntimeException("Unhandled schema entry $key");
+               if (method_exists($this, 'processExtraInventoryData')) {
+                  $assettype = $this->processExtraInventoryData($key);
+               }
+               if ($assettype === false) {
+                  //unhandled
+                  throw new \RuntimeException("Unhandled schema entry $key");
+               }
                break;
          }
 

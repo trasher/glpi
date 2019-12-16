@@ -281,6 +281,10 @@ class Computer extends InventoryAsset
          }
       }
 
+      if (function_exists($this, 'postPrepare')) {
+         $this->postPrepare($val);
+      }
+
       $this->data = [$val];
 
       // * Hacks
