@@ -226,9 +226,9 @@ class NetworkCard extends Device
                }
                $ports[$val_port->name.'-'.$uniq] = $val_port;
             }
+            $this->ports += $ports;
          }
       }
-      $this->ports = $ports;
       return $this->data;
    }
 

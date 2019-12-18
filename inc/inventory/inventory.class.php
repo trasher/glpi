@@ -215,6 +215,7 @@ class Inventory
                $this->unhandled_data
             );
          }
+
          $this->data = $data;
 
          //create/load agent
