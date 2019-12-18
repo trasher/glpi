@@ -281,7 +281,7 @@ class Computer extends InventoryAsset
          }
       }
 
-      if (function_exists($this, 'postPrepare')) {
+      if (method_exists($this, 'postPrepare')) {
          $this->postPrepare($val);
       }
 

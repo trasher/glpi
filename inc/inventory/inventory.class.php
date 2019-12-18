@@ -160,6 +160,7 @@ class Inventory
          $properties = array_keys($schema['properties']['content']['properties']);
          unset($properties['versionclient']); //already handled in extractMetadata
          $contents = $this->raw_data->content;
+         $all_props = get_object_vars($contents);
 
          $data = [];
          //parse schema properties and handle if it exists in raw_data
@@ -196,6 +197,23 @@ class Inventory
             }
          }
 
+         $this->unhandled_data = array_diff_key($all_props, $data);
+         if (count($this->unhandled_data)) {
+            \Session::addMessageAfterRedirect(
+               sprintf(
+                  __('Following keys has been ignored during process: %'),
+                  implode(
+                     ', ',
+                     array_keys($this->unhandled_data)
+                  )
+               ),
+               true,
+               WARNING
+            );
+            \Toolbox::logDebug(
+               $this->unhandled_data
+            );
+         }
          $this->data = $data;
 
          //create/load agent
