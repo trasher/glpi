@@ -180,6 +180,7 @@ class Inventory
                            $this->metadata['provider'][$sub_property] = $contents->$property->$sub_property;
                         }
                      }
+                     unset($all_props['versionprovider']);
                      break;
                   default:
                      if (count($sub_properties)) {
@@ -201,7 +202,7 @@ class Inventory
          if (count($this->unhandled_data)) {
             \Session::addMessageAfterRedirect(
                sprintf(
-                  __('Following keys has been ignored during process: %'),
+                  __('Following keys has been ignored during process: %1$s'),
                   implode(
                      ', ',
                      array_keys($this->unhandled_data)
@@ -434,7 +435,7 @@ class Inventory
                unset($this->data[$key]);
                break;
             case 'versionprovider':
-               //not used
+               //not provided see doInventory
                unset($this->data[$key]);
                break;
             case 'simcards':
