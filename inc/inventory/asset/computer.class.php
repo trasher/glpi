@@ -473,7 +473,7 @@ class Computer extends InventoryAsset
 
       if (isset($data['_no_rule_matches']) AND ($data['_no_rule_matches'] == '1')) {
          //no rule matched, this is a new one
-         $this->rulepassed(0, $this->item->getType(), 0);
+         $this->rulepassed(0, $this->item->getType(), null);
       } else if (!isset($data['found_inventories'])) {
          //nothing found, this seems an unmanaged device
          $this->errors[] = 'Not managed device are not handled yet.';
