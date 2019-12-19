@@ -144,6 +144,8 @@ class Inventory
    public function doInventory() {
       global $DB;
 
+      $prof = new \XHProf("Native inventory");
+
       //check
       if ($this->inError()) {
          throw new \RuntimeException(print_r($this->getErrors(), true));
@@ -242,6 +244,7 @@ class Inventory
          $id = $this->item->fields['id'] ?? 0;
          $this->addBench($this->item->getType() . ' #' . $id, 'full', $main_start);
          $this->printBenchResults();
+         $prof->stop();
       }
 
       return [];
