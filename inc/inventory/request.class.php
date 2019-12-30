@@ -155,6 +155,10 @@ class Request
     */
    public function handleXMLRequest($data) :bool {
       libxml_use_internal_errors(true);
+
+      if(mb_detect_encoding($data, 'UTF-8', true) === false){
+         $data = utf8_encode($data);
+      }
       $xml = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
       if (!$xml) {
          $xml_errors = libxml_get_errors();
