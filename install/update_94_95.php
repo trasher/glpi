@@ -1210,9 +1210,7 @@ function update94to95() {
             `agents_id` int(11) NOT NULL DEFAULT '0',
             `method` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
             PRIMARY KEY (`id`),
-            KEY `item` (`itemtype`,`items_id`),
-            FOREIGN KEY (rules_id) REFERENCES glpi_rules (id) ON DELETE CASCADE ON UPDATE CASCADE,
-            FOREIGN KEY (agents_id) REFERENCES glpi_agents (id) ON DELETE CASCADE ON UPDATE CASCADE
+            KEY `item` (`itemtype`,`items_id`)
          ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
       $DB->queryOrDie($query, "9.5 add table glpi_rulematchedlogs");
    }
