@@ -7752,7 +7752,7 @@ $tables['glpi_softwarecategories'] = [
    [
       'id'           => '1',
       'name'         => 'Inventoried',
-      'completename' => 'Software from inventroies',
+      'completename' => 'Software from inventories',
       'level'        => '1',
    ],
 ];
