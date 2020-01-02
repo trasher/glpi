@@ -1200,6 +1200,7 @@ function update94to95() {
    }
 
    if (!$DB->tableExists('glpi_rulematchedlogs')) {
+      $migration->migrationOneTable('glpi_agents');
       $query = "CREATE TABLE `glpi_rulematchedlogs` (
             `id` int(11) NOT NULL AUTO_INCREMENT,
             `date` timestamp NULL DEFAULT NULL,
@@ -1216,6 +1217,7 @@ function update94to95() {
       $DB->queryOrDie($query, "9.5 add table glpi_rulematchedlogs");
    }
    /** /Native inventory */
+
    // ************ Keep it at the end **************
    foreach ($ADDTODISPLAYPREF as $type => $tab) {
       $rank = 1;
