@@ -70,8 +70,7 @@ class Conf extends \CommonGLPI
    /**
     * Display form for import the XML
     *
-    * @global array $CFG_GLPI
-    * @return boolean
+    * @return void
     */
    function showUploadForm() {
       echo "<form action='' method='post' enctype='multipart/form-data'>";
@@ -102,9 +101,13 @@ class Conf extends \CommonGLPI
       echo "</table>";
 
       \Html::closeForm();
-      return true;
    }
 
+   /**
+    * Accepted file extension for inventories
+    *
+    * @return array
+    */
    public function knownInventoryExtensions() :array {
       return [
          'json',
@@ -113,6 +116,13 @@ class Conf extends \CommonGLPI
       ];
    }
 
+   /**
+    * Import inventory file
+    *
+    * @param array $files $_FILES
+    *
+    * @return void
+    */
    public function importFile($files) {
       //error_log($files['importfile']['name']);
       ini_set("memory_limit", "-1");
@@ -155,7 +165,16 @@ class Conf extends \CommonGLPI
       }
    }
 
-   protected function importContentFile($inventory_request, $path, $contents) {
+   /**
+    * Import contents of a file
+    *
+    * @param Request $inventory_request Inventory request instance
+    * @param string  $path              File path
+    * @param string  $contents          File contents
+    *
+    * @return void
+    */
+   protected function importContentFile(Request $inventory_request, $path, $contents) {
       //\Toolbox::logDebug($contents);
       try {
          $finfo = finfo_open(FILEINFO_MIME_TYPE);
@@ -586,6 +605,13 @@ class Conf extends \CommonGLPI
       return true;
    }
 
+   /**
+    * Save configuration
+    *
+    * @param array $values Configuration values
+    *
+    * @return void
+    */
    public function saveConf($values) {
       if (!\Config::canUpdate()) {
          return false;
@@ -595,11 +621,13 @@ class Conf extends \CommonGLPI
       //TODO: what to do? :)
       $unknown = array_diff_key($values, $defaults);
       if (count($unknown)) {
+         $msg = sprintf(
+            __('Some properties are not known: %1$s'),
+            implode(', ', array_keys($unknown))
+         );
+         \Toolbox::logWarning($msg);
          \Session::addMessageAfterRedirect(
-            sprintf(
-               __('Some properties are not known: %1$s'),
-               implode(', ', array_keys($unknown))
-            ),
+            $msg,
             false,
             WARNING
          );
@@ -611,6 +639,13 @@ class Conf extends \CommonGLPI
       \Config::setConfigurationValues('inventory', $to_process);
    }
 
+   /**
+    * Getter for direct access to conf properties
+    *
+    * @param string $name Property name
+    *
+    * @return mixed
+    */
    public function __get($name) {
       if (!count($this->currents)) {
          $config = \Config::getConfigurationValues('Inventory');
@@ -618,6 +653,17 @@ class Conf extends \CommonGLPI
       }
       if (in_array($name, array_keys(self::$defaults))) {
          return $this->currents[$name];
+      } else {
+         $msg = sprintf(
+            __('Property %1$s does not exists!'),
+            $name
+         );
+         \Toolbox::logWarning($msg);
+         \Session::addMessageAfterRedirect(
+            $msg,
+            false,
+            WARNING
+         );
       }
    }
 }
