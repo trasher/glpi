@@ -1257,7 +1257,7 @@ class Search extends DbTestCase {
             'searchtype' => 'equals',
             'val' => '5',
             'meta' => false,
-            'expected' => "   (`glpi_users_users_id_supervisor`.`id` = '5')",
+            'expected' => "   (`glpi_users_users_id_supervisor`.`id` = 5)",
          ],
          [
             'link' => ' AND ',
@@ -1267,7 +1267,7 @@ class Search extends DbTestCase {
             'searchtype' => 'equals',
             'val' => '2',
             'meta' => false,
-            'expected' => "  AND  (`glpi_users_users_id_tech`.`id` = '2') ",
+            'expected' => "  AND  (`glpi_users_users_id_tech`.`id` = 2) ",
          ],
       ];
    }
