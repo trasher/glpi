@@ -707,7 +707,7 @@ class Migration {
       global $DB;
 
       if (isset($this->change[$table])) {
-         $query = "ALTER TABLE `$table` ".implode($this->change[$table], " ,\n")." ";
+         $query = "ALTER TABLE `$table` ".implode( " ,\n", $this->change[$table])." ";
          $this->displayMessage( sprintf(__('Change of the database layout - %s'), $table));
          $DB->queryOrDie($query, $this->version." multiple alter in $table");
          unset($this->change[$table]);
