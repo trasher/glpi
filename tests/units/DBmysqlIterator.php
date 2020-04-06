@@ -489,19 +489,6 @@ class DBmysqlIterator extends DbTestCase {
          ->hasMessage('BAD JOIN');
    }
 
-   public function testAnalyseJoins() {
-      $join = $this->it->analyseJoins(['LEFT JOIN' => ['bar' => ['FKEY' => ['bar' => 'id', 'foo' => 'fk']]]]);
-      $this->string($join)->isIdenticalTo(' LEFT JOIN `bar` ON (`bar`.`id` = `foo`.`fk`)');
-
-      $this->exception(
-         function() {
-            $it = $this->it->analyseJoins(['LEFT OUTER JOIN' => ['ON' => ['a' => 'id', 'b' => 'a_id']]]);
-         }
-      )
-         ->isInstanceOf('RuntimeException')
-         ->hasMessage('BAD JOIN');
-   }
-
    public function testHaving() {
       $it = $this->it->execute('foo', ['HAVING' => ['bar' => 1]]);
       $this->string($it->getSql())->isIdenticalTo('SELECT * FROM `foo` HAVING `bar` = \'1\'');

@@ -128,7 +128,6 @@ if (isset($_POST["item_type"]) && is_array($_POST["item_type"])) {
                   ]
                ]
             ];
-            ];
          }
          if ($val == 'Project') {
             $criteria['ORDERBY'] = ["itemdeleted DESC"];
