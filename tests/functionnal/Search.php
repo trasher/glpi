@@ -900,7 +900,7 @@ class Search extends DbTestCase {
     * @dataProvider addSelectProvider
     */
    public function testAddSelect($provider) {
-      $search = new \Search(new $lprovider['itemtype'], []);
+      $search = new \Search(new $provider['itemtype'], []);
       $sql_select = $search->addSelect($provider['itemtype'], $provider['ID']);
 
       $this->string($this->cleanSQL($sql_select))
