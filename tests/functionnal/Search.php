@@ -447,7 +447,7 @@ class Search extends DbTestCase {
       $this->string($data['sql']['search'])
          ->contains("`glpi_changes`.`id` AS `ITEM_Change_Ticket_3`")
          ->contains("`glpi_changes_tickets`.`changes_id` = `glpi_changes`.`id`")
-         ->contains("`glpi_changes`.`id` = '1'");
+         ->contains("`glpi_changes`.`id` = 1");
    }
 
    public function testUser() {
@@ -1376,8 +1376,8 @@ class Search extends DbTestCase {
          ->contains("`glpi_users_users_id_recipient`.`realname` AS `ITEM_Ticket_22_realname`")
 
          // Check that WHERE criteria applies on corresponding table alias
-         ->contains("`glpi_users_users_id_lastupdater`.`id` = '{$user_tech_id}'")
-         ->contains("`glpi_users_users_id_recipient`.`id` = '{$user_normal_id}'")
+         ->contains("`glpi_users_users_id_lastupdater`.`id` = {$user_tech_id}")
+         ->contains("`glpi_users_users_id_recipient`.`id` = {$user_normal_id}")
 
          // Check that ORDER applies on corresponding table alias
          ->contains("glpi_users_users_id_recipient.`name` ASC");
