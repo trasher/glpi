@@ -4362,7 +4362,7 @@ JAVASCRIPT;
       //Check in current item if a specific where is defined
       if (method_exists($itemtype, 'addWhere')) {
          $qry_params = [];
-         $out = $itemtype::addWhere($link, $nott, $itemtype, $ID, $searchtype, $val, $qry_params);
+         $out = $itemtype->addWhere($link, $nott, $itemtype, $ID, $searchtype, $val, $qry_params);
          if (!empty($out)) {
             return $out;
          }

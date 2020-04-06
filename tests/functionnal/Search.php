@@ -900,7 +900,8 @@ class Search extends DbTestCase {
     * @dataProvider addSelectProvider
     */
    public function testAddSelect($provider) {
-      $sql_select = \Search::addSelect($provider['itemtype'], $provider['ID']);
+      $search = new \Search(new $lprovider['itemtype'], []);
+      $sql_select = $search->addSelect($provider['itemtype'], $provider['ID']);
 
       $this->string($this->cleanSQL($sql_select))
          ->isEqualTo($this->cleanSQL($provider['sql']));
@@ -1380,7 +1381,7 @@ class Search extends DbTestCase {
          ->contains("`glpi_users_users_id_recipient`.`id` = {$user_normal_id}")
 
          // Check that ORDER applies on corresponding table alias
-         ->contains("glpi_users_users_id_recipient.`name` ASC");
+         ->contains("glpi_users_users_id_recipient.`realname` ASC");
    }
 
    function testSearchAllAssets() {
