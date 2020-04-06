@@ -5324,15 +5324,6 @@ class Ticket extends CommonITILObject {
                   'glpi_tickets.status'         => ['<>', self::CLOSED],
                   'glpi_itilsolutions.status'   => CommonITILValidation::REFUSED
                ]
-            ];
-
-            $WHERE = array_merge(
-               $WHERE,
-               $search_assign,
-               [
-                  'glpi_tickets.status'         => ['<>', self::CLOSED],
-                  'glpi_itilsolutions.status'   => CommonITILValidation::REFUSED
-               ]
             );
             break;
          case "observed" :

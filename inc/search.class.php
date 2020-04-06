@@ -157,6 +157,7 @@ class Search {
          $longitude = 999;
       }
 
+      if (empty($data)) {
          $params['criteria'][] = [
             'link'         => 'AND NOT',
             'field'        => $latitude,
@@ -4825,11 +4826,10 @@ JAVASCRIPT;
                         $ADD = " OR $tocompute IS NULL";
                      }
                      if ($nott) {
-                        return $link." ($tocompute < ".($numeric_val - $searchopt[$ID]["width"])."
-                                        OR $tocompute > ".($numeric_val + $searchopt[$ID]["width"])."
+                        return $link." ($tocompute < ".($val - $searchopt[$ID]['width'])." OR $tocompute > ".
+                            ($val + $searchopt[$ID]['width'])." $ADD) ";
                      }
-                     return $link." (($tocompute >= ".($numeric_val - $searchopt[$ID]["width"])."
-                                      AND $tocompute <= ".($numeric_val + $searchopt[$ID]["width"]).")
+                     return $link." (($tocompute >= ".($val - $searchopt[$ID]['width'])." AND $tocompute <= ".
                         ($val + $searchopt[$ID]['width']).") $ADD) ";
                   }
                   if (!$nott) {
