@@ -4386,7 +4386,7 @@ JAVASCRIPT;
          case "glpi_users.name" :
             if ($itemtype == 'User') { // glpi_users case / not link table
                if (in_array($searchtype, ['equals', 'notequals'])) {
-                  $search_str = $this->db->quoteName("$table.id") . $SEARCH;
+                  $search_str = $this->db->quoteName("$table.id") . $this->getSearchFromType($searchtype, $val, $nott, $inittable);
 
                   if ($searchtype == 'notequals') {
                      $nott = !$nott;
