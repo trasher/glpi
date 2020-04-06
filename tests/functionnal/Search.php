@@ -1276,7 +1276,8 @@ class Search extends DbTestCase {
     * @dataProvider providerAddWhere
     */
    public function testAddWhere($link, $nott, $itemtype, $ID, $searchtype, $val, $meta, $expected) {
-      $output = \Search::addWhere($link, $nott, $itemtype, $ID, $searchtype, $val, $meta);
+      $search = new \Search($itemtype, []);
+      $output = $search->addWhere($link, $nott, $itemtype, $ID, $searchtype, $val, $meta);
       $this->string($output)->isEqualTo($expected);
 
       if ($meta) {
