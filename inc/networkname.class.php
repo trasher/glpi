@@ -401,7 +401,6 @@ class NetworkName extends FQDNLabel {
       global $DB, $CFG_GLPI;
 
       $name         = new self();
-      $number_names = 0;
 
       if ($networkPortID > 0) {
          $iterator = $DB->request([
@@ -416,9 +415,12 @@ class NetworkName extends FQDNLabel {
          $numrows = count($iterator);
 
          if ($numrows > 1) {
+            echo "<tr class='tab_bg_1'><th colspan='4'>" .
                __("Several network names available! Go to the tab 'Network Name' to manage them.") .
                "</th></tr>\n";
                return;
+         }
+
          switch ($numrows) {
             case 1 :
                $result = $iterator->next();
