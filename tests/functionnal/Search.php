@@ -1382,7 +1382,7 @@ class Search extends DbTestCase {
          ->contains("`glpi_users_users_id_recipient`.`id` = {$user_normal_id}")
 
          // Check that ORDER applies on corresponding table alias
-         ->contains("glpi_users_users_id_recipient.`realname` ASC");
+         ->contains("`glpi_users_users_id_recipient`.`realname` ASC");
    }
 
    function testSearchAllAssets() {
