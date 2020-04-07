@@ -1622,7 +1622,7 @@ class Search {
     *
     * @return void
    **/
-   static function displayData(array $data) {
+   public function displayData(array $data) {
       global $CFG_GLPI;
 
       $item = null;

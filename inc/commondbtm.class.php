@@ -5726,4 +5726,172 @@ class CommonDBTM extends CommonGLPI {
       );
       return $count;
    }
+   public function showSublist($sub_itemtype, array $params) {
+      $item = $this;
+
+      $get = $params; //$request->getQueryParams();
+      $args = [
+         'itemtype'     => $this->getType(),
+         'as_map'       => 0,
+         'show_pager'   => 0,
+         //'showmassiveactions' => 0
+      ];
+
+      if (!isset($get["withtemplate"])) {
+         $get["withtemplate"] = "";
+      }
+
+      if ($item->get_item_to_display_tab) {
+         // No id if ruleCollection but check right
+         if ($item instanceof \RuleCollection) {
+            if (!$item->canList()) {
+               //TODO: redirect with error
+               throw new \RuntimeException('Cannot list');
+               exit();
+            }
+         } else if (!$item->can($item->fields['id'], READ)) {
+            //TODO: redirect with error
+            throw new \RuntimeException('Cannot read');
+            exit();
+         }
+      }
+
+      $notvalidoptions = ['_glpi_tab', '_itemtype', 'sort', 'order', 'withtemplate'];
+      $options         = $get;
+      foreach ($notvalidoptions as $key) {
+         if (isset($options[$key])) {
+               unset($options[$key]);
+         }
+      }
+      if (isset($options['locked'])) {
+         \ObjectLock::setReadOnlyProfile();
+      }
+
+      $sub_item = new $sub_itemtype;
+      if ($sub_item instanceof \CommonDBRelation) {
+         $params = $get + $args;
+
+         if ($sub_item instanceof \Item_Devices && $item instanceof \CommonDevice) {
+            $types = $sub_item->itemAffinity();
+
+            foreach ($types as $sub_type) {
+               $sub_link_item = new $sub_type;
+               $search = new \Search($item, $params);
+               $data[$sub_type] = [
+                  'search_data'  => $search->getData([
+                        'item'      => $item,
+                        'sub_item'  => $sub_link_item
+                  ]),
+                  'item'         => $sub_link_item
+               ];
+            }
+         } else if ($sub_item instanceof \Item_Devices) {
+            $types = $sub_item->getDeviceTypes();
+            $data = [];
+            foreach ($types as $sub_type) {
+               $sub_link_item = new $sub_type;
+               if ($item->getType() == $sub_link_item::$itemtype_1) {
+                  $link_type = $sub_link_item::$itemtype_2;
+               } else if ($item->getType() == $sub_link_item::$itemtype_2) {
+                  $link_type = $sub_link_item::$itemtype_1;
+               } else {
+                  $link_type = ($sub_link_item::$itemtype_1 != 'itemtype' ?
+                        $sub_link_item::$itemtype_1 :
+                        $sub_link_item::$itemtype_2
+                  );
+               }
+
+               if (!empty($link_type) && $link_type != 'itemtype') {
+                  $link = new $link_type;
+               } else {
+                  $link = $sub_item;
+               }
+
+               $search = new \Search($link, $params);
+               $data[$link->getType()] = [
+                  'search_data'  => $search->getData([
+                        'item'      => $item,
+                        'sub_item'  => $sub_link_item
+                  ]),
+                  'item'         => $sub_link_item
+               ];
+            }
+
+            //return $this->renderTab($data);
+            /*return $this->view->render(
+               $response,
+               'list_itemtyped_contents.twig',
+               [
+                  'data'   => $data
+               ]
+            );*/
+         } else {
+            if ($item->getType() == $sub_item::$itemtype_1) {
+               $link_type = $sub_item::$itemtype_2;
+            } else if ($item->getType() == $sub_item::$itemtype_2) {
+               $link_type = $sub_item::$itemtype_1;
+            } else {
+               $link_type = ($sub_item::$itemtype_1 != 'itemtype' ?
+                  $sub_item::$itemtype_1 :
+                  $sub_item::$itemtype_2
+               );
+            }
+
+            if (!empty($link_type) && $link_type != 'itemtype') {
+               $link = new $link_type;
+            } else {
+               $link = $sub_item;
+            }
+
+            $search = new \Search($link, $params);
+            if (isset($args['page'])) {
+               $search->setPage((int)$args['page']);
+            }
+            $data = $search->getData([
+               'item'      => $item,
+               'sub_item'  => $sub_item
+            ]);
+
+            //return $this->renderTab($data);
+            /*return $this->view->render(
+               $response,
+               'list_contents.twig',
+               [
+                  'search_data'     => $data,
+                  'item'            => $sub_item
+               ]
+            );*/
+         }
+      } else if ($sub_item instanceof \CommonDBChild) {
+         $params = $get + $args;
+
+         $search = new \Search($sub_item, $params);
+         if (isset($args['page'])) {
+               $search->setPage((int)$args['page']);
+         }
+         $data = $search->getData([
+               'item'      => $item,
+               'sub_item'  => $sub_item
+         ]);
+
+         //return $this->renderTab($data);
+         /*return $this->view->render(
+               $response,
+               'list_contents.twig',
+               [
+                  'search_data'     => $data,
+                  'item'            => $sub_item
+               ]
+         );*/
+      }
+
+      echo "<div class='search_page'>";
+      //$search->showGenericSearch($sub_itemtype, $params);
+      if (isset($params['as_map']) && $params['as_map'] == 1) {
+         $search->showMap($sub_itemtype, $params, $data);
+      } else {
+         $search->showList($sub_itemtype, $params, $data);
+      }
+      echo "</div>";
+   }
 }
