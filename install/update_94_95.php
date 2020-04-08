@@ -742,7 +742,7 @@ function update94to95() {
    $ADDTODISPLAYPREF['Certificate'] = [7, 4, 8, 121, 10, 31];
    $ADDTODISPLAYPREF['Notepad'] = [200, 201, 202, 203, 204];
    $ADDTODISPLAYPREF['SoftwareVersion'] = [3, 31, 2, 122, 123, 124];
-   $ADDTODISPLAYPREF['ComputerVirtualMachine'] = [1, 6, 7, 5, 2, 3, 4];
+   $ADDTODISPLAYPREF['ComputerVirtualMachine'] = [1, 6, 7, 5, 2, 3, 4, 8];
    foreach ($ADDTODISPLAYPREF as $type => $tab) {
       $rank = 1;
       foreach ($tab as $newval) {
