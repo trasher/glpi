@@ -6464,6 +6464,7 @@ JAVASCRIPT;
       if (isset($so["datatype"])) {
          switch ($so["datatype"]) {
             case "itemlink" :
+            case "freelink" :
                $linkitemtype  = getItemTypeForTable($so["table"]);
 
                $out           = "";
