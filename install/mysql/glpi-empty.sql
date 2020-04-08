@@ -2318,7 +2318,7 @@ CREATE TABLE `glpi_displaypreferences` (
   `num` int NOT NULL DEFAULT '0',
   `rank` int NOT NULL DEFAULT '0',
   `users_id` int NOT NULL DEFAULT '0',
-  `is_main` tinyint(1) NOT NULL DEFAULT '1',
+  `is_main` tinyint NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `unicity` (`users_id`,`itemtype`,`num`,`is_main`),
   KEY `rank` (`rank`),

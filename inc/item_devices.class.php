@@ -1570,7 +1570,7 @@ class Item_Devices extends CommonDBRelation {
          $link_type = $itemtype;
       }
 
-      $link_table = getTableForItemtype($link_type);
+      $link_table = getTableForItemType($link_type);
 
       $existing = [];
       $search = new \Search($link_type, []);

@@ -725,7 +725,7 @@ class Search {
             $sub_item['sub_item']->getType() == $data['real_itemtype']
          );
       } else {
-         $COMMONWHERE = self::addDefaultWhere($data['itemtype']);
+         $COMMONWHERE = $this->addDefaultWhere($data['itemtype']);
       }
       $first       = empty($COMMONWHERE);
 
@@ -7915,7 +7915,6 @@ JAVASCRIPT;
             $sql_clause = $dbi->analyseCrit($joinparams['condition']);
             $complexjoin .= ' AND ' . $sql_clause; //TODO: and should came from conf
          }
-         }
       }
 
       // For jointype == child
@@ -7940,7 +7939,6 @@ JAVASCRIPT;
                   $dbi = new DBmysqlIterator($DB);
                   $sql_clause = $dbi->analyseCrit($tab['joinparams']['condition']);
                   $complexjoin .= ' AND ' . $sql_clause; //TODO: and should came from conf
-               }
                }
             }
          }

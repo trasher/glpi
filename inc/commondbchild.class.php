@@ -93,7 +93,7 @@ abstract class CommonDBChild extends CommonDBConnexity {
       }
       return null;
    }
- 
+
    protected function countForTab($item, $tab, $deleted = 0, $template = 0) {
       global $DB;
       $criteria = self::getSQLCriteriaToSearchForItem($item->getType(), $item->fields['id']);

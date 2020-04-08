@@ -1889,7 +1889,7 @@ abstract class CommonDBRelation extends CommonDBConnexity {
          $link = new static();
       }
 
-      $link_table = getTableForItemtype($link_type);
+      $link_table = getTableForItemType($link_type);
       $current_table = static::getTable();
       $item_type  = $item->getType();
 
@@ -1925,7 +1925,7 @@ abstract class CommonDBRelation extends CommonDBConnexity {
          $where_id   = static::$items_id_1;
       }
 
-      $dbi = new DBMysqlIterator($DB);
+      $dbi = new DBmysqlIterator($DB);
       $dbi->buildQuery(
          static::getTable(), [
             'SELECT' => 'items_id',
@@ -1975,7 +1975,7 @@ abstract class CommonDBRelation extends CommonDBConnexity {
          $link = new static();
       }
 
-      $link_table = getTableForItemtype($link_type);
+      $link_table = getTableForItemType($link_type);
 
       $existing = [];
       $search = new Search($link_type, []);
