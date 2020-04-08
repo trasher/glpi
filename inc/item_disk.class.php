@@ -288,7 +288,7 @@ class Item_Disk extends CommonDBChild {
 
       $tabs[] = [
          'id'              => 4,
-         'table'           => FileSystem::getTable(),
+         'table'           => Filesystem::getTable(),
          'field'           => 'name',
          'name'            => __('File system'),
          'datatype'        => 'dropdown',

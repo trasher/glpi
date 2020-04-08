@@ -55,6 +55,7 @@ function update95toXX() {
       'reservationitem',
       'schema_fixes',
       'softwares',
+      'sublists',
       'uuids',
       'inventory_management'
    ];

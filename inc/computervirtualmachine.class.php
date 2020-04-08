@@ -310,6 +310,10 @@ class ComputerVirtualMachine extends CommonDBChild {
          echo "</a></div>\n";
       }
 
+      /* FIXME: those 2 lines would replace the whole following echoes
+      $get = ['withtemplate' => 0] + $_GET;
+      $comp->showSublist(self::getType(), $get);*/
+
       echo "<div class='center'>";
 
       $virtualmachines = getAllDataFromTable(
@@ -521,6 +525,7 @@ class ComputerVirtualMachine extends CommonDBChild {
          'field'              => 'ram',
          'name'               => _n('Memory', 'Memories', 1),
          'datatype'           => 'string',
+         'unit'               => 'auto',
          'massiveaction'      => false,
          'autocomplete'       => true,
       ];
@@ -533,6 +538,35 @@ class ComputerVirtualMachine extends CommonDBChild {
          'datatype'           => 'string',
          'massiveaction'      => false,
          'autocomplete'       => true,
+      ];
+
+      $tab[] = [
+         'id'                 => 5,
+         'table'              => VirtualMachineState::getTable(),
+         'field'              => 'name',
+         'name'               => VirtualMachineState::getTypeName(1),
+         'datatype'           => 'dropdown',
+         'massiveaction'      => false
+
+      ];
+
+      $tab[] = [
+         'id'                 => 6,
+         'table'              => VirtualMachineSystem::getTable(),
+         'field'              => 'name',
+         'name'               => VirtualMachineSystem::getTypeName(1),
+         'datatype'           => 'dropdown',
+         'massiveaction'      => false
+
+      ];
+
+      $tab[] = [
+         'id'                 => 7,
+         'table'              => VirtualMachineType::getTable(),
+         'field'              => 'name',
+         'name'               => VirtualMachineType::getTypeName(1),
+         'datatype'           => 'dropdown',
+         'massiveaction'      => false
       ];
 
       return $tab;
