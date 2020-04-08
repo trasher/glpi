@@ -569,6 +569,23 @@ class ComputerVirtualMachine extends CommonDBChild {
          'massiveaction'      => false
       ];
 
+      /*$tab[] = [
+         'id'                 => '8',
+         'table'              => 'glpi_computers',
+         'field'              => 'uuid',
+         'name'               => __('Machine'),
+         'datatype'           => 'freelink', //FIXME: => requires a change in Search: we want an itemlink but not the JOIN part
+         'massiveaction'      => false,
+         'joinparams'         => [
+            'beforejoin'         => [
+               'table'              => self::getTable(),
+               'joinparams'         => [
+                  'jointype'           => 'child'
+               ]
+            ]
+         ]
+      ];*/
+
       return $tab;
    }
 
@@ -702,4 +719,33 @@ class ComputerVirtualMachine extends CommonDBChild {
 
       return $tab;
    }
+
+
+   /**
+    * Add default where for search
+    *
+    * @since 10.0.0
+    *
+    * @param CommonDBTM $item Item instance
+    * @param boolean    $self Condition is to add on current object itself
+    *
+    * @return array
+    */
+   /*public static function addSubDefaultWhere(CommonDBTM $item, $self = false) {
+      //FIXME: does not work as expected, count part does not cointains the join (wrog SO?)
+      global $DB;
+
+      $cvm = new self;
+      $options = $cvm->rawSearchOptions();
+      var_dump($options);
+      $tablename = $DB->quoteName(
+         $item->getTable() . '_' . Search::computeComplexJoinID(
+            $options[8]['joinparams']
+         )
+      );
+
+      $condition = 'LOWER('.$DB->quoteName($tablename.'.uuid'). ') IN (\''  . implode('\', \'', self::getUUIDRestrictCriteria($item->fields['uuid'])) . '\')';
+      return $condition;
+   }*/
+
 }
