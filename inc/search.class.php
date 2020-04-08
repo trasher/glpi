@@ -724,7 +724,7 @@ class Search {
             $sub_item['sub_item']->getType() == $data['real_itemtype']
          );
       } else {
-         $COMMONWHERE = self::addDefaultWhere($data['itemtype']);
+         $COMMONWHERE = $this->addDefaultWhere($data['itemtype']);
       }
       $first       = empty($COMMONWHERE);
 
