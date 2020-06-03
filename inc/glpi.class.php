@@ -118,4 +118,17 @@ class GLPI {
    public function getErrorHandler() {
       return $this->error_handler;
    }
+
+   /**
+    * Initialize tmeplating system
+    *
+    * @return Twig
+    */
+   public function initTemplates() {
+      $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/templates');
+      $twig = new \Twig\Environment($loader, [
+         'cache' => GLPI_CACHE_DIR . '/twig',
+      ]);
+      return $twig;
+   }
 }
