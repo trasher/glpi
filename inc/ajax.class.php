@@ -389,14 +389,19 @@ class Ajax {
             if ($key == $active_tabs) {
                $selected_tab = $current;
             }
+
+            $title = $val['title'];
+            if (is_array($title)) {
+               $title = $title['label'] . ' (' . $title['count'] . ')';
+            }
+
             echo "<li><a title=\"".
-                 str_replace(["<sup class='tab_nb'>", '</sup>'], '', $val['title'])."\" ";
+                 str_replace(["<sup class='tab_nb'>", '</sup>'], '', $title)."\" ";
             echo " href='".$val['url'].(isset($val['params'])?'?'.$val['params']:'')."'>";
             // extract sup information
             // $title = '';
             // $limit = 16;
             // No title strip for horizontal menu
-            $title = $val['title'];
             echo $title."</a></li>";
             $current ++;
          }

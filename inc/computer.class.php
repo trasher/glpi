@@ -70,7 +70,7 @@ class Computer extends CommonDBTM {
    }
 
 
-   function defineTabs($options = []) {
+   /*function defineTabs($options = []) {
 
       $ong = [];
       $this->addDefaultFormTab($ong)
@@ -104,11 +104,9 @@ class Computer extends CommonDBTM {
 
    protected function getMainTabs() {
       return [
-         'Item_OperatingSystem',
          'Item_Disk',
-         'Computer_SoftwareVersion',
+         'Item_SoftwareVersion',
          'Computer_Item',
-         'NetworkPort'
       ];
    }
 

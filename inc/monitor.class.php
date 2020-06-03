@@ -71,7 +71,7 @@ class Monitor extends CommonDBTM {
    /**
     * @see CommonGLPI::defineTabs()
    **/
-   function defineTabs($options = []) {
+   /*function defineTabs($options = []) {
 
       $ong = [];
       $this->addDefaultFormTab($ong);
@@ -95,6 +95,12 @@ class Monitor extends CommonDBTM {
       $this->addStandardTab('Log', $ong, $options);
 
       return $ong;
+   }*/
+
+   protected function getMainTabs() {
+      return [
+         'Computer_Item'
+      ];
    }
 
    /**

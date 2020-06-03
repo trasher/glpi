@@ -72,14 +72,14 @@ class ComputerAntivirus extends CommonDBChild {
       return '';
    }
 
-   protected function countForTab($item, $tab) {
+   /*protected function countForTab($item, $tab) {
       $count = countElementsInTable(
          'glpi_computerantiviruses', [
             'computers_id' => $item->getID(),
             'is_deleted'   => 0
          ]);
       return $count;
-   }
+   }*/
 
 
    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {

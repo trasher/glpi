@@ -269,6 +269,9 @@ class CommonGLPI {
       $tabs = $tabs + $this->addMainTabs();
 
       $guess_relations = [
+         'Item_OperatingSystem' => 'operatingsystem_types',
+         'Impact'             => 'impact_types',
+         'Domain_Item'        => 'domain_types',
          'Item_Devices'       => 'itemdevices_types',
          'NetworkPort'        => 'networkport_types',
          'Infocom'            => 'infocom_types',
@@ -294,6 +297,14 @@ class CommonGLPI {
 
       $tabs += $this->addTab('Notepad');
       $tabs += $this->addTab('Log');
+
+      //from plugins
+      // Object with class with 'addtabon' attribute
+      if (isset(self::$othertabs[$this->getType()])
+          && !$this->isNewItem()) {
+
+         $tabs += $this->addTabs(self::$othertabs[$this->getType()]);
+      }
 
       if ($_SESSION['glpi_use_mode'] == Session::DEBUG_MODE
           && method_exists(get_class($this), 'showDebug')) {
@@ -403,6 +414,18 @@ class CommonGLPI {
     * @return integer|false
     */
    protected function countForTab($item, $tab) {
+      global $DB;
+
+      if (!$DB->fieldExists($this->getTable(), 'itemtype')) {
+         Toolbox::logWarning(
+            sprintf(
+               'Cannot count for %1$s %2$s',
+               $item->getTypeName(),
+               $tab
+            )
+         );
+         return;
+      }
       $count = countElementsInTable(
          $this->getTable(), [
             'itemtype' => $item->getType(),
@@ -422,14 +445,14 @@ class CommonGLPI {
     *
     * @return array array containing the tabs
    **/
-   function defineTabs($options = []) {
+   /*function defineTabs($options = []) {
 
       $ong = [];
       $this->addDefaultFormTab($ong);
       $this->addImpactTab($ong, $options);
 
       return $ong;
-   }
+   }*/
 
 
    /**
@@ -450,27 +473,34 @@ class CommonGLPI {
       if ($this->isNewItem()) {
          $this->addDefaultFormTab($onglets);
       } else {
-         $onglets = $this->defineTabs($options);
-      }
+         if (method_exists($this, 'defineTabs')) {
+            //old way
+            $onglets = $this->defineTabs($options);
 
-      // Object with class with 'addtabon' attribute
-      if (isset(self::$othertabs[$this->getType()])
-          && !$this->isNewItem()) {
+            // Object with class with 'addtabon' attribute
+            if (isset(self::$othertabs[$this->getType()])
+               && !$this->isNewItem()) {
 
-         foreach (self::$othertabs[$this->getType()] as $typetab) {
-            $this->addStandardTab($typetab, $onglets, $options);
+               foreach (self::$othertabs[$this->getType()] as $typetab) {
+                  $this->addStandardTab($typetab, $onglets, $options);
+               }
+            }
+
+            $class = $this->getType();
+            if (($_SESSION['glpi_use_mode'] == Session::DEBUG_MODE)
+               && method_exists($this, 'defineTabs')
+               && (!$this->isNewItem() || $this->showdebug)
+               && (method_exists($class, 'showDebug')
+                  || Infocom::canApplyOn($class)
+                  || in_array($class, $CFG_GLPI["reservation_types"]))) {
+
+                  $onglets[-2] = __('Debug');
+            }
+         } else {
+            $onglets = $this->getTabs();
          }
       }
 
-      $class = $this->getType();
-      if (($_SESSION['glpi_use_mode'] == Session::DEBUG_MODE)
-          && (!$this->isNewItem() || $this->showdebug)
-          && (method_exists($class, 'showDebug')
-              || Infocom::canApplyOn($class)
-              || in_array($class, $CFG_GLPI["reservation_types"]))) {
-
-            $onglets[-2] = __('Debug');
-      }
       return $onglets;
    }
 
@@ -1035,6 +1065,7 @@ class CommonGLPI {
 
          // Not all tab for templates and if only 1 tab
          if ($display_all
+             && method_exists($this, 'defineTabs')
              && empty($withtemplate)
              && (count($tabs) > 1)) {
             $tabs[-1] = ['title'  => __('All'),

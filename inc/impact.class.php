@@ -1831,4 +1831,8 @@ class Impact extends CommonGLPI {
 
       Html::closeForm();
    }
+
+   public function countForTab($item, $tab, $deleted = 0, $template = 0) {
+      return;
+   }
 }
