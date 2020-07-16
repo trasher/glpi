@@ -1,0 +1,112 @@
+Received: from VI1PR0401MB2670.eurprd04.prod.outlook.com (2603:10a6:7:66::34)
+by HE1PR04MB3116.eurprd04.prod.outlook.com with HTTPS via
+HE1PR07CA0048.EURPRD07.PROD.OUTLOOK.COM; Thu, 16 Jul 2020 14:29:09 +0000
+Received: from AM4PR0701CA0041.eurprd07.prod.outlook.com
+(2603:10a6:200:42::51) by VI1PR0401MB2670.eurprd04.prod.outlook.com
+(2603:10a6:800:54::11) with Microsoft SMTP Server (version=TLS1_2,
+cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.21; Thu, 16 Jul
+2020 14:29:08 +0000
+Received: from HE1EUR02FT023.eop-EUR02.prod.protection.outlook.com
+(2603:10a6:200:42:cafe::a8) by AM4PR0701CA0041.outlook.office365.com
+(2603:10a6:200:42::51) with Microsoft SMTP Server (version=TLS1_2,
+cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.10 via Frontend
+Transport; Thu, 16 Jul 2020 14:29:08 +0000
+Authentication-Results: spf=none (sender IP is 83.220.49.166)
+smtp.mailfrom=mail.glpi-project.org; glpi-project.org; dkim=pass (signature was
+verified) header.d=mail.glpi-project.org;glpi-project.org; dmarc=permerror
+action=none header.from=mail.glpi-project.org;compauth=pass reason=105
+Received-SPF: None (protection.outlook.com: mail.glpi-project.org does not
+designate permitted sender hosts)
+Received: from mail.glpi-project.org (83.220.49.166) by
+HE1EUR02FT023.mail.protection.outlook.com (10.152.10.155) with Microsoft SMTP
+Server (version=TLS1_1, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA) id
+15.20.3195.18 via Frontend Transport; Thu, 16 Jul 2020 14:29:07 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+d=mail.glpi-project.org; s=mail;
+h=from:reply-to:subject:date:message-id:to:mime-version:content-type:
+content-transfer-encoding:in-reply-to;
+bh=kffMX1zoRdBNaJyn9V8vlF0L0ThqC0exU4jP/3387Js=;
+b=cR03+wYCuh7FdchcTdmB8kOHYvulUl3hXGFaMlqwrEEIu1vvhqj6U2o3GyR5/YCNfDEsGP9eeCYZr
+oDoCF3hNfXUDPAzrw1A2opDuw/Kro756oZtFVXP4/4mv3cf5TrMehpWkSwfzwRM91x4lsBQVvnoDUe
+iOubVrdx5Yp6A+hTN1Yhu9rtI65GasbIU0G9FtYTZqY/ZaagF3B47ic5EjgJUOYfcJ0q235mkq9LgD
+/aCaPSoIzxnbTzt7MdHDpDqFl0YOO80jpihITuPf6p/DzrN+bm7CyxBvmErj7/w0PF8eeLKcJq40lq
+SZr2wg8x5PPdhHjNYM9ecBJ0S8lp9Fw==
+X-Footer: bWFpbC5tb3Nnb3J0dXIucnU=
+Received: from localhost ([127.0.0.1])
+by mail.glpi-project.org (Kerio Connect 9.2.1) with ESMTPSA
+(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
+for unittests@glpi-project.org;
+Thu, 16 Jul 2020 17:29:05 +0300
+Date: Thu, 16 Jul 2020 17:29:05 +0300
+To: =?utf-8?B?0KHQsNC30LDQvdC+0LIg0JzQuNGF0LDQuNC7?= <unittests@glpi-project.org>
+From: =?utf-8?B?R0xQSTog0J7RgtC00LXQuyDQuNC90YTQvtGA0LzQsNGG0LjQvtC90L3Ri9GF?=
+=?utf-8?B?INGC0LXRhdC90L7Qu9C+0LPQuNC5?= <normal@glpi-project.org>
+Reply-To: "it@mail.glpi-project.org" <it@mail.glpi-project.org>
+Subject: =?utf-8?B?W0dMUEkgIzE3MTAzMTMyMTJdINCd0L7QstCw0Y8g0LfQsNGP0LLQutCwINGC?=
+=?utf-8?B?0LXRgdGC?=
+Message-ID: <GLPI-1710313212.1594909734.1769095652@webserver>
+X-Mailer: PHPMailer 6.1.6 (https://github.com/PHPMailer/PHPMailer)
+Auto-Submitted: auto-generated
+X-Auto-Response-Suppress: OOF, DR, NDR, RN, NRN
+In-Reply-To: <GLPI-Ticket-1710313212>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+boundary="b1_mNU4N8hpTqdGOTszR4FFm6UoXSeLUWo1VQaVgF56g"
+Content-Transfer-Encoding: 8bit
+Return-Path: it@mail.glpi-project.org
+X-MS-Exchange-Organization-ExpirationStartTime: 16 Jul 2020 14:29:07.7795
+(UTC)
+X-MS-Exchange-Organization-ExpirationStartTimeReason: OriginalSubmit
+X-MS-Exchange-Organization-ExpirationInterval: 1:00:00:00.0000000
+X-MS-Exchange-Organization-ExpirationIntervalReason: OriginalSubmit
+X-MS-Exchange-Organization-Network-Message-Id:
+8b3aa0b7-8154-4b94-6d95-08d82994995c
+X-EOPAttributedMessage: 0
+X-EOPTenantAttributedMessage: 487f616f-2123-4cc0-b0ee-87b522bbf1a0:0
+X-MS-Exchange-Organization-MessageDirectionality: Incoming
+X-Forefront-Antispam-Report:
+CIP:83.220.49.166;CTRY:RU;LANG:ru;SCL:-1;SRV:;IPV:NLI;SFV:SFE;H:mail.glpi-project.org;PTR:mail.glpi-project.org;CAT:NONE;SFTY:;SFS:;DIR:INB;SFP:;
+X-MS-PublicTrafficType: Email
+X-MS-Exchange-Organization-AuthSource:
+HE1EUR02FT023.eop-EUR02.prod.protection.outlook.com
+X-MS-Exchange-Organization-AuthAs: Anonymous
+X-MS-Office365-Filtering-Correlation-Id: 8b3aa0b7-8154-4b94-6d95-08d82994995c
+X-MS-TrafficTypeDiagnostic: VI1PR0401MB2670:
+X-MS-Oob-TLC-OOBClassifiers: OLM:1728;
+X-MS-Exchange-Organization-SCL: -1
+X-Microsoft-Antispam: BCL:0;
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jul 2020 14:29:07.6255
+(UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8b3aa0b7-8154-4b94-6d95-08d82994995c
+X-MS-Exchange-CrossTenant-Id: 487f616f-2123-4cc0-b0ee-87b522bbf1a0
+X-MS-Exchange-CrossTenant-AuthSource:
+HE1EUR02FT023.eop-EUR02.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: Internet
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0401MB2670
+X-MS-Exchange-Transport-EndToEndLatency: 00:00:01.4699406
+X-MS-Exchange-Processed-By-BccFoldering: 15.20.3174.025
+X-Microsoft-Antispam-Mailbox-Delivery:
+wl:1;pcwl:1;ucf:1;jmr:0;auth:0;dest:C;OFR:CustomRules;ENG:(750128)(520011016)(520004050)(702028)(944506458)(944626604);
+X-Microsoft-Antispam-Message-Info:
+=?us-ascii?Q?TZ69SpyW7YGt9pZHNxl31FOVyr1kUS0hJZUuSTTBtfKgXZuz0mrO4o/9arzn?=
+=?us-ascii?Q?SPzaqPbIckLk8bmTe9XaczQvASXtq1emmk95lfYQAWq28HWGT1NfCfuesaUm?=
+=?us-ascii?Q?I669FGg0LWRmt29CDXYngSggOmx0gvJURLji9xw0W2rIsIUgJbVmO4QpdBgo?=
+=?us-ascii?Q?aVQR5ivIf0A9XnOTg3iZsY/DHY+GiKCTr9tcGua2+VBZrfqBx9o8rwlw4YIM?=
+=?us-ascii?Q?KE+jPdoo7RzEn6g+sn2TgRH2L/WCgsk9KTKfqAEIPKnRzrosapufZiUh86Z9?=
+=?us-ascii?Q?mhQeG15ArZl7XJFVEyizGVvL3bBBNVPA5tossHHIgjn87JWPbdaEkdyY4Y+W?=
+=?us-ascii?Q?iuqlVKWF7k+J8lD4c5GahLmXGhsiUxmz12SfhBCjigOyXsDrqp40rCZMah1M?=
+=?us-ascii?Q?iaw8l83+C9pZwo4tt+Mc86d9UDRG9yP4GeoHPk8D34LxRTxq+/sHsuycHJyd?=
+=?us-ascii?Q?2D0vNUMTiYxP6y6/phjDYpYyHAdTyXrvKHG6iXtS+aW+WKBIHvX92luWcpv3?=
+=?us-ascii?Q?G8J8DZafr7JThG3mWvC6fTolLCKzGZlE/fg4+uLIGed4dqpkyentzayAui+C?=
+=?us-ascii?Q?EHFOBkMn5ZRX17le6+MKn+UVg4aF5lGlo8TezufaMhfw03FdWRh5T2x/5NNi?=
+=?us-ascii?Q?k6teEbnZgrJXQwHJVWGNRQgoKGn/G5HSi0tqwFdpN0B/xeA0s5VYJmBKIUev?=
+=?us-ascii?Q?SSBraaRq15FMMhKwJuDe+Qi0zjY3TIVHU51Z1j9gax7BZwmrtia4nA5uhwAP?=
+=?us-ascii?Q?tiVE5UXjskXnKAFBfSx10XP42zOpkQauwf6j/TTnga6aZulaAGIqZmRLyvgx?=
+=?us-ascii?Q?AwfglxG0WKyIEOny2jy93ZgWyaNijYzRboKFY4xdKte816Lw8JyWWnToAoh9?=
+=?us-ascii?Q?jGHwqWoAtxtVS7tXWqOETCoNjwI1GtkU21tfVM6bv0tjfqgq4+DELoyRMbsz?=
+=?us-ascii?Q?XDnQyK/36ZPpCU8BQXC1868TquHdEXpWGkS5Aj2JiOMK44cLMnqfljdu6O2q?=
+=?us-ascii?Q?qFb04XyQEuNcfEfS3IaP/z3NtAkotE8NNU423/HUjc/Rxv2wuyaI4306qdZG?=
+=?us-ascii?Q?56ETqM+hppefWNXN739MDos9a2qB2DSNhzRtX3dfKtY+7vJCtYuQ/53qHYTd?=
+=?us-ascii?Q?Sm0lkQhP9lkF38F0rYHzFiY4db9Fwnc10MKLPCOIG//gZ446NYzDFtwCr5xQ?=
+=?us-ascii?Q?XDJu04h7EtSJZ8fD?=
