@@ -325,7 +325,7 @@ class MailCollector extends DbTestCase {
          ]
       ]);
 
-      $this->integer(count($iterator))->isIdenticalTo(5);
+      $this->integer(count($iterator))->isIdenticalTo(6);
       $names = [];
       while ($data = $iterator->next()) {
          $names[] = $data['name'];
@@ -336,7 +336,8 @@ class MailCollector extends DbTestCase {
          'Test images',
          'Test\'ed issue',
          'Test Email from Outlook',
-         'No contenttype'
+         'No contenttype',
+         '[GLPI #1710313213] New Ticket тест2'
       ];
       $this->array($names)->isIdenticalTo($expected_names);
 
