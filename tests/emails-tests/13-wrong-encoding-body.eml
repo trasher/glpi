@@ -1,325 +1,38 @@
-Received: from VI1PR04MB7118.eurprd04.prod.outlook.com (2603:10a6:3:bc::29) by
- HE1PR04MB3116.eurprd04.prod.outlook.com with HTTPS via
- HE1P190CA0019.EURP190.PROD.OUTLOOK.COM; Thu, 16 Jul 2020 14:45:09 +0000
-Received: from AM6P193CA0053.EURP193.PROD.OUTLOOK.COM (2603:10a6:209:8e::30)
- by VI1PR04MB7118.eurprd04.prod.outlook.com (2603:10a6:800:127::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.17; Thu, 16 Jul
- 2020 14:45:08 +0000
-Received: from HE1EUR02FT049.eop-EUR02.prod.protection.outlook.com
- (2603:10a6:209:8e:cafe::83) by AM6P193CA0053.outlook.office365.com
- (2603:10a6:209:8e::30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.18 via Frontend
- Transport; Thu, 16 Jul 2020 14:45:08 +0000
-Authentication-Results: spf=none (sender IP is 83.220.49.166)
- smtp.mailfrom=glpi-project.org; glpi-project.org; dkim=pass (signature was
- verified) header.d=glpi-project.org;glpi-project.org; dmarc=permerror
- action=none header.from=glpi-project.org;compauth=pass reason=105
-Received-SPF: None (protection.outlook.com: glpi-project.org does not
- designate permitted sender hosts)
-Received: from glpi-project.org (83.220.49.166) by
- HE1EUR02FT049.mail.protection.outlook.com (10.152.11.8) with Microsoft SMTP
- Server (version=TLS1_1, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA) id
- 15.20.3195.18 via Frontend Transport; Thu, 16 Jul 2020 14:45:07 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-	d=glpi-project.org; s=mail;
-	h=from:reply-to:subject:date:message-id:to:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to;
-	bh=kgf7sVDNxypOTgsDiqUOm/U5DrdLIF2jgmqDcUDNzYI=;
-	b=PiPZdMcaaMk+2+E3NI13BXOqsug9IHXWzLv/eG9UHRT5uu3GmXnAs36jnEwvQ8MrD/u9VQxcNSZCS
-	 cRC3/oCa8LUXfRUwztOe8JMFoCmMTSIseVLTE7nZCGXqTibS2Vs1XO45dIeVZMsHN4pLi0tvK/x23j
-	 zc04W716aU0Y7ceKOWMfB+BIZSCb6RdvVS0bK4T4qCJ2t+5tdVS87Fsq1nUbwNs0j18vVHNzgl0/aI
-	 wgk7d28tVObVGXegYNuFCNYNCT/mLPvc598pW/lCTCxzOaydHh9UfgoGiXmcT0q9eNFcfI4Fbo+O/b
-	 Y3c4b69vmD0RG6NaXZZTgirNTopub2A==
-X-Footer: bWFpbC5tb3Nnb3J0dXIucnU=
-Received: from localhost ([127.0.0.1])
-	by glpi-project.org (Kerio Connect 9.2.1) with ESMTPSA
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
-	for unittests@glpi-project.org;
-	Thu, 16 Jul 2020 17:45:06 +0300
-Date: Thu, 16 Jul 2020 17:45:06 +0300
-To: =?utf-8?B?0KHQsNC30LDQvdC+0LIg0JzQuNGF0LDQuNC7?= <unittests@glpi-project.org>
-From: =?utf-8?B?R0xQSTog0J7RgtC00LXQuyDQuNC90YTQvtGA0LzQsNGG0LjQvtC90L3Ri9GF?=
- =?utf-8?B?INGC0LXRhdC90L7Qu9C+0LPQuNC5?= <normal@glpi-project.org>
-Reply-To: "normal@glpi-project.org" <normal@glpi-project.org>
-Subject: =?utf-8?Q?[GLPI_#1710313213]_New_Ticket_=D1=82=D0=B5=D1=81=D1=822?=
-Message-ID: <1710313213.1594910667.1849098713@webserver>
-X-Mailer: PHPMailer 6.1.6 (https://github.com/PHPMailer/PHPMailer)
-Auto-Submitted: auto-generated
-X-Auto-Response-Suppress: OOF, DR, NDR, RN, NRN
-Content-Type: multipart/alternative;
- boundary="b1_i8Y5icmBu8CDa2XMPh7UoQS3J5lvhPJ6PADQS1EDcA"
-Content-Transfer-Encoding: 8bit
-Return-Path: normal@glpi-project.org
-X-MS-Exchange-Organization-ExpirationStartTime: 16 Jul 2020 14:45:07.7637
- (UTC)
-X-MS-Exchange-Organization-ExpirationStartTimeReason: OriginalSubmit
-X-MS-Exchange-Organization-ExpirationInterval: 1:00:00:00.0000000
-X-MS-Exchange-Organization-ExpirationIntervalReason: OriginalSubmit
-X-MS-Exchange-Organization-Network-Message-Id:
- 1c837d8d-ab53-4267-657b-08d82996d58e
-X-EOPAttributedMessage: 0
-X-EOPTenantAttributedMessage: 487f616f-2123-4cc0-b0ee-87b522bbf1a0:0
-X-MS-Exchange-Organization-MessageDirectionality: Incoming
-X-Forefront-Antispam-Report:
- CIP:83.220.49.166;CTRY:RU;LANG:en;SCL:-1;SRV:;IPV:NLI;SFV:SFE;H:glpi-project.org;PTR:glpi-project.org;CAT:NONE;SFTY:;SFS:;DIR:INB;SFP:;
-X-MS-PublicTrafficType: Email
-X-MS-Exchange-Organization-AuthSource:
- HE1EUR02FT049.eop-EUR02.prod.protection.outlook.com
-X-MS-Exchange-Organization-AuthAs: Anonymous
-X-MS-Office365-Filtering-Correlation-Id: 1c837d8d-ab53-4267-657b-08d82996d58e
-X-MS-TrafficTypeDiagnostic: VI1PR04MB7118:
-X-MS-Oob-TLC-OOBClassifiers: OLM:2201;
-X-MS-Exchange-Organization-SCL: -1
-X-Microsoft-Antispam: BCL:0;
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jul 2020 14:45:07.5680
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1c837d8d-ab53-4267-657b-08d82996d58e
-X-MS-Exchange-CrossTenant-Id: 487f616f-2123-4cc0-b0ee-87b522bbf1a0
-X-MS-Exchange-CrossTenant-AuthSource:
- HE1EUR02FT049.eop-EUR02.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: Internet
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB7118
-X-MS-Exchange-Transport-EndToEndLatency: 00:00:02.2653124
-X-MS-Exchange-Processed-By-BccFoldering: 15.20.3174.025
-X-Microsoft-Antispam-Mailbox-Delivery:
-	wl:1;pcwl:1;ucf:1;jmr:0;auth:0;dest:C;OFR:CustomRules;ENG:(750128)(520011016)(520004050)(702028)(944506458)(944626604);
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?R21wNGVWWlZSVCtGTmtVOVBVTTZCeVlLY3kwSjkwT0RoTmZKVHphSzk3NWg0?=
- =?utf-8?B?cUxEYUJ1YXFoSTlRQzdTQnFpdzdMdW5NQVhWRW5vVG5MWGJSZVJTbTdhZ1Nv?=
- =?utf-8?B?eWl3UHQxelBlU293ZmJZank5WkNydHJlSEZ3Qm90V0pFMlFvUjBnNTd6K2hj?=
- =?utf-8?B?VXFRV1plR2M3eDdPYm1YdWhVRFE1aXVVK01DWVNCaitpNkVLNDZFU2pRWWZr?=
- =?utf-8?B?SlFpaVBQNGZHYWxLU3p6c1Zwbi9aeWVuV2tjMEcxcFU1cjZRU0o3VG4vODRW?=
- =?utf-8?B?dUladjBVN3NYU1dSL2sraFM3SFBlVjdZeGcyYTlWMHdPU0xMV2RXcUQ1U0RB?=
- =?utf-8?B?WFBmMklreDlKL3hiSkwvU2ExN3VqK0Q4Vmttb1ZKOXdkNnNkcFdFZmFMbEFu?=
- =?utf-8?B?RkY3amRZSTN1TER3eU5Xd1dFR1BwQ3VGVzFPR0RFcGVjS0RqaENuWUVzNjFt?=
- =?utf-8?B?R3RLS1IzQXBkRFhlUHFaU0xQY3lSNUM2Tk9JY3BvcTlKbkZTY1hieDJFcVBH?=
- =?utf-8?B?YmNTSlhrTm1HcWdlempOcHdoTVpUT0g2elJuS1BxT1hVNUFuS2VpSitxdFNh?=
- =?utf-8?B?QmtjdnRrRHA0dnJxWVBHUnV5dnhYNDBOcjBTU0tNajZxSkJFUzR1a3lpZUt6?=
- =?utf-8?B?WWlkWDNmMm02MlFJQnBGcjBsOFJJbFhDd1pjSWo1ZDZHdkpIblV0M01HVVJ1?=
- =?utf-8?B?K1pRL3diZGNpWmZMZ2VkL0VKUXZzbDhxeEV2WklOZ0Y5S2I3K1FiTU9nTnl2?=
- =?utf-8?B?WW5BV3ZXMlJ2bmRhRVdITU1DWVBnY3l0YnIyd3VCQ0k4ai9DVXpsTktkWkox?=
- =?utf-8?B?RGhtZXpmZWZUU2NIK1hTZzQ4MWJtOWl4TjdEUWk4WlpwNld1RkdRT3lidXdL?=
- =?utf-8?B?TXpTQ3d5TjNWeUhjNFBJeWcwellHMC9PVmFZSFNWWnF5QXhmOTMxTkhrdGhu?=
- =?utf-8?B?ZFBITTRKcVozWmNNZXcvb3ovL3I4aklLQVB3NnlMMHpyWkk2ODVYOGE2RTI0?=
- =?utf-8?B?TUNyUy9pdmFWYXBWenVlVGF3SXlTYW80V1hnVDc0eWVzbnZLWFZvVkRXZVpF?=
- =?utf-8?B?V01UcytSUnBXK1lxcmhKUllGY0RwRVBTV2U2OGVwQTBYYjk0NzhudmxORnhV?=
- =?utf-8?B?OTBzV2p2V09HSGJFNXcrUGV1V1FQUDhoRmIyRTZ2N3NaMjlMd1pGMU15bG96?=
- =?utf-8?B?WG0vWFZ1WWNheEtQdkxtaVZnUlI3SzJwb2F6UE5tb2FSOUNQNGR1eDBMTVdI?=
- =?utf-8?B?bzdvcSt2L25NUGF3MlJyZ3pPMnYvZm5ia0RWR0FwT1pDNUF4Tm9PdmFBa0pa?=
- =?utf-8?B?TFdwQ0lnelFlMjByQnJjUGx4bkhYRWZRd2VNajJYUythQ1pyWFhRWFNvSTd2?=
- =?utf-8?B?N3BUbVBRcWZRR0Nxd1pESTNGT1hJMk1zYjNzNlBRL3U2UndUb0d5aStFMUxp?=
- =?utf-8?B?aVlUd1p3bG56Nzg4OFJWVS9FUkwyeUVBUFp3Zy9zdGFUV1lPd25BUXRHRmVK?=
- =?utf-8?B?bXQvajh3WUJTSksySTg5V1Vnc2xwVXg3SEFhTWNJUlRQRDFZK0V0R0hJOERl?=
- =?utf-8?Q?OWC71s0XTQ4SJ6L2s2Y/v0u9ldpe0ZdmOk9zpl+4og/eZ4?=
+Delivered-To: unittests@glpi-project.org
+Received: by 2002:a50:cfc3:0:0:0:0:0 with SMTP id i3csp3500637edk;
+        Tue, 14 Jul 2020 05:17:41 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzNg81xPyGu0K/t2h9jrfIGP7f8arkPuRpR2dTImwUbptUDs7PwZMnVw+TGDnGflCsyHywJ
+X-Received: by 2002:a17:906:84ef:: with SMTP id zp15mr4233633ejb.3.1594729061639;
+        Tue, 14 Jul 2020 05:17:41 -0700 (PDT)
+Return-Path: <ces+bncBDY5VFVI7MJBBZGEW34AKGQE65R3V3I@glpi-project.org>
+Received: from mail.glpi-project.org (mail.glpi-project.org. [127.0.0.1])
+        by mx.google.com with ESMTPS id yh22si12729797ejb.62.2020.07.14.05.17.41
+        for <unittests@glpi-project.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 14 Jul 2020 05:17:41 -0700 (PDT)
+Received-SPF: pass (google.com: domain of ces+bncbdy5vfvi7mjbbzgew34akgqe65r3v3i@glpi-project.org designates 127.0.0.1 as permitted sender) client-ip=127.0.0.1;
+Received: from mail-ej1-f71.google.com ([127.0.0.1])
+  by mail.glpi-project.org with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2020 13:17:41 +0100
+Received: by mail-ej1-f71.google.com with SMTP id op28sf22019349ejb.15
+        for <unittests@glpi-project.org>; Tue, 14 Jul 2020 05:17:41 -0700 (PDT)
+X-Received: by 2002:a50:e385:: with SMTP id b5mr4124200edm.130.1594729061079;
+        Tue, 14 Jul 2020 05:17:41 -0700 (PDT)
+X-Received: by 2002:a50:e385:: with SMTP id b5mr4124184edm.130.1594729060866;
+        Tue, 14 Jul 2020 05:17:40 -0700 (PDT)
 MIME-Version: 1.0
+Received: by 2002:a17:906:1fd7:: with SMTP id e23ls8936851ejt.7.gmail; Tue, 14
+ Jul 2020 05:17:40 -0700 (PDT)
+X-Received: by 2002:a17:906:774d:: with SMTP id o13mr4133448ejn.373.1594729060159;
+        Tue, 14 Jul 2020 05:17:40 -0700 (PDT)
+Received: from mail.glpi-project.org (mail.glpi-project.org. [127.0.0.1])
+        by mx.google.com with SMTP id h24si5438068edj.24.2020.07.14.05.17.39
+        for <unittests@glpi-project.org>;
+        Tue, 14 Jul 2020 05:17:40 -0700 (PDT)
+Date: 14 Jul 2020 13:17:37 +0100
+Message-Id: <4021fe$691cb2b=d78b1276125ef06c@mail.glpi-project.org>
+From: Normal User <normal@glpi-project.org>
+To: unittests@glpi-project.org
+Subject: =?utf-8?Q?[GLPI_#1710313213]_New_Ticket_=D1=82=D0=B5=D1=81=D1=822?=
 
---b1_i8Y5icmBu8CDa2XMPh7UoQS3J5lvhPJ6PADQS1EDcA
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-
-=-=-=-= To answer by email, write above this line =-=-=-=
-
-URL : https://glpi.glpi-project.org/index.php?redirect=ticket_1710313213 
-
-Ticket: Description
-
-Title : тест2
- Requesters : Сазанов Михаил 
- Opening Date : 16-07-2020 17:44
- Closing Date : 
- Request Source : E-Mail
-Associated Item :
-
-Status : New
-
-Urgency : Medium
- Impact : Medium
- Priority : Medium
-
-No Defined Category 
- Description :  
- òåñò2 
-
-ÌÈÕÀÈË ÑÀÇÀÍÎÂ   Èíæåíåð Îòäåëà
-èíôîðìàöèîííûõ òåõíîëîãèé   ÃÀÓÊ
-"ÌÎÑÃÎÐÒÓÐ"             +7 499 241-33-76, äîá.176   +7 (925)
-500-01-76        Íàøè íîâîñòè â ñîöñåòÿõ                 
-ÌÎÑÃÎÐÒÓÐ - ëèäåð äåòñêîãî îòäûõà, ðàáîòàåò
-â ôîðìàòå ïîëíîãî öèêëà.
- Ñ 2017 ãîäà îòâå÷àåò çà ðàçâèòèå
-òóðèñòè÷åñêîé ïðèâëåêàòåëüíîñòè ìóçååâ
-Äåïàðòàìåíòà 
- êóëüòóðû ãîðîäà Ìîñêâû.
- Îðãàíèçàòîð ãîðîäñêèõ ïðîãðàìì, ýêñêóðñèé
-è òóðîâ.
- Â 2017 ãîäó ÌÎÑÃÎÐÒÓÐ â ÷åòâåðòûé ðàç ïîëó÷èë
-íàãðàäó «Ëó÷øåå  äåòÿì».
-
-Number of Followups : 0
-
-Number of Tasks : 0
-
--- 
-
-Automatically generated by GLPI
-
-=_=_=_= To answer by email, write under this line =_=_=_=
-
---b1_i8Y5icmBu8CDa2XMPh7UoQS3J5lvhPJ6PADQS1EDcA
-Content-Type: text/html; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-                        'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitiona=
-l.dtd'><html><head>
-<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dutf-8">
-                         <title>[GLPI #1710313213] New Ticket =D1=82=D0=B5=
-=D1=81=D1=822</title>
-                         <style type=3D"text/css">
-                          =20
-                         </style>
-                        </head>
-                        <body>
-=3D-=3D-=3D-=3D To answer by email, write above this line =3D-=3D-=3D-=3D
-<br><br><!-- description{ color: inherit; background: #ebebeb; border-style=
-: solid;border-color: #8d8d8d; border-width: 0px 1px 1px 0px; }    -->
-<div></div>
-<div> URL : <a href=3D"https://glpi.glpi-project.org/index.php?redirect=3Dticke=
-t_1710313213">https://glpi.glpi-project.org/index.php?redirect=3Dticket_1710313=
-213</a> </div>
-<p class=3D"description b"><strong>Ticket: Description</strong></p>
-<p><span style=3D"color: #8b8c8f; font-weight: bold; text-decoration: under=
-line;"> Title</span>&nbsp;:=D1=82=D0=B5=D1=81=D1=822 <br> <span style=3D"co=
-lor: #8b8c8f; font-weight: bold; text-decoration: underline;"> Requesters</=
-span>&nbsp;: =D0=A1=D0=B0=D0=B7=D0=B0=D0=BD=D0=BE=D0=B2 =D0=9C=D0=B8=D1=85=
-=D0=B0=D0=B8=D0=BB      <br> <span style=3D"color: #8b8c8f; font-weight: bo=
-ld; text-decoration: underline;"> Opening Date</span>&nbsp;:16-07-2020 17:4=
-4 <br> <span style=3D"color: #8b8c8f; font-weight: bold; text-decoration: u=
-nderline;"> Closing Date</span>&nbsp;: <br> <span style=3D"color: #8b8c8f; =
-font-weight: bold; text-decoration: underline;"> Request Source</span>&nbsp=
-;:E-Mail<br>
-<br><span style=3D"color: #8b8c8f; font-weight: bold; text-decoration: unde=
-rline;"> Associated Item</span>&nbsp;:
-<p></p>
-<br> <span style=3D"color: #8b8c8f; font-weight: bold; text-decoration: und=
-erline;">Status </span>&nbsp;: New<br> <br> <span style=3D"color: #8b8c8f; =
-font-weight: bold; text-decoration: underline;"> Urgency</span>&nbsp;: Medi=
-um<br> <span style=3D"color: #8b8c8f; font-weight: bold; text-decoration: u=
-nderline;"> Impact</span>&nbsp;: Medium<br> <span style=3D"color: #8b8c8f; =
-font-weight: bold; text-decoration: underline;"> Priority</span>&nbsp;: Med=
-ium <br>     <br>   No Defined Category     <br> <span style=3D"color: #8b8=
-c8f; font-weight: bold; text-decoration: underline;"> Description</span>&nb=
-sp;: <meta content=3D"text/html; charset=3Dwindows-1251">  <div style=3D"fo=
-nt-family: " Courier=3D"" New?,=3D"" monospace;=3D"" font-size:=3D"" 12pt;=
-=3D"" color:=3D"" rgb(0,=3D"" 0,=3D"" 0);?=3D""> =C3=B2=C3=A5=C3=B1=C3=B22<=
-/div> <div> <div style=3D"font-family: " Courier=3D"" New?,=3D"" monospace;=
-=3D"" font-size:=3D"" 12pt;=3D"" color:=3D"" rgb(0,=3D"" 0,=3D"" 0);?=3D"">=
- <br> </div> <div id=3D"Signature"> <div> <div id=3D"divtagdefaultwrapper" =
-dir=3D"ltr" style=3D"font-size:12pt; color:#808000; background-color:#FFFFF=
-F; font-family:'Segoe UI',Sans-Serif"> <table cellpadding=3D"0" border=3D"0=
-" style=3D"font-family:" Times=3D"" New=3D"" Roman?;=3D"" margin:0px;=3D"" =
-padding:0px;=3D"" width:490px;=3D"" border-spacing:=3D"" 0px;?=3D""> <tbody=
-> <tr align=3D"left" valign=3D"top" style=3D"padding:0px; margin:0px"> <td =
-style=3D"width:200px; padding:0px; margin:0px"><span style=3D"margin:0px; p=
-adding:0px"><a href=3D"https://glpi-project.org/" target=3D"_blank" style=3D"di=
-splay:block"><img style=3D"width:180px; margin:0px" src=3D"http://test.mosg=
-ortur.ru/podp/logo.png" alt=3D"image"></a></span></td> <td style=3D"width:3=
-00px; padding:0px; margin:0px"> <table cellpadding=3D"0" border=3D"0" style=
-=3D"margin:0px; padding:0px; width:300px; border-spacing: 0px;"> <tbody> <t=
-r align=3D"left" valign=3D"middle" style=3D"padding:0px; margin:0px"> <td s=
-tyle=3D"width:300px; height:25px; padding:0px; margin:0px"><span style=3D"c=
-olor:rgb(51,51,51); font-size:12px; display:block; font-family:" Acrom=3D""=
- Bold?,?Century=3D"" Gothic?,Helvetica,Arial,sans-serif;=3D"" font-weight:7=
-00;=3D"" text-transform:uppercase?=3D"">=C3=8C=C3=88=C3=95=C3=80=C3=88=C3=
-=8B =C3=91=C3=80=C3=87=C3=80=C3=8D=C3=8E=C3=82</span></td> </tr> <tr align=
-=3D"left" valign=3D"middle" style=3D"padding:0px; margin:0px"> <td style=3D=
-"width:300px; height:20px; padding:0px; margin:0px"><span style=3D"color:rg=
-b(51,51,51); font-size:10px; display:block; font-family:" Acrom=3D"" Bold?,=
-?Century=3D"" Gothic?,Helvetica,Arial,sans-serif?=3D"">=C3=88=C3=AD=C3=A6=
-=C3=A5=C3=AD=C3=A5=C3=B0 =C3=8E=C3=B2=C3=A4=C3=A5=C3=AB=C3=A0 =C3=A8=C3=AD=
-=C3=B4=C3=AE=C3=B0=C3=AC=C3=A0=C3=B6=C3=A8=C3=AE=C3=AD=C3=AD=C3=BB=C3=B5 =
-=C3=B2=C3=A5=C3=B5=C3=AD=C3=AE=C3=AB=C3=AE=C3=A3=C3=A8=C3=A9</span></td> </=
-tr> <tr align=3D"left" valign=3D"middle" style=3D"padding:0px; margin:0px">=
- <td style=3D"width:300px; height:20px; padding:0px; margin:0px"><span styl=
-e=3D"color:rgb(51,51,51); font-size:9px; display:block; font-family:" Acrom=
-=3D"" Light?,?Century=3D"" Gothic?,Helvetica,Arial,sans-serif?=3D"">=C3=83=
-=C3=80=C3=93=C3=8A &quot;=C3=8C=C3=8E=C3=91=C3=83=C3=8E=C3=90=C3=92=C3=93=
-=C3=90&quot;</span></td> </tr> </tbody> </table> </td> </tr> <tr align=3D"l=
-eft" valign=3D"middle" style=3D"padding:0px; margin:0px"> <td style=3D"widt=
-h:200px; height:30px; margin:0px; padding:0px"></td> <td style=3D"width:300=
-px; height:30px; padding:0px; margin:0px"> <table cellpadding=3D"0" border=
-=3D"0" style=3D"margin:0px; padding:0px; width:300px; border-spacing: 0px;"=
-> <tbody> <tr align=3D"left" valign=3D"middle" style=3D"padding:0px; margin=
-:0px"> <td rowspan=3D"2" style=3D"width:30px; height:30px; padding:0px; mar=
-gin:0px"><img style=3D"width:25px; height:25px; margin:0px" src=3D"http://t=
-est.glpi-project.org/podp/phone.png" alt=3D"image"></td> <td style=3D"width:270=
-px; padding:0px; margin:0px; height:15px"><span style=3D"color:rgb(51,51,51=
-); font-size:9px; display:block; font-family:" Acrom=3D"" Light?,?Century=
-=3D"" Gothic?,Helvetica,Arial,sans-serif?=3D"">&#43;7 499 241-33-76, =C3=A4=
-=C3=AE=C3=A1.176</span></td> </tr> <tr align=3D"left" valign=3D"top" style=
-=3D"padding:0px; margin:0px"> <td style=3D"width:270px; height:15px; paddin=
-g:0px; margin:0px"><span style=3D"color:rgb(51,51,51); font-size:9px; displ=
-ay:block; font-family:" Acrom=3D"" Light?,?Century=3D"" Gothic?,Helvetica,A=
-rial,sans-serif?=3D"">&#43;7 (925) 500-01-76</span></td> </tr> </tbody> </t=
-able> </td> </tr> <tr align=3D"left" valign=3D"middle" style=3D"padding:0px=
-; margin:0px"> <td style=3D"width:200px; height:25px"></td> <td style=3D"wi=
-dth:300px; height:25px; padding:0px; margin:0px"><span style=3D"color:rgb(5=
-1,51,51); font-size:9px; display:block; font-family:" Acrom=3D"" Light?,?Ce=
-ntury=3D"" Gothic?,Helvetica,Arial,sans-serif?=3D"">=C3=8D=C3=A0=C3=B8=C3=
-=A8 =C3=AD=C3=AE=C3=A2=C3=AE=C3=B1=C3=B2=C3=A8 =C3=A2 =C3=B1=C3=AE=C3=B6=C3=
-=B1=C3=A5=C3=B2=C3=BF=C3=B5</span></td> </tr> <tr align=3D"left" valign=3D"=
-top" style=3D"padding:0px; margin:0px"> <td style=3D"width:200px; height:35=
-px"></td> <td style=3D"width:300px; height:35px; padding:0px; margin:0px"> =
-<table cellpadding=3D"0" border=3D"0" style=3D"margin:0px; padding:0px; wid=
-th:300px; border-spacing: 0px;"> <tbody> <tr align=3D"left" valign=3D"middl=
-e" style=3D"padding:0px; margin:0px"> <td style=3D"width:30px; height:30px;=
- padding:0px; margin:0px"><a href=3D"http://www.facebook.com/mosgortur" tar=
-get=3D"_blank" style=3D"display:block"><img style=3D"width:25px; height:25p=
-x" src=3D"http://test.glpi-project.org/podp/f.png" alt=3D"image"></a></td> <td =
-style=3D"width:30px; height:30px; padding:0px; margin:0px"><a href=3D"http:=
-//vk.com/mosgortur" target=3D"_blank" style=3D"display:block"><img style=3D=
-"width:25px; height:25px" src=3D"http://test.glpi-project.org/podp/vk.png" alt=
-=3D"image"></a></td> <td style=3D"width:30px; height:30px; padding:0px; mar=
-gin:0px"><a href=3D"http://www.instagram.com/mosgortur/" target=3D"_blank" =
-style=3D"display:block"><img style=3D"width:25px; height:25px" src=3D"http:=
-//test.glpi-project.org/podp/ins.png" alt=3D"image"></a></td> <td style=3D"widt=
-h:210px; height:30px; padding:0px; margin:0px"></td> </tr> </tbody> </table=
-> </td> </tr> <tr align=3D"left" valign=3D"top" style=3D"padding:0px; margi=
-n:0px"> <td colspan=3D"2" style=3D"width:500px; padding:0px; margin:0px"><s=
-pan style=3D"color:rgb(51,51,51); display:block; font-family:" Acrom=3D"" L=
-ight?,?Century=3D"" Gothic?,Helvetica,Arial,sans-serif;=3D"" font-size:9px?=
-=3D"">=C3=8C=C3=8E=C3=91=C3=83=C3=8E=C3=90=C3=92=C3=93=C3=90 - =C3=AB=C3=A8=
-=C3=A4=C3=A5=C3=B0 =C3=A4=C3=A5=C3=B2=C3=B1=C3=AA=C3=AE=C3=A3=C3=AE =C3=AE=
-=C3=B2=C3=A4=C3=BB=C3=B5=C3=A0, =C3=B0=C3=A0=C3=A1=C3=AE=C3=B2=C3=A0=C3=A5=
-=C3=B2 =C3=A2 =C3=B4=C3=AE=C3=B0=C3=AC=C3=A0=C3=B2=C3=A5 =C3=AF=C3=AE=C3=AB=
-=C3=AD=C3=AE=C3=A3=C3=AE  =C3=B6=C3=A8=C3=AA=C3=AB=C3=A0.<br> =C3=91 2017 =
-=C3=A3=C3=AE=C3=A4=C3=A0 =C3=AE=C3=B2=C3=A2=C3=A5=C3=B7=C3=A0=C3=A5=C3=B2 =
-=C3=A7=C3=A0 =C3=B0=C3=A0=C3=A7=C3=A2=C3=A8=C3=B2=C3=A8=C3=A5 =C3=B2=C3=B3=
-=C3=B0=C3=A8=C3=B1=C3=B2=C3=A8=C3=B7=C3=A5=C3=B1=C3=AA=C3=AE=C3=A9 =C3=AF=
-=C3=B0=C3=A8=C3=A2=C3=AB=C3=A5=C3=AA=C3=A0=C3=B2=C3=A5=C3=AB=C3=BC=C3=AD=C3=
-=AE=C3=B1=C3=B2=C3=A8 =C3=AC=C3=B3=C3=A7=C3=A5=C3=A5=C3=A2 =C3=84=C3=A5=C3=
-=AF=C3=A0=C3=B0=C3=B2=C3=A0=C3=AC=C3=A5=C3=AD=C3=B2=C3=A0&nbsp;<br> =C3=AA=
-=C3=B3=C3=AB=C3=BC=C3=B2=C3=B3=C3=B0=C3=BB =C3=A3=C3=AE=C3=B0=C3=AE=C3=A4=
-=C3=A0 =C3=8C=C3=AE=C3=B1=C3=AA=C3=A2=C3=BB.<br> =C3=8E=C3=B0=C3=A3=C3=A0=
-=C3=AD=C3=A8=C3=A7=C3=A0=C3=B2=C3=AE=C3=B0 =C3=A3=C3=AE=C3=B0=C3=AE=C3=A4=
-=C3=B1=C3=AA=C3=A8=C3=B5 =C3=AF=C3=B0=C3=AE=C3=A3=C3=B0=C3=A0=C3=AC=C3=AC, =
-=C3=BD=C3=AA=C3=B1=C3=AA=C3=B3=C3=B0=C3=B1=C3=A8=C3=A9 =C3=A8 =C3=B2=C3=B3=
-=C3=B0=C3=AE=C3=A2.<br> =C3=82 2017 =C3=A3=C3=AE=C3=A4=C3=B3 =C3=8C=C3=8E=
-=C3=91=C3=83=C3=8E=C3=90=C3=92=C3=93=C3=90 =C3=A2 =C3=B7=C3=A5=C3=B2=C3=A2=
-=C3=A5=C3=B0=C3=B2=C3=BB=C3=A9 =C3=B0=C3=A0=C3=A7 =C3=AF=C3=AE=C3=AB=C3=B3=
-=C3=B7=C3=A8=C3=AB =C3=AD=C3=A0=C3=A3=C3=B0=C3=A0=C3=A4=C3=B3 =C2=AB=C3=8B=
-=C3=B3=C3=B7=C3=B8=C3=A5=C3=A5 &#151; =C3=A4=C3=A5=C3=B2=C3=BF=C3=AC=C2=BB.=
-<br> </span></td> </tr> </tbody> </table> </div> </div> </div> </div></p>
-<br></p>
-<div class=3D"description b">Number of Followups&nbsp;: 0</div>
-<p></p>
-<div class=3D"description b">Number of Tasks&nbsp;: 0</div>
-<p></p><br><br>--=20
-<br><br>Automatically generated by GLPI<br><br>
-=3D_=3D_=3D_=3D To answer by email, write under this line =3D_=3D_=3D_=3D
-<br><br>
-</body></html>
-
---b1_i8Y5icmBu8CDa2XMPh7UoQS3J5lvhPJ6PADQS1EDcA--
+Ceci est un message « de test », accentué, avec quelques caractères cyrilliques
+du genre Д Б ou encore Ф.
