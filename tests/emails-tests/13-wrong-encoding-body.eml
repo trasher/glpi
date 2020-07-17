@@ -1,4 +1,4 @@
-Return-Path: <unittests@glpi-project.org>
+Return-Path: <normal@glpi-project.org>
 X-Kerio-Anti-Spam:  Build: [Engines: 2.15.12.1318, Stamp: 3], Multi: [Enabled, t: (0.000010,0.007483)], BW: [Enabled, t: (0.000018)], RTDA: [Enabled, t: (0.253266), Hit: No, Details: v2.7.113; Id: 15.1i67gjp.1edbhbio6.tqdi], total: 0(700)
 X-Spam-Status: No, hits=0.0 required=5.0
 	tests=KERIO_ANTI_SPAM: -0.000, HTML_MESSAGE: 0.001, TOTAL_SCORE: 0.001,autolearn=disabled
@@ -6,7 +6,7 @@ X-Spam-Level:
 Received: from EUR04-VI1-obe.outbound.protection.outlook.com ([40.107.8.139])
 	by glpi-project.org (Kerio Connect 9.2.1) with ESMTPS
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
-	for normal@glpi-project.org;
+	for unittests@glpi-project.org;
 	Thu, 16 Jul 2020 13:05:13 +0300
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
  b=K5qF3ulDSBVkTfxTx+34AzDeCLG37vBNvmEnZgFtP3lBvP14B9KhBbSZEeeka0xh84Skur4T9bH6mEOCx3Gl1hy6P3kAAZ92sQU1KpnAKOz4+LywA4WpcIBVrjfUbUW0xDncFW3oSJ/2SQBKL+uC/L68lmcx6I+Fx2lwpNX0z/xyijxnaqFuS7Rb8cSYbZ232Pea8d60yxstZLbZLBs/fkrLbKpXkzJKl/GcWi/7Qk7cUVh1m50E0WONt5xADDtQto9JKW0UAZJ5nk6a5vWo6jO9rZadya91zsOKbp8zLcImH5iQ7p0zS404pxccV7F3BtTfBXkkxiYtcySoIl6xWw==
@@ -31,8 +31,8 @@ Received: from HE1PR04MB3116.eurprd04.prod.outlook.com
  ([fe80::90c8:bdd6:ea02:c40a]) by HE1PR04MB3116.eurprd04.prod.outlook.com
  ([fe80::90c8:bdd6:ea02:c40a%6]) with mapi id 15.20.3174.025; Thu, 16 Jul 2020
  10:05:11 +0000
-From: =?koi8-r?B?7cnIwcnMIPPB2sHOz9c=?= <unittests@glpi-project.org>
-To: "normal@glpi-project.org" <normal@glpi-project.org>
+From: =?koi8-r?B?7cnIwcnMIPPB2sHOz9c=?= <normal@glpi-project.org>
+To: <unittests@glpi-project.org>
 Subject: Fwd: Test from eml
 Thread-Topic: Test from eml
 Thread-Index: AQHWW1fCqpuqsQi/pk+Y/7pyDCKNEakJ+n+F
@@ -84,10 +84,10 @@ Content-Transfer-Encoding: quoted-printable
 =F4=C5=D3=D4 =D4=C5=D3=D4 =D4=C5=D3=D4
 ---------- =F0=C5=D2=C5=C1=C4=D2=C5=D3=CF=D7=C1=CE=CE=CF=C5 =D3=CF=CF=C2=DD=
 =C5=CE=C9=C5 ----------
-=EF=D4: =ED=C9=C8=C1=C9=CC =F3=C1=DA=C1=CE=CF=D7 <unittests@glpi-project.org>
+=EF=D4: =ED=C9=C8=C1=C9=CC =F3=C1=DA=C1=CE=CF=D7 <normal@glpi-project.org>
 =E4=C1=D4=C1: 16 =C9=C0=CC. 2020 =C7. 12:59
 =F4=C5=CD=C1: Test from eml
-=EB=CF=CD=D5: normal@glpi-project.org
+=EB=CF=CD=D5: unittests@glpi-project.org
 =EB=CF=D0=C9=D1:
 
 Eml test ticket
@@ -105,11 +105,11 @@ Content-Transfer-Encoding: quoted-printable
 <div dir=3D"auto">=F4=C5=D3=D4 =D4=C5=D3=D4 =D4=C5=D3=D4</div>
 <div class=3D"gmail_quote">---------- =F0=C5=D2=C5=C1=C4=D2=C5=D3=CF=D7=C1=
 =CE=CE=CF=C5 =D3=CF=CF=C2=DD=C5=CE=C9=C5 ----------<br>
-=EF=D4: =ED=C9=C8=C1=C9=CC =F3=C1=DA=C1=CE=CF=D7 &lt;unittests@glpi-project.org&=
+=EF=D4: =ED=C9=C8=C1=C9=CC =F3=C1=DA=C1=CE=CF=D7 &lt;normal@glpi-project.org&=
 gt;<br>
 =E4=C1=D4=C1: 16 =C9=C0=CC. 2020 =C7. 12:59<br>
 =F4=C5=CD=C1: Test from eml<br>
-=EB=CF=CD=D5: normal@glpi-project.org<br>
+=EB=CF=CD=D5: unittests@glpi-project.org<br>
 =EB=CF=D0=C9=D1: <br>
 <br type=3D"attribution">
 </div>
