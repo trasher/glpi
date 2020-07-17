@@ -945,7 +945,7 @@ class MailCollector  extends CommonDBTM {
       // Detect if it is a mail reply
       $glpi_message_match = "/GLPI-([0-9]+)\.[0-9]+\.[0-9]+@\w*/";
 
-      // Check if email not send by GLPI : if yes -> blacklist
+      // blacklist if email was sent by GLPI
       if (!isset($headers['message_id'])
           || preg_match($glpi_message_match, $headers['message_id'], $match)) {
          $tkt['_blacklisted'] = true;
