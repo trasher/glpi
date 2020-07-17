@@ -12,17 +12,17 @@ Received: from HE1EUR02FT049.eop-EUR02.prod.protection.outlook.com
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.18 via Frontend
  Transport; Thu, 16 Jul 2020 14:45:08 +0000
 Authentication-Results: spf=none (sender IP is 83.220.49.166)
- smtp.mailfrom=mail.glpi-project.org; glpi-project.org; dkim=pass (signature was
- verified) header.d=mail.glpi-project.org;glpi-project.org; dmarc=permerror
- action=none header.from=mail.glpi-project.org;compauth=pass reason=105
-Received-SPF: None (protection.outlook.com: mail.glpi-project.org does not
+ smtp.mailfrom=glpi-project.org; glpi-project.org; dkim=pass (signature was
+ verified) header.d=glpi-project.org;glpi-project.org; dmarc=permerror
+ action=none header.from=glpi-project.org;compauth=pass reason=105
+Received-SPF: None (protection.outlook.com: glpi-project.org does not
  designate permitted sender hosts)
-Received: from mail.glpi-project.org (83.220.49.166) by
+Received: from glpi-project.org (83.220.49.166) by
  HE1EUR02FT049.mail.protection.outlook.com (10.152.11.8) with Microsoft SMTP
  Server (version=TLS1_1, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA) id
  15.20.3195.18 via Frontend Transport; Thu, 16 Jul 2020 14:45:07 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-	d=mail.glpi-project.org; s=mail;
+	d=glpi-project.org; s=mail;
 	h=from:reply-to:subject:date:message-id:to:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to;
 	bh=kgf7sVDNxypOTgsDiqUOm/U5DrdLIF2jgmqDcUDNzYI=;
@@ -33,15 +33,15 @@ DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
 	 Y3c4b69vmD0RG6NaXZZTgirNTopub2A==
 X-Footer: bWFpbC5tb3Nnb3J0dXIucnU=
 Received: from localhost ([127.0.0.1])
-	by mail.glpi-project.org (Kerio Connect 9.2.1) with ESMTPSA
+	by glpi-project.org (Kerio Connect 9.2.1) with ESMTPSA
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
 	for unittests@glpi-project.org;
 	Thu, 16 Jul 2020 17:45:06 +0300
 Date: Thu, 16 Jul 2020 17:45:06 +0300
 To: =?utf-8?B?0KHQsNC30LDQvdC+0LIg0JzQuNGF0LDQuNC7?= <unittests@glpi-project.org>
 From: =?utf-8?B?R0xQSTog0J7RgtC00LXQuyDQuNC90YTQvtGA0LzQsNGG0LjQvtC90L3Ri9GF?=
- =?utf-8?B?INGC0LXRhdC90L7Qu9C+0LPQuNC5?= <normal@mail.glpi-project.org>
-Reply-To: "normal@mail.glpi-project.org" <normal@mail.glpi-project.org>
+ =?utf-8?B?INGC0LXRhdC90L7Qu9C+0LPQuNC5?= <normal@glpi-project.org>
+Reply-To: "normal@glpi-project.org" <normal@glpi-project.org>
 Subject: =?utf-8?Q?[GLPI_#1710313213]_New_Ticket_=D1=82=D0=B5=D1=81=D1=822?=
 Message-ID: <GLPI-1710313213.1594910667.1849098713@webserver>
 X-Mailer: PHPMailer 6.1.6 (https://github.com/PHPMailer/PHPMailer)
@@ -51,7 +51,7 @@ In-Reply-To: <GLPI-Ticket-1710313213>
 Content-Type: multipart/alternative;
  boundary="b1_i8Y5icmBu8CDa2XMPh7UoQS3J5lvhPJ6PADQS1EDcA"
 Content-Transfer-Encoding: 8bit
-Return-Path: normal@mail.glpi-project.org
+Return-Path: normal@glpi-project.org
 X-MS-Exchange-Organization-ExpirationStartTime: 16 Jul 2020 14:45:07.7637
  (UTC)
 X-MS-Exchange-Organization-ExpirationStartTimeReason: OriginalSubmit
@@ -63,7 +63,7 @@ X-EOPAttributedMessage: 0
 X-EOPTenantAttributedMessage: 487f616f-2123-4cc0-b0ee-87b522bbf1a0:0
 X-MS-Exchange-Organization-MessageDirectionality: Incoming
 X-Forefront-Antispam-Report:
- CIP:83.220.49.166;CTRY:RU;LANG:en;SCL:-1;SRV:;IPV:NLI;SFV:SFE;H:mail.glpi-project.org;PTR:mail.glpi-project.org;CAT:NONE;SFTY:;SFS:;DIR:INB;SFP:;
+ CIP:83.220.49.166;CTRY:RU;LANG:en;SCL:-1;SRV:;IPV:NLI;SFV:SFE;H:glpi-project.org;PTR:glpi-project.org;CAT:NONE;SFTY:;SFS:;DIR:INB;SFP:;
 X-MS-PublicTrafficType: Email
 X-MS-Exchange-Organization-AuthSource:
  HE1EUR02FT049.eop-EUR02.prod.protection.outlook.com
