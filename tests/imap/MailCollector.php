@@ -255,10 +255,16 @@ class MailCollector extends DbTestCase {
       //$this->calling($collector)->getReplyMatch = "/GLPI-Ticket-(1155)/";
       //$this->collector = $collector;
 
+      $iterator = new \FilesystemIterator(
+         __DIR__ . '/../emails-tests/',
+         \FilesystemIterator::SKIP_DOTS
+      );
+      $nb_mails = iterator_count($iterator);
+
       $this->doConnect();
       $this->collector->maxfetch_emails = 1000; // Be sure to fetch all mails from test suite
       $msg = $this->collector->collect($this->mailgate_id);
-      $this->variable($msg)->isIdenticalTo('Number of messages: available=13, retrieved=13, refused=2, errors=1, blacklisted=0');
+      $this->variable($msg)->isIdenticalTo("Number of messages: available=$nb_mails, retrieved=$nb_mails, refused=2, errors=1, blacklisted=0");
       $rejecteds = iterator_to_array($DB->request(['FROM' => \NotImportedEmail::getTable()]));
 
       $this->array($rejecteds)->hasSize(2);
