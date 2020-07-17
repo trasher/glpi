@@ -1030,6 +1030,7 @@ class MailCollector  extends CommonDBTM {
       $tkt['_auto_import']           = 1;
       // For followup : do not check users_id = login user
       $tkt['_do_not_check_users_id'] = 1;
+      var_dump($message->subject);
       $body                          = $this->getBody($message);
 
       $subject       = $message->subject;
@@ -2049,6 +2050,10 @@ class MailCollector  extends CommonDBTM {
          $contentType = "text/plain";
       } finally {
          if (preg_match('/^text\//', $contentType)) {
+            var_dump('mb_detect: '. mb_detect_encoding($contents));
+            if (isset($contentTypePart)) {
+               var_dump('getEncoding: ' . $contentTypePart->getEncoding());
+            }
             $encoding = isset($contentTypePart) ? $contentTypePart->getEncoding() : mb_detect_encoding($contents);
             if (strtoupper($encoding) != 'UTF-8') {
                $contents = Toolbox::encodeInUtf8(
