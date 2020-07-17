@@ -121,6 +121,7 @@ class DBmysqlIterator implements Iterator, Countable {
       }
 
       if ($is_legacy) {
+         Toolbox::Deprecated('Do not use raw SQL with iterator.');
          //if ($_SESSION['glpi_use_mode'] == Session::DEBUG_MODE) {
          //   trigger_error("Deprecated usage of SQL in DB/request (full query)", E_USER_DEPRECATED);
          //}
