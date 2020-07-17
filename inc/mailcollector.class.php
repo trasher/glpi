@@ -2048,11 +2048,14 @@ class MailCollector  extends CommonDBTM {
          //no ContentType header, switch to acceptable default
          $contentType = "text/plain";
       } finally {
-         if (preg_match('/^text\//', $contentType) && ($encoding = mb_detect_encoding($contents)) != 'UTF-8') {
-            $contents = Toolbox::encodeInUtf8(
-               $contents,
-               (isset($contentTypePart) ? $contentTypePart->getEncoding() : $encoding)
-            );
+         if (preg_match('/^text\//', $contentType)) {
+            $encoding = isset($contentTypePart) ? $contentTypePart->getEncoding() : mb_detect_encoding($contents);
+            if (strtoupper($encoding) != 'UTF-8') {
+               $contents = Toolbox::encodeInUtf8(
+                  $contents,
+                  $encoding
+               );
+            }
          }
       }
 
