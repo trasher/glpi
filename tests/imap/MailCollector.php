@@ -337,7 +337,7 @@ class MailCollector extends DbTestCase {
          'Test\'ed issue',
          'Test Email from Outlook',
          'No contenttype',
-         '[GLPI #1710313213] New Ticket тест2'
+         'Fwd: Test from eml'
       ];
       $this->array($names)->isIdenticalTo($expected_names);
 
@@ -345,11 +345,11 @@ class MailCollector extends DbTestCase {
       $ticket = new \Ticket();
       $this->boolean(
          $ticket->getFromDBByCrit([
-            'name'   => '[GLPI #1710313213] New Ticket тест2'
+            'name'   => 'Fwd: Test from eml'
          ])
       )->isTrue();
       $this->string($ticket->fields['content'])
-           ->isIdenticalTo('Ceci est un message « de test », accentué, avec quelques caractères cyrilliques du genre Д Б ou encore Ф.');
+           ->isIdenticalTo('?');
 
       //load ticket with observer for user normal
       //see function doConnect
