@@ -38,6 +38,7 @@ if (!defined('GLPI_ROOT')) {
  * CommonITILObject Class
 **/
 abstract class CommonITILObject extends CommonDBTM {
+   use \Glpi\Features\Clonable;
 
    /// Users by type
    protected $users       = [];
@@ -2028,7 +2029,7 @@ abstract class CommonITILObject extends CommonDBTM {
    }
 
    /**
-   * @see CommonDBTM::post_clone
+   * @see Glpi\Features\Clonable::post_clone
    */
    function post_clone($source, $history) {
       global $DB;
@@ -2047,6 +2048,10 @@ abstract class CommonITILObject extends CommonDBTM {
 
    }
 
+   public function getCloneRelations(): array
+   {
+      return [];
+   }
 
    /**
     * @since 0.84
