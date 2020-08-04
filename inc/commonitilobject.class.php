@@ -2048,8 +2048,7 @@ abstract class CommonITILObject extends CommonDBTM {
 
    }
 
-   public function getCloneRelations(): array
-   {
+   public function getCloneRelations(): array {
       return [];
    }
 
