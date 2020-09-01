@@ -6348,6 +6348,7 @@ CREATE TABLE `glpi_states` (
   `is_visible_pdu` tinyint(1) NOT NULL DEFAULT '1',
   `is_visible_cluster` tinyint(1) NOT NULL DEFAULT '1',
   `is_visible_contract` tinyint(1) NOT NULL DEFAULT '1',
+  `is_visible_appliance` tinyint(1) NOT NULL DEFAULT '1',
   `date_mod` timestamp NULL DEFAULT NULL,
   `date_creation` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -6369,6 +6370,7 @@ CREATE TABLE `glpi_states` (
   KEY `is_visible_pdu` (`is_visible_pdu`),
   KEY `is_visible_cluster` (`is_visible_cluster`),
   KEY `is_visible_contract` (`is_visible_contract`),
+  KEY `is_visible_appliance` (`is_visible_appliance`),
   KEY `date_mod` (`date_mod`),
   KEY `date_creation` (`date_creation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -8054,6 +8056,7 @@ CREATE TABLE `glpi_appliances` (
   `externalidentifier` varchar(255) DEFAULT NULL,
   `serial` varchar(255) DEFAULT NULL,
   `otherserial` varchar(255) DEFAULT NULL,
+  `is_helpdesk_visible` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY  (`id`),
   UNIQUE KEY `unicity` (`externalidentifier`),
   KEY `entities_id` (`entities_id`),
@@ -8069,7 +8072,8 @@ CREATE TABLE `glpi_appliances` (
   KEY `groups_id_tech` (`groups_id_tech`),
   KEY `states_id` (`states_id`),
   KEY `serial` (`serial`),
-  KEY `otherserial` (`otherserial`)
+  KEY `otherserial` (`otherserial`),
+  KEY `is_helpdesk_visible` (`is_helpdesk_visible`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 

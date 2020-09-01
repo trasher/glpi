@@ -113,6 +113,16 @@ function update951to952() {
    );
    /* /Register missing DomainAlert crontask */
 
+   /* Appliances rewrite */
+   $migration->addField('glpi_appliances', 'is_helpdesk_visible', 'bool', ['after' => 'otherserial', 'value' => 1]);
+   $migration->addKey('glpi_appliances', 'is_helpdesk_visible');
+   $migration->addField('glpi_states', 'is_visible_appliance', 'bool', [
+      'value' => 1,
+      'after' => 'is_visible_contract'
+   ]);
+   $migration->addKey('glpi_states', 'is_visible_appliance');
+   /* /Appliances rewrite */
+
    // ************ Keep it at the end **************
    $migration->executeMigration();
 
