@@ -116,6 +116,16 @@ function update951to952() {
    //add option to collect only unread mail
    $migration->addField('glpi_mailcollectors', 'collect_only_unread', 'bool', ['value' => 0]);
 
+   /* Appliances rewrite */
+   $migration->addField('glpi_appliances', 'is_helpdesk_visible', 'bool', ['after' => 'otherserial', 'value' => 1]);
+   $migration->addKey('glpi_appliances', 'is_helpdesk_visible');
+   $migration->addField('glpi_states', 'is_visible_appliance', 'bool', [
+      'value' => 1,
+      'after' => 'is_visible_contract'
+   ]);
+   $migration->addKey('glpi_states', 'is_visible_appliance');
+   /* /Appliances rewrite */
+
    // ************ Keep it at the end **************
    $migration->executeMigration();
 
