@@ -1100,11 +1100,7 @@ class Dropdown {
              ],
              __('Power management') => [
                'Plug'=> Plug::getTypeName(Session::getPluralNumber())
-             ],
-             __('Appliances') => [
-                'ApplianceType'  => ApplianceType::getTypeName(Session::getPluralNumber()),
-                'ApplianceEnvironment' => ApplianceEnvironment::getTypeName(Session::getPluralNumber())
-             ],
+             ]
 
          ]; //end $opt
 
