@@ -354,7 +354,7 @@ class Appliance extends CommonDBTM {
       ];
 
       $tab[] = [
-         'id'                 => '31',
+         'id'                 => '32',
          'table'              => 'glpi_states',
          'field'              => 'completename',
          'name'               => __('Status'),
