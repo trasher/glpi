@@ -574,7 +574,6 @@ class MassiveAction {
 
          Document::getMassiveActionsForItemtype($actions, $itemtype, $is_deleted, $checkitem);
          Contract::getMassiveActionsForItemtype($actions, $itemtype, $is_deleted, $checkitem);
-         Appliance::getMassiveActionsForItemtype($actions, $itemtype, $is_deleted, $checkitem);
 
          // Amend comment for objects with a 'comment' field
          $item->getEmpty();
