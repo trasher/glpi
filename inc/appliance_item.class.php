@@ -38,9 +38,11 @@ class Appliance_Item extends CommonDBRelation {
 
    static public $itemtype_1 = 'Appliance';
    static public $items_id_1 = 'appliances_id';
+   static public $take_entity_1 = false;
 
    static public $itemtype_2 = 'itemtype';
    static public $items_id_2 = 'items_id';
+   static public $take_entity_2 = true;
 
    static function getTypeName($nb = 0) {
       return _n('Item', 'Items', $nb);
