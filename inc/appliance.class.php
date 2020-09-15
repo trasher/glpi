@@ -213,7 +213,14 @@ class Appliance extends CommonDBTM {
       echo "<tr class='tab_bg_1'>";
       echo "<td>" . __('Associable to a ticket') . "</td><td>";
       Dropdown::showYesNo('is_helpdesk_visible', $this->fields['is_helpdesk_visible']);
-      echo "</td></tr>\n";
+      echo "</td>\n";
+
+      echo "<td><label for='comment'>".__('Comments')."</label></td>";
+      echo "<td class='middle'>";
+
+      echo "<textarea cols='45' rows='5' id='comment' name='comment' >".
+           $this->fields["comment"];
+      echo "</textarea></td></tr>";
 
       $this->showFormButtons($options);
       return true;
