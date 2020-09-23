@@ -125,7 +125,12 @@ function update951to952() {
    if ($DB->tableExists('glpi_appliancerelations')) {
       $migration->dropKey('glpi_appliancerelations', 'relations_id');
       $migration->changeField('glpi_appliancerelations', 'relations_id', 'items_id', 'integer');
-      $migration->addField('glpi_appliancerelations', 'itemtype', 'string', ['after' => 'appliances_items_id']);
+      $migration->addField(
+         'glpi_appliancerelations',
+         'itemtype',
+         'VARCHAR(100) COLLATE utf8_unicode_ci NOT NULL',
+         ['after' => 'appliances_items_id']
+      );
       $migration->addKey('glpi_appliancerelations', 'itemtype');
       $migration->addKey('glpi_appliancerelations', 'items_id');
       $migration->addKey('glpi_appliancerelations', [
