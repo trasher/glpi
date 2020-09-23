@@ -44,6 +44,12 @@ class Appliance_Item extends CommonDBRelation {
    static public $items_id_2 = 'items_id';
    static public $take_entity_2 = true;
 
+   public function getCloneRelations() :array {
+      return [
+         Appliance_Item_Item::class
+      ];
+   }
+
    static function getTypeName($nb = 0) {
       return _n('Item', 'Items', $nb);
    }
@@ -63,8 +69,7 @@ class Appliance_Item extends CommonDBRelation {
          }
          return self::createTabEntry(self::getTypeName(Session::getPluralNumber()), $nb);
 
-      } else if (in_array($item->getType(), Appliance::getTypes(true))
-            && Appliance::canView()) {
+      } else if (in_array($item->getType(), Appliance::getTypes(true))) {
          if ($_SESSION['glpishow_count_on_tabs']) {
             $nb = self::countForItem($item);
          }
@@ -401,5 +406,37 @@ class Appliance_Item extends CommonDBRelation {
       $specificities['itemtypes'] = Appliance::getTypes();
 
       return $specificities;
+   }
+
+   /**
+    * Get item types that can be linked to an appliance item
+    *
+    * @param boolean $all Get all possible types or only allowed ones
+    *
+    * @return array
+    */
+   public static function getTypes($all = false): array {
+      global $CFG_GLPI;
+
+      $types = ['Domain', 'Location', 'Network'];
+
+      foreach ($types as $key => $type) {
+         if (!class_exists($type)) {
+            continue;
+         }
+
+         if ($all === false && !$type::canView()) {
+            unset($types[$key]);
+         }
+      }
+      return $types;
+   }
+
+   function cleanDBonPurge() {
+      $this->deleteChildrenAndRelationsFromDb(
+         [
+            Appliance_Item_Item::class,
+         ]
+      );
    }
 }

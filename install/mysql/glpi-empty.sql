@@ -8111,11 +8111,14 @@ CREATE TABLE IF NOT EXISTS `glpi_applianceenvironments` (
   KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `glpi_appliancerelations` (
+CREATE TABLE IF NOT EXISTS `glpi_appliances_items_items` (
    `id` int(11) NOT NULL auto_increment,
    `appliances_items_id` int(11) NOT NULL DEFAULT '0',
-   `relations_id` int(11) NOT NULL DEFAULT '0',
+   `itemtype` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+   `items_id` int(11) NOT NULL DEFAULT '0',
    PRIMARY KEY (`id`),
    KEY `appliances_items_id` (`appliances_items_id`),
-   KEY `relations_id` (`relations_id`)
+   KEY `itemtype` (`itemtype`),
+   KEY `items_id` (`items_id`),
+   KEY `item` (`itemtype`,`items_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
