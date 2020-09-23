@@ -35,6 +35,7 @@ if (!defined('GLPI_ROOT')) {
  * ---------------------------------------------------------------------
 **/
 class Appliance_Item extends CommonDBRelation {
+   use Glpi\Features\Clonable;
 
    static public $itemtype_1 = 'Appliance';
    static public $items_id_1 = 'appliances_id';
@@ -43,6 +44,12 @@ class Appliance_Item extends CommonDBRelation {
    static public $itemtype_2 = 'itemtype';
    static public $items_id_2 = 'items_id';
    static public $take_entity_2 = true;
+
+   public function getCloneRelations() :array {
+      return [
+         Appliance_Item_Relation::class
+      ];
+   }
 
    static function getTypeName($nb = 0) {
       return _n('Item', 'Items', $nb);
@@ -63,8 +70,7 @@ class Appliance_Item extends CommonDBRelation {
          }
          return self::createTabEntry(self::getTypeName(Session::getPluralNumber()), $nb);
 
-      } else if (in_array($item->getType(), Appliance::getTypes(true))
-            && Appliance::canView()) {
+      } else if (in_array($item->getType(), Appliance::getTypes(true))) {
          if ($_SESSION['glpishow_count_on_tabs']) {
             $nb = self::countForItem($item);
          }
@@ -175,6 +181,7 @@ class Appliance_Item extends CommonDBRelation {
          }
          $header .= "<th>".__('Itemtype')."</th>";
          $header .= "<th>".__('Item')."</th>";
+         $header .= "<th colspan='2'>".Appliance_Item_Relation::getTypeName(Session::getPluralNumber())."</th>";
          $header .= "</tr>";
 
          echo $header;
@@ -189,6 +196,8 @@ class Appliance_Item extends CommonDBRelation {
             }
             echo "<td>" . $item->getTypeName(1) . "</td>";
             echo "<td>" . $item->getLink() . "</td>";
+            echo "<td>" . Appliance_Item_Relation::getRelationsList($row['id']) . "</td>";
+            echo "<td><a href='" . Appliance_Item_Relation::getFormURL() . "'><i class='fa fa-plus' title='" . __('New relation') . "'></i><span class='sr-only'>" . __('New relation') . "</span></a></td>";
             echo "</tr>";
          }
          echo $header;
@@ -401,5 +410,37 @@ class Appliance_Item extends CommonDBRelation {
       $specificities['itemtypes'] = Appliance::getTypes();
 
       return $specificities;
+   }
+
+   /**
+    * Get item types that can be linked to an appliance item
+    *
+    * @param boolean $all Get all possible types or only allowed ones
+    *
+    * @return array
+    */
+   public static function getTypes($all = false): array {
+      global $CFG_GLPI;
+
+      $types = ['Domain', 'Location', 'Network'];
+
+      foreach ($types as $key => $type) {
+         if (!class_exists($type)) {
+            continue;
+         }
+
+         if ($all === false && !$type::canView()) {
+            unset($types[$key]);
+         }
+      }
+      return $types;
+   }
+
+   function cleanDBonPurge() {
+      $this->deleteChildrenAndRelationsFromDb(
+         [
+            Appliance_Item_Relation::class,
+         ]
+      );
    }
 }

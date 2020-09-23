@@ -124,6 +124,25 @@ function update951to952() {
       'after' => 'is_visible_contract'
    ]);
    $migration->addKey('glpi_states', 'is_visible_appliance');
+
+   if ($DB->tableExists('glpi_appliancerelations')) {
+      $migration->dropKey('glpi_appliancerelations', 'relations_id');
+      $migration->changeField('glpi_appliancerelations', 'relations_id', 'items_id', 'integer');
+      $migration->addField(
+         'glpi_appliancerelations',
+         'itemtype',
+         'VARCHAR(100) COLLATE utf8_unicode_ci NOT NULL',
+         ['after' => 'appliances_items_id']
+      );
+      $migration->addKey('glpi_appliancerelations', 'itemtype');
+      $migration->addKey('glpi_appliancerelations', 'items_id');
+      $migration->addKey('glpi_appliancerelations', [
+         'itemtype',
+         'items_id',
+      ], 'item');
+      $migration->migrationOneTable('glpi_appliancerelations');
+      $migration->renameTable('glpi_appliancerelations', 'glpi_appliances_items_relations');
+   }
    /* /Appliances rewrite */
 
    // ************ Keep it at the end **************
