@@ -74,38 +74,10 @@ class Appliance_Item_Item extends DbTestCase {
                ->integer($this->testedInstance->add($input))
                ->isGreaterThan(0);
 
-      /*$itemtypes = [
-         'Computer'  => '_test_pc01',
-         'Printer'   => '_test_printer_all',
-         'Software'  => '_test_soft'
-      ];
-
-      foreach ($itemtypes as $itemtype => $itemname) {
-         $items_id = getItemByTypeName($itemtype, $itemname, true);
-         foreach ([$appliance_1, $appliance_2] as $app) {
-            //no printer on appliance_2
-            if ($itemtype == 'Printer' && $app == $appliance_2) {
-               continue;
-            }
-
-            $input = [
-               'appliances_id'   => $app,
-               'itemtype'        => $itemtype,
-               'items_id'        => $items_id
-            ];
-            $this
-               ->given($this->newTestedInstance)
-                  ->then
-                     ->integer($this->testedInstance->add($input))
-                     ->isGreaterThan(0);
-         }
-      }*/
-
       $iterator = $DB->request([
          'FROM'   => \Appliance_Item_Item::getTable(),
          'WHERE'  => ['appliances_items_id' => $appliances_items_id]
       ]);
-      var_dump(iterator_to_array($iterator));
 
       $this->boolean($appliance->getFromDB($appliances_id))->isTrue();
       $this->boolean($appitem->getFromDB($appliances_items_id))->isTrue();
@@ -115,6 +87,7 @@ class Appliance_Item_Item extends DbTestCase {
       $this->login();
       $this->setEntity(0, true); //locations are in root entity not recursive
       $this->integer(\Appliance_Item_Item::countForMainItem($appitem))->isIdenticalTo(1);
+      $this->string(\Appliance_Item_Item::getRelationsList($appliances_items_id))->contains('_location01');
 
       $this->boolean($appliance->delete(['id' => $appliances_id], true))->isTrue();
       $iterator = $DB->request([
@@ -129,20 +102,6 @@ class Appliance_Item_Item extends DbTestCase {
       ]);
       $this->integer(count($iterator))->isIdenticalTo(0);
 
-
-      /*$this->boolean($appliance->getFromDB($appliance_2))->isTrue();
-      $this->integer(\Appliance_Item::countForMainItem($appliance))->isIdenticalTo(2);
-
-      $this->boolean($appliance->getFromDB($appliance_1))->isTrue();
-      $this->boolean($appliance->delete(['id' => $appliance_1], true))->isTrue();
-
-      $this->boolean($appliance->getFromDB($appliance_2))->isTrue();
-      $this->boolean($appliance->delete(['id' => $appliance_2], true))->isTrue();
-
-      $iterator = $DB->request([
-         'FROM'   => \Appliance_Item::getTable(),
-         'WHERE'  => ['appliances_id' => [$appliance_1, $appliance_2]]
-      ]);
-      $this->integer(count($iterator))->isIdenticalTo(0);*/
+      $this->string(\Appliance_Item_Item::getRelationsList($appliances_items_id))->isIdenticalTo('');
    }
 }

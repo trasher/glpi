@@ -35,6 +35,7 @@ if (!defined('GLPI_ROOT')) {
  * ---------------------------------------------------------------------
 **/
 class Appliance_Item extends CommonDBRelation {
+   use Glpi\Features\Clonable;
 
    static public $itemtype_1 = 'Appliance';
    static public $items_id_1 = 'appliances_id';
@@ -180,6 +181,7 @@ class Appliance_Item extends CommonDBRelation {
          }
          $header .= "<th>".__('Itemtype')."</th>";
          $header .= "<th>".__('Item')."</th>";
+         $header .= "<th colspan='2'>".Appliance_Item_Item::getTypeName(Session::getPluralNumber())."</th>";
          $header .= "</tr>";
 
          echo $header;
@@ -194,6 +196,8 @@ class Appliance_Item extends CommonDBRelation {
             }
             echo "<td>" . $item->getTypeName(1) . "</td>";
             echo "<td>" . $item->getLink() . "</td>";
+            echo "<td>" . Appliance_Item_Item::getRelationsList($row['id']) . "</td>";
+            echo "<td><a href='" . Appliance_Item_Item::getFormURL() . "'><i class='fa fa-plus' title='" . __('New relation') . "'></i><span class='sr-only'>" . __('New relation') . "</span></a></td>";
             echo "</tr>";
          }
          echo $header;

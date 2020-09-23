@@ -99,6 +99,15 @@ class Appliance extends DbTestCase {
          ])
       )->isGreaterThan(0);
 
+      $rapp = new \Appliance_Item_Item();
+      $this->integer(
+         $rapp->add([
+            'appliances_items_id'   => $iapp->fields['id'],
+            'itemtype'              => 'Location',
+            'items_id'              => getItemByTypeName('Location', '_location01', true)
+         ])
+      )->isGreaterThan(0);
+
       //add infocom
       $infocom = new \Infocom();
       $this->integer(
@@ -163,5 +172,8 @@ class Appliance extends DbTestCase {
 
       //items has been cloned
       $this->boolean($iapp->getFromDBByCrit(['appliances_id' => $added]))->isTrue();
+
+      //relations has been cloned
+      $this->boolean($rapp->getFromDBByCrit(['appliances_items_id' => $iapp->fields['id']]))->isTrue();
    }
 }

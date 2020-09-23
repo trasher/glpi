@@ -38,11 +38,11 @@ class Appliance_Item_Item extends CommonDBRelation {
 
    static public $itemtype_1 = 'Appliance_Item';
    static public $items_id_1 = 'appliances_items_id';
-   static public $take_entity_1 = false;
+   //static public $take_entity_1 = false;
 
    static public $itemtype_2 = 'itemtype';
    static public $items_id_2 = 'items_id';
-   static public $take_entity_2 = true;
+   //static public $take_entity_2 = true;
 
    static function getTypeName($nb = 0) {
       return _n('Relation', 'Relations', $nb);
@@ -84,12 +84,35 @@ class Appliance_Item_Item extends CommonDBRelation {
       return true;
    }
 
+   function showForm($ID, $options = []) {
+      $rand = mt_rand();
+
+      $this->initForm($ID, $options);
+      $this->showFormHeader($options);
+
+      echo "<tr class='tab_bg_1'>";
+
+      $randDropdown = mt_rand();
+      echo "<td><label for='dropdown_itemtype$randDropdown'>".__('Status')."</label></td>";
+      echo "<td>";
+      Dropdown::showFromArray([
+         'value'     => $this->fields["itemtype"],
+         'values' => Appliance_Item::getTypes(),
+         /*'entity'    => $this->fields["entities_id"],*/
+         /*'condition' => ['is_visible_appliance' => 1],*/
+         'rand'      => $randDropdown
+      ]);
+      echo "</td></tr>\n";
+
+      $this->showFormButtons($options);
+      return true;
+   }
    /**
     * Print items
     *
     * @return void
    **/
-   static function showItems(Appliance_Item $appliance) {
+   static function showItems(Appliance_Item $appliance_item) {
    }
 
    /**
@@ -165,5 +188,26 @@ class Appliance_Item_Item extends CommonDBRelation {
          $clause
       );
       return parent::countForMainItem($item, $extra_types_where);
+   }
+
+   public static function getRelationsList($appliances_items_id) {
+      global $DB;
+
+      $iterator = $DB->request([
+         'FROM'   => self::getTable(),
+         'WHERE'  => [
+            Appliance_Item::getForeignKeyField() => $appliances_items_id
+         ]
+      ]);
+
+      $relations = [];
+      while ($row = $iterator->next()) {
+         $itemtype = $row['itemtype'];
+         $item = new $itemtype;
+         $item->getFromDB($row['items_id']);
+         $relations[] = $item->getLink();
+      }
+
+      return implode(', ', $relations);
    }
 }
