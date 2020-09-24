@@ -99,7 +99,7 @@ class Appliance extends DbTestCase {
          ])
       )->isGreaterThan(0);
 
-      $rapp = new \Appliance_Item_Item();
+      $rapp = new \Appliance_Item_Relation();
       $this->integer(
          $rapp->add([
             'appliances_items_id'   => $iapp->fields['id'],

@@ -34,7 +34,7 @@ if (!defined('GLPI_ROOT')) {
  * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
  * ---------------------------------------------------------------------
 **/
-class Appliance_Item_Item extends CommonDBRelation {
+class Appliance_Item_Relation extends CommonDBRelation {
 
    static public $itemtype_1 = 'Appliance_Item';
    static public $items_id_1 = 'appliances_items_id';

@@ -47,7 +47,7 @@ class Appliance_Item extends CommonDBRelation {
 
    public function getCloneRelations() :array {
       return [
-         Appliance_Item_Item::class
+         Appliance_Item_Relation::class
       ];
    }
 
@@ -181,7 +181,7 @@ class Appliance_Item extends CommonDBRelation {
          }
          $header .= "<th>".__('Itemtype')."</th>";
          $header .= "<th>".__('Item')."</th>";
-         $header .= "<th colspan='2'>".Appliance_Item_Item::getTypeName(Session::getPluralNumber())."</th>";
+         $header .= "<th colspan='2'>".Appliance_Item_Relation::getTypeName(Session::getPluralNumber())."</th>";
          $header .= "</tr>";
 
          echo $header;
@@ -196,8 +196,8 @@ class Appliance_Item extends CommonDBRelation {
             }
             echo "<td>" . $item->getTypeName(1) . "</td>";
             echo "<td>" . $item->getLink() . "</td>";
-            echo "<td>" . Appliance_Item_Item::getRelationsList($row['id']) . "</td>";
-            echo "<td><a href='" . Appliance_Item_Item::getFormURL() . "'><i class='fa fa-plus' title='" . __('New relation') . "'></i><span class='sr-only'>" . __('New relation') . "</span></a></td>";
+            echo "<td>" . Appliance_Item_Relation::getRelationsList($row['id']) . "</td>";
+            echo "<td><a href='" . Appliance_Item_Relation::getFormURL() . "'><i class='fa fa-plus' title='" . __('New relation') . "'></i><span class='sr-only'>" . __('New relation') . "</span></a></td>";
             echo "</tr>";
          }
          echo $header;
@@ -439,7 +439,7 @@ class Appliance_Item extends CommonDBRelation {
    function cleanDBonPurge() {
       $this->deleteChildrenAndRelationsFromDb(
          [
-            Appliance_Item_Item::class,
+            Appliance_Item_Relation::class,
          ]
       );
    }

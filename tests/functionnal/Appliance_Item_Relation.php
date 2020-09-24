@@ -34,7 +34,7 @@ namespace tests\units;
 
 use \DbTestCase;
 
-class Appliance_Item_Item extends DbTestCase {
+class Appliance_Item_Relation extends DbTestCase {
 
    public function testGetForbiddenStandardMassiveAction() {
       $this->newTestedInstance();
@@ -75,19 +75,19 @@ class Appliance_Item_Item extends DbTestCase {
                ->isGreaterThan(0);
 
       $iterator = $DB->request([
-         'FROM'   => \Appliance_Item_Item::getTable(),
+         'FROM'   => \Appliance_Item_Relation::getTable(),
          'WHERE'  => ['appliances_items_id' => $appliances_items_id]
       ]);
 
       $this->boolean($appliance->getFromDB($appliances_id))->isTrue();
       $this->boolean($appitem->getFromDB($appliances_items_id))->isTrue();
       //not logged, no Appliances types
-      $this->integer(\Appliance_Item_Item::countForMainItem($appitem))->isIdenticalTo(0);
+      $this->integer(\Appliance_Item_Relation::countForMainItem($appitem))->isIdenticalTo(0);
 
       $this->login();
       $this->setEntity(0, true); //locations are in root entity not recursive
-      $this->integer(\Appliance_Item_Item::countForMainItem($appitem))->isIdenticalTo(1);
-      $this->string(\Appliance_Item_Item::getRelationsList($appliances_items_id))->contains('_location01');
+      $this->integer(\Appliance_Item_Relation::countForMainItem($appitem))->isIdenticalTo(1);
+      $this->string(\Appliance_Item_Relation::getRelationsList($appliances_items_id))->contains('_location01');
 
       $this->boolean($appliance->delete(['id' => $appliances_id], true))->isTrue();
       $iterator = $DB->request([
@@ -97,11 +97,11 @@ class Appliance_Item_Item extends DbTestCase {
       $this->integer(count($iterator))->isIdenticalTo(0);
 
       $iterator = $DB->request([
-         'FROM'   => \Appliance_Item_Item::getTable(),
+         'FROM'   => \Appliance_Item_Relation::getTable(),
          'WHERE'  => ['appliances_items_id' => $appliances_items_id]
       ]);
       $this->integer(count($iterator))->isIdenticalTo(0);
 
-      $this->string(\Appliance_Item_Item::getRelationsList($appliances_items_id))->isIdenticalTo('');
+      $this->string(\Appliance_Item_Relation::getRelationsList($appliances_items_id))->isIdenticalTo('');
    }
 }

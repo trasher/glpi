@@ -8111,7 +8111,7 @@ CREATE TABLE IF NOT EXISTS `glpi_applianceenvironments` (
   KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `glpi_appliances_items_items` (
+CREATE TABLE IF NOT EXISTS `glpi_appliances_items_relations` (
    `id` int(11) NOT NULL auto_increment,
    `appliances_items_id` int(11) NOT NULL DEFAULT '0',
    `itemtype` varchar(100) COLLATE utf8_unicode_ci NOT NULL,

@@ -138,7 +138,7 @@ function update951to952() {
          'items_id',
       ], 'item');
       $migration->migrationOneTable('glpi_appliancerelations');
-      $migration->renameTable('glpi_appliancerelations', 'glpi_appliances_items_items');
+      $migration->renameTable('glpi_appliancerelations', 'glpi_appliances_items_relations');
    }
    /* /Appliances rewrite */
 
