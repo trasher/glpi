@@ -8051,7 +8051,6 @@ CREATE TABLE `glpi_appliances` (
   `users_id_tech` int(11) NOT NULL DEFAULT '0',
   `groups_id` int(11) NOT NULL DEFAULT '0',
   `groups_id_tech` int(11) NOT NULL DEFAULT '0',
-  `relationtype` int(11) NOT NULL DEFAULT '0',
   `date_mod` timestamp NULL DEFAULT NULL,
   `states_id` int(11) NOT NULL DEFAULT '0',
   `externalidentifier` varchar(255) DEFAULT NULL,
