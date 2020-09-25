@@ -143,6 +143,47 @@ function update951to952() {
       $migration->migrationOneTable('glpi_appliancerelations');
       $migration->renameTable('glpi_appliancerelations', 'glpi_appliances_items_relations');
    }
+
+   if ($DB->fieldExists('glpi_appliances', 'relationtype')) {
+      $iterator = $DB->request([
+         'SELECT' => ['items.id', 'app.relationtype'],
+         'FROM'   => 'glpi_appliances_items AS items',
+         'LEFT JOIN' => [
+            'glpi_appliances AS app' => [
+               'ON'  => [
+                  'app'    => 'id',
+                  'items'  => 'appliances_id'
+               ]
+            ]
+         ]
+      ]);
+      while ($row = $iterator->next()) {
+
+         $itemtype = null;
+         switch ($row['relationtype']) {
+            case 1:
+               $itemtype = 'Location';
+               break;
+            case 2:
+               $itemtype = 'Network';
+               break;
+            case 3:
+               $itemtype = 'Domain';
+               break;
+         }
+
+         $migration->addPostQuery(
+            $DB->buildUpdate(
+               'glpi_appliances_items_relations', [
+                  'itemtype'  => $itemtype
+               ], [
+                  'appliances_items_id'   => $row['id']
+               ]
+            )
+         );
+      }
+      $migration->dropField('glpi_appliances', 'relationtype');
+   }
    /* /Appliances rewrite */
 
    // ************ Keep it at the end **************
