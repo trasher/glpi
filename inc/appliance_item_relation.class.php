@@ -56,11 +56,9 @@ class Appliance_Item_Relation extends CommonDBRelation {
     * @return array
     */
    public static function getTypes($all = false): array {
-      return [
-         'Location',
-         'Network',
-         'Domain',
-      ];
+      global $CFG_GLPI;
+
+      return $CFG_GLPI['appliance_relation_types'];
    }
 
    static function canCreate() {
