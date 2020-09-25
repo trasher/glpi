@@ -180,7 +180,7 @@ class Appliance_Item extends CommonDBRelation {
             $header .= "</th>";
          }
          $header .= "<th>".__('Itemtype')."</th>";
-         $header .= "<th>".__('Item')."</th>";
+         $header .= "<th>"._n('Item', 'Items', 1)."</th>";
          $header .= "<th colspan='2'>".Appliance_Item_Relation::getTypeName(Session::getPluralNumber())."</th>";
          $header .= "</tr>";
          echo $header;

@@ -45,7 +45,7 @@ class Appliance_Item_Relation extends CommonDBRelation {
    //static public $take_entity_2 = true;
 
    static function getTypeName($nb = 0) {
-      return _n('Relation', 'Relations', $nb);
+      return _nx('appliance', 'Relation', 'Relations', $nb);
    }
 
    /**

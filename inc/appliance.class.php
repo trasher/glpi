@@ -118,14 +118,14 @@ class Appliance extends CommonDBTM {
 
       echo "<tr class='tab_bg_1'>";
       $randDropdown = mt_rand();
-      echo "<td><label for='dropdown_locations_id$randDropdown'>".__('Location')."</label></td>";
+      echo "<td><label for='dropdown_locations_id$randDropdown'>".Location::getTypeName(1)."</label></td>";
       echo "<td>";
       Location::dropdown(['value'  => $this->fields["locations_id"],
                                'entity' => $this->fields["entities_id"],
                                'rand' => $randDropdown]);
       echo "</td>";
       $randDropdown = mt_rand();
-      echo "<td><label for='dropdown_appliancetypes_id$randDropdown'>".__('Type')."</label></td>";
+      echo "<td><label for='dropdown_appliancetypes_id$randDropdown'>".ApplianceType::getTypeName(1)."</label></td>";
       echo "<td>";
       ApplianceType::dropdown(['value' => $this->fields["appliancetypes_id"], 'rand' => $randDropdown]);
       echo "</td></tr>\n";
@@ -141,7 +141,7 @@ class Appliance extends CommonDBTM {
                            'rand'   => $randDropdown]);
       echo "</td>";
       $randDropdown = mt_rand();
-      echo "<td><label for='dropdown_manufacturers_id$randDropdown'>".__('Manufacturer')."</label></td>";
+      echo "<td><label for='dropdown_manufacturers_id$randDropdown'>"._n('Manufacturer', 'Manufacturers', 1)."</label></td>";
       echo "<td>";
       Manufacturer::dropdown(['value' => $this->fields["manufacturers_id"], 'rand' => $randDropdown]);
       echo "</td></tr>\n";
@@ -190,7 +190,7 @@ class Appliance extends CommonDBTM {
 
       echo "<tr class='tab_bg_1'>";
       $randDropdown = mt_rand();
-      echo "<td><label for='dropdown_users_id$randDropdown'>".__('User')."</label></td>";
+      echo "<td><label for='dropdown_users_id$randDropdown'>".User::getTypeName(1)."</label></td>";
       echo "<td>";
       User::dropdown(['value'  => $this->fields["users_id"],
                            'entity' => $this->fields["entities_id"],
@@ -199,7 +199,7 @@ class Appliance extends CommonDBTM {
       echo "</td>";
 
       $randDropdown = mt_rand();
-      echo "<td><label for='dropdown_groups_id$randDropdown'>".__('Group')."</label></td>";
+      echo "<td><label for='dropdown_groups_id$randDropdown'>".Group::getTypeName(1)."</label></td>";
       echo "<td>";
       Group::dropdown([
          'value'     => $this->fields["groups_id"],
@@ -253,7 +253,7 @@ class Appliance extends CommonDBTM {
          'id'            => '6',
          'table'         => User::getTable(),
          'field'         => 'name',
-         'name'          => __('User'),
+         'name'          => User::getTypeName(1),
          'datatype'      => 'dropdown'
       ];
 
@@ -261,7 +261,7 @@ class Appliance extends CommonDBTM {
          'id'            => '8',
          'table'         => Group::getTable(),
          'field'         => 'completename',
-         'name'          => __('Group'),
+         'name'          => Group::getTypeName(1),
          'condition'     => ['is_itemgroup' => 1],
          'datatype'      => 'dropdown'
       ];
@@ -332,7 +332,7 @@ class Appliance extends CommonDBTM {
          'id'            => '80',
          'table'         => 'glpi_entities',
          'field'         => 'completename',
-         'name'          => __('Entity'),
+         'name'          => Entity::getTypeName(1),
          'datatype'      => 'dropdown'
       ];
 
@@ -349,7 +349,7 @@ class Appliance extends CommonDBTM {
          'id'            => '81',
          'table'         => Entity::getTable(),
          'field'         => 'entities_id',
-         'name'          => sprintf('%s-%s', __('Entity'), __('ID'))
+         'name'          => sprintf('%s-%s', Entity::getTypeName(1), __('ID'))
       ];
 
       $tab[] = [
