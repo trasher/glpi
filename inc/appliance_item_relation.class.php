@@ -48,84 +48,30 @@ class Appliance_Item_Relation extends CommonDBRelation {
       return _n('Relation', 'Relations', $nb);
    }
 
-
-   function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
-      if (!Appliance_Item::canView()) {
-         return '';
-      }
-
-      $nb = 0;
-      if ($item->getType() == Appliance_Item::class) {
-         if ($_SESSION['glpishow_count_on_tabs']) {
-            if (!$item->isNewItem()) {
-               $nb = self::countForMainItem($item);
-            }
-         }
-         return self::createTabEntry(self::getTypeName(Session::getPluralNumber()), $nb);
-
-      } else if (in_array($item->getType(), Appliance_Item::getTypes(true))) {
-         if ($_SESSION['glpishow_count_on_tabs']) {
-            $nb = self::countForItem($item);
-         }
-         return self::createTabEntry(Appliance_Item::getTypeName(Session::getPluralNumber()), $nb);
-      }
-   }
-
-   static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
-      switch ($item->getType()) {
-         case Appliance_Item::class:
-            self::showItems($item, $withtemplate);
-            break;
-         default :
-            if (in_array($item->getType(), Appliance_Item::getTypes())) {
-               self::showForItem($item, $withtemplate);
-            }
-      }
-      return true;
-   }
-
-   function showForm($ID, $options = []) {
-      $rand = mt_rand();
-
-      $this->initForm($ID, $options);
-      $this->showFormHeader($options);
-
-      echo "<tr class='tab_bg_1'>";
-
-      $randDropdown = mt_rand();
-      echo "<td><label for='dropdown_itemtype$randDropdown'>".__('Status')."</label></td>";
-      echo "<td>";
-      Dropdown::showFromArray([
-         'value'     => $this->fields["itemtype"],
-         'values' => Appliance_Item::getTypes(),
-         /*'entity'    => $this->fields["entities_id"],*/
-         /*'condition' => ['is_visible_appliance' => 1],*/
-         'rand'      => $randDropdown
-      ]);
-      echo "</td></tr>\n";
-
-      $this->showFormButtons($options);
-      return true;
-   }
    /**
-    * Print items
+    * Get item types that can be linked to an appliance item
     *
-    * @return void
-   **/
-   static function showItems(Appliance_Item $appliance_item) {
+    * @param boolean $all Get all possible types or only allowed ones
+    *
+    * @return array
+    */
+   public static function getTypes($all = false): array {
+      return [
+         'Location',
+         'Network',
+         'Domain',
+      ];
    }
 
-   /**
-    * Print an HTML array of appliances associated to an object
-    *
-    * @since 9.5.2
-    *
-    * @param CommonDBTM $item         CommonDBTM object wanted
-    * @param boolean    $withtemplate not used (to be deleted)
-    *
-    * @return void
-   **/
-   static function showForItem(CommonDBTM $item, $withtemplate = 0) {
+   static function canCreate() {
+      return Appliance_Item::canUpdate();
+   }
+
+
+   function canCreateItem() {
+      $app_item = new Appliance_Item;
+      $app_item->getFromDB($this->fields[Appliance_Item::getForeignKeyField()]);
+      return $app_item->canUpdateItem();
    }
 
 
@@ -205,9 +151,10 @@ class Appliance_Item_Relation extends CommonDBRelation {
          $itemtype = $row['itemtype'];
          $item = new $itemtype;
          $item->getFromDB($row['items_id']);
-         $relations[] = $item->getLink();
+         $relations[$row['id']] = "<i class='".$item->getIcon()."' title='".$item::getTypeName(1)."'></i>".
+                        "&nbsp;".$item->getLink();
       }
 
-      return implode(', ', $relations);
+      return $relations;
    }
 }

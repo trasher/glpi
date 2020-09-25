@@ -148,7 +148,7 @@ class Appliance_Item extends CommonDBRelation {
                                        : $appliance->fields['entities_id']),
                 'checkright'      => true,
                ]);
-         echo "</td><td colspan='2' class='center' class='tab_bg_1'>";
+         echo "</td><td class='center' class='tab_bg_1'>";
          echo Html::hidden('appliances_id', ['value' => $ID]);
          echo Html::submit(_x('button', 'Add'), ['name' => 'add']);
          echo "</td></tr>";
@@ -183,8 +183,8 @@ class Appliance_Item extends CommonDBRelation {
          $header .= "<th>".__('Item')."</th>";
          $header .= "<th colspan='2'>".Appliance_Item_Relation::getTypeName(Session::getPluralNumber())."</th>";
          $header .= "</tr>";
-
          echo $header;
+
          foreach ($items as $row) {
             $item = new $row['itemtype'];
             $item->getFromDB($row['items_id']);
@@ -196,8 +196,23 @@ class Appliance_Item extends CommonDBRelation {
             }
             echo "<td>" . $item->getTypeName(1) . "</td>";
             echo "<td>" . $item->getLink() . "</td>";
-            echo "<td>" . Appliance_Item_Relation::getRelationsList($row['id']) . "</td>";
-            echo "<td><a href='" . Appliance_Item_Relation::getFormURL() . "'><i class='fa fa-plus' title='" . __('New relation') . "'></i><span class='sr-only'>" . __('New relation') . "</span></a></td>";
+            $relations_str = "";
+            foreach (Appliance_Item_Relation::getRelationsList($row['id']) as $rel_id => $link) {
+               $del = "";
+               if ($canedit) {
+                  $del = "<a href='".Appliance_Item_Relation::getFormURLWithID($rel_id)."&purge'>
+                     <i class='delete_relation pointer fas fa-times'></i>
+                  </a>";
+               }
+               $relations_str.= "<li>$link $del</li>";
+            }
+
+            echo "<td class='relations_list'><ul>$relations_str</ul>
+                     <span class='pointer add_relation' data-relations-id='{$row['id']}'>
+                        <i class='fa fa-plus' title='" . __('New relation') . "'></i>
+                        <span class='sr-only'>" . __('New relation') . "</span>
+                     </span>
+                  </td>";
             echo "</tr>";
          }
          echo $header;
@@ -209,6 +224,44 @@ class Appliance_Item extends CommonDBRelation {
          }
          if ($canedit) {
             Html::closeForm();
+         }
+
+         if ($canedit) {
+            echo "<div id='add_relation_dialog' title='"._x('button', "Add an item")."' style='display:none;'>
+            <form action='".Appliance_Item_Relation::getFormURL()."'>
+               <p>".Dropdown::showSelectItemFromItemtypes([
+                  'items_id_name'   => 'items_id',
+                  'itemtypes'       => Appliance_Item_Relation::getTypes(true),
+                  'entity_restrict' => $appliance->fields['is_recursive']
+                                          ? getSonsOf('glpi_entities', $appliance->fields['entities_id'])
+                                          : $appliance->fields['entities_id'],
+                  'checkright'     => true,
+                  'display'        => false,
+               ])."</p>
+               <input type='hidden' name='appliances_items_id'>
+               ".Html::submit(_x('button', "Add"), ['name' => 'add'])."
+            </form>
+            </div>";
+
+            $js = <<<JAVASCRIPT
+            $(function() {
+               $(document).on('click', '.add_relation', function() {
+                  var relations_id = $(this).data('relations-id');
+
+                  $('#add_relation_dialog input[name=appliances_items_id]').val(relations_id);
+
+                  $('#add_relation_dialog').dialog({
+                     modal: true,
+                     overlay: {
+                        opacity: 0.7,
+                        background: "black"
+                     },
+                  });
+
+               });
+            });
+JAVASCRIPT;
+            echo Html::scriptBlock($js);
          }
       }
    }
