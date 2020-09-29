@@ -469,7 +469,7 @@ $CFG_GLPI['appliance_relation_types'] = ['Location', 'Network', 'Domain'];
 
 $dashboard_libs = [
    'dashboard', 'gridstack',
-   'charts', 'clipboard'
+   'charts', 'clipboard', 'sortable'
 ];
 
 $CFG_GLPI['javascript'] = [
