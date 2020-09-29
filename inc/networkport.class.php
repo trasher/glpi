@@ -47,7 +47,9 @@ if (!defined('GLPI_ROOT')) {
  * port, then, the fields of NetworkName are display. Thus, NetworkPort UI remain similar to 0.83
 **/
 class NetworkPort extends CommonDBChild {
-   use \Glpi\Features\Clonable;
+   use Glpi\Features\Clonable {
+      post_clone as protected post_cloneTrait;
+   }
 
    // From CommonDBChild
    static public $itemtype             = 'itemtype';
@@ -228,11 +230,9 @@ class NetworkPort extends CommonDBChild {
       $this->updateDependencies(!$this->input['_no_history']);
    }
 
-   /**
-   * @see Glpi\Features\Clonable::post_clone
-   */
+
    function post_clone($source, $history) {
-      parent::post_clone($source, $history);
+      $this->post_cloneTrait($source, $history);
       $instantiation = $source->getInstantiation();
       if ($instantiation !== false) {
          $instantiation->fields[$instantiation->getIndexName()] = $this->getID();
@@ -240,9 +240,6 @@ class NetworkPort extends CommonDBChild {
       }
    }
 
-   public function getCloneRelations(): array {
-      return [];
-   }
 
    /**
     * \brief split input fields when validating a port
