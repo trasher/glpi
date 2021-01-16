@@ -1508,7 +1508,10 @@ class MailCollector  extends CommonDBTM {
    private function getRecursiveAttached(\Laminas\Mail\Storage\Part $part, $path, $maxsize, $subject, $subpart = "") {
       if ($part->isMultipart()) {
          $index = 0;
-         foreach (new RecursiveIteratorIterator($part) as $mypart) {
+         // while instead of foreach to supress header error in laminas-mail
+         $iterator = new RecursiveIteratorIterator($part);
+         while (@$iterator->valid()) {
+            $mypart = $iterator->current();
             $this->getRecursiveAttached(
                $mypart,
                $path,
@@ -1516,6 +1519,7 @@ class MailCollector  extends CommonDBTM {
                $subject,
                ($subpart ? $subpart.".".($index+1) : ($index+1))
             );
+            $iterator->next();
          }
       } else {
          if (!$part->getHeaders()->has('content-type')
