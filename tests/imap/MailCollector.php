@@ -255,6 +255,7 @@ class MailCollector extends DbTestCase {
       $expected_blacklist_count        = 0;
       $expected_expected_already_seen  = 0;
 
+      var_export(file_get_contents(GLPI_LOG_DIR . '/mailgate.log'));
       $this->variable($msg)->isIdenticalTo(
          sprintf(
             'Number of messages: available=%1$s, already imported=%2$d, retrieved=%3$s, refused=%4$s, errors=%5$s, blacklisted=%6$s',
