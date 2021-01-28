@@ -113,6 +113,36 @@ class Search extends DbTestCase {
             . '\)/im');
    }
 
+   public function testMetaComputerSoftwareInstallations() {
+      $search_params = ['is_deleted'   => 0,
+                        'start'        => 0,
+                        'criteria'     => [0 => ['field'      => 'view',
+                                                 'searchtype' => 'contains',
+                                                 'value'      => '']],
+                        'metacriteria' => [0 => ['link'       => 'AND',
+                                                 'itemtype'   => 'Software',
+                                                 'field'      => 72,
+                                                 'searchtype' => 'is',
+                                                 'value'      => 1],
+                                           ]];
+
+      $data = $this->doSearch('Computer', $search_params);
+
+      // check for sql error (data key missing or empty)
+      $this->array($data)
+         ->hasKey('data')
+            ->array['last_errors']->isIdenticalTo([])
+            ->array['data']->isNotEmpty();
+
+      $this->string($data['sql']['search'])
+         ->matches('/'
+            . 'LEFT JOIN\s*`glpi_items_softwareversions`\s*AS\s*`glpi_items_softwareversions_[^`]+_Software`\s*ON\s*\('
+            . '`glpi_items_softwareversions_[^`]+_Software`\.`items_id`\s*=\s*`glpi_computers`.`id`'
+            . '\s*AND\s*`glpi_items_softwareversions_[^`]+_Software`\.`itemtype`\s*=\s*\'Computer\''
+            . '\s*AND\s*`glpi_items_softwareversions_[^`]+_Software`\.`is_deleted`\s*=\s*0'
+            . '\)/im');
+   }
+
    public function testMetaComputerUser() {
       $search_params = ['is_deleted'   => 0,
                         'start'        => 0,
