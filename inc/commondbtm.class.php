@@ -5726,6 +5726,7 @@ class CommonDBTM extends CommonGLPI {
       );
       return $count;
    }
+
    public function showSublist($sub_itemtype, array $params) {
       $item = $this;
 
@@ -5734,6 +5735,8 @@ class CommonDBTM extends CommonGLPI {
          'itemtype'     => $this->getType(),
          'as_map'       => 0,
          'show_pager'   => 0,
+         'addlink'      => false,
+         'add'          => false
          //'showmassiveactions' => 0
       ];
 
@@ -5883,6 +5886,37 @@ class CommonDBTM extends CommonGLPI {
                   'item'            => $sub_item
                ]
          );*/
+      }
+
+      if ($params['addlink'] === true) {
+         $rand = mt_rand();
+         echo "<div class='firstbloc'>";
+         echo "<form name='contractitem_form$rand' id='contractitem_form$rand' method='post'
+                action='".Toolbox::getItemTypeFormURL($sub_itemtype)."'>";
+         echo "<input type='hidden' name='items_id' value='".$this->fields['id']."'>";
+         echo "<input type='hidden' name='itemtype' value='".$this->getType()."'>";
+
+         echo "<table class='tab_cadre_fixe'>";
+         echo "<tr class='tab_bg_2'><th colspan='2'>";
+         echo sprintf(
+             //TRANS: parameter will be replaced with an item name like Contract or Disk
+             __('Add link to %1$s'),
+             $link->getTypeName(1)
+          );
+         echo "</th></tr>";
+
+         echo "<tr class='tab_bg_1'><td>";
+         $link::dropdown([
+            'entity'  => $this->getEntityID(),
+            'expired' => false
+         ]);
+
+         echo "</td><td class='center'>";
+         echo "<input type='submit' name='add' value=\""._sx('button', 'Add')."\" class='submit'>";
+         echo "</td></tr>";
+         echo "</table>";
+         Html::closeForm();
+         echo "</div>";
       }
 
       echo "<div class='search_page'>";

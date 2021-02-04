@@ -112,6 +112,10 @@ class Item_RemoteManagement extends CommonDBChild {
           || !$item->can($ID, READ)) {
          return false;
       }
+
+      $get = ['withtemplate' => $withtemplate] + $_GET;
+      $item->showSublist(self::getType(), $get);
+
       $canedit = $item->canEdit($ID);
 
       if ($canedit

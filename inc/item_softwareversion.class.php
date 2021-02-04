@@ -956,6 +956,8 @@ class Item_SoftwareVersion extends CommonDBRelation {
       }
       echo "<div class='spaced'>";
 
+      $get = ['withtemplate' => $withtemplate] + $_GET;
+      $item->showSublist(self::getType(), $get);
       Session::initNavigateListItems('Software',
                            //TRANS : %1$s is the itemtype name,
                            //        %2$s is the name of the item (used for headings of a list)

@@ -310,9 +310,8 @@ class ComputerVirtualMachine extends CommonDBChild {
          echo "</a></div>\n";
       }
 
-      /* FIXME: those 2 lines would replace the whole following echoes
-      $get = ['withtemplate' => 0] + $_GET;
-      $comp->showSublist(self::getType(), $get);*/
+      $get = ['add' => true] + $_GET;
+      $comp->showSublist(self::getType(), $get);
 
       echo "<div class='center'>";
 

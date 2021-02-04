@@ -514,6 +514,9 @@ class NetworkPort extends CommonDBChild {
    static function showForItem(CommonDBTM $item, $withtemplate = 0) {
       global $DB, $CFG_GLPI;
 
+      $get = ['withtemplate' => $withtemplate] + $_GET;
+      $item->showSublist(self::getType(), $get);
+
       $itemtype = $item->getType();
       $items_id = $item->getField('id');
 
@@ -1495,7 +1498,7 @@ class NetworkPort extends CommonDBChild {
          'joinparams' => ['beforejoin' => $netportjoin]
       ];
 
-      if (!defined('TU_USER')) {
+      /*if (!defined('TU_USER')) {
          $tab[] = [
             'id'    => '39',
             'table' => $this->getTable(),
@@ -1505,7 +1508,7 @@ class NetworkPort extends CommonDBChild {
             'nodisplay' => true,
             'massiveaction' => false
          ];
-      }
+      }*/
 
       $tab[] = [
          'id'    => '40',
