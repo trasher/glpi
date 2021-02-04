@@ -62,6 +62,7 @@ $ADDTODISPLAYPREF['Certificate'] = [7, 4, 8, 121, 10, 31];
 $ADDTODISPLAYPREF['Notepad'] = [200, 201, 202, 203, 204];
 $ADDTODISPLAYPREF['SoftwareVersion'] = [3, 31, 2, 122, 123, 124];
 $ADDTODISPLAYPREF['ComputerVirtualMachine'] = [1, 6, 7, 5, 2, 3, 4, 8];
+$ADDTODISPLAYPREF['NetworkPort'] = [3, 30, 31, 32, 33, 34, 35, 36, 38, 39, 40];
 foreach ($ADDTODISPLAYPREF as $type => $tab) {
    $rank = 1;
    foreach ($tab as $newval) {

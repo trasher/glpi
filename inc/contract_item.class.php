@@ -252,6 +252,9 @@ class Contract_Item extends CommonDBRelation{
          return;
       }
 
+      $get = ['withtemplate' => $withtemplate, 'add' => true] + $_GET;
+      $item->showSublist(self::getType(), $get);
+
       $canedit = $item->can($ID, UPDATE);
       $rand = mt_rand();
 

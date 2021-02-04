@@ -325,7 +325,7 @@ class Item_Disk extends CommonDBChild {
          'datatype'           => 'progressbar',
          'field'              => 'freepercent',
          'width'              => 2,
-         'computation'        => 'ROUND(100*TABLE.freesize/TABLE.totalsize)',
+         'computation'        => 'IF(TABLE.totalsize > 0, ROUND(100*TABLE.freesize/TABLE.totalsize), "-")',
          'computationgroupby' => true,
          'unit'               => '%',
       ];
