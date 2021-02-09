@@ -1936,12 +1936,7 @@ abstract class CommonDBRelation extends CommonDBConnexity {
          ]
       );
 
-      $expr = $DB->mergeStatementWithParams(
-         $dbi->getSql(),
-         $dbi->getParameters()
-      );
-
-      return $expr;
+      return $dbi->getSql();
    }
 
 
@@ -1978,7 +1973,7 @@ abstract class CommonDBRelation extends CommonDBConnexity {
       $link_table = getTableForItemType($link_type);
 
       $existing = [];
-      $search = new Search($link_type, []);
+      $search = new Search($link->getType(), []);
       $join = $search->addLeftJoin(
          $link_type,
          $link_table,
