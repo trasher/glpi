@@ -1025,12 +1025,17 @@ class Search {
                   $tmpquery = str_replace($CFG_GLPI["union_search_type"][$data['itemtype']],
                                           $ctable, $tmpquery);
                   $name_field = $ctype::getNameField();
-                  $tmpquery = str_replace("`$ctable`.`name`", "`$ctable`.`$name_field`", $tmpquery);
+                  $tmpquery = str_replace(
+                     $this->db->quoteName("$ctable.name"),
+                     $this->db->quoteName("$ctable.$name_field"),
+                     $tmpquery
+                  );
                }
-               $tmpquery = str_replace("ENTITYRESTRICT",
-                                       getEntitiesRestrictRequest('', $ctable, '', '',
-                                                                  $citem->maybeRecursive()),
-                                       $tmpquery);
+               $tmpquery = str_replace(
+                  "ENTITYRESTRICT",
+                  getEntitiesRestrictRequest('', $ctable, '', '', $citem->maybeRecursive()),
+                  $tmpquery
+               );
 
                // SOFTWARE HACK
                if ($ctype == 'Software') {
@@ -3418,7 +3423,7 @@ JAVASCRIPT;
       }
 
       if (isset($CFG_GLPI["union_search_type"][$itemtype])) {
-         return " ORDER BY `ITEM_{$itemtype}_{$ID}` $order ";
+         return " ORDER BY ".$this->db->quoteName("ITEM_{$itemtype}_{$ID}")." $order ";
       }
 
       // Plugin can override core definition for its type
@@ -3501,7 +3506,7 @@ JAVASCRIPT;
          }
       }
 
-      return " ORDER BY `ITEM_{$itemtype}_{$ID}` $order ";
+      return " ORDER BY ".$this->db->quoteName("ITEM_{$itemtype}_{$ID}")." $order ";
    }
 
 
@@ -3844,9 +3849,9 @@ JAVASCRIPT;
                      '".self::SHORTSEP."',
                      $tocomputeid
                   )
-                  ORDER BY `$table$addtable`.`date` DESC
+                  ORDER BY ".$this->db->quoteName("$table$addtable.date")." DESC
                   SEPARATOR '".self::LONGSEP."'
-               ) AS `".$NAME."`, $ADDITONALFIELDS";
+               ) AS ".$this->db->quoteName($NAME).", $ADDITONALFIELDS";
             }
             break;
 
@@ -4190,11 +4195,11 @@ JAVASCRIPT;
             }
 
             $in = "IN ('" . implode("','", $allowed_is_private) . "')";
-            $condition = "(`glpi_tickettasks`.`is_private` $in ";
+            $condition = "(".$this->db->quoteName("glpi_tickettasks.is_private")." $in ";
 
             // Check for assigned or created tasks
-            $condition .= "OR `glpi_tickettasks`.`users_id` = " . Session::getLoginUserID() . " ";
-            $condition .= "OR `glpi_tickettasks`.`users_id_tech` = " . Session::getLoginUserID() . " ";
+            $condition .= "OR ".$this->db->quoteName("glpi_tickettasks.users_id")." = " . Session::getLoginUserID() . " ";
+            $condition .= "OR ".$this->db->quoteName("glpi_tickettasks.users_id_tech")." = " . Session::getLoginUserID() . " ";
 
             // Check for parent item visibility unless the user can see all the
             // possible parents
@@ -4223,7 +4228,7 @@ JAVASCRIPT;
             }
 
             $in = "IN ('" . implode("','", $allowed_is_private) . "')";
-            $condition = "(`glpi_itilfollowups`.`is_private` $in ";
+            $condition = "(".$this->db->quoteName("glpi_itilfollowups.is_private")." $in ";
 
             // Now filter on parent item visiblity
             $condition .= "AND (";
@@ -4691,8 +4696,8 @@ JAVASCRIPT;
             if (in_array($searchtype, ['equals', 'notequals']) && strpos($val, self::SHORTSEP)) {
                $not = 'notequals' === $searchtype ? 'NOT' : '';
                list($itemtype_val, $event_val) = explode(self::SHORTSEP, $val);
-               return " $link $not(`$table`.`event` = '$event_val'
-                               AND `$table`.`itemtype` = '$itemtype_val')";
+               return " $link $not(".$this->db->quoteName("$table.event")." = '$event_val'
+                               AND ".$this->db->quoteName("$table.itemtype")." = '$itemtype_val')";
             }
             break;
 
@@ -5434,22 +5439,22 @@ JAVASCRIPT;
          $softwareversions_table = "glpi_softwareversions{$alias_suffix}";
          if (!in_array($softwareversions_table, $already_link_tables2)) {
             array_push($already_link_tables2, $softwareversions_table);
-            $JOIN .= "$LINK `glpi_softwareversions` AS `$softwareversions_table`
-                         ON (`$softwareversions_table`.`softwares_id` = `$from_table`.`id`) ";
+            $JOIN .= "$LINK ".$this->db->quoteName("glpi_softwareversions")." AS ".$this->db->quoteName($softwareversions_table)."
+                         ON (".$this->db->quoteName("$softwareversions_table.softwares_id")." = ".$this->db->quoteName("$from_table.id").") ";
          }
          $items_softwareversions_table = "glpi_items_softwareversions_{$alias_suffix}";
          if (!in_array($items_softwareversions_table, $already_link_tables2)) {
             array_push($already_link_tables2, $items_softwareversions_table);
-            $JOIN .= "$LINK `glpi_items_softwareversions` AS `$items_softwareversions_table`
-                         ON (`$items_softwareversions_table`.`softwareversions_id` = `$softwareversions_table`.`id`
-                             AND `$items_softwareversions_table`.`itemtype` = '$to_type'
-                             AND `$items_softwareversions_table`.`is_deleted` = 0) ";
+            $JOIN .= "$LINK ".$this->db->quoteName("glpi_items_softwareversions")." AS ".$this->db->quoteName($items_softwareversions_table)."
+                         ON (".$this->db->quoteName("$items_softwareversions_table.softwareversions_id")." = ".$this->db->quoteName("$softwareversions_table.id")."
+                             AND ".$this->db->quoteName("$items_softwareversions_table.itemtype")." = '$to_type'
+                             AND ".$this->db->quoteName("$items_softwareversions_table.is_deleted")." = 0) ";
          }
          if (!in_array($to_table, $already_link_tables2)) {
             array_push($already_link_tables2, $to_table);
-            $JOIN .= "$LINK `$to_table`
-                         ON (`$items_softwareversions_table`.`items_id` = `$to_table`.`id`
-                             AND `$items_softwareversions_table`.`itemtype` = '$to_type'
+            $JOIN .= "$LINK ".$this->db->quoteName($to_table)."
+                         ON (".$this->db->quoteName("$items_softwareversions_table.items_id")." = ".$this->db->quoteName("$to_table.id")."
+                             AND ".$this->db->quoteName("$items_softwareversions_table.itemtype")." = '$to_type'
                              $to_entity_restrict) ";
          }
          return $JOIN;
