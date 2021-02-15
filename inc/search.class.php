@@ -3785,10 +3785,10 @@ JAVASCRIPT;
             return " ".$this->db->quoteName("glpi_users.authtype")." AS ".$this->db->quoteName($NAME).",
                      ".$this->db->quoteName("glpi_users.auths_id")." AS ".$this->db->quoteName($NAME."_auths_id").",
                      ".$this->db->quoteName("glpi_authldaps".$addtable."_".
-                           self::computeComplexJoinID($user_searchopt[30]['joinparams']).$addmeta."`.`$field`
+                           self::computeComplexJoinID($user_searchopt[30]['joinparams']).$addmeta.".$field")."
                               AS ".$this->db->quoteName($NAME."_".$ID."_ldapname").",
                      ".$this->db->quoteName("glpi_authmails".$addtable."_".
-                           self::computeComplexJoinID($user_searchopt[31]['joinparams']).$addmeta."`.`$field`
+                           self::computeComplexJoinID($user_searchopt[31]['joinparams']).$addmeta.".$field")."
                               AS ".$this->db->quoteName($NAME."_mailname").",
                      $ADDITONALFIELDS";
 
@@ -4326,6 +4326,7 @@ JAVASCRIPT;
 
       return $SEARCH;
    }
+
    /**
     * Generic Function to add where to a request
     *
@@ -4516,8 +4517,7 @@ JAVASCRIPT;
                         $groups += getSonsOf($inittable, $g);
                      }
                      $groups = array_unique($groups);
-                     return " $link ($field_name IN ('".
-                        implode(', ', $groups)."')) ";
+                     return " $link ($field_name IN ('" . implode(', ', $groups)."')) ";
 
                   case 'notunder' :
                      $groups = $_SESSION['glpigroups'];
@@ -4525,8 +4525,7 @@ JAVASCRIPT;
                         $groups += getSonsOf($inittable, $g);
                      }
                      $groups = array_unique($groups);
-                     return " $link ($field_name NOT IN ('".
-                        implode(',', $groups)."')) ";
+                     return " $link ($field_name NOT IN ('" . implode(',', $groups)."')) ";
                }
             }
             break;
@@ -5585,7 +5584,6 @@ JAVASCRIPT;
             $JOIN .= "$LINK `$to_table`
                          ON (`$from_table`.`id` = `$to_table`.`$from_fk`
                              $to_entity_restrict) ";
-
          }
       } else if ($from_obj && $from_obj->isField('itemtype') && $from_obj->isField('items_id')) {
          // $from_table has items_id/itemtype fields
