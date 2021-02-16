@@ -3334,7 +3334,7 @@ JAVASCRIPT;
                      break;
                }
 
-               return " {$LINK} ({$this->db->quoteName($NAME)} $operator {$this->db->quoteValue($val)}) ";
+               return " {$LINK} ({$NAME} $operator {$this->db->quoteValue($val)}) ";
                break;
             case "count" :
             case "number" :
@@ -4293,17 +4293,17 @@ JAVASCRIPT;
 
          case "equals" :
             if ($nott) {
-               $SEARCH = " <> $val";
+               $SEARCH = " <> " . $this->db->quote($val);
             } else {
-               $SEARCH = " = $val";
+               $SEARCH = " = "  . $this->db->quote($val);
             }
             break;
 
          case "notequals" :
             if ($nott) {
-               $SEARCH = " = $val";
+               $SEARCH = " = " . $this->db->quote($val);
             } else {
-               $SEARCH = " <> $val";
+               $SEARCH = " <> " . $this->db->quote($val);
             }
             break;
 
