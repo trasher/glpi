@@ -301,14 +301,14 @@ final class DbUtils {
          $itemtype = 'Glpi\\Event';
       }
 
-      if (class_exists($itemtype) && is_a($itemtype, CommonDBTM::class, true)) {
+      if (class_exists($itemtype) && is_a($itemtype, CommonGLPI::class, true)) {
          return new $itemtype();
       }
 
       //handle namespaces
       if (substr($itemtype, 0, \strlen(NS_GLPI)) === NS_GLPI) {
          $itemtype = stripslashes($itemtype);
-         if (class_exists($itemtype) && is_a($itemtype, CommonDBTM::class, true)) {
+         if (class_exists($itemtype) && is_a($itemtype, CommonGLPI::class, true)) {
             return new $itemtype();
          }
       }
