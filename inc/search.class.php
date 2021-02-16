@@ -1589,15 +1589,16 @@ class Search {
                }
             }
             foreach ($data['data']['cols'] as $val) {
-               $newrow[$val['itemtype'] . '_' . $val['id']]['displayname'] = $this->giveItem(
-                  $val['itemtype'],
-                  $val['id'],
-                  $newrow
-               );
-            }
 
-            if ($val['itemtype'] == 'AllAssets') {
-               $newrow[$val['itemtype'] . '_TYPE'] = ['displayname' => $newrow['TYPE']];
+               if ($val['itemtype'] == 'AllAssets') {
+                  $newrow[$val['itemtype'] . '_TYPE'] = ['displayname' => $newrow['TYPE']];
+               } else {
+                  $newrow[$val['itemtype'] . '_' . $val['id']]['displayname'] = $this->giveItem(
+                     $val['itemtype'],
+                     $val['id'],
+                     $newrow
+                  );
+               }
             }
 
             $data['data']['rows'][$i] = $newrow;
