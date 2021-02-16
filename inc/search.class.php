@@ -4794,7 +4794,7 @@ JAVASCRIPT;
                $search  = ["/\&lt;/","/\&gt;/"];
                $replace = ["<",">"];
                $val     = preg_replace($search, $replace, $val);
-               if (preg_match("/^\s*([<>=]+)\s*(.*)/", $val, $regs)) {
+               if (preg_match("/^\s*([<>=]+)*(.*)/", $val, $regs)) {
                   if (is_numeric($regs[2])) {
                      return $link." $date_computation ".$regs[1]."
                             ADDDATE(NOW(), INTERVAL ".$regs[2]." $search_unit) ";
