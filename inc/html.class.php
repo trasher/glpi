@@ -1276,7 +1276,8 @@ class Html {
          }
 
          if (in_array('gantt', $jslibs)) {
-            echo Html::css('public/lib/jquery-gantt.css');
+            echo Html::css('public/lib/dhtmlx-gantt.css');
+            echo Html::scss('css/glpi-gantt');
             Html::requireJs('gantt');
          }
 
@@ -6517,7 +6518,8 @@ JAVASCRIPT;
             $_SESSION['glpi_js_toload'][$name][] = 'public/lib/jstree.js';
             break;
          case 'gantt':
-            $_SESSION['glpi_js_toload'][$name][] = 'public/lib/jquery-gantt.js';
+            $_SESSION['glpi_js_toload'][$name][] = 'public/lib/dhtmlx-gantt.js';
+            $_SESSION['glpi_js_toload'][$name][] = 'js/gantt-helper.js';
             break;
          case 'kanban':
             $_SESSION['glpi_js_toload'][$name][] = 'js/kanban.js';
