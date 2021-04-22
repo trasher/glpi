@@ -34,6 +34,7 @@ namespace Glpi\Inventory;
 
 use DOMDocument;
 use DOMElement;
+use Glpi\Agent\Communication\Headers\Common;
 use Toolbox;
 use Unmanaged;
 
@@ -74,6 +75,8 @@ class Request
    private $test_rules = false;
    /** @var Inventory */
    private $inventory;
+   /** @var Glpi\Agent\Communication\Headers\Common */
+   private $headers;
 
    public function __construct() {
       $this->handleContentType($_SERVER['CONTENT_TYPE'] ?? false);
@@ -349,6 +352,8 @@ class Request
     * @return string
     */
    public function getResponse() :string {
+      $this->prepareHeaders();
+
       if ($this->mode === null) {
          throw new \RuntimeException("Mode has not been set");
       }
@@ -495,5 +500,15 @@ class Request
       }
 
       return $encodings;
+   }
+
+   /**
+    * Prepare HTTP headers
+    */
+   private function prepareHeaders() {
+      $this->headers = new Common();
+
+      $this->haders->setHeaders([]);
+      //TODO: set known ones.
    }
 }
