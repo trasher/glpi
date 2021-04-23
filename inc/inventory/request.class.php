@@ -508,7 +508,7 @@ class Request
    private function prepareHeaders() {
       $this->headers = new Common();
 
-      $this->haders->setHeaders([]);
+      $this->headers->setHeaders([]);
       //TODO: set known ones.
    }
 }
