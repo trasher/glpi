@@ -32,7 +32,6 @@
 
 namespace Glpi\Agent\Communication\Headers;
 
-use RuntimeException;
 use ReflectionClass;
 use ReflectionProperty;
 
@@ -102,8 +101,7 @@ class Common {
     */
    protected $glpi_proxy_id;
 
-   public function getRequireds(): array
-   {
+   public function getRequireds(): array {
       return [
          'content_type',
          'pragma',
@@ -134,8 +132,8 @@ class Common {
          $headername = $this->getHeaderName($propname);
          if (!empty($this->$propname)) {
             $headers[$headername] = $this->$propname;
-         } elseif (in_array($propname, $this->getRequireds())) {
-            throw new RuntimeException(
+         } else if (in_array($propname, $this->getRequireds())) {
+            throw new \RuntimeException(
                sprintf(
                   '%1$s HTTP header is mandatory!',
                   $headername
