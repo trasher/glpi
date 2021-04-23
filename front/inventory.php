@@ -36,7 +36,6 @@ include ('../inc/includes.php');
 
 $inventory_request = new Request();
 
-
 $handle = true;
 if (isset($_GET['refused'])) {
    $refused = new RefusedEquipment();
@@ -61,10 +60,9 @@ if (isset($_GET['refused'])) {
    $redirect_url = $refused->handleInventoryRequest($inventory_request);
    Html::redirect($redirect_url);
 } else {
-   header('Content-Type: ' . $inventory_request->getContentType());
-   header('Cache-Control: no-cache,no-store');
-   header('Pragma: no-cache');
-   header('Connection: close');
-
+   $headers = $inventory_request->getHeaders();
+   foreach ($headers as $key => $value) {
+       header(sprintf('%1$s: %2$s', $key, $value));
+   }
    echo $inventory_request->getResponse();
 }

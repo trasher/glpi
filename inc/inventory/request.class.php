@@ -489,6 +489,11 @@ class Request
       return $this;
    }
 
+    /**
+     * Accepted encodings
+     *
+     * @return string[]
+     */
    public function acceptedEncodings(): array {
       $encodings = [
          'gzip',
@@ -504,11 +509,22 @@ class Request
 
    /**
     * Prepare HTTP headers
+    *
+    * @return void
     */
    private function prepareHeaders() {
       $this->headers = new Common();
 
       $this->headers->setHeaders([]);
       //TODO: set known ones.
+   }
+
+    /**
+     * Get HTTP headers
+     *
+     * @return array
+     */
+   public function getHeaders(): array {
+       return $this->headers->getHeaders();
    }
 }

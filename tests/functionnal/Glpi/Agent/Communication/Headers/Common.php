@@ -105,7 +105,7 @@ class Common extends GLPITestCase {
          ->if($this->newTestedInstance)
          ->then
          ->array($this->testedInstance->getRequireds())
-         ->hasSize(3);
+         ->hasSize(5);
    }
 
    public function testGetHeadersNames() {

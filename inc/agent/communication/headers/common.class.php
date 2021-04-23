@@ -53,6 +53,22 @@ class Common {
     */
    protected $accept;
 
+    /**
+     * "Cache-Control" HTTP header
+     * Required
+     *
+     * @var string
+     */
+   protected $cache_control = 'no-cache,no-store';
+
+    /**
+     * "Connection" HTTP header
+     * Required
+     *
+     * @var string
+     */
+   protected $connection = 'close';
+
    /**
     * "Pragma" HTTP header
     * Required
@@ -105,7 +121,9 @@ class Common {
       return [
          'content_type',
          'pragma',
-         'glpi_agent_id'
+         'glpi_agent_id',
+          'cache_control',
+          'connection'
       ];
    }
 
