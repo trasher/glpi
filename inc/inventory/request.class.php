@@ -352,8 +352,6 @@ class Request
     * @return string
     */
    public function getResponse() :string {
-      $this->prepareHeaders();
-
       if ($this->mode === null) {
          throw new \RuntimeException("Mode has not been set");
       }
@@ -515,8 +513,10 @@ class Request
    private function prepareHeaders() {
       $this->headers = new Common();
 
-      $this->headers->setHeaders([]);
-      //TODO: set known ones.
+      $this->headers->setHeaders([
+          'Content-Type' => $this->getContentType(),
+          'GLPI-Agent-ID' => 'noone'
+      ]);
    }
 
     /**
@@ -525,6 +525,7 @@ class Request
      * @return array
      */
    public function getHeaders(): array {
+       $this->prepareHeaders();
        return $this->headers->getHeaders();
    }
 }
