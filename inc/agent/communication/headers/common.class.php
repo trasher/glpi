@@ -122,8 +122,8 @@ class Common {
          'content_type',
          'pragma',
          'glpi_agent_id',
-          'cache_control',
-          'connection'
+         'cache_control',
+         'connection'
       ];
    }
 
@@ -161,6 +161,16 @@ class Common {
       }
 
       return $headers;
+   }
+
+    /**
+     * Get header value for given propname
+     *
+     * @param string $propname Property name
+     */
+   public function getHeader($propname) {
+       //TODO: check header does exists, and has expected value
+       return $this->$propname;
    }
 
    /**

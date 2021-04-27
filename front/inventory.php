@@ -35,6 +35,7 @@ use Glpi\Inventory\Request;
 include ('../inc/includes.php');
 
 $inventory_request = new Request();
+$inventory_request->handleHeaders();
 
 $handle = true;
 if (isset($_GET['refused'])) {
@@ -61,8 +62,9 @@ if (isset($_GET['refused'])) {
    Html::redirect($redirect_url);
 } else {
    $headers = $inventory_request->getHeaders();
+
    foreach ($headers as $key => $value) {
-       header(sprintf('%1$s: %2$s', $key, $value));
+      header(sprintf('%1$s: %2$s', $key, $value));
    }
    echo $inventory_request->getResponse();
 }

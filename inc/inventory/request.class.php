@@ -46,20 +46,20 @@ use Unmanaged;
  */
 class Request
 {
-    const DEFAULT_FREQUENCY = 24;
+   const DEFAULT_FREQUENCY = 24;
 
-    const XML_MODE    = 0;
-    const JSON_MODE   = 1;
+   const XML_MODE    = 0;
+   const JSON_MODE   = 1;
 
-    const PROLOG_QUERY = 'PROLOG';
-    const INVENT_QUERY = 'INVENTORY';
-    const SNMP_QUERY   = 'SNMP';
-    const OLD_SNMP_QUERY   = 'SNMPQUERY';
+   const PROLOG_QUERY = 'PROLOG';
+   const INVENT_QUERY = 'INVENTORY';
+   const SNMP_QUERY   = 'SNMP';
+   const OLD_SNMP_QUERY   = 'SNMPQUERY';
 
-    const COMPRESS_NONE = 0;
-    const COMPRESS_ZLIB = 1;
-    const COMPRESS_GZIP = 2;
-    const COMPRESS_BR   = 3;
+   const COMPRESS_NONE = 0;
+   const COMPRESS_ZLIB = 1;
+   const COMPRESS_GZIP = 2;
+   const COMPRESS_BR   = 3;
 
    /** @var integer */
    private $mode; //will be usefull when agent will send json
@@ -79,7 +79,8 @@ class Request
    private $headers;
 
    public function __construct() {
-      $this->handleContentType($_SERVER['CONTENT_TYPE'] ?? false);
+       $this->headers = new Common();
+       $this->handleContentType($_SERVER['CONTENT_TYPE'] ?? false);
    }
 
    /**
@@ -106,6 +107,7 @@ class Request
          default:
               throw new \RuntimeException("Unknown mode $mode");
       }
+      $this->prepareHeaders();
    }
 
    /**
@@ -121,6 +123,27 @@ class Request
          //defaults to XML; whose validity is checked later.
          $this->setMode(self::XML_MODE);
       }
+   }
+
+    /**
+     * Handle request headers
+     *
+     * @param $data
+     */
+   public function handleHeaders() {
+       $req_headers = [];
+       if (!function_exists('getallheaders')) {
+           foreach ($_SERVER as $name => $value) {
+               /* RFC2616 (HTTP/1.1) defines header fields as case-insensitive entities. */
+               if (strtolower(substr($name, 0, 5)) == 'http_') {
+                   $req_headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+               }
+           }
+       } else {
+           $req_headers = getallheaders();
+       }
+
+       $this->headers->setHeaders($req_headers);
    }
 
    /**
@@ -511,12 +534,15 @@ class Request
     * @return void
     */
    private function prepareHeaders() {
-      $this->headers = new Common();
-
-      $this->headers->setHeaders([
+      $headers = [
           'Content-Type' => $this->getContentType(),
-          'GLPI-Agent-ID' => 'noone'
-      ]);
+      ];
+
+      if (empty($this->headers->getHeader('glpi_agent_id'))) {
+         $headers['GLPI-Agent-ID'] = 'noone';
+      }
+
+      $this->headers->setHeaders($headers);
    }
 
     /**
@@ -525,7 +551,6 @@ class Request
      * @return array
      */
    public function getHeaders(): array {
-       $this->prepareHeaders();
        return $this->headers->getHeaders();
    }
 }
