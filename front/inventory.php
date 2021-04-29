@@ -62,7 +62,7 @@ if (isset($_GET['refused'])) {
    Html::redirect($redirect_url);
 } else {
    $headers = $inventory_request->getHeaders();
-
+   http_response_code($inventory_request->getHttpResponseCode());
    foreach ($headers as $key => $value) {
       header(sprintf('%1$s: %2$s', $key, $value));
    }

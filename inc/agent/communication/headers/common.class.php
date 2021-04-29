@@ -164,11 +164,13 @@ class Common {
    }
 
     /**
-     * Get header value for given propname
+     * Get header value
      *
-     * @param string $propname Property name
+     * @param string $name Header name
      */
-   public function getHeader($propname) {
+   public function getHeader($name) {
+       $propname = strtolower(str_replace('-', '_', $name));
+
        //TODO: check header does exists, and has expected value
        return $this->$propname;
    }
@@ -233,5 +235,17 @@ class Common {
       $this->$propname = $value;
 
       return $this;
+   }
+
+    /**
+     * Is header set
+     *
+     * @param string $name Property name
+     *
+     * @return bool
+     */
+   public function hasHeader($name): bool {
+      $propname = strtolower(str_replace('-', '_', $name));
+       return (isset($this->$propname) && !empty($this->$propname));
    }
 }
