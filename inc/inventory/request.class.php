@@ -631,11 +631,6 @@ class Request
       $headers = [
           'Content-Type' => $this->getContentType(),
       ];
-
-      if (!$this->headers->hasHeader('GLPI-Agent-ID')) {
-         $headers['GLPI-Agent-ID'] = 'noone';
-      }
-
       $this->headers->setHeaders($headers);
    }
 
