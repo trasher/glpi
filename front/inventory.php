@@ -61,7 +61,7 @@ if (isset($_GET['refused'])) {
    $redirect_url = $refused->handleInventoryRequest($inventory_request);
    Html::redirect($redirect_url);
 } else {
-   $headers = $inventory_request->getHeaders();
+   $headers = $inventory_request->getHeaders(true);
    http_response_code($inventory_request->getHttpResponseCode());
    foreach ($headers as $key => $value) {
       header(sprintf('%1$s: %2$s', $key, $value));

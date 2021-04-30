@@ -136,9 +136,11 @@ class Common {
    /**
     * Get HTTP headers
     *
+    * @param boolean $legacy Set to true to shunt required headers checks
+    *
     * @return array
     */
-   public function getHeaders(): array {
+   public function getHeaders($legacy = false): array {
       //parse class attributes and normalize key name
       $reflect = new ReflectionClass($this);
       $props   = $reflect->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED);
@@ -150,7 +152,7 @@ class Common {
          $headername = $this->getHeaderName($propname);
          if (!empty($this->$propname)) {
             $headers[$headername] = $this->$propname;
-         } else if (in_array($propname, $this->getRequireds())) {
+         } else if (in_array($propname, $this->getRequireds()) && $legacy === false) {
             throw new \RuntimeException(
                sprintf(
                   '%1$s HTTP header is mandatory!',

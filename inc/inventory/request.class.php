@@ -433,18 +433,18 @@ class Request
          switch ($this->compression) {
             case self::COMPRESS_ZLIB:
                $data = gzcompress($data);
-                 break;
+               break;
             case self::COMPRESS_GZIP:
                 $data = gzencode($data);
-                 break;
+                break;
             case self::COMPRESS_BR:
                if (!function_exists('brotli_compress')) {
                    throw new \UnexpectedValueException("You must install Brotli PHP extension.");
                }
-                $data = brotli_compress($data);
-                 break;
+               $data = brotli_compress($data);
+               break;
             default:
-                 throw new \UnexpectedValueException("Unknown compression mode" . $this->compression);
+               throw new \UnexpectedValueException("Unknown compression mode" . $this->compression);
          }
       }
 
@@ -458,7 +458,6 @@ class Request
     */
    public function prolog() {
       if ($this->headers->hasHeader('GLPI-Agent-ID')) {
-         var_dump($this->headers);
           $this->setMode(self::JSON_MODE);
           $response = [
               'expiration'  => self::DEFAULT_FREQUENCY,
@@ -638,10 +637,12 @@ class Request
     /**
      * Get HTTP headers
      *
+     * @param boolean $legacy Set to true to shunt required headers checks
+     *
      * @return array
      */
-   public function getHeaders(): array {
-       return $this->headers->getHeaders();
+   public function getHeaders($legacy = false): array {
+       return $this->headers->getHeaders($legacy);
    }
 
    public function getHttpResponseCode(): int {
