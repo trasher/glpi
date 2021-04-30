@@ -271,7 +271,7 @@ class Request
       $query = self::INVENT_QUERY;
       if (property_exists($jdata, 'query')) {
          $query = $jdata->query;
-      } elseif (property_exists($jdata, 'action')) {
+      } else if (property_exists($jdata, 'action')) {
          $query = $jdata->action;
       }
       return $this->handleQuery($query, $data);
@@ -429,24 +429,24 @@ class Request
             break;
       }
 
-       if ($this->compression !== self::COMPRESS_NONE) {
-           switch ($this->compression) {
-               case self::COMPRESS_ZLIB:
-                   $data = gzcompress($data);
-                   break;
-               case self::COMPRESS_GZIP:
-                   $data = gzencode($data);
-                   break;
-               case self::COMPRESS_BR:
-                   if (!function_exists('brotli_compress')) {
-                       throw new \UnexpectedValueException("You must install Brotli PHP extension.");
-                   }
-                   $data = brotli_compress($data);
-                   break;
-               default:
-                   throw new \UnexpectedValueException("Unknown compression mode" . $this->compression);
-           }
-       }
+      if ($this->compression !== self::COMPRESS_NONE) {
+         switch ($this->compression) {
+            case self::COMPRESS_ZLIB:
+               $data = gzcompress($data);
+                 break;
+            case self::COMPRESS_GZIP:
+                $data = gzencode($data);
+                 break;
+            case self::COMPRESS_BR:
+               if (!function_exists('brotli_compress')) {
+                   throw new \UnexpectedValueException("You must install Brotli PHP extension.");
+               }
+                $data = brotli_compress($data);
+                 break;
+            default:
+                 throw new \UnexpectedValueException("Unknown compression mode" . $this->compression);
+         }
+      }
 
        return $data;
    }
@@ -457,18 +457,19 @@ class Request
     * @return void
     */
    public function prolog() {
-       if ($this->headers->hasHeader('GLPI-Agent-ID')) {
-           $this->setMode(self::JSON_MODE);
-           $response = [
-               'expiration'  => self::DEFAULT_FREQUENCY,
-               'status'     => 'ok'
-           ];
-       } else {
+      if ($this->headers->hasHeader('GLPI-Agent-ID')) {
+         var_dump($this->headers);
+          $this->setMode(self::JSON_MODE);
           $response = [
-             'PROLOG_FREQ'  => self::DEFAULT_FREQUENCY,
-             'RESPONSE'     => 'SEND'
+              'expiration'  => self::DEFAULT_FREQUENCY,
+              'status'     => 'ok'
           ];
-       }
+      } else {
+         $response = [
+            'PROLOG_FREQ'  => self::DEFAULT_FREQUENCY,
+            'RESPONSE'     => 'SEND'
+         ];
+      }
        $this->addToResponse($response);
    }
 

@@ -172,7 +172,7 @@ class Inventory
          // Get tag if defined
          if (property_exists($this->raw_data, 'tag')) {
             $this->metadata['tag'] = $this->raw_data->tag;
-         } elseif (property_exists($this->raw_data->content, 'accountinfo')) {
+         } else if (property_exists($this->raw_data->content, 'accountinfo')) {
             $ainfos = $this->raw_data->content->accountinfo;
             if (property_exists($ainfos, 'keyname')
                && $ainfos->keyname == 'TAG'
