@@ -33,7 +33,6 @@
 
 namespace Glpi\Gantt;
 
-use Glpi\Gantt\Link;
 use ProjectTaskLink;
 
 if (!defined('GLPI_ROOT')) {

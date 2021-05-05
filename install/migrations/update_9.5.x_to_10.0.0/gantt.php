@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ---------------------------------------------------------------------
  * GLPI - Gestionnaire Libre de Parc Informatique
@@ -30,49 +29,29 @@
  * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
  * ---------------------------------------------------------------------
  */
-
-namespace Glpi\Gantt;
-
-if (!defined('GLPI_ROOT')) {
-   die("Sorry. You can't access this file directly");
-}
-
 /**
- * DAO class for handling project task records
+ * @var DB $DB
+ * @var Migration $migration
+ * @var array $ADDTODISPLAYPREF
  */
-class TaskDAO {
 
-   function updateTask($task) {
-      global $DB;
-      $t = new \ProjectTask();
-      $t->getFromDB($task->id);
+$default_charset = DBConnection::getDefaultCharset();
+$default_collation = DBConnection::getDefaultCollation();
 
-      $t->update([
-         'id' => $task->id,
-         'plan_start_date' => $task->start_date,
-         'plan_end_date' => $task->end_date,
-         'percent_done' => ($task->progress * 100),
-         'name' => (isset($task->text) ? $task->text : $t->fields['name'])
-      ]);
-      return true;
-   }
-
-   function deleteTask(&$failed, $taskId) {
-      global $DB;
-      if ($taskId > 0) {
-         foreach ($DB->request('glpi_projecttasks', ['projecttasks_id' => $taskId]) as $record) {
-            if (isset($record['id'])) {
-               if (!$this->deleteTask($failed, $record['id'])) {
-                  $failed[] = $record;
-               }
-            }
-         }
-         try {
-            $DB->delete(\ProjectTask::getTable(), ['id' => $taskId]);
-         } catch (\Exception $ex) {
-            return false;
-         }
-      }
-      return true;
-   }
+// Create table for project task links
+if (!$DB->tableExists('glpi_projecttasklinks')) {
+   $query = "CREATE TABLE `glpi_projecttasklinks` (
+         `id` int NOT NULL AUTO_INCREMENT,
+         `source_id` int NOT NULL,
+         `source_uuid` varchar(255) NOT NULL,
+         `target_id` int NOT NULL,
+         `target_uuid` varchar(255) NOT NULL,
+         `type` tinyint NOT NULL DEFAULT '0',
+         `lag` smallint DEFAULT '0',
+         `lead` smallint DEFAULT '0',
+         PRIMARY KEY (`id`),
+         KEY `source_id` (`source_id`),
+         KEY `target_id` (`target_id`)
+      ) ENGINE = InnoDB ROW_FORMAT = DYNAMIC DEFAULT CHARSET = {$default_charset} COLLATE = {$default_collation};";
+      $DB->queryOrDie($query, "Adding table glpi_projecttasklinks");
 }

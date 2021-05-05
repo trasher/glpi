@@ -5660,16 +5660,18 @@ CREATE TABLE `glpi_projecttasks` (
 
 DROP TABLE IF EXISTS `glpi_projecttasklinks`;
 CREATE TABLE `glpi_projecttasklinks` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `source_id` int(11) NOT NULL,
-  `source_uuid` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `target_id` int(11) NOT NULL,
-  `target_uuid` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `type` tinyint(4) NOT NULL DEFAULT '0',
-  `lag` smallint(6) DEFAULT '0',
-  `lead` smallint(6) DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+  `id` int NOT NULL AUTO_INCREMENT,
+  `source_id` int NOT NULL,
+  `source_uuid` varchar(255) NOT NULL,
+  `target_id` int NOT NULL,
+  `target_uuid` varchar(255) NOT NULL,
+  `type` tinyint NOT NULL DEFAULT '0',
+  `lag` smallint DEFAULT '0',
+  `lead` smallint DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `source_id` (`source_id`),
+  KEY `target_id` (`target_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 ### Dump table glpi_projecttasktemplates
 
