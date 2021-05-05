@@ -86,7 +86,8 @@ function initGantt($ID) {
    };
 
    var zoomConfig = {
-      levels: [{
+      levels: [
+         {
             name: "day",
             scale_height: 27,
             min_column_width: 80,
@@ -98,7 +99,8 @@ function initGantt($ID) {
             name: "week",
             scale_height: 50,
             min_column_width: 50,
-            scales: [{
+            scales: [
+               {
                   unit: "week",
                   step: 1,
                   format: function(date) {
@@ -168,7 +170,7 @@ function initGantt($ID) {
    }
 
    // enable task reordering (on same level) between projects
-   gantt.attachEvent("onBeforeTaskMove", function(id, parent, tindex) {
+   gantt.attachEvent("onBeforeTaskMove", function(id, parent) {
       var task = gantt.getTask(id);
       if (task.parent != parent)
          return false;
@@ -177,7 +179,7 @@ function initGantt($ID) {
 
    if (!readonly) {
       // catch task drag event to update db
-      gantt.attachEvent("onAfterTaskDrag", function(id, mode, e) {
+      gantt.attachEvent("onAfterTaskDrag", function(id) {
          var task = gantt.getTask(id);
          var progress = (Math.round(task.progress * 100 / 5) * 5) / 100; // prevent server side exception for wrong stepping
          $.ajax({
@@ -204,12 +206,12 @@ function initGantt($ID) {
          });
       });
 
-      gantt.attachEvent("onAfterTaskUpdate", function(id, task) {
+      gantt.attachEvent("onAfterTaskUpdate", function(id) {
          parentProgress(id);
       });
 
       // handle lightbox Save action
-      gantt.attachEvent("onLightboxSave", function(id, item, is_new) {
+      gantt.attachEvent("onLightboxSave", function(id, item) {
          // TODO add new item
 
          // update item
@@ -378,7 +380,7 @@ function initGantt($ID) {
 
       var modal;
       var editLinkId;
-      gantt.attachEvent("onLinkDblClick", function(id, e) {
+      gantt.attachEvent("onLinkDblClick", function(id) {
 
          editLinkId = id;
          var link = gantt.getLink(id);
@@ -608,3 +610,4 @@ function deleteTaskLink(linkId, callback) {
 }
 
 // <<<<< Functions
+
