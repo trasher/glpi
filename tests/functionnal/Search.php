@@ -744,7 +744,8 @@ class Search extends DbTestCase {
       $this->login();
       $uid =  getItemByTypeName('User', TU_USER, true);
 
-      $search = \Search::manageParams('Ticket', ['reset' => 1], false, false);
+      $search_instance = new \Search('Ticket', ['reset' => 1]);
+      $search = $search_instance->manageParams(false, false);
       $this->array(
          $search
       )->isEqualTo(['reset'        => 1,
@@ -785,7 +786,7 @@ class Search extends DbTestCase {
                                 ])
       )->isTrue();
 
-      $search = \Search::manageParams('Ticket', ['reset' => 1], true, false);
+      $search = $search_instance->manageParams(true, false);
       $this->array(
          $search
       )->isEqualTo(['reset'        => 1,
@@ -805,7 +806,8 @@ class Search extends DbTestCase {
                    ]);
 
       // let's test for Computers
-      $search = \Search::manageParams('Computer', ['reset' => 1], false, false);
+      $search_instance = new \Search('Computer', ['reset' => 1]);
+      $search = $search_instance->manageParams(false, false);
       $this->array(
          $search
       )->isEqualTo(['reset'        => 1,
@@ -848,7 +850,7 @@ class Search extends DbTestCase {
                                 ])
       )->isTrue();
 
-      $search = \Search::manageParams('Computer', ['reset' => 1], true, false);
+      $search = $search_instance->manageParams(true, false);
       $this->array(
          $search
       )->isEqualTo(['reset'        => 1,
@@ -955,7 +957,6 @@ class Search extends DbTestCase {
 
       $search = new \Search(new $lj_provider['itemtype'], []);
       $sql_join = $search->addLeftJoin(
-         $lj_provider['itemtype'],
          getTableForItemType($lj_provider['itemtype']),
          $already_link_tables,
          $lj_provider['table'],
@@ -1051,7 +1052,7 @@ class Search extends DbTestCase {
 
       // do search and check presence of the created problem
       $search = new \Search('Problem', ['reset' => 'reset']);
-      $data = $search->prepareDataForSearch('Problem', ['reset' => 'reset']);
+      $data = $search->prepareDataForSearch();
       $search->constructSQL($data);
       $search->constructData($data);
 
@@ -1103,8 +1104,8 @@ class Search extends DbTestCase {
       $this->login('tech', 'tech');
 
       // do search and check presence of the created Change
-      $search = new \Search('Change', ['reset', 'reset']);
-      $data = $search->prepareDataForSearch('Change', ['reset' => 'reset']);
+      $search = new \Search('Change', ['reset' => 'reset']);
+      $data = $search->prepareDataForSearch();
       $search->constructSQL($data);
       $search->constructData($data);
 
@@ -1535,7 +1536,7 @@ class Search extends DbTestCase {
       ob_start();
 
       $search = new \Search($params['item_type'], $params);
-      $search->showList($params['item_type'], $params);
+      $search->showList();
       $names = ob_get_contents();
       ob_end_clean();
 

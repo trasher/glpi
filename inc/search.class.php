@@ -65,17 +65,49 @@ class Search {
    private $output_type = self::HTML_OUTPUT;
    static $search = [];
 
+   /** @var DB */
    private $db;
+   /**
+    * Current searched item instance
+    *
+    *  @var CommonDBTM|null
+    */
    private $item;
+   /**
+    * Current itemtype
+    *
+    * @var string */
    private $itemtype;
+   /**
+    * Raw search parameters
+    *
+    *  @var array
+    */
    private $raw_params;
+   /**
+    * Parsed parameters (@see Search::manageParams())
+    *
+    *  @var array
+    */
+   private $params;
+   /**
+    * Columns to be displayed
+    *
+    * @var array
+    */
+   private $toview;
+   /**
+    * Are we working on a sub item?
+    *
+    * @var bool
+    */
    private $sub_item = false;
 
    /**
     * Constructor
     *
-    * @param CommonDBTM|null $item   Item instance
-    * @param array           $params Search parameters
+    * @param CommonDBTM|string $item   Item instance
+    * @param array             $params Search parameters
     */
    public function __construct($item, array $params) {
       global $DB;
@@ -90,6 +122,7 @@ class Search {
          }
       }
       $this->raw_params = $params;
+      $this->manageParams();
    }
 
    /**
@@ -100,9 +133,7 @@ class Search {
     * @return void
    **/
    public static function show($itemtype) {
-      $params = self::manageParams($itemtype, $_GET);
-      $item = $itemtype == 'AllAssets' ? $itemtype : new $itemtype;
-      $inst = new self($item, $params);
+      $inst = new self($itemtype, $_GET);
       echo "<div class='search_page row'>";
       TemplateRenderer::getInstance()->display('layout/parts/saved_searches.html.twig', [
          'itemtype' => $itemtype,
@@ -115,11 +146,11 @@ class Search {
          $dashboard->show(true);
       }
 
-      $inst->showGenericSearch($itemtype, $params);
-      if ($params['as_map'] == 1) {
-         $inst->showMap($itemtype, $params);
+      $inst->showGenericSearch();
+      if ($inst->params['as_map'] == 1) {
+         $inst->showMap();
       } else {
-         $inst->showList($itemtype, $params);
+         $inst->showList();
       }
       echo "</div>";
       echo "</div>";
@@ -128,18 +159,18 @@ class Search {
    /**
     * Display result table for search engine for an type
     *
-    * @param string $itemtype Item type to manage
-    * @param array  $params   Search params passed to prepareDatasForSearch function
     * @param array  $data     data if already processed
     *
     * @return void
     *
     * @since 10.0.0 Method is no longer static
     * @since 10.0.0 Added $data parameter
+    * @since 10.0.0 Removed $itemtype parameter
+    * @since 10.0.0 Removed $params parameter
    **/
-   public function showList($itemtype, $params, $data = []) {
-      if (empty($data)) {
-         $data = $this->prepareDataForSearch($itemtype, $params);
+   public function showList(array $data = []) {
+      if (!count($data)) {
+         $data = $this->prepareDataForSearch();
          $this->constructSQL($data);
          $this->constructData($data);
       }
@@ -163,22 +194,22 @@ class Search {
    /**
     * Display result table for search engine for an type as a map
     *
-    * @param string $itemtype Item type to manage
-    * @param array  $params   Search params passed to prepareDatasForSearch function
     * @param array  $data     data if already processed
     *
     * @return void
     *
     * @since 10.0.0 Method is no longer static
     * @since 10.0.0 Added $data parameter
+    * @since 10.0.0 Removed $itemtype parameter
+    * @since 10.0.0 Removed $params parameter
    **/
-   public function showMap($itemtype, $params, $data = []) {
+   public function showMap($data = []) {
       global $CFG_GLPI;
 
-      if ($itemtype == 'Location') {
+      if ($this->itemtype == 'Location') {
          $latitude = 21;
          $longitude = 20;
-      } else if ($itemtype == 'Entity') {
+      } else if ($this->itemtype == 'Entity') {
          $latitude = 67;
          $longitude = 68;
       } else {
@@ -187,19 +218,19 @@ class Search {
       }
 
       if (empty($data)) {
-         $params['criteria'][] = [
+         $this->params['criteria'][] = [
             'link'         => 'AND NOT',
             'field'        => $latitude,
             'searchtype'   => 'contains',
             'value'        => 'NULL'
          ];
-         $params['criteria'][] = [
+         $this->params['criteria'][] = [
             'link'         => 'AND NOT',
             'field'        => $longitude,
             'searchtype'   => 'contains',
             'value'        => 'NULL'
          ];
-         $data = $this->prepareDataForSearch($itemtype, $params);
+         $data = $this->prepareDataForSearch();
          $this->constructSQL($data);
          $this->constructData($data);
       }
@@ -212,7 +243,7 @@ class Search {
          array_pop($criteria);
          $criteria[] = [
             'link'         => 'AND',
-            'field'        => ($itemtype == 'Location' || $itemtype == 'Entity') ? 1 : (($itemtype == 'Ticket') ? 83 : 3),
+            'field'        => ($this->itemtype == 'Location' || $this->itemtype == 'Entity') ? 1 : (($this->itemtype == 'Ticket') ? 83 : 3),
             'searchtype'   => 'equals',
             'value'        => 'CURLOCATION'
          ];
@@ -231,15 +262,15 @@ class Search {
          } else {
             $fulltarget = $target."&".$parameters;
          }
-         $typename = class_exists($itemtype) ? $itemtype::getTypeName($data['data']['totalcount']) :
-                        ($itemtype == 'AllAssets' ? __('assets') : $itemtype);
+         $typename = class_exists($this->itemtype) ? $this->itemtype::getTypeName($data['data']['totalcount']) :
+                        ($this->itemtype == 'AllAssets' ? __('assets') : $this->itemtype);
 
          echo "<div class='card'>";
          echo "<div class='card-body' id='map_container'>";
          echo "<div class='card-title'>".__('Search results for localized items only')."</div>";
          $js = "$(function() {
                var map = initMap($('#map_container'), 'map', 'full');
-               _loadMap(map, '$itemtype');
+               _loadMap(map, '{$this->itemtype}');
             });
 
          var _loadMap = function(map_elt, itemtype) {
@@ -285,7 +316,7 @@ class Search {
                url: '{$CFG_GLPI['root_doc']}/ajax/map.php',
                data: {
                   itemtype: itemtype,
-                  params: ".json_encode($params)."
+                  params: ".json_encode($this->params)."
                }
             }).done(function(data) {
                var _points = data.points;
@@ -385,29 +416,27 @@ class Search {
     */
    public function getData($sub_item = false) {
       $this->sub_item = $sub_item;
-      $itemtype = ($this->item instanceof CommonDBTM ? $this->item->getType() : 'AllAssets');
-      $params = self::manageParams($itemtype, $this->raw_params);
-      if ($params['as_map'] == 1) {
-         $params['criteria'][] = [
+      if ($this->params['as_map'] == 1) {
+         $this->params['criteria'][] = [
             'link'         => 'AND NOT',
-            'field'        => ($itemtype == 'Location') ? 21 : 998,
+            'field'        => ($this->itemtype == 'Location') ? 21 : 998,
             'searchtype'   => 'contains',
             'value'        => 'NULL'
          ];
-         $params['criteria'][] = [
+         $this->params['criteria'][] = [
             'link'         => 'AND NOT',
-            'field'        => ($itemtype == 'Location') ? 20 : 999,
+            'field'        => ($this->itemtype == 'Location') ? 20 : 999,
             'searchtype'   => 'contains',
             'value'        => 'NULL'
          ];
       }
 
-      $data = $this->prepareDataForSearch($itemtype, $params, $this->sub_item);
-      $this->constructSQL($data, $this->sub_item);
+      $data = $this->prepareDataForSearch();
+      $this->constructSQL($data);
       $this->constructData($data);
 
       if (!isset($data['data']['totalcount'])) {
-         Toolbox::logError("Something went wrong during $itemtype search");
+         Toolbox::logError("Something went wrong during {$this->itemtype} search");
          return;
       }
 
@@ -419,17 +448,11 @@ class Search {
     *
     * @since 0.85
     *
-    * @param string  $itemtype      Item type
-    * @param array   $params        Array of parameters
-    *                               may include sort, order, start, list_limit, deleted, criteria, metacriteria
-    * @param array   $forcedisplay  Array of columns to display (default empty = empty use display pref and search criterias)
-    * @param boolean $sub_item      Are we looking for a sub item?
-    *
     * @return array prepare to be used for a search (include criteria and others needed information)
     *
-    * @since 10.0.0 Method has been renamed is no longer static, $forcedisplay has been removed
+    * @since 10.0.0 Method has been renamed is no longer static, $forcedisplay, $itemtype and $params has been removed
    **/
-   public function prepareDataForSearch($itemtype, array $params, $sub_item = false) {
+   public function prepareDataForSearch() {
       global $CFG_GLPI;
 
       // Default values of parameters
@@ -440,10 +463,10 @@ class Search {
       $p['start']               = 0;//
       $p['is_deleted']          = 0;
       $p['export_all']          = 0;
-      if (class_exists($itemtype)) {
-         $p['target']       = $itemtype::getSearchURL();
+      if (class_exists($this->itemtype)) {
+         $p['target']       = $this->itemtype::getSearchURL();
       } else {
-         $p['target']       = Toolbox::getItemTypeSearchURL($itemtype);
+         $p['target']       = Toolbox::getItemTypeSearchURL($this->itemtype);
       }
       $p['display_type']        = self::HTML_OUTPUT;
       $p['showmassiveactions']  = true;
@@ -455,7 +478,7 @@ class Search {
       $p['massiveactionparams'] = [];
       $p['forcedisplay']        = [];
 
-      foreach ($params as $key => $val) {
+      foreach ($this->params as $key => $val) {
          switch ($key) {
             case 'order':
                if (in_array($val, ['ASC', 'DESC'])) {
@@ -493,14 +516,14 @@ class Search {
 
       $data             = [];
       $data['search']   = $p;
-      $data['real_itemtype'] = $itemtype;
-      $data['itemtype'] = $itemtype;
+      $data['real_itemtype'] = $this->itemtype;
+      $data['itemtype'] = $this->itemtype;
 
       // Instanciate an object to access method
       $data['item'] = null;
 
-      if ($itemtype != 'AllAssets') {
-         $data['item'] = getItemForItemtype($itemtype);
+      if ($this->itemtype != 'AllAssets') {
+         $data['item'] = getItemForItemtype($this->itemtype);
       }
 
       $data['display_type'] = $data['search']['display_type'];
@@ -532,18 +555,18 @@ class Search {
       // If no research limit research to display item and compute number of item using simple request
       $data['search']['no_search']   = true;
 
-      $data['toview'] = $this->addDefaultToView($itemtype, $params);
+      $data['toview'] = $this->addDefaultToView();
       $data['meta_toview'] = [];
       if (!$forcetoview) {
          // Add items to display depending of personal prefs
-         $pref_itemtype = $itemtype;
-         if ($sub_item && $sub_item['sub_item'] instanceof CommonDBRelation && $sub_item['sub_item']->getType() == $itemtype) {
+         $pref_itemtype = $this->itemtype;
+         if ($this->sub_item && $this->sub_item['sub_item'] instanceof CommonDBRelation && $this->sub_item['sub_item']->getType() == $this->itemtype) {
             $pref_itemtype = 'AllAssets';
          }
          $displaypref = DisplayPreference::getForTypeUser(
             $pref_itemtype,
             Session::getLoginUserID(),
-            ($sub_item !== false && count($sub_item))
+            ($this->sub_item !== false && count($this->sub_item))
          );
          if (count($displaypref)) {
             foreach ($displaypref as $val) {
@@ -599,7 +622,7 @@ class Search {
       }
 
       // Special case for Ticket : put ID in front
-      if ($itemtype == 'Ticket') {
+      if ($this->itemtype == 'Ticket') {
          array_unshift($data['toview'], 2);
       }
 
@@ -625,7 +648,7 @@ class Search {
 
       /*if (!count($data['toview'])) {
          Toolbox::logWarning(
-            'No columns found to display ' . $itemtype
+            'No columns found to display ' . $this->itemtype
          );
       }*/
 
@@ -645,13 +668,12 @@ class Search {
     * @since 0.85
     *
     * @param array $data  Array of search datas prepared to generate SQL
-    * @param CommonDBTM|false $sub_item Are we calling from a sub item?
     *
     * @return void
     *
     * @since 10.0.0 Method is no longer static
    **/
-   public function constructSQL(array &$data, $sub_item = false) {
+   public function constructSQL(array &$data) {
       global $CFG_GLPI;
 
       if (!isset($data['itemtype'])) {
@@ -684,7 +706,7 @@ class Search {
       //// 1 - SELECT
       // request currentuser for SQL supervision, not displayed
       $SELECT = "SELECT DISTINCT ".$this->db->quoteName("$itemtable.id")." AS id, ".$this->db->quote($_SESSION['glpiname'])." AS currentuser,
-                        ".$this->addDefaultSelect($data['itemtype']);
+                        ".$this->addDefaultSelect();
 
       // Add select for all toview item
       foreach ($data['toview'] as $val) {
@@ -705,13 +727,13 @@ class Search {
       array_push($already_link_tables, $itemtable);
 
       // Add default join
-      $COMMONLEFTJOIN = $this->addDefaultJoin($data['itemtype'], $itemtable, $already_link_tables);
+      $COMMONLEFTJOIN = $this->addDefaultJoin($itemtable, $already_link_tables);
 
       $itemtype = $data['itemtype'];
       $COMMONSUBLEFTJOIN = '';
-      if ($sub_item !== false && method_exists($sub_item['sub_item'], 'addSubDefaultJoin') && $sub_item['sub_item']->getType() !== $itemtype) {
-         $sub = $sub_item['sub_item'];
-         $COMMONSUBLEFTJOIN = $sub::addSubDefaultJoin($sub_item['item'], $itemtype, $already_link_tables);
+      if ($this->sub_item !== false && method_exists($this->sub_item['sub_item'], 'addSubDefaultJoin') && $this->sub_item['sub_item']->getType() !== $itemtype) {
+         $sub = $this->sub_item['sub_item'];
+         $COMMONSUBLEFTJOIN = $sub::addSubDefaultJoin($this->sub_item['item'], $itemtype, $already_link_tables);
       }
 
       $FROM          .= $COMMONLEFTJOIN;
@@ -719,7 +741,7 @@ class Search {
       // Add all table for toview items
       foreach ($data['tocompute'] as $val) {
          if (!in_array($searchopt[$val]["table"], $blacklist_tables)) {
-            $FROM .= $this->addLeftJoin($data['itemtype'], $itemtable, $already_link_tables,
+            $FROM .= $this->addLeftJoin($itemtable, $already_link_tables,
                                        $searchopt[$val]["table"],
                                        $searchopt[$val]["linkfield"], 0, 0,
                                        $searchopt[$val]["joinparams"],
@@ -733,7 +755,7 @@ class Search {
             // Do not search on Group Name
             if (is_array($val) && isset($val['table'])) {
                if (!in_array($searchopt[$key]["table"], $blacklist_tables)) {
-                  $FROM .= $this->addLeftJoin($data['itemtype'], $itemtable, $already_link_tables,
+                  $FROM .= $this->addLeftJoin($itemtable, $already_link_tables,
                                              $searchopt[$key]["table"],
                                              $searchopt[$key]["linkfield"], 0, 0,
                                              $searchopt[$key]["joinparams"],
@@ -747,14 +769,14 @@ class Search {
 
       // default string
       $COMMONWHERE = '';
-      if ($sub_item !== false && method_exists($sub_item['sub_item'], 'addSubDefaultWhere')) {
-         $sub = $sub_item['sub_item'];
+      if ($this->sub_item !== false && method_exists($this->sub_item['sub_item'], 'addSubDefaultWhere')) {
+         $sub = $this->sub_item['sub_item'];
          $COMMONSUBWHERE = $sub::addSubDefaultWhere(
-            $sub_item['item'],
-            $sub_item['sub_item']->getType() == $data['real_itemtype']
+            $this->sub_item['item'],
+            $this->sub_item['sub_item']->getType() == $data['real_itemtype']
          );
       } else {
-         $COMMONWHERE = $this->addDefaultWhere($data['itemtype']);
+         $COMMONWHERE = $this->addDefaultWhere();
       }
       $first       = empty($COMMONWHERE);
 
@@ -815,7 +837,6 @@ class Search {
       foreach ($data['tocompute'] as $val) {
          if ($data['search']['sort'] == $val) {
             $ORDER = $this->addOrderBy(
-               $data['itemtype'],
                $data['search']['sort'],
                $data['search']['order']
             );
@@ -888,10 +909,10 @@ class Search {
                                                $ctable, $tmpquery);
                      $query_num  = str_replace($data['itemtype'], $ctype, $query_num);
 
-                     if ($sub_item !== false && method_exists($sub_item['sub_item'], 'addSubSelect')) {
-                        $sub = $sub_item['sub_item'];
+                     if ($this->sub_item !== false && method_exists($this->sub_item['sub_item'], 'addSubSelect')) {
+                        $sub = $this->sub_item['sub_item'];
                         $sub_select = $sub::addSubSelect(
-                           $sub_item['item'],
+                           $this->sub_item['item'],
                            $ctype
                         );
                         $query_num .= "AND $ctable.id IN ($sub_select)";
@@ -987,10 +1008,10 @@ class Search {
                if ($data['itemtype'] == 'AllAssets') {
                   $tmpquery = "$SELECT, '$ctype' AS TYPE $FROM $NOSUBWHERE";
 
-                  if ($sub_item !== false && method_exists($sub_item['sub_item'], 'addSubSelect')) {
-                     $sub = $sub_item['sub_item'];
+                  if ($this->sub_item !== false && method_exists($this->sub_item['sub_item'], 'addSubSelect')) {
+                     $sub = $this->sub_item['sub_item'];
                      $sub_select = $sub::addSubSelect(
-                        $sub_item['item'],
+                        $this->sub_item['item'],
                         $ctype
                      );
                      $tmpquery .= "AND $ctable.id IN ($sub_select)";
@@ -1315,8 +1336,7 @@ class Search {
                                         $already_link_tables,
                                         $sopt["joinparams"]);
 
-         $FROM .= $this->addLeftJoin($m_itemtype,
-                                    $m_itemtype::getTable(),
+         $FROM .= $this->addLeftJoin($m_itemtype::getTable(),
                                     $already_link_tables, $sopt["table"],
                                     $sopt["linkfield"], 1, $m_itemtype,
                                     $sopt["joinparams"], $sopt["field"]);
@@ -1648,7 +1668,6 @@ class Search {
       }
 
       $search     = $data['search'];
-      $itemtype   = $data['itemtype'];
       $item       = $data['item'];
       $is_deleted = $search['is_deleted'];
 
@@ -1688,19 +1707,19 @@ class Search {
          'start'               => $search['start'] ?? 0,
          'limit'               => $_SESSION['glpilist_limit'],
          'count'               => $data['data']['totalcount'] ?? 0,
-         'itemtype'            => $itemtype,
+         'itemtype'            => $this->itemtype,
          'href'                => $href,
          'is_tab'              => $this->sub_item !== false,
          'prehref'             => $prehref,
          'posthref'            => $globallinkto,
          'showmassiveactions'  => ($search['showmassiveactions'] ?? true)
                                   && $data['display_type'] != self::GLOBAL_SEARCH
-                                  && ($itemtype == 'AllAssets'
+                                  && ($this->itemtype == 'AllAssets'
                                     || count(MassiveAction::getAllMassiveActions($item, $is_deleted))
                                   ),
          'massiveactionparams' => $data['search']['massiveactionparams'] + [
                                     'is_deleted' => $is_deleted,
-                                    'container'  => "massform$itemtype",
+                                    'container'  => "massform{$this->itemtype}",
                                   ],
          'can_config'          => Session::haveRightsOr('search_config', [
             DisplayPreference::PERSONAL,
@@ -2233,12 +2252,11 @@ class Search {
     *
     * Params need to parsed before using Search::manageParams function
     *
-    * @param string $itemtype  Type to display the form
-    * @param array  $params    Array of parameters may include sort, is_deleted, criteria, metacriteria
-    *
     * @return void
+    *
+    * @since 10.0.0 method is no longer static, $itemtype and $params have been removed
    **/
-   static function showGenericSearch($itemtype, array $params) {
+   public function showGenericSearch() {
       global $CFG_GLPI;
 
       // Default values of parameters
@@ -2247,10 +2265,10 @@ class Search {
       $p['as_map']       = 0;
       $p['criteria']     = [];
       $p['metacriteria'] = [];
-      if (class_exists($itemtype)) {
-         $p['target']       = $itemtype::getSearchURL();
+      if (class_exists($this->itemtype)) {
+         $p['target']       = $this->itemtype::getSearchURL();
       } else {
-         $p['target']       = Toolbox::getItemTypeSearchURL($itemtype);
+         $p['target']       = Toolbox::getItemTypeSearchURL($this->itemtype);
       }
       $p['showreset']    = true;
       $p['showbookmark'] = true;
@@ -2261,7 +2279,7 @@ class Search {
       $p['actionname']   = 'search';
       $p['actionvalue']  = _sx('button', 'Search');
 
-      foreach ($params as $key => $val) {
+      foreach ($this->params as $key => $val) {
          $p[$key] = $val;
       }
 
@@ -2269,7 +2287,7 @@ class Search {
       $main_block_class = '';
       $card_class = 'search-form card card-sm mb-4';
       if ($p['mainform']) {
-         echo "<form name='searchform$itemtype'  class='search-form-container' method='get' action='".$p['target']."'>";
+         echo "<form name='searchform{$this->itemtype}'  class='search-form-container' method='get' action='".$p['target']."'>";
       } else {
          $main_block_class = "sub_criteria";
          $card_class = 'border d-inline-block ms-1';
@@ -2278,8 +2296,8 @@ class Search {
       echo "<div class='$card_class' $display>";
 
       echo "<div id='searchcriteria$rand_criteria' class='$main_block_class' >";
-      $nbsearchcountvar      = 'nbcriteria'.strtolower($itemtype).mt_rand();
-      $searchcriteriatableid = 'criteriatable'.strtolower($itemtype).mt_rand();
+      $nbsearchcountvar      = 'nbcriteria'.strtolower($this->itemtype).mt_rand();
+      $searchcriteriatableid = 'criteriatable'.strtolower($this->itemtype).mt_rand();
       // init criteria count
       echo Html::scriptBlock("
          var $nbsearchcountvar = ".count($p['criteria']).";
@@ -2291,7 +2309,7 @@ class Search {
       $i = 0;
       foreach (array_keys($p['criteria']) as $i) {
          self::displayCriteria([
-            'itemtype' => $itemtype,
+            'itemtype' => $this->itemtype,
             'num'      => $i,
             'p'        => $p
          ]);
@@ -2312,7 +2330,7 @@ class Search {
       }
 
       echo "<div class='card-footer d-flex search_actions'>";
-      $linked = self::getMetaItemtypeAvailable($itemtype);
+      $linked = self::getMetaItemtypeAvailable($this->itemtype);
       echo "<button id='addsearchcriteria$rand_criteria' class='btn btn-sm btn-outline-secondary me-1' type='button'>
                <i class='fas fa-plus-square'></i>
                <span class='d-none d-sm-block'>".__s('rule')."</span>
@@ -2339,7 +2357,7 @@ class Search {
             if ($p['showbookmark']) {
                SavedSearch::showSaveButton(
                   SavedSearch::SEARCH,
-                  $itemtype,
+                  $this->itemtype,
                   isset($_GET['savedsearches_id'])
                );
             }
@@ -2358,16 +2376,16 @@ class Search {
       echo "</div>"; //.search_actions
 
       // idor checks
-      $idor_display_criteria       = Session::getNewIDORToken($itemtype);
-      $idor_display_meta_criteria  = Session::getNewIDORToken($itemtype);
-      $idor_display_criteria_group = Session::getNewIDORToken($itemtype);
+      $idor_display_criteria       = Session::getNewIDORToken($this->itemtype);
+      $idor_display_meta_criteria  = Session::getNewIDORToken($this->itemtype);
+      $idor_display_criteria_group = Session::getNewIDORToken($this->itemtype);
 
       $JS = <<<JAVASCRIPT
          $('#addsearchcriteria$rand_criteria').on('click', function(event) {
             event.preventDefault();
             $.post('{$CFG_GLPI['root_doc']}/ajax/search.php', {
                'action': 'display_criteria',
-               'itemtype': '$itemtype',
+               'itemtype': '{$this->itemtype}',
                'num': $nbsearchcountvar,
                'p': $json_p,
                '_idor_token': '$idor_display_criteria'
@@ -2382,7 +2400,7 @@ class Search {
             event.preventDefault();
             $.post('{$CFG_GLPI['root_doc']}/ajax/search.php', {
                'action': 'display_meta_criteria',
-               'itemtype': '$itemtype',
+               'itemtype': '{$this->itemtype}',
                'meta': true,
                'num': $nbsearchcountvar,
                'p': $json_p,
@@ -2398,7 +2416,7 @@ class Search {
             event.preventDefault();
             $.post('{$CFG_GLPI['root_doc']}/ajax/search.php', {
                'action': 'display_criteria_group',
-               'itemtype': '$itemtype',
+               'itemtype': '{$this->itemtype}',
                'meta': true,
                'num': $nbsearchcountvar,
                'p': $json_p,
@@ -2440,7 +2458,7 @@ JAVASCRIPT;
 
       if ($p['mainform']) {
          // For dropdown
-         echo Html::hidden('itemtype', ['value' => $itemtype]);
+         echo Html::hidden('itemtype', ['value' => $this->itemtype]);
          // Reset to start when submit new search
          echo Html::hidden('start', ['value'    => 0]);
       }
@@ -2622,7 +2640,7 @@ JAVASCRIPT;
          'num'         => $num,
          'p'           => $p,
       ];
-      Search::displaySearchoption($params);
+      self::displaySearchoption($params);
       echo "</div>";
 
       Ajax::updateItemOnSelectEvent(
@@ -2800,7 +2818,8 @@ JAVASCRIPT;
       ];
 
       echo "<div class='col-auto'>";
-      echo self::showGenericSearch($request['itemtype'], $params);
+      $inst = new self($request['itemtype'], $params);
+      echo $inst->showGenericSearch();
       echo "</div>";
 
       echo "</div>";//.row
@@ -3242,22 +3261,21 @@ JAVASCRIPT;
     *
     * @since 9.4: $key param has been dropped
     *
-    * @param string  $itemtype  ID of the device type
     * @param integer $ID        field to add
     * @param string  $order     order define
     *
     * @return select string
     *
-    * @since 10.0.0 Method is no longer static
+    * @since 10.0.0 Method is no longer static, $itemtype param has been removed
    **/
-   public function addOrderBy($itemtype, $ID, $order) {
+   public function addOrderBy($ID, $order) {
       global $CFG_GLPI;
 
       // Security test for order
       if ($order != "ASC") {
          $order = "DESC";
       }
-      $searchopt = &self::getOptions($itemtype);
+      $searchopt = &self::getOptions($this->itemtype);
 
       $table     = $searchopt[$ID]["table"];
       $field     = $searchopt[$ID]["field"];
@@ -3266,7 +3284,7 @@ JAVASCRIPT;
 
       $is_fkey_composite_on_self = getTableNameForForeignKeyField($searchopt[$ID]["linkfield"]) == $table
          && $searchopt[$ID]["linkfield"] != getForeignKeyFieldForTable($table);
-      $orig_table = self::getOrigTableName($itemtype);
+      $orig_table = self::getOrigTableName($this->itemtype);
       if (($is_fkey_composite_on_self || $table != $orig_table)
           && ($searchopt[$ID]["linkfield"] != getForeignKeyFieldForTable($table))) {
          $addtable .= "_".$searchopt[$ID]["linkfield"];
@@ -3280,16 +3298,16 @@ JAVASCRIPT;
          }
       }
 
-      if (isset($CFG_GLPI["union_search_type"][$itemtype])) {
-         return " ORDER BY `ITEM_{$itemtype}_{$ID}` $order ";
+      if (isset($CFG_GLPI["union_search_type"][$this->itemtype])) {
+         return " ORDER BY `ITEM_{$this->itemtype}_{$ID}` $order ";
       }
 
       // Plugin can override core definition for its type
-      if ($plug = isPluginItemType($itemtype)) {
+      if ($plug = isPluginItemType($this->itemtype)) {
          $out = Plugin::doOneHook(
             $plug['plugin'],
             'addOrderBy',
-            $itemtype, $ID, $order, "{$itemtype}_{$ID}"
+            $this->itemtype, $ID, $order, "{$this->itemtype}_{$ID}"
          );
          if (!empty($out)) {
             return $out;
@@ -3308,7 +3326,7 @@ JAVASCRIPT;
                                  `name` $order ";
 
          case "glpi_users.name" :
-            if ($itemtype!='User') {
+            if ($this->itemtype!='User') {
                if ($_SESSION["glpinames_format"] == User::FIRSTNAME_BEFORE) {
                   $name1 = 'firstname';
                   $name2 = 'realname';
@@ -3336,7 +3354,7 @@ JAVASCRIPT;
             $out = Plugin::doOneHook(
                $plug,
                'addOrderBy',
-               $itemtype, $ID, $order, "{$itemtype}_{$ID}"
+               $this->itemtype, $ID, $order, "{$this->itemtype}_{$ID}"
             );
             if (!empty($out)) {
                return $out;
@@ -3364,45 +3382,45 @@ JAVASCRIPT;
          }
       }
 
-      return " ORDER BY `ITEM_{$itemtype}_{$ID}` $order ";
+      return " ORDER BY `ITEM_{$this->itemtype}_{$ID}` $order ";
    }
 
 
    /**
     * Generic Function to add default columns to view
     *
-    * @param string $itemtype device type
-    * @param array  $params   array of parameters
-    *
     * @return array
+    *
+    * @since 10.0.0 method is no longer static, $itemtype and $params have been removed
    **/
-   static function addDefaultToView($itemtype, $params) {
+   public function addDefaultToView() {
       global $CFG_GLPI;
 
       $toview = [];
       $item   = null;
       $entity_check = true;
 
-      if ($itemtype != 'AllAssets') {
-         $item = getItemForItemtype($itemtype);
-         $entity_check = $item->isEntityAssign();
+      if ($this->itemtype != 'AllAssets') {
+         $entity_check = $this->item->isEntityAssign();
       }
       // Add first element (name)
       array_push($toview, 1);
 
-      if (isset($params['as_map']) && $params['as_map'] == 1) {
+      if (isset($this->params['as_map']) && $this->params['as_map'] == 1) {
          // Add location name when map mode
-         array_push($toview, ($itemtype == 'Location' ? 1 : ($itemtype == 'Ticket' ? 83 : 3)));
+         array_push($toview, ($this->itemtype == 'Location' ? 1 : ($this->itemtype == 'Ticket' ? 83 : 3)));
       }
 
       // Add entity view :
       if (Session::isMultiEntitiesMode()
           && $entity_check
-          && (isset($CFG_GLPI["union_search_type"][$itemtype])
-              || ($item && $item->maybeRecursive())
+          && (isset($CFG_GLPI["union_search_type"][$this->itemtype])
+              || ($this->item && $this->item->maybeRecursive())
               || isset($_SESSION['glpiactiveentities']) && (count($_SESSION["glpiactiveentities"]) > 1))) {
          array_push($toview, 80);
       }
+
+      $this->toview = $toview;
       return $toview;
    }
 
@@ -3410,24 +3428,18 @@ JAVASCRIPT;
    /**
     * Generic Function to add default select to a request
     *
-    * @param string $itemtype device type
-    *
     * @return string Select SQL string
     *
-    * @since 10.0.0 Method is no longer static
+    * @since 10.0.0 Method is no longer static, $itemtype param has been removed
    **/
-   public function addDefaultSelect($itemtype) {
+   public function addDefaultSelect() {
       global $DB;
 
-      $itemtable = self::getOrigTableName($itemtype);
+      $itemtable = self::getOrigTableName($this->itemtype);
       $item      = null;
-      $mayberecursive = false;
-      if ($itemtype != 'AllAssets') {
-         $item           = getItemForItemtype($itemtype);
-         $mayberecursive = $item->maybeRecursive();
-      }
+      $mayberecursive = ($this->item && $this->item->maybeRecursive());
       $ret = "";
-      switch ($itemtype) {
+      switch ($this->itemtype) {
 
          case 'FieldUnicity' :
             $ret = "`glpi_fieldunicities`.`itemtype` AS ITEMTYPE,";
@@ -3435,21 +3447,21 @@ JAVASCRIPT;
 
          default :
             // Plugin can override core definition for its type
-            if ($plug = isPluginItemType($itemtype)) {
+            if ($plug = isPluginItemType($this->itemtype)) {
                $ret = Plugin::doOneHook(
                   $plug['plugin'],
                   'addDefaultSelect',
-                  $itemtype
+                  $this->itemtype
                );
             }
       }
       if ($itemtable == 'glpi_entities') {
          $ret .= "`$itemtable`.`id` AS entities_id, '1' AS is_recursive, ";
       } else if ($mayberecursive) {
-         if ($item->isField('entities_id')) {
+         if ($this->item->isField('entities_id')) {
             $ret .= $DB->quoteName("$itemtable.entities_id").", ";
          }
-         if ($item->isField('is_recursive')) {
+         if ($this->item->isField('is_recursive')) {
             $ret .= $DB->quoteName("$itemtable.is_recursive").", ";
          }
       }
@@ -3825,16 +3837,14 @@ JAVASCRIPT;
    /**
     * Generic Function to add default where to a request
     *
-    * @param string $itemtype device type
-    *
     * @return string
     *
-    * @since 10.0.0 Method is no longer static
+    * @since 10.0.0 Method is no longer static, $itemtype parameter has been removed
    **/
-   public function addDefaultWhere($itemtype) {
+   public function addDefaultWhere() {
       $condition = '';
 
-      switch ($itemtype) {
+      switch ($this->itemtype) {
          case 'Reminder' :
             $condition = Reminder::addVisibilityRestrict();
             break;
@@ -3895,7 +3905,7 @@ JAVASCRIPT;
             if (!Session::haveRight("ticket", Ticket::READALL)) {
 
                $searchopt
-                  = &self::getOptions($itemtype);
+                  = &self::getOptions($this->itemtype);
                $requester_table
                   = '`glpi_tickets_users_'.
                      self::computeComplexJoinID($searchopt[4]['joinparams']['beforejoin']
@@ -3970,20 +3980,20 @@ JAVASCRIPT;
 
          case 'Change' :
          case 'Problem':
-            if ($itemtype == 'Change') {
+            if ($this->itemtype == 'Change') {
                $right       = 'change';
                $table       = 'changes';
                $groupetable = "glpi_changes_groups_";
-            } else if ($itemtype == 'Problem') {
+            } else if ($this->itemtype == 'Problem') {
                $right       = 'problem';
                $table       = 'problems';
                $groupetable = "glpi_groups_problems_";
             }
             // Same structure in addDefaultJoin
             $condition = '';
-            if (!Session::haveRight("$right", $itemtype::READALL)) {
-               $searchopt       = &self::getOptions($itemtype);
-               if (Session::haveRight("$right", $itemtype::READMY)) {
+            if (!Session::haveRight("$right", $this->itemtype::READALL)) {
+               $searchopt       = &self::getOptions($this->itemtype);
+               if (Session::haveRight("$right", $this->itemtype::READMY)) {
                   $requester_table      = $this->db->quoteName('glpi_'.$table.'_users_'.
                                           self::computeComplexJoinID($searchopt[4]['joinparams']
                                                                      ['beforejoin']['joinparams']));
@@ -4007,7 +4017,7 @@ JAVASCRIPT;
                }
                $condition = "(";
 
-               if (Session::haveRight("$right", $itemtype::READMY)) {
+               if (Session::haveRight("$right", $this->itemtype::READMY)) {
                   $condition .= " $requester_table.users_id = '".Session::getLoginUserID()."'
                                  OR $observer_table.users_id = '".Session::getLoginUserID()."'
                                  OR $assign_table.users_id = '".Session::getLoginUserID()."'
@@ -4117,14 +4127,14 @@ JAVASCRIPT;
 
          default :
             // Plugin can override core definition for its type
-            if ($plug = isPluginItemType($itemtype)) {
-               $condition = Plugin::doOneHook($plug['plugin'], 'addDefaultWhere', $itemtype);
+            if ($plug = isPluginItemType($this->itemtype)) {
+               $condition = Plugin::doOneHook($plug['plugin'], 'addDefaultWhere', $this->itemtype);
             }
             break;
       }
 
       /* Hook to restrict user right on current itemtype */
-      list($itemtype, $condition) = Plugin::doHookFunction('add_default_where', [$itemtype, $condition]);
+      list($itemtype, $condition) = Plugin::doHookFunction('add_default_where', [$this->itemtype, $condition]);
       return $condition;
    }
 
@@ -4786,21 +4796,20 @@ JAVASCRIPT;
    /**
     * Generic Function to add Default left join to a request
     *
-    * @param string $itemtype             Reference item type
     * @param string $ref_table            Reference table
     * @param array &$already_link_tables  Array of tables already joined
     *
     * @return string Left join SQL string
     *
-    * @since 10.0.0 Method is no longer static
+    * @since 10.0.0 Method is no longer static, $itemtype parameter has been removed
    **/
-   public function addDefaultJoin($itemtype, $ref_table, array &$already_link_tables) {
+   public function addDefaultJoin($ref_table, array &$already_link_tables) {
       $out = '';
 
-      switch ($itemtype) {
+      switch ($this->itemtype) {
          // No link
          case 'User' :
-            $out = $this->addLeftJoin($itemtype, $ref_table, $already_link_tables,
+            $out = $this->addLeftJoin($ref_table, $already_link_tables,
                                      "glpi_profiles_users", "profiles_users_id", 0, 0,
                                      ['jointype' => 'child']);
             break;
@@ -4815,9 +4824,9 @@ JAVASCRIPT;
 
          case 'ProjectTask' :
             // Same structure in addDefaultWhere
-            $out .= $this->addLeftJoin($itemtype, $ref_table, $already_link_tables,
+            $out .= $this->addLeftJoin($ref_table, $already_link_tables,
                                       "glpi_projects", "projects_id");
-            $out .= $this->addLeftJoin($itemtype, $ref_table, $already_link_tables,
+            $out .= $this->addLeftJoin($ref_table, $already_link_tables,
                                       "glpi_projecttaskteams", "projecttaskteams_id", 0, 0,
                                       ['jointype' => 'child']);
             break;
@@ -4825,7 +4834,7 @@ JAVASCRIPT;
          case 'Project' :
             // Same structure in addDefaultWhere
             if (!Session::haveRight("project", Project::READALL)) {
-               $out .= $this->addLeftJoin($itemtype, $ref_table, $already_link_tables,
+               $out .= $this->addLeftJoin($ref_table, $already_link_tables,
                                           "glpi_projectteams", "projectteams_id", 0, 0,
                                           ['jointype' => 'child']);
             }
@@ -4834,16 +4843,16 @@ JAVASCRIPT;
          case 'Ticket' :
             // Same structure in addDefaultWhere
             if (!Session::haveRight("ticket", Ticket::READALL)) {
-               $searchopt = &$this->getOptions($itemtype);
+               $searchopt = &$this->getOptions($this->itemtype);
 
                // show mine : requester
-               $out .= $this->addLeftJoin($itemtype, $ref_table, $already_link_tables,
+               $out .= $this->addLeftJoin($ref_table, $already_link_tables,
                                          "glpi_tickets_users", "tickets_users_id", 0, 0,
                                          $searchopt[4]['joinparams']['beforejoin']['joinparams']);
 
                if (Session::haveRight("ticket", Ticket::READGROUP)) {
                   if (count($_SESSION['glpigroups'])) {
-                     $out .= $this->addLeftJoin($itemtype, $ref_table, $already_link_tables,
+                     $out .= $this->addLeftJoin($ref_table, $already_link_tables,
                                                "glpi_groups_tickets", "groups_tickets_id", 0, 0,
                                                $searchopt[71]['joinparams']['beforejoin']
                                                          ['joinparams']);
@@ -4851,29 +4860,29 @@ JAVASCRIPT;
                }
 
                // show mine : observer
-               $out .= $this->addLeftJoin($itemtype, $ref_table, $already_link_tables,
+               $out .= $this->addLeftJoin($ref_table, $already_link_tables,
                                          "glpi_tickets_users", "tickets_users_id", 0, 0,
                                          $searchopt[66]['joinparams']['beforejoin']['joinparams']);
 
                if (count($_SESSION['glpigroups'])) {
-                  $out .= $this->addLeftJoin($itemtype, $ref_table, $already_link_tables,
+                  $out .= $this->addLeftJoin($ref_table, $already_link_tables,
                                             "glpi_groups_tickets", "groups_tickets_id", 0, 0,
                                             $searchopt[65]['joinparams']['beforejoin']['joinparams']);
                }
 
                if (Session::haveRight("ticket", Ticket::OWN)) { // Can own ticket : show assign to me
-                  $out .= $this->addLeftJoin($itemtype, $ref_table, $already_link_tables,
+                  $out .= $this->addLeftJoin($ref_table, $already_link_tables,
                                             "glpi_tickets_users", "tickets_users_id", 0, 0,
                                             $searchopt[5]['joinparams']['beforejoin']['joinparams']);
                }
 
                if (Session::haveRightsOr("ticket", [Ticket::READMY, Ticket::READASSIGN])) { // show mine + assign to me
-                  $out .= $this->addLeftJoin($itemtype, $ref_table, $already_link_tables,
+                  $out .= $this->addLeftJoin($ref_table, $already_link_tables,
                                             "glpi_tickets_users", "tickets_users_id", 0, 0,
                                             $searchopt[5]['joinparams']['beforejoin']['joinparams']);
 
                   if (count($_SESSION['glpigroups'])) {
-                     $out .= $this->addLeftJoin($itemtype, $ref_table, $already_link_tables,
+                     $out .= $this->addLeftJoin($ref_table, $already_link_tables,
                                                "glpi_groups_tickets", "groups_tickets_id", 0, 0,
                                                $searchopt[8]['joinparams']['beforejoin']
                                                          ['joinparams']);
@@ -4883,7 +4892,7 @@ JAVASCRIPT;
                if (Session::haveRightsOr('ticketvalidation',
                                          [TicketValidation::VALIDATEINCIDENT,
                                                TicketValidation::VALIDATEREQUEST])) {
-                  $out .= $this->addLeftJoin($itemtype, $ref_table, $already_link_tables,
+                  $out .= $this->addLeftJoin($ref_table, $already_link_tables,
                                             "glpi_ticketvalidations", "ticketvalidations_id", 0, 0,
                                             $searchopt[58]['joinparams']['beforejoin']['joinparams']);
                }
@@ -4892,12 +4901,12 @@ JAVASCRIPT;
 
          case 'Change' :
          case 'Problem' :
-            if ($itemtype == 'Change') {
+            if ($this->itemtype == 'Change') {
                $right       = 'change';
                $table       = 'changes';
                $groupetable = "glpi_changes_groups";
                $linkfield   = "changes_groups_id";
-            } else if ($itemtype == 'Problem') {
+            } else if ($this->itemtype == 'Problem') {
                $right       = 'problem';
                $table       = 'problems';
                $groupetable = "glpi_groups_problems";
@@ -4906,36 +4915,36 @@ JAVASCRIPT;
 
             // Same structure in addDefaultWhere
             $out = '';
-            if (!Session::haveRight("$right", $itemtype::READALL)) {
-               $searchopt = &self::getOptions($itemtype);
+            if (!Session::haveRight("$right", $this->itemtype::READALL)) {
+               $searchopt = &self::getOptions($this->itemtype);
 
-               if (Session::haveRight("$right", $itemtype::READMY)) {
+               if (Session::haveRight("$right", $this->itemtype::READMY)) {
                   // show mine : requester
-                  $out .= $this->addLeftJoin($itemtype, $ref_table, $already_link_tables,
+                  $out .= $this->addLeftJoin($ref_table, $already_link_tables,
                                             "glpi_".$table."_users", $table."_users_id", 0, 0,
                                             $searchopt[4]['joinparams']['beforejoin']['joinparams']);
                   if (count($_SESSION['glpigroups'])) {
-                     $out .= $this->addLeftJoin($itemtype, $ref_table, $already_link_tables,
+                     $out .= $this->addLeftJoin($ref_table, $already_link_tables,
                                                $groupetable, $linkfield, 0, 0,
                                                $searchopt[71]['joinparams']['beforejoin']['joinparams']);
                   }
 
                   // show mine : observer
-                  $out .= $this->addLeftJoin($itemtype, $ref_table, $already_link_tables,
+                  $out .= $this->addLeftJoin($ref_table, $already_link_tables,
                                             "glpi_".$table."_users", $table."_users_id", 0, 0,
                                             $searchopt[66]['joinparams']['beforejoin']['joinparams']);
                   if (count($_SESSION['glpigroups'])) {
-                     $out .= $this->addLeftJoin($itemtype, $ref_table, $already_link_tables,
+                     $out .= $this->addLeftJoin($ref_table, $already_link_tables,
                                                $groupetable, $linkfield, 0, 0,
                                                $searchopt[65]['joinparams']['beforejoin']['joinparams']);
                   }
 
                   // show mine : assign
-                  $out .= $this->addLeftJoin($itemtype, $ref_table, $already_link_tables,
+                  $out .= $this->addLeftJoin($ref_table, $already_link_tables,
                                             "glpi_".$table."_users", $table."_users_id", 0, 0,
                                             $searchopt[5]['joinparams']['beforejoin']['joinparams']);
                   if (count($_SESSION['glpigroups'])) {
-                     $out .= $this->addLeftJoin($itemtype, $ref_table, $already_link_tables,
+                     $out .= $this->addLeftJoin($ref_table, $already_link_tables,
                                                $groupetable, $linkfield, 0, 0,
                                                $searchopt[8]['joinparams']['beforejoin']['joinparams']);
                   }
@@ -4945,7 +4954,8 @@ JAVASCRIPT;
 
          default :
             // Plugin can override core definition for its type
-            if ($plug = isPluginItemType($itemtype)) {
+            if ($plug = isPluginItemType($this->itemtype)) {
+               $itemtype = $this->itemtype;
                $plugin_name   = $plug['plugin'];
                $hook_function = 'plugin_' . strtolower($plugin_name) . '_addDefaultJoin';
                $hook_closure  = function () use ($hook_function, $itemtype, $ref_table, &$already_link_tables) {
@@ -4958,7 +4968,7 @@ JAVASCRIPT;
             break;
       }
 
-      list($itemtype, $out) = Plugin::doHookFunction('add_default_join', [$itemtype, $out]);
+      list($itemtype, $out) = Plugin::doHookFunction('add_default_join', [$this->itemtype, $out]);
       return $out;
    }
 
@@ -4966,7 +4976,6 @@ JAVASCRIPT;
    /**
     * Generic Function to add left join to a request
     *
-    * @param string  $itemtype             Item type
     * @param string  $ref_table            Reference table
     * @param array   $already_link_tables  Array of tables already joined
     * @param string  $new_table            New table to join
@@ -4978,9 +4987,9 @@ JAVASCRIPT;
     *
     * @return string Left join string
     *
-    * @since 10.0.0 Method is no longer static
+    * @since 10.0.0 Method is no longer static, $itemtype param has been removed
    **/
-   public function addLeftJoin($itemtype, $ref_table, array &$already_link_tables, $new_table,
+   public function addLeftJoin($ref_table, array &$already_link_tables, $new_table,
                                $linkfield, $meta = 0, $meta_type = 0, $joinparams = [], $field = '') {
 
       // Rename table for meta left join
@@ -5049,7 +5058,8 @@ JAVASCRIPT;
       $specific_leftjoin = '';
 
       // Plugin can override core definition for its type
-      if ($plug = isPluginItemType($itemtype)) {
+      if ($plug = isPluginItemType($this->itemtype)) {
+         $itemtype = $this->itemtype;
          $plugin_name   = $plug['plugin'];
          $hook_function = 'plugin_' . strtolower($plugin_name) . '_addLeftJoin';
          $hook_closure  = function () use ($hook_function, $itemtype, $ref_table, $new_table, $linkfield, &$already_link_tables) {
@@ -5064,6 +5074,7 @@ JAVASCRIPT;
       if (empty($specific_leftjoin)
           && preg_match("/^glpi_plugin_([a-z0-9]+)/", $new_table, $matches)) {
          if (count($matches) == 2) {
+            $itemtype = $this->itemtype;
             $plugin_name   = $matches[1];
             $hook_function = 'plugin_' . strtolower($plugin_name) . '_addLeftJoin';
             $hook_closure  = function () use ($hook_function, $itemtype, $ref_table, $new_table, $linkfield, &$already_link_tables) {
@@ -5096,7 +5107,7 @@ JAVASCRIPT;
                   if (isset($tab['joinparams'])) {
                      $interjoinparams = $tab['joinparams'];
                   }
-                  $before .= $this->addLeftJoin($itemtype, $rt, $already_link_tables, $intertable,
+                  $before .= $this->addLeftJoin($rt, $already_link_tables, $intertable,
                                                $interlinkfield, $meta, $meta_type, $interjoinparams);
                }
 
@@ -5138,10 +5149,10 @@ JAVASCRIPT;
                case "glpi_auth_tables" :
                      $user_searchopt     = self::getOptions('User');
 
-                     $specific_leftjoin  = $this->addLeftJoin($itemtype, $rt, $already_link_tables,
+                     $specific_leftjoin  = $this->addLeftJoin($rt, $already_link_tables,
                                                              "glpi_authldaps", 'auths_id', 0, 0,
                                                              $user_searchopt[30]['joinparams']);
-                     $specific_leftjoin .= $this->addLeftJoin($itemtype, $rt, $already_link_tables,
+                     $specific_leftjoin .= $this->addLeftJoin($rt, $already_link_tables,
                                                              "glpi_authmails", 'auths_id', 0, 0,
                                                              $user_searchopt[31]['joinparams']);
                      break;
@@ -5189,7 +5200,7 @@ JAVASCRIPT;
                   if (!isset($addmain)) {
                      $addmain = '';
                   }
-                  $used_itemtype = $itemtype;
+                  $used_itemtype = $this->itemtype;
                   if (isset($joinparams['specific_itemtype'])
                       && !empty($joinparams['specific_itemtype'])) {
                      $used_itemtype = $joinparams['specific_itemtype'];
@@ -5205,7 +5216,7 @@ JAVASCRIPT;
                   if (!isset($addmain)) {
                      $addmain = '';
                   }
-                  $used_itemtype = $itemtype;
+                  $used_itemtype = $this->itemtype;
                   if (isset($joinparams['specific_itemtype'])
                       && !empty($joinparams['specific_itemtype'])) {
                      $used_itemtype = $joinparams['specific_itemtype'];
@@ -5218,7 +5229,7 @@ JAVASCRIPT;
                   break;
 
                case "itemtypeonly" :
-                  $used_itemtype = $itemtype;
+                  $used_itemtype = $this->itemtype;
                   if (isset($joinparams['specific_itemtype'])
                       && !empty($joinparams['specific_itemtype'])) {
                      $used_itemtype = $joinparams['specific_itemtype'];
@@ -5512,7 +5523,7 @@ JAVASCRIPT;
     * @param array   $data     array retrieved data array
     *
     * @return string String to print
-   **/
+    */
    static function displayConfigItem($itemtype, $ID, $data = []) {
 
       $searchopt  = &self::getOptions($itemtype);
@@ -6634,15 +6645,15 @@ JAVASCRIPT;
    /**
     * Completion of the URL $_GET values with the $_SESSION values or define default values
     *
-    * @param string  $itemtype        Item type to manage
-    * @param array   $params          Params to parse
     * @param boolean $usesession      Use datas save in session (true by default)
     * @param boolean $forcebookmark   Force trying to load parameters from default bookmark:
     *                                  used for global search (false by default)
     *
     * @return array parsed params
+    *
+    * @since 10.0.0 Remove $itemtype and $params parameters
    **/
-   static function manageParams($itemtype, $params = [], $usesession = true,
+   public function manageParams($usesession = true,
                                 $forcebookmark = false) {
       $default_values = [];
 
@@ -6652,11 +6663,12 @@ JAVASCRIPT;
       $default_values["is_deleted"]  = 0;
       $default_values["as_map"]      = 0;
 
+      $params = $this->raw_params;
       if (isset($params['start'])) {
          $params['start'] = (int)$params['start'];
       }
 
-      $default_values["criteria"]     = self::getDefaultCriteria($itemtype);
+      $default_values["criteria"]     = self::getDefaultCriteria($this->itemtype);
       $default_values["metacriteria"] = [];
 
       // Reorg search array
@@ -6675,17 +6687,17 @@ JAVASCRIPT;
       //                                  searchtype =>
       //                                  value =>   (contains)
 
-      if (($itemtype != 'AllAssets')
-          && class_exists($itemtype)) {
+      if (($this->itemtype != 'AllAssets')
+          && class_exists($this->itemtype)) {
 
          // retrieve default values for current itemtype
          $itemtype_default_values = [];
-         if (method_exists($itemtype, 'getDefaultSearchRequest')) {
-            $itemtype_default_values = call_user_func([$itemtype, 'getDefaultSearchRequest']);
+         if (method_exists($this->itemtype, 'getDefaultSearchRequest')) {
+            $itemtype_default_values = call_user_func([$this->itemtype, 'getDefaultSearchRequest']);
          }
 
          // retrieve default values for the current user
-         $user_default_values = SavedSearch_User::getDefault(Session::getLoginUserID(), $itemtype);
+         $user_default_values = SavedSearch_User::getDefault(Session::getLoginUserID(), $this->itemtype);
          if ($user_default_values === false) {
             $user_default_values = [];
          }
@@ -6706,11 +6718,11 @@ JAVASCRIPT;
       if ($forcebookmark
           || ($usesession
               && !isset($params["reset"])
-              && !isset($_SESSION['glpisearch'][$itemtype]))) {
+              && !isset($_SESSION['glpisearch'][$this->itemtype]))) {
 
-         $user_default_values = SavedSearch_User::getDefault(Session::getLoginUserID(), $itemtype);
+         $user_default_values = SavedSearch_User::getDefault(Session::getLoginUserID(), $this->itemtype);
          if ($user_default_values) {
-            $_SESSION['glpisearch'][$itemtype] = [];
+            $_SESSION['glpisearch'][$this->itemtype] = [];
             // Only get datas for bookmarks
             if ($forcebookmark) {
                $params = $user_default_values;
@@ -6748,15 +6760,15 @@ JAVASCRIPT;
 
       if ($usesession
           && isset($params["reset"])) {
-         if (isset($_SESSION['glpisearch'][$itemtype])) {
-            unset($_SESSION['glpisearch'][$itemtype]);
+         if (isset($_SESSION['glpisearch'][$this->itemtype])) {
+            unset($_SESSION['glpisearch'][$this->itemtype]);
          }
       }
 
       if (isset($params) && is_array($params)
           && $usesession) {
          foreach ($params as $key => $val) {
-            $_SESSION['glpisearch'][$itemtype][$key] = $val;
+            $_SESSION['glpisearch'][$this->itemtype][$key] = $val;
          }
       }
 
@@ -6765,15 +6777,16 @@ JAVASCRIPT;
          if (!isset($params[$key])) {
             if ($usesession
                 && ($key == 'is_deleted' || $key == 'as_map' || !isset($saved_params['criteria'])) // retrieve session only if not a new request
-                && isset($_SESSION['glpisearch'][$itemtype][$key])) {
-               $params[$key] = $_SESSION['glpisearch'][$itemtype][$key];
+                && isset($_SESSION['glpisearch'][$this->itemtype][$key])) {
+               $params[$key] = $_SESSION['glpisearch'][$this->itemtype][$key];
             } else {
                $params[$key]                    = $val;
-               $_SESSION['glpisearch'][$itemtype][$key] = $val;
+               $_SESSION['glpisearch'][$this->itemtype][$key] = $val;
             }
          }
       }
 
+      $this->params = $params;
       return $params;
    }
 
@@ -8046,5 +8059,16 @@ JAVASCRIPT;
     */
    public static function getOrigTableName(string $itemtype): string {
       return (is_a($itemtype, CommonDBTM::class, true)) ? $itemtype::getTable() : getTableForItemType($itemtype);
+   }
+
+   public function getParameters(): array {
+      return $this->params;
+   }
+
+   public function setParameters(array $params): self {
+      foreach ($params as $key => $value) {
+         $this->params[$key] = $value;
+      }
+      return $this;
    }
 }

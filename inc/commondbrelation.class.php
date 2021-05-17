@@ -1975,7 +1975,6 @@ abstract class CommonDBRelation extends CommonDBConnexity {
       $existing = [];
       $search = new Search($link->getType(), []);
       $join = $search->addLeftJoin(
-         $link_type,
          $link_table,
          $existing,
          static::getTable(),
