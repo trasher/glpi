@@ -1688,7 +1688,8 @@ HTML;
          'no_sort'            => true,
          'list_limit'         => $p['limit']
       ]);
-      Search::showList($p['itemtype'], $params);
+      $search = new Search($p['itemtype'], $params);
+      $search->showList($params);
       $search_result = ob_get_clean();
 
       $html = <<<HTML

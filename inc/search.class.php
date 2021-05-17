@@ -65,17 +65,22 @@ class Search {
    private $output_type = self::HTML_OUTPUT;
    static $search = [];
 
+   /** @var DB */
    private $db;
+   /** @var CommonDBTM|null */
    private $item;
+   /** @var string */
    private $itemtype;
+   /** @var array */
    private $raw_params;
+   /** @var bool */
    private $sub_item = false;
 
    /**
     * Constructor
     *
-    * @param CommonDBTM|null $item   Item instance
-    * @param array           $params Search parameters
+    * @param CommonDBTM|string $item   Item instance
+    * @param array             $params Search parameters
     */
    public function __construct($item, array $params) {
       global $DB;
@@ -101,8 +106,7 @@ class Search {
    **/
    public static function show($itemtype) {
       $params = self::manageParams($itemtype, $_GET);
-      $item = $itemtype == 'AllAssets' ? $itemtype : new $itemtype;
-      $inst = new self($item, $params);
+      $inst = new self($itemtype, $params);
       echo "<div class='search_page row'>";
       TemplateRenderer::getInstance()->display('layout/parts/saved_searches.html.twig', [
          'itemtype' => $itemtype,
@@ -115,11 +119,11 @@ class Search {
          $dashboard->show(true);
       }
 
-      $inst->showGenericSearch($itemtype, $params);
+      $inst::showGenericSearch($itemtype, $params);
       if ($params['as_map'] == 1) {
-         $inst->showMap($itemtype, $params);
+         $inst->showMap($params);
       } else {
-         $inst->showList($itemtype, $params);
+         $inst->showList($params);
       }
       echo "</div>";
       echo "</div>";
@@ -128,7 +132,6 @@ class Search {
    /**
     * Display result table for search engine for an type
     *
-    * @param string $itemtype Item type to manage
     * @param array  $params   Search params passed to prepareDatasForSearch function
     * @param array  $data     data if already processed
     *
@@ -136,10 +139,11 @@ class Search {
     *
     * @since 10.0.0 Method is no longer static
     * @since 10.0.0 Added $data parameter
+    * @since 10.0.0 Removed $itemtype parameter
    **/
-   public function showList($itemtype, $params, $data = []) {
+   public function showList($params, $data = []) {
       if (empty($data)) {
-         $data = $this->prepareDataForSearch($itemtype, $params);
+         $data = $this->prepareDataForSearch($params);
          $this->constructSQL($data);
          $this->constructData($data);
       }
@@ -163,7 +167,6 @@ class Search {
    /**
     * Display result table for search engine for an type as a map
     *
-    * @param string $itemtype Item type to manage
     * @param array  $params   Search params passed to prepareDatasForSearch function
     * @param array  $data     data if already processed
     *
@@ -171,14 +174,15 @@ class Search {
     *
     * @since 10.0.0 Method is no longer static
     * @since 10.0.0 Added $data parameter
+    * @since 10.0.0 Removed $itemtype parameter
    **/
-   public function showMap($itemtype, $params, $data = []) {
+   public function showMap($params, $data = []) {
       global $CFG_GLPI;
 
-      if ($itemtype == 'Location') {
+      if ($this->itemtype == 'Location') {
          $latitude = 21;
          $longitude = 20;
-      } else if ($itemtype == 'Entity') {
+      } else if ($this->itemtype == 'Entity') {
          $latitude = 67;
          $longitude = 68;
       } else {
@@ -199,7 +203,7 @@ class Search {
             'searchtype'   => 'contains',
             'value'        => 'NULL'
          ];
-         $data = $this->prepareDataForSearch($itemtype, $params);
+         $data = $this->prepareDataForSearch($params);
          $this->constructSQL($data);
          $this->constructData($data);
       }
@@ -212,7 +216,7 @@ class Search {
          array_pop($criteria);
          $criteria[] = [
             'link'         => 'AND',
-            'field'        => ($itemtype == 'Location' || $itemtype == 'Entity') ? 1 : (($itemtype == 'Ticket') ? 83 : 3),
+            'field'        => ($this->itemtype == 'Location' || $this->itemtype == 'Entity') ? 1 : (($this->itemtype == 'Ticket') ? 83 : 3),
             'searchtype'   => 'equals',
             'value'        => 'CURLOCATION'
          ];
@@ -231,15 +235,15 @@ class Search {
          } else {
             $fulltarget = $target."&".$parameters;
          }
-         $typename = class_exists($itemtype) ? $itemtype::getTypeName($data['data']['totalcount']) :
-                        ($itemtype == 'AllAssets' ? __('assets') : $itemtype);
+         $typename = class_exists($this->itemtype) ? $this->itemtype::getTypeName($data['data']['totalcount']) :
+                        ($this->itemtype == 'AllAssets' ? __('assets') : $this->itemtype);
 
          echo "<div class='card'>";
          echo "<div class='card-body' id='map_container'>";
          echo "<div class='card-title'>".__('Search results for localized items only')."</div>";
          $js = "$(function() {
                var map = initMap($('#map_container'), 'map', 'full');
-               _loadMap(map, '$itemtype');
+               _loadMap(map, '{$this->itemtype}');
             });
 
          var _loadMap = function(map_elt, itemtype) {
@@ -385,29 +389,28 @@ class Search {
     */
    public function getData($sub_item = false) {
       $this->sub_item = $sub_item;
-      $itemtype = ($this->item instanceof CommonDBTM ? $this->item->getType() : 'AllAssets');
       $params = self::manageParams($itemtype, $this->raw_params);
       if ($params['as_map'] == 1) {
          $params['criteria'][] = [
             'link'         => 'AND NOT',
-            'field'        => ($itemtype == 'Location') ? 21 : 998,
+            'field'        => ($this->itemtype == 'Location') ? 21 : 998,
             'searchtype'   => 'contains',
             'value'        => 'NULL'
          ];
          $params['criteria'][] = [
             'link'         => 'AND NOT',
-            'field'        => ($itemtype == 'Location') ? 20 : 999,
+            'field'        => ($this->itemtype == 'Location') ? 20 : 999,
             'searchtype'   => 'contains',
             'value'        => 'NULL'
          ];
       }
 
-      $data = $this->prepareDataForSearch($itemtype, $params, $this->sub_item);
+      $data = $this->prepareDataForSearch($params, $this->sub_item);
       $this->constructSQL($data, $this->sub_item);
       $this->constructData($data);
 
       if (!isset($data['data']['totalcount'])) {
-         Toolbox::logError("Something went wrong during $itemtype search");
+         Toolbox::logError("Something went wrong during {$this->itemtype} search");
          return;
       }
 
@@ -419,7 +422,6 @@ class Search {
     *
     * @since 0.85
     *
-    * @param string  $itemtype      Item type
     * @param array   $params        Array of parameters
     *                               may include sort, order, start, list_limit, deleted, criteria, metacriteria
     * @param array   $forcedisplay  Array of columns to display (default empty = empty use display pref and search criterias)
@@ -427,9 +429,9 @@ class Search {
     *
     * @return array prepare to be used for a search (include criteria and others needed information)
     *
-    * @since 10.0.0 Method has been renamed is no longer static, $forcedisplay has been removed
+    * @since 10.0.0 Method has been renamed is no longer static, $forcedisplay has been removed, $itemtype has been removed
    **/
-   public function prepareDataForSearch($itemtype, array $params, $sub_item = false) {
+   public function prepareDataForSearch(array $params, $sub_item = false) {
       global $CFG_GLPI;
 
       // Default values of parameters
@@ -440,10 +442,10 @@ class Search {
       $p['start']               = 0;//
       $p['is_deleted']          = 0;
       $p['export_all']          = 0;
-      if (class_exists($itemtype)) {
-         $p['target']       = $itemtype::getSearchURL();
+      if (class_exists($this->itemtype)) {
+         $p['target']       = $this->itemtype::getSearchURL();
       } else {
-         $p['target']       = Toolbox::getItemTypeSearchURL($itemtype);
+         $p['target']       = Toolbox::getItemTypeSearchURL($this->itemtype);
       }
       $p['display_type']        = self::HTML_OUTPUT;
       $p['showmassiveactions']  = true;
@@ -493,14 +495,14 @@ class Search {
 
       $data             = [];
       $data['search']   = $p;
-      $data['real_itemtype'] = $itemtype;
-      $data['itemtype'] = $itemtype;
+      $data['real_itemtype'] = $this->itemtype;
+      $data['itemtype'] = $this->itemtype;
 
       // Instanciate an object to access method
       $data['item'] = null;
 
-      if ($itemtype != 'AllAssets') {
-         $data['item'] = getItemForItemtype($itemtype);
+      if ($this->itemtype != 'AllAssets') {
+         $data['item'] = getItemForItemtype($this->itemtype);
       }
 
       $data['display_type'] = $data['search']['display_type'];
@@ -532,12 +534,12 @@ class Search {
       // If no research limit research to display item and compute number of item using simple request
       $data['search']['no_search']   = true;
 
-      $data['toview'] = $this->addDefaultToView($itemtype, $params);
+      $data['toview'] = $this->addDefaultToView($this->itemtype, $params);
       $data['meta_toview'] = [];
       if (!$forcetoview) {
          // Add items to display depending of personal prefs
-         $pref_itemtype = $itemtype;
-         if ($sub_item && $sub_item['sub_item'] instanceof CommonDBRelation && $sub_item['sub_item']->getType() == $itemtype) {
+         $pref_itemtype = $this->itemtype;
+         if ($sub_item && $sub_item['sub_item'] instanceof CommonDBRelation && $sub_item['sub_item']->getType() == $this->itemtype) {
             $pref_itemtype = 'AllAssets';
          }
          $displaypref = DisplayPreference::getForTypeUser(
@@ -599,7 +601,7 @@ class Search {
       }
 
       // Special case for Ticket : put ID in front
-      if ($itemtype == 'Ticket') {
+      if ($this->itemtype == 'Ticket') {
          array_unshift($data['toview'], 2);
       }
 

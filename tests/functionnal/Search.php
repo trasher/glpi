@@ -1051,7 +1051,7 @@ class Search extends DbTestCase {
 
       // do search and check presence of the created problem
       $search = new \Search('Problem', ['reset' => 'reset']);
-      $data = $search->prepareDataForSearch('Problem', ['reset' => 'reset']);
+      $data = $search->prepareDataForSearch(['reset' => 'reset']);
       $search->constructSQL($data);
       $search->constructData($data);
 
@@ -1104,7 +1104,7 @@ class Search extends DbTestCase {
 
       // do search and check presence of the created Change
       $search = new \Search('Change', ['reset', 'reset']);
-      $data = $search->prepareDataForSearch('Change', ['reset' => 'reset']);
+      $data = $search->prepareDataForSearch(['reset' => 'reset']);
       $search->constructSQL($data);
       $search->constructData($data);
 
