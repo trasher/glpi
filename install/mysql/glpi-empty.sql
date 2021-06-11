@@ -8802,6 +8802,7 @@ CREATE TABLE `glpi_databases` (
    `date_creation` timestamp NULL DEFAULT NULL,
    `states_id` int NOT NULL DEFAULT '0',
    `is_helpdesk_visible` tinyint NOT NULL DEFAULT '1',
+   `is_dynamic` tinyint NOT NULL DEFAULT '0',
    `comment` text,
    PRIMARY KEY (`id`),
    KEY `entities_id` (`entities_id`),
@@ -8819,7 +8820,8 @@ CREATE TABLE `glpi_databases` (
    KEY `states_id` (`states_id`),
    KEY `date_mod` (`date_mod`),
    KEY `date_creation` (`date_creation`),
-   KEY `is_helpdesk_visible` (`is_helpdesk_visible`)
+   KEY `is_helpdesk_visible` (`is_helpdesk_visible`),
+   KEY `is_dynamic` (`is_dynamic`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 DROP TABLE IF EXISTS `glpi_databaseinstances`;
@@ -8839,6 +8841,7 @@ CREATE TABLE `glpi_databaseinstances` (
   `date_creation` timestamp NULL DEFAULT NULL,
   `date_lastboot` timestamp NULL DEFAULT NULL,
   `date_lastbackup` timestamp NULL DEFAULT NULL,
+  `is_dynamic` tinyint NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `entities_id` (`entities_id`),
   KEY `is_recursive` (`is_recursive`),
@@ -8847,7 +8850,8 @@ CREATE TABLE `glpi_databaseinstances` (
   KEY `is_deleted` (`is_deleted`),
   KEY `databases_id` (`databases_id`),
   KEY `date_mod` (`date_mod`),
-  KEY `date_creation` (`date_creation`)
+  KEY `date_creation` (`date_creation`),
+  KEY `is_dynamic` (`is_dynamic`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 DROP TABLE IF EXISTS `glpi_databases_items`;
