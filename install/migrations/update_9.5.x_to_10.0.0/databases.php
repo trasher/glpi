@@ -86,7 +86,6 @@ if (!$DB->tableExists('glpi_databases')) {
          `groups_id_tech` int NOT NULL DEFAULT '0',
          `date_mod` timestamp NULL DEFAULT NULL,
          `date_creation` timestamp NULL DEFAULT NULL,
-         `date_lastboot` timestamp NULL DEFAULT NULL,
          `states_id` int NOT NULL DEFAULT '0',
          `is_helpdesk_visible` tinyint NOT NULL DEFAULT '1',
          `comment` text,

@@ -147,14 +147,6 @@ class Database extends CommonDBTM {
       echo "<td><label for='dropdown_suppliers_id$rand'>".Supplier::getTypeName(1)."</label></td>";
       echo "<td>";
       Supplier::dropdown(['value' => $this->fields["suppliers_id"], 'rand' => $rand]);
-      echo "</td>";
-      echo "<td><label for='date_lastboot$rand'>".__('Last boot')."</label></td>";
-      echo "<td>";
-      Html::showDateTimeField(
-         "date_lastboot", [
-            'value'      => $this->fields['date_lastboot'],
-            'maybeempty' => true
-         ]);
       echo "</td></tr>\n";
 
       echo "<tr class='tab_bg_1'>";
@@ -281,15 +273,6 @@ class Database extends CommonDBTM {
       ];
 
       $tab[] = [
-         'id'                 => '42',
-         'table'              => $this->getTable(),
-         'field'              => 'date_lastboot',
-         'name'               => __('Last boot date'),
-         'datatype'           => 'datetime',
-         'massiveaction'      => false
-      ];
-
-      $tab[] = [
          'id'                 => '16',
          'table'              => $this->getTable(),
          'field'              => 'comment',
@@ -395,14 +378,6 @@ class Database extends CommonDBTM {
       }
 
       return $instances;
-   }
-
-   public function prepareInputForAdd($input) {
-      if (isset($input['date_lastboot']) && empty($input['date_lastboot'])) {
-         unset($input['date_lastboot']);
-      }
-
-      return $input;
    }
 
    /**
