@@ -4075,6 +4075,49 @@ Compiled Tue 28-Sep-10 13:44 by prod_rel_team",
          ]
       ]);
       $this->integer(count($iterator))->isIdenticalTo(1);
+
+      //partial inventory: add databases
+      $json = file_get_contents(GLPI_ROOT . '/tests/fixtures/inventory/computer_2_partial_dbs.json');
+      $CFG_GLPI["is_contact_autoupdate"] = 0;
+      $inventory = new \Glpi\Inventory\Inventory($json);
+      $CFG_GLPI["is_contact_autoupdate"] = 1; //reset to default
+
+      if ($inventory->inError()) {
+         foreach ($inventory->getErrors() as $error) {
+            var_dump($error);
+         }
+      }
+      $this->boolean($inventory->inError())->isFalse();
+      $this->array($inventory->getErrors())->isEmpty();
+
+      //check nothing has changed
+      $this->integer(countElementsInTable(\Computer::getTable()))->isIdenticalTo($nb_computers + $count_vms - 1);
+
+      //check created databases & instances
+      $this->integer(countElementsInTable(\Database::getTable()))->isIdenticalTo(2);
+      $this->integer(countElementsInTable(\DatabaseInstance::getTable()))->isIdenticalTo(2);
+      $this->integer(countElementsInTable(\Database_Item::getTable()))->isIdenticalTo(2);
+
+      //play an update - nothing should have changed
+      $CFG_GLPI["is_contact_autoupdate"] = 0;
+      $inventory = new \Glpi\Inventory\Inventory($json);
+      $CFG_GLPI["is_contact_autoupdate"] = 1; //reset to default
+
+      if ($inventory->inError()) {
+         foreach ($inventory->getErrors() as $error) {
+            var_dump($error);
+         }
+      }
+      $this->boolean($inventory->inError())->isFalse();
+      $this->array($inventory->getErrors())->isEmpty();
+
+      //check nothing has changed
+      $this->integer(countElementsInTable(\Computer::getTable()))->isIdenticalTo($nb_computers + $count_vms - 1);
+
+      //check created databases & instances
+      $this->integer(countElementsInTable(\Database::getTable()))->isIdenticalTo(2);
+      $this->integer(countElementsInTable(\DatabaseInstance::getTable()))->isIdenticalTo(2);
+      $this->integer(countElementsInTable(\Database_Item::getTable()))->isIdenticalTo(2);
    }
 
    public function testImportPhone() {
