@@ -404,4 +404,12 @@ class Database extends CommonDBTM {
       return $types;
    }
 
+   function cleanDBonPurge() {
+      $this->deleteChildrenAndRelationsFromDb(
+         [
+            DatabaseInstance::class,
+            Database_Item::class
+         ]
+      );
+   }
 }

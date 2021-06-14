@@ -82,4 +82,44 @@ class Database extends DbTestCase {
       $this->string($instance['port'])->isIdenticalTo('3306');
       $this->integer($instance['size'])->isIdenticalTo(52000);
    }
+
+   public function testDelete() {
+      $db = new \Database();
+
+      $dbid = $db->add([
+         'name' => 'To be removed',
+         'instance_port' => 3306,
+         'instance_size' => 52000
+      ]);
+
+      //check DB is created, and load it
+      $this->integer($dbid)->isGreaterThan(0);
+      $this->boolean($db->getFromDB($dbid))->isTrue();
+
+      //create link with computer
+      $item = new \Database_Item();
+      $this->integer(
+         $item->add([
+            'databases_id' => $dbid,
+            'itemtype' => 'Computer',
+            'items_id' => getItemByTypeName('Computer', '_test_pc01', true)
+         ])
+      )->isGreaterThan(0);
+
+      //check instance has been created
+      $instances = $db->getInstances();
+      $this->array($instances)->hasSize(1);
+      $instance = $instances[0];
+      $this->string($instance['name'])->isIdenticalTo('"To be removed" default instance');
+      $this->string($instance['port'])->isIdenticalTo('3306');
+      $this->integer($instance['size'])->isIdenticalTo(52000);
+
+      //test removal
+      $this->boolean($db->delete(['id' => $dbid, 1]))->isTrue();
+      $this->boolean($db->getFromDB($dbid))->isFalse();
+
+      //ensure instance has been dropped aswell
+      $this->integer(countElementsInTable(\DatabaseInstance::getTable()))->isIdenticalTo(0);
+      $this->integer(countElementsInTable(\Database_Item::getTable()))->isIdenticalTo(0);
+   }
 }
