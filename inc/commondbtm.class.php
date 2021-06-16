@@ -5618,11 +5618,11 @@ class CommonDBTM extends CommonGLPI {
       }
 
       echo "<div class='search_page'>";
-      //$search->showGenericSearch($sub_itemtype, $params);
+      //$search->showGenericSearch($params);
       if (isset($params['as_map']) && $params['as_map'] == 1) {
-         $sub_item->sub_search->showMap($sub_itemtype, $params, $data);
+         $sub_item->sub_search->showMap($data);
       } else {
-         $sub_item->sub_search->showList($sub_itemtype, $params, $data);
+         $sub_item->sub_search->showList($data);
       }
       echo "</div>";
    }

@@ -1678,7 +1678,8 @@ HTML;
       ];
 
       ob_start();
-      $params = Search::manageParams($p['itemtype'], $params);
+      $search = new Search($p['itemtype'], $params);
+      $params = $search->manageParams();
       // remove parts of search list
       $params = array_merge($params, [
          'showmassiveactions' => false,
@@ -1688,7 +1689,8 @@ HTML;
          'no_sort'            => true,
          'list_limit'         => $p['limit']
       ]);
-      Search::showList($p['itemtype'], $params);
+      $search->setParameters($params);
+      $search->showList();
       $search_result = ob_get_clean();
 
       $html = <<<HTML

@@ -47,17 +47,19 @@ if (isset($_GET["globalsearch"])) {
           && $item->canView()) {
          $_GET["reset"]        = 'reset';
 
-         $params                 = Search::manageParams($itemtype, $_GET, false, true);
+         $search                 = new Search($itemtype, $_GET);
+         $params                 = $search->manageParams(false, true);
          $params["display_type"] = Search::GLOBAL_SEARCH;
-
          $count                  = count($params["criteria"]);
 
          $params["criteria"][$count]["field"]       = 'view';
          $params["criteria"][$count]["searchtype"]  = 'contains';
          $params["criteria"][$count]["value"]       = $searchtext;
 
+         $search->setParameters($params);
+
          echo "<div class='my-4 search-container w-100 disable-overflow-y'>";
-         Search::showList($itemtype, $params);
+         $search->showList();
          echo "</div>";
       }
    }

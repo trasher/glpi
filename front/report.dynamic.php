@@ -82,7 +82,7 @@ if (isset($_GET["item_type"]) && isset($_GET["display_type"])) {
                exit();
             }
          }
-         $params = Search::manageParams($_GET["item_type"], $_GET);
-         Search::showList($_GET["item_type"], $params);
+         $search = new Search($_GET['item_type'], $_GET);
+         $search->showList();
    }
 }
