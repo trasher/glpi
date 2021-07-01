@@ -4217,7 +4217,7 @@ Compiled Tue 28-Sep-10 13:44 by prod_rel_team",
 
       //check created databases & instances
       $this->integer(countElementsInTable(\DatabaseServer::getTable()))->isIdenticalTo(2);
-      $this->integer(countElementsInTable(\DatabaseServerInstance::getTable()))->isIdenticalTo(3);
+      $this->integer(countElementsInTable(\DatabaseInstance::getTable()))->isIdenticalTo(3);
       $this->integer(countElementsInTable(\DatabaseServer_Item::getTable()))->isIdenticalTo(2);
 
       //play an update - nothing should have changed
@@ -4238,7 +4238,7 @@ Compiled Tue 28-Sep-10 13:44 by prod_rel_team",
 
       //check created databases & instances
       $this->integer(countElementsInTable(\DatabaseServer::getTable()))->isIdenticalTo(2);
-      $this->integer(countElementsInTable(\DatabaseServerInstance::getTable()))->isIdenticalTo(3);
+      $this->integer(countElementsInTable(\DatabaseInstance::getTable()))->isIdenticalTo(3);
       $this->integer(countElementsInTable(\DatabaseServer_Item::getTable()))->isIdenticalTo(2);
 
       //play an update with changes
@@ -4277,7 +4277,7 @@ Compiled Tue 28-Sep-10 13:44 by prod_rel_team",
 
       //check created databases & instances
       $this->integer(countElementsInTable(\DatabaseServer::getTable()))->isIdenticalTo(1);
-      $this->integer(countElementsInTable(\DatabaseServerInstance::getTable()))->isIdenticalTo(2);
+      $this->integer(countElementsInTable(\DatabaseInstance::getTable()))->isIdenticalTo(2);
       $this->integer(countElementsInTable(\DatabaseServer_Item::getTable()))->isIdenticalTo(1);
 
       //ensure database version has been updated
