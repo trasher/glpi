@@ -585,7 +585,7 @@ class Inventory
             case 'cameras':
                $assettype = '\Glpi\Inventory\Asset\Camera';
                break;
-            case 'databases_instances':
+            case 'databases_services':
                $assettype = '\Glpi\Inventory\Asset\DatabaseInstance';
                break;
             default:
