@@ -527,13 +527,16 @@ class Request
      */
    public function handleContentType($type) {
       switch (strtolower($type)) {
+         case 'application/x-zlib':
          case 'application/x-compress-zlib':
             $this->compression = self::COMPRESS_ZLIB;
             break;
+         case 'application/x-gzip':
          case 'application/x-compress-gzip':
             $this->compression = self::COMPRESS_GZIP;
             break;
          case 'application/x-br':
+         case 'application/x-compress-br':
             $this->compression = self::COMPRESS_BR;
             break;
          case 'application/xml':
