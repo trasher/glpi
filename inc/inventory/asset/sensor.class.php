@@ -30,26 +30,37 @@
  * ---------------------------------------------------------------------
  */
 
-if (!defined('GLPI_ROOT')) {
-   die("Sorry. You can't access this file directly");
-}
+namespace Glpi\Inventory\Asset;
 
-/// Import rules collection class
-class RuleImportEntityCollection extends RuleCollection {
+use CommonDBTM;
+use Glpi\Inventory\Conf;
 
-   // From RuleCollection
-   public $stop_on_first_match = true;
-   static $rightname           = 'rule_import';
-   public $menu_option         = 'importentity';
-
-
-   function canList() {
-      return static::canView();
+class Sensor extends Device
+{
+   public function __construct(CommonDBTM $item, array $data = null) {
+      parent::__construct($item, $data, 'Item_DeviceSensor');
    }
 
+   public function prepare() :array {
 
-   function getTitle() {
-      return __('Rules for assigning an item to an entity');
+      $mapping = [
+         'manufacturer' => 'manufacturers_id',
+         'type'         => 'devicesensortypes_id',
+         'name'         => 'designation'
+      ];
+
+      foreach ($this->data as &$val) {
+         foreach ($mapping as $origin => $dest) {
+            if (property_exists($val, $origin)) {
+               $val->$dest = $val->$origin;
+            }
+         }
+      }
+
+      return $this->data;
    }
 
+   public function checkConf(Conf $conf): bool {
+      return true;
+   }
 }

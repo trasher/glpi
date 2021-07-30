@@ -30,26 +30,41 @@
  * ---------------------------------------------------------------------
  */
 
-if (!defined('GLPI_ROOT')) {
-   die("Sorry. You can't access this file directly");
-}
+namespace Glpi\Inventory\Asset;
 
-/// Import rules collection class
-class RuleImportEntityCollection extends RuleCollection {
+use CommonDBTM;
+use Glpi\Inventory\Conf;
 
-   // From RuleCollection
-   public $stop_on_first_match = true;
-   static $rightname           = 'rule_import';
-   public $menu_option         = 'importentity';
-
-
-   function canList() {
-      return static::canView();
+class HardDrive extends Device
+{
+   public function __construct(CommonDBTM $item, array $data = null) {
+      parent::__construct($item, $data, 'Item_DeviceHardDrive');
    }
 
+   public function prepare() :array {
+      $mapping = [
+         'disksize'      => 'capacity',
+         'interface'     => 'interfacetypes_id',
+         'manufacturer'  => 'manufacturers_id',
+         'model'         => 'designation'
+      ];
 
-   function getTitle() {
-      return __('Rules for assigning an item to an entity');
+      foreach ($this->data as &$val) {
+         foreach ($mapping as $origin => $dest) {
+            if (property_exists($val, $origin)) {
+               $val->$dest = $val->$origin;
+            }
+         }
+
+         if ((!property_exists($val, 'model') || $val->model == '') && property_exists($val, 'name')) {
+            $val->designation = $val->name;
+         }
+      }
+
+      return $this->data;
    }
 
+   public function checkConf(Conf $conf): bool {
+      return $conf->component_harddrive == 1;
+   }
 }

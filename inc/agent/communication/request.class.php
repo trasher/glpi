@@ -30,26 +30,14 @@
  * ---------------------------------------------------------------------
  */
 
-if (!defined('GLPI_ROOT')) {
-   die("Sorry. You can't access this file directly");
-}
+namespace Glpi\Agent\Communication;
 
-/// Import rules collection class
-class RuleImportEntityCollection extends RuleCollection {
-
-   // From RuleCollection
-   public $stop_on_first_match = true;
-   static $rightname           = 'rule_import';
-   public $menu_option         = 'importentity';
-
-
-   function canList() {
-      return static::canView();
+/**
+ * Agent requests factory
+ */
+class Request
+{
+   public static function create(): AbstractRequest {
+      return n
    }
-
-
-   function getTitle() {
-      return __('Rules for assigning an item to an entity');
-   }
-
 }

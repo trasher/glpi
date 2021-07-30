@@ -30,26 +30,20 @@
  * ---------------------------------------------------------------------
  */
 
-if (!defined('GLPI_ROOT')) {
-   die("Sorry. You can't access this file directly");
-}
+namespace Glpi\Inventory\Asset;
 
-/// Import rules collection class
-class RuleImportEntityCollection extends RuleCollection {
+use ComputerModel;
+use ComputerType;
 
-   // From RuleCollection
-   public $stop_on_first_match = true;
-   static $rightname           = 'rule_import';
-   public $menu_option         = 'importentity';
+class Computer extends MainAsset
+{
 
-
-   function canList() {
-      return static::canView();
+   protected function getModelsFieldName(): string {
+      return ComputerModel::getForeignKeyField();
    }
 
-
-   function getTitle() {
-      return __('Rules for assigning an item to an entity');
+   protected function getTypesFieldName(): string {
+      return ComputerType::getForeignKeyField();
    }
 
 }

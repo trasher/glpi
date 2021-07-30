@@ -34,22 +34,13 @@ if (!defined('GLPI_ROOT')) {
    die("Sorry. You can't access this file directly");
 }
 
-/// Import rules collection class
-class RuleImportEntityCollection extends RuleCollection {
+class DatabaseInstanceType extends CommonDropdown {
 
-   // From RuleCollection
-   public $stop_on_first_match = true;
-   static $rightname           = 'rule_import';
-   public $menu_option         = 'importentity';
-
-
-   function canList() {
-      return static::canView();
+   static function getTypeName($nb = 0) {
+      return _n('Database instance type', 'Database instance types', $nb);
    }
 
-
-   function getTitle() {
-      return __('Rules for assigning an item to an entity');
+   static function getFieldLabel() {
+      return _n('Type', 'Types', 1);
    }
-
 }

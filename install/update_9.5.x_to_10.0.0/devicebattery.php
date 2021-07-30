@@ -29,27 +29,11 @@
  * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
  * ---------------------------------------------------------------------
  */
+/**
+ * @var DB $DB
+ * @var Migration $migration
+ */
 
-if (!defined('GLPI_ROOT')) {
-   die("Sorry. You can't access this file directly");
-}
-
-/// Import rules collection class
-class RuleImportEntityCollection extends RuleCollection {
-
-   // From RuleCollection
-   public $stop_on_first_match = true;
-   static $rightname           = 'rule_import';
-   public $menu_option         = 'importentity';
-
-
-   function canList() {
-      return static::canView();
-   }
-
-
-   function getTitle() {
-      return __('Rules for assigning an item to an entity');
-   }
-
-}
+$migration->addField('glpi_items_devicebatteries', 'real_capacity', 'integer', [
+    'after' => 'states_id'
+]);

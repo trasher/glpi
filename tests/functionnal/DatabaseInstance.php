@@ -30,26 +30,42 @@
  * ---------------------------------------------------------------------
  */
 
-if (!defined('GLPI_ROOT')) {
-   die("Sorry. You can't access this file directly");
-}
+namespace tests\units;
 
-/// Import rules collection class
-class RuleImportEntityCollection extends RuleCollection {
+use DbTestCase;
 
-   // From RuleCollection
-   public $stop_on_first_match = true;
-   static $rightname           = 'rule_import';
-   public $menu_option         = 'importentity';
+/* Test for inc/databaseinstance.class.php */
 
+class DatabaseInstance extends DbTestCase {
 
-   function canList() {
-      return static::canView();
+   public function testDelete() {
+      $db = new \DatabaseInstance();
+
+      $dbid = $db->add([
+         'name' => 'To be removed',
+         'port' => 3306,
+         'size' => 52000
+      ]);
+
+      //check DB is created, and load it
+      $this->integer($dbid)->isGreaterThan(0);
+      $this->boolean($db->getFromDB($dbid))->isTrue();
+
+      //create link with computer
+      $item = new \DatabaseInstance_Item();
+      $this->integer(
+         $item->add([
+            'databaseinstances_id' => $dbid,
+            'itemtype' => 'Computer',
+            'items_id' => getItemByTypeName('Computer', '_test_pc01', true)
+         ])
+      )->isGreaterThan(0);
+
+      //test removal
+      $this->boolean($db->delete(['id' => $dbid, 1]))->isTrue();
+      $this->boolean($db->getFromDB($dbid))->isFalse();
+
+      //ensure instance has been dropped aswell
+      $this->integer(countElementsInTable(\DatabaseInstance_Item::getTable()))->isIdenticalTo(0);
    }
-
-
-   function getTitle() {
-      return __('Rules for assigning an item to an entity');
-   }
-
 }

@@ -30,26 +30,44 @@
  * ---------------------------------------------------------------------
  */
 
-if (!defined('GLPI_ROOT')) {
-   die("Sorry. You can't access this file directly");
-}
+namespace Glpi\Inventory\Asset;
 
-/// Import rules collection class
-class RuleImportEntityCollection extends RuleCollection {
+use CommonDBTM;
+use Glpi\Inventory\Conf;
 
-   // From RuleCollection
-   public $stop_on_first_match = true;
-   static $rightname           = 'rule_import';
-   public $menu_option         = 'importentity';
+class GraphicCard extends Device
+{
+   protected $ignored = ['controllers' => null];
 
-
-   function canList() {
-      return static::canView();
+   public function __construct(CommonDBTM $item, array $data = null) {
+      parent::__construct($item, $data, 'Item_DeviceGraphicCard');
    }
 
+   public function prepare() :array {
+      $mapping = [
+         'name'   => 'designation'
+      ];
 
-   function getTitle() {
-      return __('Rules for assigning an item to an entity');
+      foreach ($this->data as $k => &$val) {
+         if (property_exists($val, 'name')) {
+            foreach ($mapping as $origin => $dest) {
+               if (property_exists($val, $origin)) {
+                  $val->$dest = $val->$origin;
+               }
+            }
+
+            $this->ignored['controllers'][$val->name] = $val->name;
+            if (isset($val->chipset)) {
+               $this->ignored['controllers'][$val->chipset] = $val->chipset;
+            }
+         } else {
+            unset($this->data[$k]);
+         }
+      }
+      return $this->data;
    }
 
+   public function checkConf(Conf $conf): bool {
+      return $conf->component_graphiccard == 1;
+   }
 }
