@@ -84,7 +84,6 @@ class Software extends DbTestCase {
       $_SESSION['glpiactiveprofile']['document'] = 0;
       $tabs = $software->defineTabs();
       $this->array($tabs)->hasSize(12);
-
    }
 
    public function testPrepareInputForUpdate() {
@@ -98,13 +97,13 @@ class Software extends DbTestCase {
 
       $input    = ['name' => 'A name', 'is_update' => 0, 'id' => 3, 'withtemplate' => 0];
       $result   = $software->prepareInputForAdd($input);
-      $expected = ['name' => 'A name', 'is_update' => 0, 'softwares_id' => 0, '_oldID' => 3];
+        $expected = ['name' => 'A name', 'is_update' => 0, 'softwares_id' => 0, '_oldID' => 3];
 
       $this->array($result)->isIdenticalTo($expected);
 
       $input    = ['name' => 'A name', 'is_update' => 0, 'withtemplate' => 0];
       $result   = $software->prepareInputForAdd($input);
-      $expected = ['name' => 'A name', 'is_update' => 0, 'softwares_id' => 0];
+        $expected = ['name' => 'A name', 'is_update' => 0, 'softwares_id' => 0];
 
       $this->array($result)->isIdenticalTo($expected);
 
@@ -118,7 +117,6 @@ class Software extends DbTestCase {
                    'softwares_id'          => 0];
 
       $this->array($result)->isIdenticalTo($expected);
-
    }
 
    public function testPrepareInputForAddWithCategory() {
@@ -381,7 +379,6 @@ class Software extends DbTestCase {
 
       $software->getEmpty();
       $this->variable($software->fields['is_helpdesk_visible'])->isEqualTo(1);
-
    }
 
    public function testGetSpecificMassiveActions() {
@@ -414,10 +411,10 @@ class Software extends DbTestCase {
    public function testGetSearchOptionsNew() {
       $software = new \Software();
       $result   = $software->rawSearchOptions();
-      $this->array($result)->hasSize(41);
+        $this->array($result)->hasSize(42);
 
       $this->login();
       $result   = $software->rawSearchOptions();
-      $this->array($result)->hasSize(57);
+        $this->array($result)->hasSize(58);
    }
 }

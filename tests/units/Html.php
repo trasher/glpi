@@ -345,10 +345,11 @@ class Html extends \GLPITestCase {
          'Enclosure',
          'PDU',
          'PassiveDCEquipment',
-         'Item_DeviceSimcard'
+         'Unmanaged',
+         'Item_DeviceSimcard',
       ];
       $this->string($menu['assets']['title'])->isIdenticalTo('Assets');
-      $this->array($menu['assets']['types'])->isIdenticalTo($expected);
+      $this->array($menu['assets']['types'])->isEqualTo($expected);
 
       $expected = [
          'Ticket',
@@ -403,7 +404,8 @@ class Html extends \GLPITestCase {
          'Rule',
          'Profile',
          'QueuedNotification',
-         'Glpi\\Event'
+         'Glpi\\Event',
+         'Glpi\\Inventory\\Inventory'
       ];
       $this->string($menu['admin']['title'])->isIdenticalTo('Administration');
       $this->array($menu['admin']['types'])->isIdenticalTo($expected);

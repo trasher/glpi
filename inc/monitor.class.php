@@ -40,6 +40,7 @@ if (!defined('GLPI_ROOT')) {
 class Monitor extends CommonDBTM {
    use Glpi\Features\DCBreadcrumb;
    use Glpi\Features\Clonable;
+    use Glpi\Features\Inventoriable;
 
    // From CommonDBTM
    public $dohistory                   = true;
@@ -103,6 +104,7 @@ class Monitor extends CommonDBTM {
       $this->addStandardTab('Reservation', $ong, $options);
       $this->addStandardTab('Domain_Item', $ong, $options);
       $this->addStandardTab('Appliance_Item', $ong, $options);
+        $this->addStandardTab('RuleMatchedLog', $ong, $options);
       $this->addStandardTab('Log', $ong, $options);
 
       return $ong;
@@ -619,6 +621,38 @@ class Monitor extends CommonDBTM {
 
       return $tab;
    }
+
+   /**
+    * @param $itemtype
+    *
+    * @return array
+    */
+    public static function rawSearchOptionsToAdd($itemtype = null)
+    {
+        $tab = [];
+
+        $tab[] = [
+            'id'                 => 'monitor',
+            'name'               => self::getTypeName(Session::getPluralNumber())
+        ];
+
+        $tab[] = [
+            'id'                 => '129',
+            'table'              => 'glpi_computers_items',
+            'field'              => 'id',
+            'name'               => _x('quantity', 'Number of monitors'),
+            'forcegroupby'       => true,
+            'usehaving'          => true,
+            'datatype'           => 'count',
+            'massiveaction'      => false,
+            'joinparams'         => [
+                'jointype'           => 'child',
+                'condition'          => "AND NEWTABLE.itemtype = 'Monitor'"
+            ]
+        ];
+
+        return $tab;
+    }
 
 
    static function getIcon() {

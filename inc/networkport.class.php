@@ -369,6 +369,32 @@ class NetworkPort extends CommonDBChild {
 
    }
 
+    public function updateMetrics()
+    {
+        $unicity_input = [
+            'networkports_id' => $this->fields['id'],
+            'date'            => date('Y-m-d', strtotime($_SESSION['glpi_currenttime'])),
+        ];
+        $input = array_merge(
+            [
+                'networkports_id' => $this->fields['id'],
+                'ifinbytes'       => $this->fields['ifinbytes'] ?? 0,
+                'ifoutbytes'      => $this->fields['ifoutbytes'] ?? 0,
+                'ifinerrors'      => $this->fields['ifinerrors'] ?? 0,
+                'ifouterrors'     => $this->fields['ifouterrors'] ?? 0,
+            ],
+            $unicity_input
+        );
+
+        $metrics = new NetworkPortMetrics();
+        if ($metrics->getFromDBByCrit($unicity_input)) {
+            $input['id'] = $metrics->fields['id'];
+            $metrics->update($input, false);
+        } else {
+            $metrics->add($input, [], false);
+        }
+    }
+
 
    function prepareInputForAdd($input) {
 
@@ -431,9 +457,11 @@ class NetworkPort extends CommonDBChild {
 
       $ong = [];
       $this->addDefaultFormTab($ong);
+        $this->addStandardTab('NetworkPortMetrics', $ong, $options);
       $this->addStandardTab('NetworkName', $ong, $options);
       $this->addStandardTab('NetworkPort_Vlan', $ong, $options);
       $this->addStandardTab('Log', $ong, $options);
+        $this->addStandardTab('NetworkPortConnectionLog', $ong, $options);
       $this->addStandardTab('NetworkPortInstantiation', $ong, $options);
       $this->addStandardTab('NetworkPort', $ong, $options);
 
@@ -896,6 +924,8 @@ class NetworkPort extends CommonDBChild {
       }
 
       $this->showFormButtons($options);
+
+        return true;
    }
 
 
@@ -1234,4 +1264,82 @@ class NetworkPort extends CommonDBChild {
 
       return parent::computeFriendlyName();
    }
+
+    public function getLink($options = [])
+    {
+        $port_link = parent::getLink($options);
+
+        if (!isset($this->fields['itemtype']) || !class_exists($this->fields['itemtype'])) {
+            return $port_link;
+        }
+
+        $itemtype = $this->fields['itemtype'];
+        /** @var CommonDBTM */
+        $equipment = new $itemtype();
+
+        if ($equipment->getFromDB($this->fields['items_id'])) {
+            return sprintf(
+                '<i class="%1$s"></i> %2$s > <i class="%3$s"></i> %4$s',
+                $equipment->getIcon(),
+                $equipment->getLink(),
+                $this->getIcon(),
+                $port_link,
+            );
+        }
+
+        return $port_link;
+    }
+
+    /**
+     * Is port connected to a hub?
+     *
+     * @param integer $networkports_id Port ID
+     *
+     * @return boolean
+     */
+    public function isHubConnected($networkports_id): bool
+    {
+        global $DB;
+
+        $wired = new NetworkPort_NetworkPort();
+        $opposite = $wired->getOppositeContact($networkports_id);
+
+        if (empty($opposite)) {
+            return false;
+        }
+
+        $result = $DB->request([
+            'FROM'         => Unmanaged::getTable(),
+            'COUNT'        => 'cpt',
+            'INNER JOIN'   => [
+                $this->getTable() => [
+                    'ON' => [
+                        $this->getTable()       => 'items_id',
+                        Unmanaged::getTable()   => 'id', [
+                            'AND' => [
+                                $this->getTable() . '.itemtype' => Unmanaged::getType()
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'WHERE'        => [
+                'hub' => 1,
+                $this->getTable() . '.id' => $opposite
+            ]
+        ])->next();
+
+        return ($result['cpt'] > 0);
+    }
+
+    public function getNonLoggedFields(): array
+    {
+        return [
+            'ifinbytes',
+            'ifoutbytes',
+            'ifinerrors',
+            'ifouterrors'
+        ];
+    }
+
 }

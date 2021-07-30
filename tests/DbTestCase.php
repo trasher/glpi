@@ -72,6 +72,18 @@ class DbTestCase extends \GLPITestCase {
       return $auth;
    }
 
+    /**
+     * Log out current user
+     *
+     * @return void
+     */
+    protected function logOut()
+    {
+        $ctime = $_SESSION['glpi_currenttime'];
+        \Session::destroy();
+        $_SESSION['glpi_currenttime'] = $ctime;
+    }
+
    /**
     * change current entity
     *

@@ -71,6 +71,10 @@ class Log extends CommonDBTM {
 
    static $rightname = 'logs';
 
+    /** @var array  */
+    public static array $queue = [];
+    /** @var bool  */
+    public static bool $use_queue = false;
 
 
    static function getTypeName($nb = 0) {
@@ -207,7 +211,6 @@ class Log extends CommonDBTM {
          } else { // For cron management
             $username = $uid;
          }
-
       } else {
          $username = "";
       }
@@ -243,6 +246,13 @@ class Log extends CommonDBTM {
          'old_value'         => $old_value,
          'new_value'         => $new_value
       ];
+
+        if (static::$use_queue) {
+            //use queue rather than direct insert
+            static::$queue[] = $params;
+            return true;
+        }
+
       $result = $DB->insert(self::getTable(), $params);
 
       if ($result && $DB->affectedRows($result) > 0) {
@@ -497,7 +507,6 @@ class Log extends CommonDBTM {
                      } else {
                         $tmp['field'] = $item2->getTypeName(1);
                      }
-
                   }
                   //TRANS: %s is the component name
                   $tmp['change'] = sprintf(__('%1$s: %2$s'), $action_label, $data["old_value"]);
@@ -511,7 +520,6 @@ class Log extends CommonDBTM {
                      } else {
                         $tmp['field'] = $item2->getTypeName(1);
                      }
-
                   }
                   //TRANS: %s is the component name
                   $tmp['change'] = sprintf(__('%1$s: %2$s'), $action_label, $data["old_value"]);
@@ -525,7 +533,6 @@ class Log extends CommonDBTM {
                      } else {
                         $tmp['field'] = $item2->getTypeName(1);
                      }
-
                   }
                   //TRANS: %s is the component name
                   $tmp['change'] = sprintf(__('%1$s: %2$s'), $action_label, $data["new_value"]);
@@ -551,7 +558,6 @@ class Log extends CommonDBTM {
                      } else {
                         $tmp['field'] = $item2->getTypeName(1);
                      }
-
                   }
                   //TRANS: %s is the item name
                   $tmp['change'] = sprintf(__('%1$s: %2$s'), $action_label, $data["old_value"]);
@@ -565,7 +571,6 @@ class Log extends CommonDBTM {
                      } else {
                         $tmp['field'] = $item2->getTypeName(1);
                      }
-
                   }
                   //TRANS: %s is the item name
                   $tmp['change'] = sprintf(__('%1$s: %2$s'), $action_label, $data["new_value"]);
@@ -728,7 +733,6 @@ class Log extends CommonDBTM {
                   }
                   $tmp['display_history'] = !empty($tmp['change']);
             }
-
          } else {
             $fieldname = "";
             $searchopt = [];
@@ -980,7 +984,6 @@ class Log extends CommonDBTM {
                   $value = __('Others');
                   break;
             }
-
          } else {
             // It's not an internal device
             foreach (Search::getOptions($itemtype) as $search_opt_key => $search_opt_val) {
@@ -1288,4 +1291,44 @@ class Log extends CommonDBTM {
       return $values;
    }
 
+    public static function useQueue(): void
+    {
+        static::$use_queue = true;
+    }
+
+    public static function queue($var): void
+    {
+        static::$queue[] = $var;
+    }
+
+    public static function resetQueue(): void
+    {
+        static::$queue = [];
+    }
+
+    public static function handleQueue(): void
+    {
+        global $DB;
+
+        $queue = static::$queue;
+        if (!count($queue)) {
+            return;
+        }
+
+        $update = $DB->buildInsert(
+            static::getTable(),
+            array_fill_keys(array_keys($queue[0]), new \QueryParam())
+        );
+        $stmt = $DB->prepare($update);
+
+        foreach (static::$queue as $input) {
+            $stmt->bind_param(
+                str_pad('', count($input), 's'),
+                ...array_values($input)
+            );
+            $DB->executeStatement($stmt);
+        }
+        $stmt->close();
+        static::resetQueue();
+    }
 }

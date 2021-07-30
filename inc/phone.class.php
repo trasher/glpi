@@ -40,6 +40,7 @@ if (!defined('GLPI_ROOT')) {
 **/
 class Phone extends CommonDBTM {
    use Glpi\Features\Clonable;
+    use Glpi\Features\Inventoriable;
 
    // From CommonDBTM
    public $dohistory                   = true;
@@ -58,8 +59,10 @@ class Phone extends CommonDBTM {
          NetworkPort::class,
          Contract_Item::class,
          Document_Item::class,
+            NetworkPort::class,
          Computer_Item::class,
-         KnowbaseItem_Item::class
+            KnowbaseItem_Item::class,
+            Item_RemoteManagement::class
       ];
    }
 
@@ -416,6 +419,14 @@ class Phone extends CommonDBTM {
          'autocomplete'       => true,
       ];
 
+        $tab[] = [
+            'id'                 => '10',
+            'table'              => $this->getTable(),
+            'field'              => 'last_inventory_update',
+            'name'               => __('Last inventory date'),
+            'datatype'           => 'datetime',
+        ];
+
       $tab[] = [
          'id'                 => '7',
          'table'              => $this->getTable(),
@@ -602,6 +613,39 @@ class Phone extends CommonDBTM {
 
       return $tab;
    }
+
+
+   /**
+    * @param $itemtype
+    *
+    * @return array
+    */
+    public static function rawSearchOptionsToAdd($itemtype = null)
+    {
+        $tab = [];
+
+        $tab[] = [
+            'id'                 => 'phone',
+            'name'               => self::getTypeName(Session::getPluralNumber())
+        ];
+
+        $tab[] = [
+            'id'                 => '132',
+            'table'              => 'glpi_computers_items',
+            'field'              => 'id',
+            'name'               => _x('quantity', 'Number of phones'),
+            'forcegroupby'       => true,
+            'usehaving'          => true,
+            'datatype'           => 'count',
+            'massiveaction'      => false,
+            'joinparams'         => [
+                'jointype'           => 'child',
+                'condition'          => "AND NEWTABLE.itemtype = 'Phone'"
+            ]
+        ];
+
+        return $tab;
+    }
 
 
    static function getIcon() {

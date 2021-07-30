@@ -37,6 +37,10 @@ if (!defined('GLPI_ROOT')) {
 }
 
 class RuleCollection extends CommonDBTM {
+    public const MOVE_BEFORE = 'before';
+    public const MOVE_AFTER = 'after';
+
+
    /// Rule type
    public $sub_type;
    /// process collection stop on first matched rule
@@ -184,7 +188,16 @@ class RuleCollection extends CommonDBTM {
          $criteria['LIMIT'] = (int)$p['limit'];
          $criteria['START'] = (int)$p['start'];
       }
+
       $criteria['WHERE'] = $where;
+
+        if (method_exists($this, 'collectionFilter')) {
+            $filter_opts = [];
+            if (isset($options['_glpi_tab'])) {
+                $filter_opts['_glpi_tab'] = $options['_glpi_tab'];
+            }
+            $criteria = $this->collectionFilter($criteria, $filter_opts);
+        }
 
       return $criteria;
    }
@@ -217,12 +230,18 @@ class RuleCollection extends CommonDBTM {
 
       //Select all the rules of a different type
       $criteria   = $this->getRuleListCriteria($p);
+
       $iterator   = $DB->request($criteria);
 
-      while ($data = $iterator->next()) {
+        $active_tab = Session::getActiveTab($this->getType());
+        $can_sort = !(str_starts_with($this->getType() . '$', $active_tab));
+
+        foreach ($iterator as $data) {
          //For each rule, get a Rule object with all the criterias and actions
          $tempRule               = $this->getRuleClass();
          $tempRule->fields       = $data;
+            $tempRule->can_sort = $can_sort;
+
          $this->RuleList->list[] = $tempRule;
       }
    }
@@ -252,13 +271,22 @@ class RuleCollection extends CommonDBTM {
 
          if (count($iterator)) {
             $this->RuleList->list = [];
+                $active_tab = Session::getActiveTab($this->getType());
+                $can_sort = !(str_starts_with($this->getType() . '$', $active_tab));
 
-            while ($rule = $iterator->next()) {
+                foreach ($iterator as $rule) {
                //For each rule, get a Rule object with all the criterias and actions
                $tempRule = $this->getRuleClass();
 
-               if ($tempRule->getRuleWithCriteriasAndActions($rule["id"], $retrieve_criteria,
-                                                             $retrieve_action)) {
+                    if (
+                        $tempRule->getRuleWithCriteriasAndActions(
+                            $rule["id"],
+                            $retrieve_criteria,
+                            $retrieve_action
+                        )
+                    ) {
+                        $tempRule->can_sort = $can_sort;
+
                   //Add the object to the list of rules
                   $this->RuleList->list[] = $tempRule;
                }
@@ -380,7 +408,6 @@ class RuleCollection extends CommonDBTM {
          //The engine stop on the first matched rule
          echo "<span class='center b'>".__('The engine stops on the first checked rule.').
               "</span><br>";
-
       } else {
          //The engine process all the rules
          echo "<span class='center b'>".__('The engine treats all the rules.')."</span><br>";
@@ -419,6 +446,7 @@ class RuleCollection extends CommonDBTM {
       $p['childrens'] = 0;
       $p['active']    = false;
       $p['condition'] = 0;
+        $p['_glpi_tab'] = $options['_glpi_tab'];
       $rand           = mt_rand();
 
       foreach (['inherited','childrens', 'condition'] as $param) {
@@ -562,6 +590,14 @@ class RuleCollection extends CommonDBTM {
          $url = $CFG_GLPI["root_doc"];
       }
 
+       //if rules provides an initRules method, then we're able to reset them
+        if (method_exists($this->getRuleClass(), 'initRules')) {
+            echo "<a class='btn btn-primary' id='reset_rules' href='" . $rule->getSearchURL() . "?reinit=true' " .
+            //does not work.
+            //"onClick='if(confirm(\"" . __s('All rules will be erased and recreated from scratch. Are you sure?')."\")) { return true } else { return false; };' " .
+            "title='" . __s("Remove all equipment import rules and recreate from defaults") . "'" .
+            ">" . __('Reset rules') . "</a>&nbsp;";
+        }
       echo "<a class='vsubmit' href='#' onClick=\"".
                   Html::jsGetElementbyID('allruletest'.$rand).".dialog('open'); return false;\">".
                   __('Test rules engine')."</a>";
@@ -760,8 +796,7 @@ class RuleCollection extends CommonDBTM {
       if ($ref_ID) { // Move after/before an existing rule
          $ruleDescription->getFromDB($ref_ID);
          $rank = $ruleDescription->fields["ranking"];
-
-      } else if ($type == "after") {
+        } else if ($type == self::MOVE_AFTER) {
          // Move after all
          $result = $DB->request([
             'SELECT' => ['MAX' => 'ranking AS maxi'],
@@ -780,7 +815,7 @@ class RuleCollection extends CommonDBTM {
 
       // Move others rules in the collection
       if ($old_rank < $rank) {
-         if ($type == "before") {
+            if ($type == self::MOVE_BEFORE) {
             $rank--;
          }
 
@@ -800,7 +835,7 @@ class RuleCollection extends CommonDBTM {
          }
 
       } else if ($old_rank > $rank) {
-         if ($type == "after") {
+            if ($type == self::MOVE_AFTER) {
             $rank++;
          }
 
@@ -818,7 +853,6 @@ class RuleCollection extends CommonDBTM {
             $data['ranking']++;
             $result = $rule->update($data);
          }
-
       } else { // $old_rank == $rank : nothing to do
          $result = false;
       }
@@ -1513,7 +1547,6 @@ class RuleCollection extends CommonDBTM {
          echo "</td></tr>\n";
          echo "</table></div>";
          Html::closeForm();
-
       } else {
          echo '<br><div class="center b">'.__('No element to be tested').'</div>';
       }
@@ -1830,7 +1863,6 @@ class RuleCollection extends CommonDBTM {
 
       if ($plug = isPluginItemType($itemtype)) {
          $typeclass = 'Plugin'.$plug['plugin'].$plug['class'].'Collection';
-
       } else {
          if (in_array($itemtype, $CFG_GLPI["dictionnary_types"])) {
             $typeclass = 'RuleDictionnary'.$itemtype."Collection";
@@ -1914,6 +1946,15 @@ class RuleCollection extends CommonDBTM {
       return $ong;
    }
 
+    /**
+     * Get label for main tab
+     *
+     * @return string
+     */
+    public function getMainTabLabel()
+    {
+        return _n('Rule', 'Rules', Session::getPluralNumber());
+    }
 
    /**
     * @see CommonGLPI::getTabNameForItem()

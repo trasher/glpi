@@ -96,7 +96,17 @@ class Transfer extends DbTestCase {
             'Consumable',
             'Infocom',
             'ComputerAntivirus',
-            'TicketRecurrent'
+                'TicketRecurrent',
+                'Agent',
+                'Printer_CartridgeInfo',
+                'PrinterLog',
+                'USBVendor',
+                'PCIVendor',
+                'PendingReasonCron',
+                'Database',
+                'Socket',
+                'Netpoint',
+                'Link_Itemtype',
          ]
       );
 
@@ -160,12 +170,6 @@ class Transfer extends DbTestCase {
 
          ++$count;
       }
-      $this->dump(
-         sprintf(
-            '%1$s itemtypes tested',
-            $count
-         )
-      );
    }
 
    public function testDomainTransfer() {
@@ -274,7 +278,7 @@ class Transfer extends DbTestCase {
          $this->integer($computers_id)->isGreaterThan(0);
       }
 
-      // Create test softwares
+      // Create test software
       $softwares_to_create = [
          'test_transfer_software_1',
          'test_transfer_software_2',

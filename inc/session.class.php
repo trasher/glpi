@@ -746,6 +746,22 @@ class Session {
                   || strpos($_SERVER['PHP_SELF'], '/cron.php')));
    }
 
+    /**
+     * Detect inventory mode
+     *
+     * @return boolean
+     **/
+    public static function isInventory(): bool
+    {
+
+        return (isset($_SESSION["glpiinventoryuserrunning"])
+              && (
+                  strpos($_SERVER['PHP_SELF'], '/inventory.php')
+                  || strpos($_SERVER['PHP_SELF'], '/index.php')
+                  || defined('TU_USER')
+              )
+        );
+    }
 
    /**
     * Get the Login User ID or return cron user ID for cron jobs
@@ -756,10 +772,13 @@ class Session {
     *                          int for user id, string for cron jobs
    **/
    static function getLoginUserID($force_human = true) {
+        if (self::isInventory()) { // Check inventory
+            return $_SESSION["glpiinventoryuserrunning"];
+        }
 
       if (!$force_human
           && self::isCron()) { // Check cron jobs
-         return $_SESSION["glpicronuserrunning"];
+         return $_SESSION["glpicronuserrunning"] ?? $_SESSION['glpiinventoryuserrunning'];
       }
 
       if (isset($_SESSION["glpiID"])) {
@@ -1040,6 +1059,10 @@ class Session {
    **/
    static function haveRight($module, $right) {
       global $DB;
+
+        if (Session::isInventory()) {
+            return true;
+        }
 
       //If GLPI is using the slave DB -> read only mode
       if ($DB->isSlave()

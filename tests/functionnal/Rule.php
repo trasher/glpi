@@ -45,7 +45,6 @@ class Rule extends DbTestCase {
 
       $table = \Rule::getTable('RuleTicket');
       $this->string($table)->isIdenticalTo('glpi_rules');
-
    }
 
    public function testGetTypeName() {
@@ -70,7 +69,6 @@ class Rule extends DbTestCase {
       $this->object($obj)->isInstanceOf('RuleDictionnarySoftware');
 
       $this->variable(\Rule::getRuleObjectByID(100))->isNull();
-
    }
 
    public function testGetConditionsArray() {
@@ -122,7 +120,6 @@ class Rule extends DbTestCase {
 
       $rule = new \RuleDictionnaryPrinter();
       $this->string($rule->getRuleIdField())->isIdenticalTo('rules_id');
-
    }
 
    public function testIsEntityAssign() {
@@ -238,14 +235,13 @@ class Rule extends DbTestCase {
 
    public function testMaxActionsCount() {
       $rule = new \Rule();
-      $this->integer($rule->maxActionsCount())->isIdenticalTo(0);
+      $this->integer($rule->maxActionsCount())->isIdenticalTo(1);
 
       $rule = new \RuleTicket();
       $this->integer($rule->maxActionsCount())->isIdenticalTo(29);
 
       $rule = new \RuleDictionnarySoftware();
       $this->integer($rule->maxActionsCount())->isIdenticalTo(4);
-
    }
 
    public function testMaybeRecursive() {
@@ -281,7 +277,7 @@ class Rule extends DbTestCase {
          [\Location::getTypeName(1)               , 'locations_id'],
          ["&nbsp;"                     , 'location'],
          [_n('Type', 'Types', 1)                   , 'type'],
-         [__('Category')               , 'itilcategories_id'],
+            [_n('Category', 'Categories', 1)               , 'itilcategories_id'],
          [_n('Requester', 'Requesters', 1)              , '_users_id_requester'],
          [_n('Requester group', 'Requester groups', 1)        , '_groups_id_requester'],
          [__('Technician')             , '_users_id_assign'],
@@ -395,7 +391,6 @@ class Rule extends DbTestCase {
       $this->boolean($rule->getFromDB($rules_id))->isTrue();
       //Check that the uuid has been added as it is, and has not been overriden
       $this->string($rule->fields['uuid'])->isIdenticalTo('12345');
-
    }
 
    public function testGetMinimalCriteriaText() {
@@ -497,7 +492,7 @@ class Rule extends DbTestCase {
                 'value' => 1
                ];
       $result = $rule->getMinimalActionText($input);
-      $expected = "<td >Category</td><td >Assign</td><td >FUSION</td>";
+        $expected = "<td >Category</td><td >Assign</td><td >Software from inventories</td>";
       $this->string($result)->isIdenticalTo($expected);
 
       $input = ['field' => '_import_category',

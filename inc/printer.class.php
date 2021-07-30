@@ -40,6 +40,7 @@ if (!defined('GLPI_ROOT')) {
 **/
 class Printer  extends CommonDBTM {
    use Glpi\Features\Clonable;
+    use Glpi\Features\Inventoriable;
 
    // From CommonDBTM
    public $dohistory                   = true;
@@ -92,6 +93,7 @@ class Printer  extends CommonDBTM {
       $this->addStandardTab('Item_OperatingSystem', $ong, $options);
       $this->addStandardTab('Item_SoftwareVersion', $ong, $options);
       $this->addStandardTab('Cartridge', $ong, $options);
+        $this->addStandardTab('PrinterLog', $ong, $options);
       $this->addStandardTab('Item_Devices', $ong, $options);
       $this->addStandardTab('Item_Disk', $ong, $options);
       $this->addStandardTab('Computer_Item', $ong, $options);
@@ -109,6 +111,7 @@ class Printer  extends CommonDBTM {
       $this->addStandardTab('Certificate_Item', $ong, $options);
       $this->addStandardTab('Domain_Item', $ong, $options);
       $this->addStandardTab('Appliance_Item', $ong, $options);
+        $this->addStandardTab('RuleMatchedLog', $ong, $options);
       $this->addStandardTab('Log', $ong, $options);
 
       return $ong;
@@ -794,12 +797,54 @@ class Printer  extends CommonDBTM {
          'massiveaction'      => false
       ];
 
+        $tab[] = [
+            'id'                 => '83',
+            'table'              => self::getTable(),
+            'field'              => 'last_inventory_update',
+            'name'               => __('Last inventory date'),
+            'datatype'           => 'datetime',
+            'massiveaction'      => false
+        ];
+
       $tab = array_merge($tab, Notepad::rawSearchOptionsToAdd());
 
       $tab = array_merge($tab, Item_Devices::rawSearchOptionsToAdd(get_class($this)));
 
       return $tab;
    }
+
+
+   /**
+    * @param $itemtype
+    *
+    * @return array
+    */
+    public static function rawSearchOptionsToAdd($itemtype = null)
+    {
+        $tab = [];
+
+        $tab[] = [
+            'id'                 => 'printer',
+            'name'               => self::getTypeName(Session::getPluralNumber())
+        ];
+
+        $tab[] = [
+            'id'                 => '131',
+            'table'              => 'glpi_computers_items',
+            'field'              => 'id',
+            'name'               => _x('quantity', 'Number of printers'),
+            'forcegroupby'       => true,
+            'usehaving'          => true,
+            'datatype'           => 'count',
+            'massiveaction'      => false,
+            'joinparams'         => [
+                'jointype'           => 'child',
+                'condition'          => "AND NEWTABLE.itemtype = 'Printer'"
+            ]
+        ];
+
+        return $tab;
+    }
 
 
    /**

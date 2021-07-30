@@ -40,6 +40,7 @@ if (!defined('GLPI_ROOT')) {
 class Computer extends CommonDBTM {
    use Glpi\Features\DCBreadcrumb;
    use Glpi\Features\Clonable;
+    use Glpi\Features\Inventoriable;
 
    // From CommonDBTM
    public $dohistory                   = true;
@@ -68,7 +69,8 @@ class Computer extends CommonDBTM {
          NetworkPort::class,
          Computer_Item::class,
          Notepad::class,
-         KnowbaseItem_Item::class
+            KnowbaseItem_Item::class,
+            Item_RemoteManagement::class
       ];
    }
 
@@ -98,6 +100,7 @@ class Computer extends CommonDBTM {
          ->addStandardTab('Item_SoftwareVersion', $ong, $options)
          ->addStandardTab('Computer_Item', $ong, $options)
          ->addStandardTab('NetworkPort', $ong, $options)
+         ->addStandardTab('Item_RemoteManagement', $ong, $options)
          ->addStandardTab('Infocom', $ong, $options)
          ->addStandardTab('Contract_Item', $ong, $options)
          ->addStandardTab('Document_Item', $ong, $options)
@@ -114,6 +117,7 @@ class Computer extends CommonDBTM {
          ->addStandardTab('Reservation', $ong, $options)
          ->addStandardTab('Domain_Item', $ong, $options)
          ->addStandardTab('Appliance_Item', $ong, $options)
+         ->addStandardTab('RuleMatchedLog', $ong, $options)
          ->addStandardTab('Log', $ong, $options);
 
       return $ong;
@@ -608,6 +612,14 @@ class Computer extends CommonDBTM {
          'autocomplete'       => true,
       ];
 
+        $tab[] = [
+            'id'                 => '9',
+            'table'              => $this->getTable(),
+            'field'              => 'last_inventory_update',
+            'name'               => __('Last inventory date'),
+            'datatype'           => 'datetime',
+        ];
+
       $tab[] = [
          'id'                 => '16',
          'table'              => $this->getTable(),
@@ -739,7 +751,19 @@ class Computer extends CommonDBTM {
 
       $tab = array_merge($tab, ComputerAntivirus::rawSearchOptionsToAdd());
 
+        $tab = array_merge($tab, Monitor::rawSearchOptionsToAdd());
+
+        $tab = array_merge($tab, Peripheral::rawSearchOptionsToAdd());
+
+        $tab = array_merge($tab, Printer::rawSearchOptionsToAdd());
+
+        $tab = array_merge($tab, Phone::rawSearchOptionsToAdd());
+
       $tab = array_merge($tab, Datacenter::rawSearchOptionsToAdd(get_class($this)));
+
+        $tab = array_merge($tab, Rack::rawSearchOptionsToAdd(get_class($this)));
+
+        $tab = array_merge($tab, Agent::rawSearchOptionsToAdd());
 
       return $tab;
    }

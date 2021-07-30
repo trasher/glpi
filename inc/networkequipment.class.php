@@ -41,6 +41,7 @@ if (!defined('GLPI_ROOT')) {
 class NetworkEquipment extends CommonDBTM {
    use Glpi\Features\DCBreadcrumb;
    use Glpi\Features\Clonable;
+   use Glpi\Features\Inventoriable;
 
    // From CommonDBTM
    public $dohistory                   = true;
@@ -96,17 +97,6 @@ class NetworkEquipment extends CommonDBTM {
 
 
    /**
-    * @see CommonGLPI::getMenuName()
-    *
-    * @since 0.85
-   **/
-   // bug in translation: https://github.com/glpi-project/glpi/issues/1970
-   /*static function getMenuName() {
-      return _n('Network', 'Networks', Session::getPluralNumber());
-   }*/
-
-
-   /**
     * @since 0.84
     *
     * @see CommonDBTM::cleanDBonPurge()
@@ -159,6 +149,7 @@ class NetworkEquipment extends CommonDBTM {
          ->addStandardTab('Certificate_Item', $ong, $options)
          ->addStandardTab('Domain_Item', $ong, $options)
          ->addStandardTab('Appliance_Item', $ong, $options)
+         ->addStandardTab('RuleMatchedLog', $ong, $options)
          ->addStandardTab('Log', $ong, $options);
 
       return $ong;
@@ -631,6 +622,15 @@ class NetworkEquipment extends CommonDBTM {
          'massiveaction'      => false,
          'datatype'           => 'dropdown'
       ];
+
+        $tab[] = [
+            'id'                 => '83',
+            'table'              => self::getTable(),
+            'field'              => 'last_inventory_update',
+            'name'               => __('Last inventory date'),
+            'datatype'           => 'datetime',
+            'massiveaction'      => false
+        ];
 
       // add operating system search options
       $tab = array_merge($tab, Item_OperatingSystem::rawSearchOptionsToAdd(get_class($this)));

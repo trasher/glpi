@@ -45,29 +45,16 @@ $tables['glpi_apiclients'] = [
    ],
 ];
 
-$tables['glpi_blacklists'] = [
-   [
-      'id'    => 1,
-      'type'  => 1,
-      'name'  => 'empty IP',
-      'value' => '',
-   ], [
-      'id'    => 2,
-      'type'  => 1,
-      'name'  => 'localhost',
-      'value' => '127.0.0.1',
-   ], [
-      'id'    => 3,
-      'type'  => 1,
-      'name'  => 'zero IP',
-      'value' => '0.0.0.0',
-   ], [
-      'id'    => 4,
-      'type'  => 2,
-      'name'  => 'empty MAC',
-      'value' => '',
-   ],
+        foreach (Blacklist::getDefaults() as $type => $values) {
+            foreach ($values as $value) {
+                $tables['glpi_blacklists'][] = [
+                    'type' => $type,
+                    'name' => $value['name'],
+                    'value' => $value['value'],
 ];
+            }
+        }
+
 
 $tables['glpi_calendars'] = [
    [
@@ -316,6 +303,15 @@ foreach ($default_prefs as $name => $value) {
       'value'   => $value,
    ];
 }
+
+        foreach (\Glpi\Inventory\Conf::$defaults as $name => $value) {
+            $tables['glpi_configs'][] = [
+                'context' => 'inventory',
+                'name' => $name,
+                'value' => $value,
+            ];
+        }
+
 $tables['glpi_crontasks'] = [
    [
       'id'            => 2,
@@ -1693,6 +1689,14 @@ $ADDTODISPLAYPREF['Cluster'] = [31, 19];
 $ADDTODISPLAYPREF['Domain'] = [3, 4, 2, 6, 7];
 $ADDTODISPLAYPREF['DomainRecord'] = [2, 3];
 $ADDTODISPLAYPREF['Appliance'] = [2, 3, 4, 5];
+        $ADDTODISPLAYPREF['Lockedfield'] = [3, 13, 5];
+        $ADDTODISPLAYPREF['Unmanaged'] = [2, 4, 3, 5, 7, 10, 18, 14, 15, 9];
+        $ADDTODISPLAYPREF['NetworkPortType'] = [10, 11, 12];
+        $ADDTODISPLAYPREF['NetworkPort'] = [3, 30, 31, 32, 33, 34, 35, 36, 38, 39, 40];
+        $ADDTODISPLAYPREF['USBVendor'] = [10, 11];
+        $ADDTODISPLAYPREF['PCIVendor'] = [10, 11];
+        $ADDTODISPLAYPREF['Agent'] = [2, 4, 10, 8, 11, 6];
+        $ADDTODISPLAYPREF['Database'] = [2, 3, 6, 9, 10];
 
 foreach ($ADDTODISPLAYPREF as $type => $options) {
    $rank = 1;
@@ -7997,8 +8001,8 @@ $tables['glpi_rules'] = [
 $tables['glpi_softwarecategories'] = [
    [
       'id'           => '1',
-      'name'         => 'FUSION',
-      'completename' => 'FUSION',
+                'name' => 'Inventoried',
+                'completename' => 'Software from inventories',
       'level'        => '1',
    ],
 ];
@@ -8170,5 +8174,13 @@ $tables['glpi_devicefirmwaretypes'] = [
 
 $tables[DomainRecordType::getTable()] = DomainRecordType::getDefaults();
 $tables[DomainRelation::getTable()] = DomainRelation::getDefaults();
+        $tables[NetworkPortType::getTable()] = Toolbox::addslashes_deep(NetworkPortType::getDefaults());
+
+        $tables['glpi_agenttypes'] = [
+            [
+                'id' => 1,
+                'name' => 'Core'
+            ]
+        ];
 
 return $tables;

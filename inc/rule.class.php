@@ -88,6 +88,8 @@ class Rule extends CommonDBTM {
    const PATTERN_UNDER           = 11;
    const PATTERN_NOT_UNDER       = 12;
    const PATTERN_IS_EMPTY        = 30; // Global criteria
+    const PATTERN_CIDR            = 333;
+    const PATTERN_NOT_CIDR        = 334;
 
    const AND_MATCHING            = "AND";
    const OR_MATCHING             = "OR";
@@ -122,9 +124,11 @@ class Rule extends CommonDBTM {
 
       $rule = new self();
       if ($rule->getFromDB($rules_id)) {
+            if (class_exists($rule->fields['sub_type'])) {
          $realrule = new $rule->fields['sub_type']();
          return $realrule;
       }
+        }
       return null;
    }
 
@@ -244,7 +248,7 @@ class Rule extends CommonDBTM {
          $menu['rule']['options']['transfer']['links']['search'] = "/front/transfer.php";
 
          if (Session::haveRightsOr("transfer", [CREATE, UPDATE])) {
-            $menu['rule']['options']['transfer']['links']['summary']
+                $menu['rule']['options']['transfer']['links']['transfer_list']
                                                                  = "/front/transfer.action.php";
             $menu['rule']['options']['transfer']['links']['add'] = Transfer::getFormURL(false);
          }
@@ -776,6 +780,12 @@ class Rule extends CommonDBTM {
       if (!is_array($values)) {
          $values = [$field => $values];
       }
+
+        if (isset($options['searchopt']['real_type'])) {
+            $ruleclass = new $options['searchopt']['real_type']();
+            return $ruleclass->getSpecificValueToDisplay($field, $values, $options);
+        }
+
       switch ($field) {
          case 'match' :
             switch ($values[$field]) {
@@ -806,6 +816,12 @@ class Rule extends CommonDBTM {
          $values = [$field => $values];
       }
       $options['display'] = false;
+
+        if (isset($options['searchopt']['real_type'])) {
+            $ruleclass = new $options['searchopt']['real_type']();
+            return $ruleclass->getSpecificValueToSelect($field, $name, $values, $options);
+        }
+
       switch ($field) {
          case 'match' :
             if (isset($values['itemtype']) && !empty($values['itemtype'])) {
@@ -2312,8 +2328,10 @@ class Rule extends CommonDBTM {
                $display = true;
                break;
 
-            case "dropdown_import_type" :
-               RuleAsset::dropdownImportType($name, $value);
+                case "dropdown_inventory_itemtype":
+                    $types = $CFG_GLPI['state_types'];
+                    $types[''] = __('No item type defined');
+                    Dropdown::showItemTypes($name, $types, ['value' => $value]);
                $display = true;
                break;
 
@@ -2656,8 +2674,14 @@ class Rule extends CommonDBTM {
    }
 
 
-   function getActions() {
-      return [];
+    public function getActions()
+    {
+        return [
+            '_stop_rules_processing' => [
+                'name' => __('Skip remaining rules'),
+                'type' => 'yesonly',
+            ]
+        ];
    }
 
 

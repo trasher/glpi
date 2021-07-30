@@ -143,6 +143,7 @@ final class DbUtils {
       $rules = [
          //'plural'           => 'singular'
          'pdus$'              => 'pdu', // special case for acronym pdu (to avoid us rule)
+            'metrics$'           => 'metrics',// Special case
          'ches$'              => 'ch',
          'ch$'                => 'ch',
          'shes$'              => 'sh',

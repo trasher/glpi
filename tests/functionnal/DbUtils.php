@@ -271,7 +271,8 @@ class DbUtils extends DbTestCase {
          ['machine', 'machines'],
          ['memory', 'memories'],
          ['licence', 'licences'],
-         ['pdu', 'pdus']
+            ['pdu', 'pdus'],
+            ['metrics', 'metrics']
       ];
    }
 

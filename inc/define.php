@@ -197,7 +197,7 @@ $CFG_GLPI["project_asset_types"]          = ['Computer', 'Monitor', 'NetworkEqui
                                                   'DeviceHardDrive', 'DeviceNetworkCard', 'DeviceDrive',
                                                   'DeviceControl', 'DeviceGraphicCard', 'DeviceSoundCard',
                                                   'DevicePci', 'DeviceCase', 'DevicePowerSupply', 'DeviceGeneric',
-                                                  'DeviceBattery', 'DeviceFirmware',
+                                                  'DeviceBattery', 'DeviceFirmware', 'DeviceCamera',
                                                   'Certificate'];
 
 
@@ -250,7 +250,10 @@ $CFG_GLPI["location_types"]               = ['Budget', 'CartridgeItem', 'Consuma
                                                   'Computer', 'Monitor', 'Netpoint',
                                                   'NetworkEquipment', 'Peripheral', 'Phone',
                                                   'Printer', 'Software', 'SoftwareLicense',
-                                                  'Ticket', 'User', 'Certificate', 'Item_DeviceSimcard'];
+    'Ticket', 'User', 'Certificate', 'Item_DeviceSimcard',
+    'Line', 'Appliance', 'PassiveDCEquipment', 'DataCenter',
+    'DCRoom', 'Rack', 'Enclosure', 'PDU'
+];
 
 $CFG_GLPI["ticket_types"]                 = ['Computer', 'Monitor', 'NetworkEquipment',
                                                   'Peripheral', 'Phone', 'Printer', 'Software',
@@ -273,12 +276,12 @@ $CFG_GLPI["dictionnary_types"]            = ['ComputerModel', 'ComputerType', 'M
                                                   'Printer', 'PrinterModel', 'PrinterType',
                                                   'Software', 'OperatingSystemArchitecture',
                                                   'OperatingSystemKernel', 'OperatingSystemKernelVersion',
-                                                  'OperatingSystemEdition'];
+                                                  'OperatingSystemEdition', 'ImageResolution', 'ImageFormat'];
 
 $CFG_GLPI["helpdesk_visible_types"]       = ['Software', 'Appliance'];
 
 $CFG_GLPI["networkport_types"]            = ['Computer', 'Monitor', 'NetworkEquipment', 'Peripheral',
-                                                  'Phone', 'Printer', 'Enclosure', 'PDU', 'Cluster'];
+                                                  'Phone', 'Printer', 'Enclosure', 'PDU', 'Cluster', 'Unmanaged'];
 
 // Warning : the order is used for displaying different NetworkPort types ! Keep it !
 $CFG_GLPI['networkport_instantiations']   = ['NetworkPortEthernet', 'NetworkPortWifi' ,
@@ -291,7 +294,7 @@ $CFG_GLPI['device_types']                 = ['DeviceMotherboard', 'DeviceFirmwar
                                                   'DeviceDrive', 'DeviceBattery', 'DeviceGraphicCard',
                                                   'DeviceSoundCard', 'DeviceControl', 'DevicePci',
                                                   'DeviceCase', 'DevicePowerSupply', 'DeviceGeneric',
-                                                  'DeviceSimcard', 'DeviceSensor'];
+                                                  'DeviceSimcard', 'DeviceSensor', 'DeviceCamera'];
 
 $CFG_GLPI['itemdevices'] = [];
 foreach ($CFG_GLPI['device_types'] as $dtype) {
@@ -304,9 +307,9 @@ $CFG_GLPI["itemdevices_types"]            = ['Computer', 'NetworkEquipment', 'Pe
 
 $CFG_GLPI["itemdevices_itemaffinity"]     = ['Computer'];
 
-$CFG_GLPI["itemdevicememory_types"]       = ['Computer', 'NetworkEquipment', 'Peripheral', 'Printer'];
+$CFG_GLPI["itemdevicememory_types"]       = ['Computer', 'NetworkEquipment', 'Peripheral', 'Printer', 'Phone'];
 
-$CFG_GLPI["itemdevicepowersupply_types"]  = ['Computer', 'NetworkEquipment', 'Enclosure'];
+$CFG_GLPI["itemdevicepowersupply_types"]  = ['Computer', 'NetworkEquipment', 'Enclosure', 'Phone'];
 
 $CFG_GLPI["itemdevicenetworkcard_types"]  = ['Computer', 'NetworkEquipment', 'Peripheral', 'Phone', 'Printer'];
 
@@ -322,15 +325,17 @@ $CFG_GLPI['itemdevicegeneric_types']      = ['*'];
 
 $CFG_GLPI['itemdevicepci_types']          = ['*'];
 
-$CFG_GLPI['itemdevicesensor_types']       = ['Computer', 'Peripheral'];
+$CFG_GLPI['itemdevicesensor_types']       = ['Computer', 'Peripheral', 'Phone'];
 
-$CFG_GLPI['itemdeviceprocessor_types']    = ['Computer'];
+$CFG_GLPI['itemdeviceprocessor_types']    = ['Computer', 'Phone'];
 
 $CFG_GLPI['itemdevicesoundcard_types']    = ['Computer'];
 
-$CFG_GLPI['itemdevicegraphiccard_types']  = ['Computer'];
+$CFG_GLPI['itemdevicegraphiccard_types']  = ['Computer', 'Phone'];
 
-$CFG_GLPI['itemdevicemotherboard_types']  = ['Computer'];
+$CFG_GLPI['itemdevicemotherboard_types']  = ['Computer', 'Phone'];
+
+$CFG_GLPI['itemdevicecamera_types']  = ['Computer', 'Phone'];
 
 $CFG_GLPI["notificationtemplates_types"]  = ['CartridgeItem', 'Change', 'ConsumableItem',
                                              'Contract', 'CronTask', 'DBConnection',
@@ -355,7 +360,8 @@ $CFG_GLPI["systeminformations_types"]     = ['AuthLDAP', 'DBConnection', 'MailCo
                                                   'Plugin'];
 
 $CFG_GLPI["rulecollections_types"]        = ['RuleImportEntityCollection',
-                                                  'RuleImportComputerCollection',
+                                                  'RuleImportAssetCollection',
+                                                  'RuleImportEntityCollection',
                                                   'RuleMailCollectorCollection',
                                                   'RuleRightCollection',
                                                   'RuleSoftwareCategoryCollection',
@@ -382,7 +388,7 @@ $CFG_GLPI["globalsearch_types"]           = ['Computer', 'Contact', 'Contract',
                                              'Ticket', 'Problem', 'Change',
                                              'User', 'Group', 'Project', 'Supplier',
                                              'Budget', 'Certificate', 'Line', 'Datacenter',
-                                             'DCRoom', 'Enclosure', 'PDU', 'Rack', 'Cluster',
+                                             'DCRoom', 'Enclosure', 'PDU', 'Rack', 'Cluster', 'PassiveDCEquipment',
                                              'Domain', 'Appliance'];
 
 // New config options which can be missing during migration
@@ -434,6 +440,13 @@ $CFG_GLPI['lock_lockable_objects'] = ['Budget',  'Change', 'Contact', 'Contract'
                                            'RSSFeed', 'Software', 'Supplier', 'Ticket', 'User',
                                            'SoftwareLicense', 'Certificate'];
 
+$CFG_GLPI['inventory_types'] = [
+    'Computer',
+    'Phone',
+    'Printer',
+    'NetworkEquipment'
+];
+
 $CFG_GLPI['inventory_lockable_objects'] = ['Computer_Item',  'Item_SoftwareLicense',
                                            'Item_SoftwareVersion', 'Item_Disk', 'ComputerVirtualMachine',
                                            'NetworkPort', 'NetworkName', 'IPAddress'];
@@ -464,9 +477,13 @@ $CFG_GLPI['domain_types']        = ['Computer', 'Monitor', 'NetworkEquipment', '
                                        'Phone', 'Printer', 'Software', 'Appliance', 'Certificate'];
 
 $CFG_GLPI['appliance_types']     = ['Computer', 'Monitor', 'NetworkEquipment', 'Peripheral', 'Phone',
-                                       'Printer', 'Software', 'Cluster'];
+                                       'Printer', 'Software', 'Appliance', 'Cluster'];
 
 $CFG_GLPI['appliance_relation_types'] = ['Location', 'Network', 'Domain'];
+
+$CFG_GLPI['remote_management_types'] = ['Computer', 'Phone'];
+
+$CFG_GLPI['agent_types'] = ['Computer', 'Phone'];
 
 $dashboard_libs = [
    'dashboard', 'gridstack',

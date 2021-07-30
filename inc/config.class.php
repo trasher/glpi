@@ -2105,6 +2105,8 @@ class Config extends CommonDBTM {
                  'check'   => 'wapmorgan\\UnifiedArchive\\UnifiedArchive' ],
                [ 'name'    => 'paragonie/sodium_compat',
                  'check'   => 'ParagonIE_Sodium_Compat' ],
+               [ 'name'    => 'glpi-project/inventory_format',
+                 'check'   => 'Glpi\Inventory\Converter' ],
       ];
       if (Toolbox::canUseCAS()) {
          $deps[] = [

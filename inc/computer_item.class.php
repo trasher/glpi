@@ -128,6 +128,7 @@ class Computer_Item extends CommonDBRelation{
 
             $updates['contact']     = addslashes($comp->fields['contact']);
             $updates['contact_num'] = addslashes($comp->fields['contact_num']);
+            $updates['is_dynamic'] = $comp->fields['is_dynamic'] ?? 0;
             Session::addMessageAfterRedirect(
                __('Alternate username updated. The connected items have been updated using this alternate username.'),
                                              true);
@@ -229,10 +230,11 @@ class Computer_Item extends CommonDBRelation{
 
 
    static function getRelationMassiveActionsSpecificities() {
+      global $CFG_GLPI;
 
       $specificities              = parent::getRelationMassiveActionsSpecificities();
 
-      $specificities['itemtypes'] = ['Monitor', 'Peripheral', 'Phone', 'Printer'];
+      $specificities['itemtypes'] = $CFG_GLPI['directconnect_types'];
 
       $specificities['select_items_options_2']['entity_restrict'] = $_SESSION['glpiactive_entity'];
       $specificities['select_items_options_2']['onlyglobal']      = true;
@@ -368,9 +370,7 @@ class Computer_Item extends CommonDBRelation{
 
          $header_end .= "<th>"._n('Type', 'Types', 1)."</th>";
          $header_end .= "<th>".__('Name')."</th>";
-         if (Plugin::haveImport()) {
-            $header_end .= "<th>".__('Automatic inventory')."</th>";
-         }
+         $header_end .= "<th>".__('Automatic inventory')."</th>";
          $header_end .= "<th>".Entity::getTypeName(1)."</th>";
          $header_end .= "<th>".__('Serial number')."</th>";
          $header_end .= "<th>".__('Inventory number')."</th>";
@@ -397,10 +397,8 @@ class Computer_Item extends CommonDBRelation{
             echo "<td ".
                   ((isset($data['is_deleted']) && $data['is_deleted'])?"class='tab_bg_2_2'":"").
                  ">".$name."</td>";
-            if (Plugin::haveImport()) {
-               $dynamic_field = static::getTable() . '_is_dynamic';
-               echo "<td>".Dropdown::getYesNo($data[$dynamic_field])."</td>";
-            }
+            $dynamic_field = static::getTable() . '_is_dynamic';
+            echo "<td>".Dropdown::getYesNo($data[$dynamic_field])."</td>";
             echo "<td>".Dropdown::getDropdownName("glpi_entities",
                                                                $data['entities_id']);
             echo "</td>";
@@ -523,9 +521,7 @@ class Computer_Item extends CommonDBRelation{
          }
 
          $header_end .= "<th>".__('Name')."</th>";
-         if (Plugin::haveImport()) {
-            $header_end .= "<th>".__('Automatic inventory')."</th>";
-         }
+         $header_end .= "<th>".__('Automatic inventory')."</th>";
          $header_end .= "<th>".Entity::getTypeName(1)."</th>";
          $header_end .= "<th>".__('Serial number')."</th>";
          $header_end .= "<th>".__('Inventory number')."</th>";
@@ -545,9 +541,7 @@ class Computer_Item extends CommonDBRelation{
             echo "<td ".
                   ($comp->getField('is_deleted')?"class='tab_bg_2_2'":"").
                  ">".$comp->getLink()."</td>";
-            if (Plugin::haveImport()) {
-               echo "<td>".Dropdown::getYesNo($dynamic[$key])."</td>";
-            }
+            echo "<td>".Dropdown::getYesNo($dynamic[$key])."</td>";
             echo "<td class='center'>".Dropdown::getDropdownName("glpi_entities",
                                                                $comp->getField('entities_id'));
             echo "</td>";
@@ -699,36 +693,40 @@ class Computer_Item extends CommonDBRelation{
 
 
    function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
+      global $CFG_GLPI;
 
       // can exists for Template
       if ($item->can($item->getField('id'), READ)) {
          $nb = 0;
-         switch ($item->getType()) {
-            case 'Phone' :
-            case 'Printer' :
-            case 'Peripheral' :
-            case 'Monitor' :
-               if (Computer::canView()) {
-                  if ($_SESSION['glpishow_count_on_tabs']) {
-                     $nb = self::countForItem($item);
-                  }
-                  return self::createTabEntry(_n('Connection', 'Connections', Session::getPluralNumber()),
-                                              $nb);
-               }
-               break;
+            $canview = false;
 
-            case 'Computer' :
-               if (Phone::canView()
-                   || Printer::canView()
-                   || Peripheral::canView()
-                   || Monitor::canView()) {
+            if ($item->getType() == Computer::getType()) {
+                foreach ($CFG_GLPI['directconnect_types'] as $type) {
+                    if ($type::canView()) {
+                        $canview = true;
+                        break;
+                  }
+               }
+
+                if ($canview) {
                   if ($_SESSION['glpishow_count_on_tabs']) {
                      $nb = self::countForMainItem($item);
                   }
-                  return self::createTabEntry(_n('Connection', 'Connections', Session::getPluralNumber()),
-                                              $nb);
                }
-               break;
+            }
+
+            if (in_array($item->getType(), $CFG_GLPI['directconnect_types']) && Computer::canView()) {
+                $canview = true;
+                if ($_SESSION['glpishow_count_on_tabs']) {
+                    $nb = self::countForItem($item);
+                }
+            }
+
+            if ($canview) {
+                return self::createTabEntry(
+                    _n('Connection', 'Connections', Session::getPluralNumber()),
+                    $nb
+                );
          }
       }
       return '';
@@ -736,77 +734,24 @@ class Computer_Item extends CommonDBRelation{
 
 
    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
+      global $CFG_GLPI;
 
-      switch ($item->getType()) {
-         case 'Phone' :
-         case 'Printer' :
-         case 'Peripheral' :
-         case 'Monitor' :
-            self::showForItem($item, $withtemplate);
-            return true;
-
-         case 'Computer' :
+        if ($item->getType() == Computer::getType()) {
             self::showForComputer($item, $withtemplate);
             return true;
-      }
    }
 
-
-   /**
-    * Duplicate connected items to computer from an item template to its clone
-    *
-    * @deprecated 9.5
-    * @since 0.84
-    *
-    * @param integer $oldid ID of the item to clone
-    * @param integer $newid ID of the item cloned
-   **/
-   static function cloneComputer($oldid, $newid) {
-      global $DB;
-
-      Toolbox::deprecated('Use clone');
-      $iterator = $DB->request([
-         'FROM'   => self::getTable(),
-         'WHERE'  => ['computers_id' => $oldid]
-      ]);
-
-      while ($data = $iterator->next()) {
-         $conn = new Computer_Item();
-         $conn->add(['computers_id' => $newid,
-                     'itemtype'     => $data["itemtype"],
-                     'items_id'     => $data["items_id"]]);
-      }
+        if (in_array($item->getType(), $CFG_GLPI['directconnect_types'])) {
+            self::showForItem($item, $withtemplate);
+            return true;
    }
 
-
-   /**
-    * Duplicate connected items to item from an item template to its clone
-    *
-    * @deprecated 9.5
-    * @since 0.83.3
-    *
-    * @param string  $itemtype type of the item to clone
-    * @param integer $oldid    ID of the item to clone
-    * @param integer $newid    ID of the item cloned
-   **/
-   static function cloneItem($itemtype, $oldid, $newid) {
-      global $DB;
-
-      Toolbox::deprecated('Use clone');
-      $iterator = $DB->request([
-         'FROM'   => self::getTable(),
-         'WHERE'  => [
-            'itemtype'  => $itemtype,
-            'items_id'  => $oldid
-         ]
-      ]);
-
-      while ($data = $iterator->next()) {
-         $conn = new self();
-         $conn->add(['computers_id' => $data["computers_id"],
-                     'itemtype'     => $data["itemtype"],
-                     'items_id'     => $newid]);
-      }
+        throw new \RuntimeException(
+            sprintf(
+                'Cannot link a computer with a %s',
+                $item->getType()
+            )
+        );
    }
 
 

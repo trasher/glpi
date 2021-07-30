@@ -31,6 +31,8 @@
  */
 
 use Glpi\Event;
+use Glpi\Features\CacheableListInterface;
+use Glpi\Plugin\Hooks;
 
 if (!defined('GLPI_ROOT')) {
    die("Sorry. You can't access this file directly");
@@ -429,6 +431,27 @@ class CommonDBTM extends CommonGLPI {
    }
 
 
+    /**
+     * Retrieve locked field for the current item
+     *
+     * @return array
+     */
+    public function getLockedFields()
+    {
+        $locks = [];
+        $lockedfield = new Lockedfield();
+        if (
+            !$this instanceof Lockedfield
+            && !$this->isNewItem()
+            && $lockedfield->isHandled($this)
+        ) {
+            $locks = $lockedfield->getLocks($this->getType(), $this->fields['id']);
+        }
+
+        return $locks;
+    }
+
+
    /**
     * Actions done to not show some fields when geting a single item from API calls
     *
@@ -680,6 +703,9 @@ class CommonDBTM extends CommonGLPI {
          );
          if ($result) {
             $this->post_deleteFromDB();
+                if ($this instanceof CacheableListInterface) {
+                    $this->invalidateListCache();
+                }
             return true;
          }
 
@@ -990,6 +1016,11 @@ class CommonDBTM extends CommonGLPI {
             Domain_Item::class
          ]);
       }
+
+        $lockedfield = new Lockedfield();
+        if ($lockedfield->isHandled($this)) {
+            $lockedfield->itemDeleted();
+        }
    }
 
 
@@ -1175,6 +1206,9 @@ class CommonDBTM extends CommonGLPI {
          if ($this->checkUnicity(true, $options)) {
             if ($this->addToDB() !== false) {
                $this->post_addItem();
+                    if ($this instanceof CacheableListInterface) {
+                        $this->invalidateListCache();
+                    }
                $this->addMessageOnAddAction();
 
                if ($this->dohistory && $history) {
@@ -1646,10 +1680,12 @@ class CommonDBTM extends CommonGLPI {
                }
                $this->pre_updateInDB();
 
+                    $this->cleanLockeds();
                if (count($this->updates)) {
                   if ($this->updateInDB($this->updates,
                                         ($this->dohistory && $history ? $this->oldvalues
                                                                       : []))) {
+                     $this->manageLocks();
                      $this->addMessageOnUpdateAction();
                      Plugin::doHook("item_update", $this);
 
@@ -1695,6 +1731,65 @@ class CommonDBTM extends CommonGLPI {
       return false;
    }
 
+    /**
+     * Clean locked fields from update, if needed
+     *
+     * @return void
+     */
+    protected function cleanLockeds()
+    {
+        if ($this->isDynamic() && (in_array('is_dynamic', $this->updates) || isset($this->input['is_dynamic']) && $this->input['is_dynamic'] == true)) {
+            $lockedfield = new Lockedfield();
+            $locks = $lockedfield->getLocks($this->getType(), $this->fields['id']);
+            foreach ($locks as $lock) {
+                $idx = array_search($lock, $this->updates);
+                if ($idx !== false) {
+                    $lockedfield->setLastValue($this->getType(), $this->fields['id'], $lock, $this->input[$lock]);
+                    unset($this->updates[$idx]);
+                }
+            }
+            $this->updates = array_values($this->updates);
+        }
+    }
+
+    /**
+     * Manage fields that should be marked as locked
+     *
+     * @return void
+     */
+    protected function manageLocks()
+    {
+        global $DB;
+
+        $lockedfield = new Lockedfield();
+        if ($lockedfield->isHandled($this) && (!isset($this->input['is_dynamic']) || $this->input['is_dynamic'] == false)) {
+            $fields = array_values($this->updates);
+            $idx = array_search('date_mod', $fields);
+            if ($idx !== false) {
+                unset($fields[$idx]);
+            }
+            $stmt = $DB->prepare(
+                $DB->buildInsert(
+                    $lockedfield->getTable(),
+                    [
+                        'itemtype'        => $this->getType(),
+                        'items_id'        => $this->fields['id'],
+                        'date_creation'   => $_SESSION["glpi_currenttime"],
+                        'field'           => new QueryParam()
+                    ]
+                )
+            );
+            foreach ($fields as $field) {
+                 $stmt->bind_param('s', $field);
+                 $res = $stmt->execute();
+                if ($res === false) {
+                    if ($DB->errno() != 1062) {
+                        trigger_error('Unable to add locked field!', E_USER_WARNING);
+                    }
+                }
+            }
+        }
+    }
 
    /**
     * Forward entity information to linked items
@@ -1876,6 +1971,10 @@ class CommonDBTM extends CommonGLPI {
          $this->input['_no_history'] = !$history;
       }
 
+        if ($force && method_exists($this, 'pre_purgeInventory')) {
+            $this->pre_purgeInventory();
+        }
+
       // Purge
       if ($force) {
          Plugin::doHook("pre_item_purge", $this);
@@ -1895,7 +1994,10 @@ class CommonDBTM extends CommonGLPI {
             if ($force) {
                $this->addMessageOnPurgeAction();
                $this->post_purgeItem();
-               Plugin::doHook("item_purge", $this);
+                    if ($this instanceof CacheableListInterface) {
+                        $this->invalidateListCache();
+                    }
+                    Plugin::doHook(Hooks::ITEM_PURGE, $this);
                Impact::clean($this);
             } else {
                $this->addMessageOnDeleteAction();
@@ -1916,7 +2018,9 @@ class CommonDBTM extends CommonGLPI {
                                $logaction);
                }
                $this->post_deleteItem();
-
+                    if ($this instanceof CacheableListInterface) {
+                        $this->invalidateListCache();
+                    }
                Plugin::doHook("item_delete", $this);
             }
             if ($this->notificationqueueonaction) {
@@ -2086,6 +2190,9 @@ class CommonDBTM extends CommonGLPI {
          }
 
          $this->post_restoreItem();
+            if ($this instanceof CacheableListInterface) {
+                $this->invalidateListCache();
+            }
          Plugin::doHook("item_restore", $this);
          if ($this->notificationqueueonaction) {
             QueuedNotification::forceSendFor($this->getType(), $this->fields['id']);
@@ -2941,6 +3048,10 @@ class CommonDBTM extends CommonGLPI {
     * @return boolean
    **/
    function can($ID, $right, array &$input = null) {
+        if (Session::isInventory()) {
+            return true;
+        }
+
       // Clean ID :
       $ID = Toolbox::cleanInteger($ID);
 

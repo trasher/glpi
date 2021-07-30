@@ -497,7 +497,7 @@ class Computer extends DbTestCase {
    }
 
    public function testCloneWithAutoCreateInfocom() {
-      global $DB;
+      global $CFG_GLPI, $DB;
 
       $this->login();
       $this->setEntity('_test_root_entity', true);

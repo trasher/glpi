@@ -853,7 +853,7 @@ class DBmysql {
       foreach ($queries as $query) {
          $query = trim($query);
          if ($query != '') {
-            $query = htmlentities($query);
+            $query = htmlentities($query, ENT_COMPAT, 'UTF-8');
             if (!$this->query($query)) {
                return false;
             }
@@ -1429,7 +1429,6 @@ class DBmysql {
             echo $message . "\n";
             die(1);
          }
-
       }
       return $res;
    }
@@ -1905,7 +1904,6 @@ class DBmysql {
          if (($i != ($linecount - 1)) || (strlen($lines[$i]) > 0)) {
             if (isset($lines[$i][0])) {
                if ($lines[$i][0] != "#" && substr($lines[$i], 0, 2) != "--") {
-
                   $output .= $lines[$i] . "\n";
                } else {
                   $output .= "\n";
@@ -1917,4 +1915,19 @@ class DBmysql {
       }
       return trim($this->removeSqlComments($output));
    }
+
+    /**
+     * Executes a prepared statement
+     *
+     * @param mysqli_stmt $stmt STatement to execute
+     *
+     * @return void
+     */
+    public function executeStatement(mysqli_stmt $stmt): void
+    {
+        if (!$stmt->execute()) {
+            trigger_error($stmt->error, E_USER_ERROR);
+        }
+    }
+
 }
