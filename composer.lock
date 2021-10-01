@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "449be88a953ab1b9e28b3805f87fcfe1",
+    "content-hash": "1c4d1ae69e63990f48a41d4e30f21b94",
     "packages": [
         {
             "name": "blueimp/jquery-file-upload",
@@ -5702,20 +5702,19 @@
         },
         {
             "name": "glpi-project/tools",
-            "version": "0.1.16",
+            "version": "0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/glpi-project/tools.git",
-                "reference": "218e67a88ed2f5db7085af80e39522a138a262d8"
+                "reference": "d0661d70c32044c0c3b22418d8fb40f35a8c4b80"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/glpi-project/tools/zipball/218e67a88ed2f5db7085af80e39522a138a262d8",
-                "reference": "218e67a88ed2f5db7085af80e39522a138a262d8",
+                "url": "https://api.github.com/repos/glpi-project/tools/zipball/d0661d70c32044c0c3b22418d8fb40f35a8c4b80",
+                "reference": "d0661d70c32044c0c3b22418d8fb40f35a8c4b80",
                 "shasum": ""
             },
             "require": {
-                "consolidation/robo": "^2.0 || ^3.0",
                 "glpi-project/coding-standard": "^0.8",
                 "symfony/console": "^4.4 || ^5.0"
             },
@@ -5751,7 +5750,7 @@
                 "issues": "https://github.com/glpi-project/tools/issues",
                 "source": "https://github.com/glpi-project/tools"
             },
-            "time": "2021-03-03T08:05:40+00:00"
+            "time": "2021-09-28T11:28:00+00:00"
         },
         {
             "name": "grasmash/expander",
@@ -6343,16 +6342,16 @@
         },
         {
             "name": "squizlabs/php_codesniffer",
-            "version": "3.5.8",
+            "version": "3.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "9d583721a7157ee997f235f327de038e7ea6dac4"
+                "reference": "ffced0d2c8fa8e6cdc4d695a743271fab6c38625"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/9d583721a7157ee997f235f327de038e7ea6dac4",
-                "reference": "9d583721a7157ee997f235f327de038e7ea6dac4",
+                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/ffced0d2c8fa8e6cdc4d695a743271fab6c38625",
+                "reference": "ffced0d2c8fa8e6cdc4d695a743271fab6c38625",
                 "shasum": ""
             },
             "require": {
@@ -6395,7 +6394,7 @@
                 "source": "https://github.com/squizlabs/PHP_CodeSniffer",
                 "wiki": "https://github.com/squizlabs/PHP_CodeSniffer/wiki"
             },
-            "time": "2020-10-23T02:01:07+00:00"
+            "time": "2021-04-09T00:54:41+00:00"
         },
         {
             "name": "symfony/event-dispatcher",
