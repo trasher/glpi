@@ -2170,7 +2170,7 @@ class Config extends CommonDBTM
         echo "<tr class='tab_bg_2'>";
         echo "<td><label for='proxy_name'>" . __('Server') . "</label></td>";
         echo "<td><input type='text' name='proxy_name' id='proxy_name' value='" . $CFG_GLPI["proxy_name"] . "' class='form-control'></td>";
-       //TRANS: Proxy port
+        //TRANS: Proxy port
         echo "<td><label for='proxy_port'>" . _n('Port', 'Ports', 1) . "</label></td>";
         echo "<td><input type='text' name='proxy_port' id='proxy_port' value='" . $CFG_GLPI["proxy_port"] . "' class='form-control'></td>";
         echo "</tr>";

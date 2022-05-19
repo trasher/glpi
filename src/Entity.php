@@ -1606,6 +1606,8 @@ class Entity extends CommonTreeDropdown
      **/
     public static function showAdvancedOptions(Entity $entity)
     {
+        global $CFG_GLPI;
+
         $con_spotted = false;
         $ID          = $entity->getField('id');
         if (!$entity->can($ID, READ)) {
@@ -1671,6 +1673,34 @@ class Entity extends CommonTreeDropdown
             echo Html::input('entity_ldapfilter', ['value' => $entity->fields['entity_ldapfilter'], 'size' => 100]);
             echo "</td></tr>";
         }
+
+        echo "<tr><th colspan='2'>" . __('Proxy configuration for inventory') .
+            "</th></tr>";
+        echo "<tr class='tab_bg_1'><td colspan='2' class='center'>" .
+            __('Default proxy for inventory configuration will be used if nothing is specified here') .
+            "</td></tr>";
+
+        echo "<tr class='tab_bg_2'>";
+        echo "<td><label for='proxy_name'>" . __('Server') . "</label></td>";
+        echo "<td>";
+        echo Html::input('proxy_name', ['value' => $entity->fields['proxy_name'], 'placeholder' => $CFG_GLPI["proxy_name"]]);
+        echo "</td></tr>";
+
+        //TRANS: Proxy port
+        echo "<td><label for='proxy_port'>" . _n('Port', 'Ports', 1) . "</label></td>";
+        echo "<td>"; //<input type='text' name='proxy_port' id='proxy_port' value='" . $CFG_GLPI["proxy_port"] . "' class='form-control'></td>";
+        echo Html::input('proxy_port', ['value' => $entity->fields['proxy_port'], 'placeholder' => $CFG_GLPI["proxy_port"]]);
+        echo "</td></tr>";
+
+        echo "<tr class='tab_bg_2'>";
+        echo "<td><label for='proxy_user'>" . __('Login') . "</label></td>";
+        echo "<td><input type='text' name='proxy_user' id='proxy_user' value='" . $entity->fields["proxy_user"] . "' class='form-control'></td>";
+        echo "</td></tr>";
+        echo "<tr class='tab_bg_2'>";
+        echo "<td><label for='proxy_passwd'>" . __('Password') . "</label></td>";
+        echo "<td><input type='password' name='proxy_passwd' id='proxy_passwd' value='' autocomplete='new-password' class='form-control'>";
+        echo "<br><input type='checkbox' name='_blank_proxy_passwd' id='_blank_proxy_passwd'><label for='_blank_proxy_passwd'>" . __('Clear') . "</label>";
+        echo "</td></tr>";
 
         Plugin::doHook(Hooks::POST_ITEM_FORM, ['item' => $entity, 'options' => &$options]);
 
