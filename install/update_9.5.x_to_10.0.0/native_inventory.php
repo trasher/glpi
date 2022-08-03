@@ -170,10 +170,12 @@ if (!$DB->tableExists('glpi_lockedfields')) {
          `value` varchar(255) DEFAULT NULL,
          `date_mod` timestamp NULL DEFAULT NULL,
          `date_creation` timestamp NULL DEFAULT NULL,
+         `is_global` tinyint NOT NULL DEFAULT '0',
          PRIMARY KEY (`id`),
          UNIQUE KEY `unicity` (`itemtype`, `items_id`, `field`),
          KEY `date_creation` (`date_creation`),
-         KEY `date_mod` (`date_mod`)
+         KEY `date_mod` (`date_mod`),
+         KEY `is_global` (`is_global`)
       ) ENGINE = InnoDB ROW_FORMAT = DYNAMIC DEFAULT CHARSET = {$default_charset} COLLATE = {$default_collation};";
     $DB->queryOrDie($query, "10.0 add table glpi_lockedfields");
 } else {
@@ -182,7 +184,7 @@ if (!$DB->tableExists('glpi_lockedfields')) {
     $migration->addField('glpi_lockedfields', 'value', 'string');
     $migration->addKey('glpi_lockedfields', 'date_creation');
 }
-$ADDTODISPLAYPREF['Lockedfield'] = [3, 13, 5];
+$ADDTODISPLAYPREF['Lockedfield'] = [3, 13, 5, 7];
 
 
 //transfer configuration per entity
