@@ -90,47 +90,6 @@ if (!$DB->tableExists('glpi_agents')) {
          KEY `agenttypes_id` (`agenttypes_id`)
    ) ENGINE = InnoDB ROW_FORMAT = DYNAMIC DEFAULT CHARSET = {$default_charset} COLLATE = {$default_collation};";
     $DB->queryOrDie($query, "10.0 add table glpi_agents");
-} else {
-    $migration->dropKey('glpi_agents', 'items_id');
-    $migration->dropKey('glpi_agents', 'itemtype');
-    $migration->dropForeignKeyContraint('glpi_agents', 'agenttypes_id');
-    $migration->migrationOneTable('glpi_agents');
-    $migration->addKey('glpi_agents', 'agenttypes_id');
-    $migration->addKey('glpi_agents', 'entities_id');
-    $migration->addKey('glpi_agents', 'is_recursive');
-    $migration->addKey('glpi_agents', ['itemtype', 'items_id'], 'item');
-    $migration->addField(
-        'glpi_agents',
-        'threads_networkdiscovery',
-        'int NOT NULL DEFAULT 1',
-        [
-            'comment' => 'Number of threads for Network Discovery'
-        ]
-    );
-    $migration->addField(
-        'glpi_agents',
-        'threads_networkinventory',
-        "int NOT NULL DEFAULT '1'",
-        [
-            'comment' => 'Number of threads for Network Inventory'
-        ]
-    );
-    $migration->addField(
-        'glpi_agents',
-        'timeout_networkdiscovery',
-        "int NOT NULL DEFAULT '0'",
-        [
-            'comment' => 'Network Discovery task timeout (disabled by default)'
-        ]
-    );
-    $migration->addField(
-        'glpi_agents',
-        'timeout_networkinventory',
-        "int NOT NULL DEFAULT '0'",
-        [
-            'comment' => 'Network Inventory task timeout (disabled by default)'
-        ]
-    );
 }
 $ADDTODISPLAYPREF['Agent'] = [2, 4, 10, 8, 11, 6];
 
