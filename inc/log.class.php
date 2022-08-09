@@ -72,9 +72,9 @@ class Log extends CommonDBTM {
    static $rightname = 'logs';
 
     /** @var array  */
-    public static array $queue = [];
+    public static $queue = [];
     /** @var bool  */
-    public static bool $use_queue = false;
+    public static $use_queue = false;
 
 
    static function getTypeName($nb = 0) {

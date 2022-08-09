@@ -80,7 +80,7 @@ class Inventory
     /** @var string */
     private $request_query;
     /** @var bool */
-    private bool $is_discovery = false;
+    private $is_discovery = false;
 
     /**
      * @param mixed   $data   Inventory data, optional

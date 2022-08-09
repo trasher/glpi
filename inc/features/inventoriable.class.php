@@ -49,7 +49,7 @@ use RefusedEquipment;
 trait Inventoriable
 {
     /** @var CommonDBTM|null */
-    protected ?CommonDBTM $agent = null;
+    protected $agent = null;
 
     public function pre_purgeInventory()
     {

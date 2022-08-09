@@ -70,7 +70,7 @@ abstract class InventoryAsset
     /** @var string */
     protected $request_query;
     /** @var bool */
-    private bool $is_new = false;
+    private $is_new = false;
 
     /**
      * Constructor

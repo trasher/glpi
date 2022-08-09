@@ -75,7 +75,7 @@ abstract class MainAsset extends InventoryAsset
     /** @var boolean */
     protected $partial = false;
     /** @var bool */
-    protected bool $is_discovery = false;
+    protected $is_discovery = false;
 
     protected $current_key;
 

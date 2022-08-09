@@ -51,10 +51,10 @@ class Request extends AbstractRequest
     private $inventory;
 
     /** @var bool */
-    private bool $is_discovery = false;
+    private $is_discovery = false;
 
     /** @var string */
-    private string $network_inventory_mode;
+    private $network_inventory_mode;
 
     protected function initHeaders(): Common
     {
