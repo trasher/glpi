@@ -1544,7 +1544,7 @@ final class DbUtils
             $DB->update(
                 $table,
                 [
-                    'completename' => addslashes($name),
+                    'completename' => $name,
                     'level'        => $level
                 ],
                 [

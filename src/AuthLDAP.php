@@ -2095,7 +2095,7 @@ class AuthLDAP extends CommonDBTM
                    // -> renaming case
                     if ($userfound) {
                         //Get user in DB with this dn
-                        if (!$tmpuser->getFromDBByDn(Toolbox::addslashes_deep($user['user_dn']))) {
+                        if (!$tmpuser->getFromDBByDn($user['user_dn'])) {
                           //This should never happened
                           //If a user_dn is present more than one time in database
                           //Just skip user synchronization to avoid errors
@@ -2150,7 +2150,7 @@ class AuthLDAP extends CommonDBTM
 
             foreach ($diff as $user) {
                //If user dn exists in DB, it means that user login field has changed
-                if (!$tmpuser->getFromDBByDn(Toolbox::addslashes_deep($user_infos[$user]["user_dn"]))) {
+                if (!$tmpuser->getFromDBByDn($user_infos[$user]["user_dn"])) {
                     $entry  = ["user"      => $user_infos[$user][$config_ldap->fields['login_field']],
                         "timestamp" => $user_infos[$user]["timestamp"],
                         "date_sync" => Dropdown::EMPTY_VALUE
@@ -2618,7 +2618,7 @@ class AuthLDAP extends CommonDBTM
                                         'SELECT' => ['ldap_value'],
                                         'FROM'   => 'glpi_groups',
                                         'WHERE'  => [
-                                            'ldap_group_dn' => Toolbox::addslashes_deep($ou)
+                                            'ldap_group_dn' => $ou
                                         ]
                                     ]);
 
@@ -2805,7 +2805,7 @@ class AuthLDAP extends CommonDBTM
                             $ds,
                             $config_ldap->fields,
                             $user_dn,
-                            addslashes($login),
+                            $login,
                             ($action == self::ACTION_IMPORT)
                         )
                     ) {
@@ -2909,15 +2909,15 @@ class AuthLDAP extends CommonDBTM
             $group_infos = self::getGroupByDn($ds, stripslashes($group_dn));
             $group       = new Group();
             if ($options['type'] == "groups") {
-                return $group->add(["name"          => addslashes($group_infos["cn"][0]),
-                    "ldap_group_dn" => addslashes($group_infos["dn"]),
+                return $group->add(["name"          => $group_infos["cn"][0],
+                    "ldap_group_dn" => $group_infos["dn"],
                     "entities_id"   => $options['entities_id'],
                     "is_recursive"  => $options['is_recursive']
                 ]);
             }
-            return $group->add(["name"         => addslashes($group_infos["cn"][0]),
+            return $group->add(["name"         => $group_infos["cn"][0],
                 "ldap_field"   => $config_ldap->fields["group_field"],
-                "ldap_value"   => addslashes($group_infos["dn"]),
+                "ldap_value"   => $group_infos["dn"],
                 "entities_id"  => $options['entities_id'],
                 "is_recursive" => $options['is_recursive']
             ]);
@@ -3228,7 +3228,7 @@ class AuthLDAP extends CommonDBTM
            // try by login+auth_id and next by dn
             if (
                 $auth->user->getFromDBbyNameAndAuth($login, Auth::LDAP, $ldap_method['id'])
-                || $auth->user->getFromDBbyDn(Toolbox::addslashes_deep($user_dn))
+                || $auth->user->getFromDBbyDn($user_dn)
             ) {
                 //There's already an existing user in DB with the same DN but its login field has changed
                 $auth->user->fields['name'] = $login;
@@ -3289,7 +3289,7 @@ class AuthLDAP extends CommonDBTM
                 [
                     'SELECT' => 'auths_id',
                     'FROM'   => User::getTable(),
-                    'WHERE'  => ['name' => addslashes($login)],
+                    'WHERE'  => ['name' => $login],
                 ]
             );
             $known_servers_id = array_column(iterator_to_array($known_servers), 'auths_id');

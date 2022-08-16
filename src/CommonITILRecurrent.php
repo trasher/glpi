@@ -584,7 +584,6 @@ abstract class CommonITILRecurrent extends CommonDropdown
 
             /** @var CommonITILObject $item */
             $item = new $concrete_class();
-            $input  = Toolbox::addslashes_deep($input);
 
             if ($items_id = $item->add($input)) {
                 $msg = sprintf(
@@ -626,7 +625,7 @@ abstract class CommonITILRecurrent extends CommonDropdown
         Log::history(
             $this->fields['id'],
             static::class,
-            [0, '', addslashes($msg)],
+            [0, '', $msg],
             '',
             Log::HISTORY_LOG_SIMPLE_MESSAGE
         );

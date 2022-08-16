@@ -548,7 +548,7 @@ class Change extends CommonITILObject
                      unset($row['tickets_id']);
                      unset($row['id']);
                      $row['changes_id'] = $this->fields['id'];
-                     $assoc->add(Toolbox::addslashes_deep($row));
+                     $assoc->add($row);
                 }
             }
         }
@@ -573,7 +573,7 @@ class Change extends CommonITILObject
                      unset($row['problems_id']);
                      unset($row['id']);
                      $row['changes_id'] = $this->fields['id'];
-                     $assoc->add(Toolbox::addslashes_deep($row));
+                     $assoc->add($row);
                 }
             }
         }
