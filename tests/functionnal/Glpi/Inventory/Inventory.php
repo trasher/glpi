@@ -5378,9 +5378,6 @@ Compiled Tue 28-Sep-10 13:44 by prod_rel_team",
         $rule = new \Rule();
         $criteria = new \RuleCriteria();
         $action = new \RuleAction();
-        $collection = new \RuleDictionnaryManufacturerCollection();
-        $manufacturer = new \Manufacturer();
-        //$manufacturers_id = $manufacturer->importExternal('Mozilla');
 
         $rules_id = $rule->add(['name' => 'Set manufacturer',
             'is_active' => 1,
@@ -5410,15 +5407,51 @@ Compiled Tue 28-Sep-10 13:44 by prod_rel_team",
             ])
         )->isGreaterThan(0);
 
-        $json = json_decode(file_get_contents(self::INV_FIXTURES . 'computer_2.json'));
+        $rules_id = $rule->add(['name' => 'Set controller manufacturer',
+            'is_active' => 1,
+            'entities_id' => 0,
+            'sub_type' => 'RuleDictionnaryManufacturer',
+            'match' => \Rule::AND_MATCHING,
+            'condition' => 0,
+            'description' => ''
+        ]);
+        $this->integer($rules_id)->isGreaterThan(0);
+
+        $this->integer(
+            $criteria->add([
+                'rules_id' => $rules_id,
+                'criteria' => 'name',
+                'condition' => \Rule::PATTERN_IS,
+                'pattern' => 'My Intel Corporation'
+            ])
+        )->isGreaterThan(0);
+
+        $this->integer(
+            $action->add([
+                'rules_id' => $rules_id,
+                'action_type' => 'assign',
+                'field' => 'name',
+                'value' => 'Untel'
+            ])
+        )->isGreaterThan(0);
+
+        $vendors = new \PCIVendor();
+        $this->integer(
+            $vendors->add([
+                'name'  => addslashes("My Intel Corporation"),
+                'vendorid'  => '8086'
+            ])
+        )->isGreaterThan(0);
+
+        $json = json_decode(file_get_contents(self::INV_FIXTURES . 'computer_1.json'));
 
         $nb_computers = countElementsInTable(\Computer::getTable());
         $inventory = $this->doInventory($json);
 
         //check inventory metadata
         $metadata = $inventory->getMetadata();
-        $this->array($metadata)->hasSize(5)
-            ->string['deviceid']->isIdenticalTo('acomputer-2021-01-26-14-32-36')
+        $this->array($metadata)->hasSize(6)
+            ->string['deviceid']->isIdenticalTo('glpixps-2018-07-09-09-07-13')
             ->string['itemtype']->isIdenticalTo('Computer')
             ->variable['port']->isIdenticalTo(null)
             ->string['action']->isIdenticalTo('inventory');
@@ -5432,8 +5465,8 @@ Compiled Tue 28-Sep-10 13:44 by prod_rel_team",
         $this->integer(count($agents))->isIdenticalTo(1);
         $agent = $agents->current();
         $this->array($agent)
-            ->string['deviceid']->isIdenticalTo('acomputer-2021-01-26-14-32-36')
-            ->string['name']->isIdenticalTo('acomputer-2021-01-26-14-32-36')
+            ->string['deviceid']->isIdenticalTo('glpixps-2018-07-09-09-07-13')
+            ->string['name']->isIdenticalTo('glpixps-2018-07-09-09-07-13')
             ->string['itemtype']->isIdenticalTo('Computer')
             ->integer['items_id']->isGreaterThan(0);
 
@@ -5443,5 +5476,25 @@ Compiled Tue 28-Sep-10 13:44 by prod_rel_team",
         $manufacturer = new \Manufacturer();
         $this->boolean($manufacturer->getFromDB($computer->fields['manufacturers_id']))->isTrue();
         $this->string($manufacturer->fields['name'])->isIdenticalTo('Dictionary manufacturer');
+
+        $controllers = $DB->request([
+                'SELECT' => \Manufacturer::getTable() . '.name',
+                'FROM' => \DeviceControl::getTable(),
+                'LEFT JOIN' => [
+                    \Manufacturer::getTable() => [
+                        'ON' => [
+                            \Manufacturer::getTable() => 'id',
+                            \DeviceControl::getTable() => 'manufacturers_id'
+                        ]
+                    ]
+                ],
+                'WHERE' => [
+                    \DeviceControl::getTable() . '.designation' => 'Wireless 8260'
+                ]
+            ]
+        );
+        $this->integer(count($controllers))->isIdenticalTo(1);
+        $controller = $controllers->current();
+        $this->string($controller['name'])->isIdenticalTo('Untel');
     }
 }
