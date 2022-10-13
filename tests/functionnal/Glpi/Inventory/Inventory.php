@@ -5450,7 +5450,7 @@ Compiled Tue 28-Sep-10 13:44 by prod_rel_team",
 
         //check inventory metadata
         $metadata = $inventory->getMetadata();
-        $this->array($metadata)->hasSize(6)
+        $this->array($metadata)->hasSize(7)
             ->string['deviceid']->isIdenticalTo('glpixps-2018-07-09-09-07-13')
             ->string['itemtype']->isIdenticalTo('Computer')
             ->variable['port']->isIdenticalTo(null)
@@ -5496,5 +5496,148 @@ Compiled Tue 28-Sep-10 13:44 by prod_rel_team",
         $this->integer(count($controllers))->isIdenticalTo(1);
         $controller = $controllers->current();
         $this->string($controller['name'])->isIdenticalTo('Untel');
+    }
+
+    public function testDictionnaryManufacturer4Peripherals()
+    {
+        global $DB;
+
+        $xml_source = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>
+<REQUEST>
+  <CONTENT>
+    <USBDEVICES>
+      <CAPTION>VFS451 Fingerprint Reader</CAPTION>
+      <MANUFACTURER>Validity Sensors, Inc.</MANUFACTURER>
+      <NAME>VFS451 Fingerprint Reader</NAME>
+      <PRODUCTID>0007</PRODUCTID>
+      <SERIAL>00B0FE47AC85</SERIAL>
+      <VENDORID>138A</VENDORID>
+    </USBDEVICES>
+    <USBDEVICES>
+      <CAPTION>OZ776 CCID Smartcard Reader</CAPTION>
+      <NAME>OZ776 CCID Smartcard Reader</NAME>
+      <CLASS>11</CLASS>
+      <MANUFACTURER>O2 Micro, Inc.</MANUFACTURER>
+      <PRODUCTID>7772</PRODUCTID>
+      <SERIAL>ABCDEF</SERIAL>
+      <SUBCLASS>0</SUBCLASS>
+      <VENDORID>0b97</VENDORID>
+    </USBDEVICES>
+    <HARDWARE>
+      <NAME>pc002</NAME>
+    </HARDWARE>
+    <BIOS>
+      <SSN>ggheb7ne7</SSN>
+    </BIOS>
+    <VERSIONCLIENT>FusionInventory-Agent_v2.3.19</VERSIONCLIENT>
+  </CONTENT>
+  <DEVICEID>test-pc002</DEVICEID>
+  <QUERY>INVENTORY</QUERY>
+</REQUEST>";
+
+        //create manufacturer dictionary entry
+        $rule = new \Rule();
+        $criteria = new \RuleCriteria();
+        $action = new \RuleAction();
+
+        $rules_id = $rule->add(['name' => 'Set peripheral manufacturer',
+            'is_active' => 1,
+            'entities_id' => 0,
+            'sub_type' => 'RuleDictionnaryManufacturer',
+            'match' => \Rule::AND_MATCHING,
+            'condition' => 0,
+            'description' => ''
+        ]);
+        $this->integer($rules_id)->isGreaterThan(0);
+
+        $this->integer(
+            $criteria->add([
+                'rules_id' => $rules_id,
+                'criteria' => 'name',
+                'condition' => \Rule::PATTERN_IS,
+                'pattern' => 'Validity Sensors, Inc.'
+            ])
+        )->isGreaterThan(0);
+
+        $this->integer(
+            $action->add([
+                'rules_id' => $rules_id,
+                'action_type' => 'assign',
+                'field' => 'name',
+                'value' => 'Finger sensor'
+            ])
+        )->isGreaterThan(0);
+
+        $this->doInventory($xml_source, true);
+
+        //check created agent
+        $agents = $DB->request(['FROM' => \Agent::getTable()]);
+        $this->integer(count($agents))->isIdenticalTo(1);
+        $agent = $agents->current();
+        $this->array($agent)
+            ->string['deviceid']->isIdenticalTo('test-pc002')
+            ->string['name']->isIdenticalTo('test-pc002')
+            ->string['itemtype']->isIdenticalTo('Computer')
+            ->integer['items_id']->isGreaterThan(0);
+
+        //check created computer
+        $computer = new \Computer();
+        $periph = new \Peripheral();
+        $item_periph = new \Computer_Item();
+
+        $this->boolean($computer->getFromDB($agent['items_id']))->isTrue();
+        $manufacturer = new \Manufacturer();
+
+        //we have 2 peripherals
+        $periphs = $periph->find(['NOT' => ['name' => ['LIKE', '_test_%']]]);
+        $this->integer(count($periphs))->isIdenticalTo(2);
+
+        //we have 2 peripherals items linked to the computer
+        $iperiphs = $item_periph->find(['itemtype' => \Peripheral::class, 'computers_id' => $computer->fields['id']]);
+        $this->integer(count($iperiphs))->isIdenticalTo(2);
+
+        /*
+        $this->boolean($manufacturer->getFromDB($computer->fields['manufacturers_id']))->isTrue();
+        $this->string($manufacturer->fields['name'])->isIdenticalTo('Dictionary manufacturer');
+
+        $controllers = $DB->request([
+                'SELECT' => \Manufacturer::getTable() . '.name',
+                'FROM' => \DeviceControl::getTable(),
+                'LEFT JOIN' => [
+                    \Manufacturer::getTable() => [
+                        'ON' => [
+                            \Manufacturer::getTable() => 'id',
+                            \DeviceControl::getTable() => 'manufacturers_id'
+                        ]
+                    ]
+                ],
+                'WHERE' => [
+                    \DeviceControl::getTable() . '.designation' => 'Wireless 8260'
+                ]
+            ]
+        );
+        $this->integer(count($controllers))->isIdenticalTo(1);
+        $controller = $controllers->current();
+        $this->string($controller['name'])->isIdenticalTo('Untel');*/
+
+        $peripherals = $DB->request([
+                'SELECT' => \Manufacturer::getTable() . '.name',
+                'FROM' => \Peripheral::getTable(),
+                'LEFT JOIN' => [
+                    \Manufacturer::getTable() => [
+                        'ON' => [
+                            \Manufacturer::getTable() => 'id',
+                            \Peripheral::getTable() => 'manufacturers_id'
+                        ]
+                    ]
+                ],
+                'WHERE' => [
+                    \Peripheral::getTable() . '.name' => 'VFS451 Fingerprint Reader'
+                ]
+            ]
+        );
+        $this->integer(count($peripherals))->isIdenticalTo(1);
+        $periph = $peripherals->current();
+        $this->string($periph['name'])->isIdenticalTo('Finger sensor');
     }
 }
