@@ -5478,21 +5478,20 @@ Compiled Tue 28-Sep-10 13:44 by prod_rel_team",
         $this->string($manufacturer->fields['name'])->isIdenticalTo('Dictionary manufacturer');
 
         $controllers = $DB->request([
-                'SELECT' => \Manufacturer::getTable() . '.name',
-                'FROM' => \DeviceControl::getTable(),
-                'LEFT JOIN' => [
-                    \Manufacturer::getTable() => [
-                        'ON' => [
-                            \Manufacturer::getTable() => 'id',
-                            \DeviceControl::getTable() => 'manufacturers_id'
-                        ]
+            'SELECT' => \Manufacturer::getTable() . '.name',
+            'FROM' => \DeviceControl::getTable(),
+            'LEFT JOIN' => [
+                \Manufacturer::getTable() => [
+                    'ON' => [
+                        \Manufacturer::getTable() => 'id',
+                        \DeviceControl::getTable() => 'manufacturers_id'
                     ]
-                ],
-                'WHERE' => [
-                    \DeviceControl::getTable() . '.designation' => 'Wireless 8260'
                 ]
+            ],
+            'WHERE' => [
+                \DeviceControl::getTable() . '.designation' => 'Wireless 8260'
             ]
-        );
+        ]);
         $this->integer(count($controllers))->isIdenticalTo(1);
         $controller = $controllers->current();
         $this->string($controller['name'])->isIdenticalTo('Untel');
@@ -5596,48 +5595,24 @@ Compiled Tue 28-Sep-10 13:44 by prod_rel_team",
         $iperiphs = $item_periph->find(['itemtype' => \Peripheral::class, 'computers_id' => $computer->fields['id']]);
         $this->integer(count($iperiphs))->isIdenticalTo(2);
 
-        /*
-        $this->boolean($manufacturer->getFromDB($computer->fields['manufacturers_id']))->isTrue();
-        $this->string($manufacturer->fields['name'])->isIdenticalTo('Dictionary manufacturer');
-
-        $controllers = $DB->request([
-                'SELECT' => \Manufacturer::getTable() . '.name',
-                'FROM' => \DeviceControl::getTable(),
-                'LEFT JOIN' => [
-                    \Manufacturer::getTable() => [
-                        'ON' => [
-                            \Manufacturer::getTable() => 'id',
-                            \DeviceControl::getTable() => 'manufacturers_id'
-                        ]
-                    ]
-                ],
-                'WHERE' => [
-                    \DeviceControl::getTable() . '.designation' => 'Wireless 8260'
-                ]
-            ]
-        );
-        $this->integer(count($controllers))->isIdenticalTo(1);
-        $controller = $controllers->current();
-        $this->string($controller['name'])->isIdenticalTo('Untel');*/
-
         $peripherals = $DB->request([
-                'SELECT' => \Manufacturer::getTable() . '.name',
-                'FROM' => \Peripheral::getTable(),
-                'LEFT JOIN' => [
-                    \Manufacturer::getTable() => [
-                        'ON' => [
-                            \Manufacturer::getTable() => 'id',
-                            \Peripheral::getTable() => 'manufacturers_id'
-                        ]
+            'SELECT' => \Manufacturer::getTable() . '.name',
+            'FROM' => \Peripheral::getTable(),
+            'LEFT JOIN' => [
+                \Manufacturer::getTable() => [
+                    'ON' => [
+                        \Manufacturer::getTable() => 'id',
+                        \Peripheral::getTable() => 'manufacturers_id'
                     ]
-                ],
-                'WHERE' => [
-                    \Peripheral::getTable() . '.name' => 'VFS451 Fingerprint Reader'
                 ]
+            ],
+            'WHERE' => [
+                \Peripheral::getTable() . '.name' => 'VFS451 Fingerprint Reader'
             ]
-        );
+        ]);
         $this->integer(count($peripherals))->isIdenticalTo(1);
         $periph = $peripherals->current();
+        //check manufacturer name is the one expected
         $this->string($periph['name'])->isIdenticalTo('Finger sensor');
     }
 }
