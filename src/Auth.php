@@ -966,7 +966,7 @@ class Auth extends CommonGLPI
                     if (isset($email)) {
                          $this->user->fields['_useremails'] = $email;
                     }
-                    $this->user->update($this->user->fields);
+                    $this->user->update(Sanitizer::sanitize($this->user->fields));
                 } else if ($CFG_GLPI["is_users_auto_add"]) {
                    // Auto add user
                     $input = $this->user->fields;
@@ -974,7 +974,7 @@ class Auth extends CommonGLPI
                     if ($authtype == self::EXTERNAL && !isset($input["authtype"])) {
                         $input["authtype"] = $authtype;
                     }
-                    $this->user->add($input);
+                    $this->user->add(Sanitizer::sanitize($input));
                 } else {
                    // Auto add not enable so auth failed
                     $this->addToError(__('User not authorized to connect in GLPI'));

@@ -34,6 +34,7 @@
  */
 
 use Glpi\Application\ErrorHandler;
+use Glpi\Toolbox\Sanitizer;
 use Laminas\Mail\Address;
 use Laminas\Mail\Header\AbstractAddressList;
 use Laminas\Mail\Header\ContentDisposition;
@@ -797,7 +798,7 @@ class MailCollector extends CommonDBTM
                               $rejinput['from']              = $requester ?? '';
                               $rejinput['to']                = $headers['to'];
                               $rejinput['users_id']          = $tkt['_users_id_requester'];
-                              $rejinput['subject']           = $this->cleanSubject($headers['subject']);
+                              $rejinput['subject']           = Sanitizer::sanitize($this->cleanSubject($headers['subject']));
                               $rejinput['messageid']         = $headers['message_id'];
                         }
                     } catch (\Throwable $e) {
@@ -1279,6 +1280,7 @@ class MailCollector extends CommonDBTM
             }
         }
 
+        $tkt = Sanitizer::sanitize($tkt);
         return $tkt;
     }
 
