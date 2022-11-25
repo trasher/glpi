@@ -151,6 +151,14 @@ class Sanitizer extends \GLPITestCase
             'value'           => 'Glpi\Socket:update\' OR 1 = 1', // invalid syntax, should be sanitized
             'sanitized_value' => 'Glpi\\\Socket:update\\\' OR 1 = 1',
         ];
+        yield [
+            'value'             => "<strong>text with slashable chars ' \n \"</strong>",
+            'sanitized_value'   => "&#60;strong&#62;text with slashable chars ' \n \"&#60;/strong&#62;",
+            'htmlencoded_value' => "&#60;strong&#62;text with slashable chars ' \n \"&#60;/strong&#62;",
+            'dbescaped_value'   => "<strong>text with slashable chars \' \\n \\\"</strong>",
+            'db_escape'         => false,
+        ];
+
     }
 
     /**
@@ -160,13 +168,14 @@ class Sanitizer extends \GLPITestCase
         $value,
         $sanitized_value,
         $htmlencoded_value = null,
-        $dbescaped_value = null
+        $dbescaped_value = null,
+        $db_escape = true
     ) {
         $sanitizer = $this->newTestedInstance();
-        $this->variable($sanitizer->sanitize($value))->isEqualTo($sanitized_value);
+        $this->variable($sanitizer->sanitize($value, $db_escape))->isEqualTo($sanitized_value);
 
         // Calling sanitize on sanitized value should have no effect
-        $this->variable($sanitizer->sanitize($sanitized_value))->isEqualTo($sanitized_value);
+        $this->variable($sanitizer->sanitize($sanitized_value, $db_escape))->isEqualTo($sanitized_value);
     }
 
     /**
@@ -176,7 +185,8 @@ class Sanitizer extends \GLPITestCase
         $value,
         $sanitized_value,
         $htmlencoded_value = null,
-        $dbescaped_value = null
+        $dbescaped_value = null,
+        $db_escape = true
     ) {
         if (!is_string($htmlencoded_value)) {
             return; // Unrelated entry in provider
@@ -196,7 +206,8 @@ class Sanitizer extends \GLPITestCase
         $value,
         $sanitized_value,
         $htmlencoded_value = null,
-        $dbescaped_value = null
+        $dbescaped_value = null,
+        $db_escape = true
     ) {
         if (!is_array($htmlencoded_value)) {
             return; // Unrelated entry in provider
@@ -216,7 +227,8 @@ class Sanitizer extends \GLPITestCase
         $value,
         $sanitized_value,
         $htmlencoded_value = null,
-        $dbescaped_value = null
+        $dbescaped_value = null,
+        $db_escape = true
     ) {
         if (!is_string($dbescaped_value)) {
             return; // Unrelated entry in provider
@@ -236,7 +248,8 @@ class Sanitizer extends \GLPITestCase
         $value,
         $sanitized_value,
         $htmlencoded_value = null,
-        $dbescaped_value = null
+        $dbescaped_value = null,
+        $db_escape = true
     ) {
         if (!is_array($dbescaped_value)) {
             return; // Unrelated entry in provider
@@ -584,15 +597,16 @@ TXT;
         $value,
         $sanitized_value,
         $htmlencoded_value = null,
-        $dbescaped_value = null
+        $dbescaped_value = null,
+        $db_escape = true
     ) {
         $sanitizer = $this->newTestedInstance();
 
         // Value should stay the same if it has been sanitized then unsanitized
-        $this->variable($sanitizer->unsanitize($sanitizer->sanitize($value)))->isEqualTo($value);
+        $this->variable($sanitizer->unsanitize($sanitizer->sanitize($value, $db_escape)))->isEqualTo($value);
 
         // Re-sanitize a value provide the same result as first sanitization
-        $this->variable($sanitizer->sanitize($sanitizer->unsanitize($value)))->isEqualTo($sanitized_value);
+        $this->variable($sanitizer->sanitize($sanitizer->unsanitize($value), $db_escape))->isEqualTo($sanitized_value);
     }
 
     protected function isNsClassOrCallableIdentifierProvider(): iterable
