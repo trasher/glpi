@@ -59,35 +59,12 @@ use wapmorgan\UnifiedArchive\UnifiedArchive;
 class Conf extends CommonGLPI
 {
     private $currents = [];
-    public static $defaults = [
-        'import_software'                => 1,
-        'import_volume'                  => 1,
-        'import_antivirus'               => 1,
-        'import_registry'                => 1,
-        'import_process'                 => 1,
-        'import_vm'                      => 1,
-        'import_monitor_on_partial_sn'   => 0,
-        'component_processor'            => 1,
-        'component_memory'               => 1,
-        'component_harddrive'            => 1,
-        'component_networkcard'          => 1,
-        'component_graphiccard'          => 1,
-        'component_soundcard'            => 1,
-        'component_drive'                => 1,
-        'component_networkdrive'         => 1,
-        'component_networkcardvirtual'   => 1,
-        'component_control'              => 1,
-        'component_battery'              => 1,
-        'component_simcard'              => 1,
-        'states_id_default'              => 0,
-        'location'                       => 0,
-        'group'                          => 0,
-        'vm_type'                        => 0,
-        'vm_components'                  => 0,
-        'vm_as_computer'                 => 0,
-        'component_removablemedia'       => 1,
-        'component_powersupply'          => 1
-    ];
+
+    public const STALE_AGENT_ACTION_CLEAN = 0;
+
+    public const STALE_AGENT_ACTION_STATUS = 1;
+
+    public const STALE_AGENT_ACTION_TRASHBIN = 2;
 
     /**
      * Display form for import the XML
@@ -170,6 +147,7 @@ class Conf extends CommonGLPI
            //nay, not an archive neither
             Session::addMessageAfterRedirect(
                 __('No file to import!'),
+                false,
                 ERROR
             );
             return $inventory_request;
@@ -244,6 +222,20 @@ class Conf extends CommonGLPI
         } catch (\Exception $e) {
             throw $e;
         }
+    }
+
+    /**
+     * Get possible actions for stale agents
+     *
+     * @return string
+     */
+    public static function getStaleAgentActions(): array
+    {
+        return [
+            self::STALE_AGENT_ACTION_CLEAN  => __('Clean agents'),
+            self::STALE_AGENT_ACTION_STATUS => __('Change the status'),
+            self::STALE_AGENT_ACTION_TRASHBIN => __('Put asset in trashbin'),
+        ];
     }
 
     public function defineTabs($options = [])
@@ -464,7 +456,7 @@ class Conf extends CommonGLPI
         ]);
         echo "</td>";
         echo "<td>";
-        echo "<label for='import_vm'>";
+        echo "<label for='vm_components'>";
         echo __('Create components for virtual machines');
         echo "</label>";
         echo "</td>";
@@ -478,7 +470,7 @@ class Conf extends CommonGLPI
         echo "</tr>";
 
         echo "<tr class='tab_bg_1'>";
-        echo "<td colspan='4'>";
+        echo "<td colspan='4' style='text-align:right;'>";
         echo "<span class='red'>" . __('Will attempt to create components from VM information sent from host, do not use if you plan to inventory any VM directly!') . "</span>";
         echo "</td>";
         echo "</tr>";
@@ -690,6 +682,73 @@ class Conf extends CommonGLPI
         echo "</td>";
         echo "</tr>";
 
+        echo "<tr class='tab_bg_1'>";
+        echo "<th colspan=4 >" . __('Agent cleanup') . "</th></tr>";
+        echo "<tr class='tab_bg_1'>";
+        echo "<td>" . __('Update agents who have not contacted the server for (in days)') . "</td>";
+        echo "<td width='20%'>";
+        Dropdown::showNumber(
+            'stale_agents_delay',
+            [
+                'value' => $config['stale_agents_delay'] ?? 0,
+                'min'   => 1,
+                'max'   => 1000,
+                'toadd' => ['0' => __('Disabled')]
+            ]
+        );
+        echo "</td>";
+        echo "<td>" . _n('Action', 'Actions', 1) . "</td>";
+        echo "<td width='20%'>";
+        //action
+        $action = self::getDefaults()['stale_agents_action'];
+        if (isset($config['stale_agents_action'])) {
+            $action = $config['stale_agents_action'];
+        }
+        $rand = Dropdown::showFromArray(
+            'stale_agents_action',
+            self::getStaleAgentActions(),
+            [
+                'values' => importArrayFromDB($action),
+                'on_change' => 'changestatus();',
+                'multiple' => true
+            ]
+        );
+        //if action == action_status => show blocation else hide blocaction
+        echo Html::scriptBlock("
+         function changestatus() {
+            if ($('#dropdown_stale_agents_action$rand').val() != 0) {
+               $('#blocaction1').show();
+               $('#blocaction2').show();
+            } else {
+               $('#blocaction1').hide();
+               $('#blocaction2').hide();
+            }
+         }
+         changestatus();
+
+      ");
+        echo "</td>";
+        echo "</tr>";
+        //blocaction with status
+        echo "<tr class='tab_bg_1'><td colspan=2></td>";
+        echo "<td>";
+        echo "<span id='blocaction1' style='display:none'>";
+        echo __('Change the status');
+        echo "</span>";
+        echo "</td>";
+        echo "<td width='20%'>";
+        echo "<span id='blocaction2' style='display:none'>";
+        State::dropdown(
+            [
+                'name'   => 'stale_agents_status',
+                'value'  => $config['stale_agents_status'] ?? -1,
+                'entity' => $_SESSION['glpiactive_entity']
+            ]
+        );
+        echo "</span>";
+        echo "</td>";
+        echo "</tr>";
+
         if ($canedit) {
             echo "<tr class='tab_bg_2'>";
             echo "<td colspan='7' class='center'>";
@@ -715,7 +774,7 @@ class Conf extends CommonGLPI
             return false;
         }
 
-        $defaults = self::$defaults;
+        $defaults = self::getDefaults();
         unset($values['_glpi_csrf_token']);
 
         $unknown = array_diff_key($values, $defaults);
@@ -734,6 +793,9 @@ class Conf extends CommonGLPI
         $to_process = [];
         foreach ($defaults as $prop => $default_value) {
             $to_process[$prop] = $values[$prop] ?? $default_value;
+            if ($prop == 'stale_agents_action') {
+                $to_process[$prop] = exportArrayToDB($to_process[$prop]);
+            }
         }
         \Config::setConfigurationValues('inventory', $to_process);
         $this->currents = $to_process;
@@ -753,7 +815,7 @@ class Conf extends CommonGLPI
             $config = \Config::getConfigurationValues('inventory');
             $this->currents = $config;
         }
-        if (in_array($name, array_keys(self::$defaults))) {
+        if (in_array($name, array_keys(self::getDefaults()))) {
             return $this->currents[$name];
         } else if ($name == 'fields') {
            //no fields here
@@ -797,5 +859,47 @@ class Conf extends CommonGLPI
             $items_id,
             $ext
         );
+    }
+
+    public static function getDefaults(): array
+    {
+        return [
+            'enabled_inventory'              => 0,
+            'import_software'                => 1,
+            'import_volume'                  => 1,
+            'import_antivirus'               => 1,
+            'import_registry'                => 1,
+            'import_process'                 => 1,
+            'import_vm'                      => 1,
+            'import_monitor_on_partial_sn'   => 0,
+            'component_processor'            => 1,
+            'component_memory'               => 1,
+            'component_harddrive'            => 1,
+            'component_networkcard'          => 1,
+            'component_graphiccard'          => 1,
+            'component_soundcard'            => 1,
+            'component_drive'                => 1,
+            'component_networkdrive'         => 1,
+            'component_networkcardvirtual'   => 1,
+            'component_control'              => 1,
+            'component_battery'              => 1,
+            'component_simcard'              => 1,
+            'states_id_default'              => 0,
+            'entities_id_default'            => 0,
+            'location'                       => 0,
+            'group'                          => 0,
+            'vm_type'                        => 0,
+            'vm_components'                  => 0,
+            'vm_as_computer'                 => 0,
+            'component_removablemedia'       => 1,
+            'component_powersupply'          => 1,
+            'inventory_frequency'            => AbstractRequest::DEFAULT_FREQUENCY,
+            'import_monitor'                 => 1,
+            'import_printer'                 => 1,
+            'import_peripheral'              => 1,
+            'stale_agents_delay'             => 0,
+            'stale_agents_action'            => exportArrayToDB([0]),
+            'stale_agents_status'            => 0,
+        ];
     }
 }

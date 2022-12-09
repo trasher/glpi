@@ -37,7 +37,7 @@
  * @var array $ADDTODISPLAYPREF
  */
 
-$migration->addConfig(\Glpi\Inventory\Conf::$defaults, 'inventory');
+$migration->addConfig(\Glpi\Inventory\Conf::getDefaults(), 'inventory');
 
 $default_charset = 'utf8';
 $default_collation = 'utf8_unicode_ci';
@@ -838,3 +838,18 @@ if (countElementsInTable(Blacklist::getTable()) === 4) {
 }
 
 $migration->addRight('inventory', READ);
+
+$config = \Config::getConfigurationValues('inventory');
+if (is_numeric($config['stale_agents_action'])) {
+    //convert stale_agents_action to an array
+    $DB->update(
+        'glpi_configs',
+        [
+            'value' => exportArrayToDB([$config['stale_agents_action']])
+        ],
+        [
+            'context' => 'inventory',
+            'name' => 'stale_agents_action'
+        ]
+    );
+}

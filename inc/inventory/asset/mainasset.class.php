@@ -120,6 +120,7 @@ abstract class MainAsset extends InventoryAsset
            //set update system
             $val->autoupdatesystems_id = $entry->content->autoupdatesystems_id ?? 'GLPI Native Inventory';
             $val->last_inventory_update = $_SESSION["glpi_currenttime"];
+            $val->is_deleted = 0;
 
             if (isset($this->extra_data['hardware'])) {
                 $this->prepareForHardware($val);

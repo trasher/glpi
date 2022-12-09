@@ -114,6 +114,7 @@ class Printer extends AbstractInventoryAsset
         $this->array((array)$result[0])->isIdenticalTo([
             'autoupdatesystems_id' => 'GLPI Native Inventory',
             'last_inventory_update' => $date_now,
+            "is_deleted" => 0,
             'firmware' => '2409048_052887',
             'ips' => ['10.59.29.175'],
             'mac' => '00:68:eb:f2:be:10',
