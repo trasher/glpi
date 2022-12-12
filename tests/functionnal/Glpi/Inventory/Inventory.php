@@ -4451,10 +4451,9 @@ Compiled Tue 28-Sep-10 13:44 by prod_rel_team",
 
         //check inventory metadata
         $metadata = $inventory->getMetadata();
-        $this->array($metadata)->hasSize(5)
+        $this->array($metadata)->hasSize(4)
             ->string['deviceid']->isIdenticalTo('acomputer-2021-01-26-14-32-36')
             ->string['itemtype']->isIdenticalTo('Computer')
-            ->variable['port']->isIdenticalTo(null)
             ->string['action']->isIdenticalTo('inventory');
 
         //check we add main computer and one computer per vm

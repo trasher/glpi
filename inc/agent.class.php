@@ -34,6 +34,7 @@ if (!defined('GLPI_ROOT')) {
    die("Sorry. You can't access this file directly");
 }
 
+use Glpi\Inventory\Conf;
 use GuzzleHttp\Client as Guzzle_Client;
 use GuzzleHttp\Psr7\Response;
 
@@ -699,4 +700,86 @@ class Agent extends CommonDBTM {
    public static function getIcon() {
       return "fas fa-robot";
    }
+
+    /**
+     * Cron task: clean and do other defined actions when agent not have been contacted
+     * the server since xx days
+     *
+     * @global object $DB
+     * @param object $task
+     * @return boolean
+     * @copyright 2010-2022 by the FusionInventory Development Team.
+     */
+    public static function cronCleanoldagents($task = null)
+    {
+        global $DB;
+
+        $config = \Config::getConfigurationValues('inventory');
+
+        $retention_time = $config['stale_agents_delay'] ?? 0;
+        if ($retention_time <= 0) {
+            return true;
+        }
+
+        $iterator = $DB->request([
+            'FROM' => self::getTable(),
+            'WHERE' => [
+                'last_contact' => ['<', new QueryExpression("date_add(now(), interval -" . $retention_time . " day)")]
+            ]
+        ]);
+
+        $cron_status = false;
+        if (count($iterator)) {
+            $actions = importArrayFromDB($config['stale_agents_action']);
+            foreach ($actions as $action) {
+                switch ($action) {
+                    case Conf::STALE_AGENT_ACTION_CLEAN:
+                        //delete agents
+                        $agent = new self();
+                        foreach ($iterator as $data) {
+                            $agent->delete($data);
+                            $task->addVolume(1);
+                            $cron_status = true;
+                        }
+                        break;
+                    case Conf::STALE_AGENT_ACTION_STATUS:
+                        if (isset($config['stale_agents_status'])) {
+                            //change status of agents linked assets
+                            foreach ($iterator as $data) {
+                                $itemtype = $data['itemtype'];
+                                if (is_subclass_of($itemtype, CommonDBTM::class)) {
+                                    $item = new $itemtype();
+                                    if ($item->getFromDB($data['items_id']) && $item->fields['is_dynamic'] == 1) {
+                                        $item->update([
+                                            'id' => $data['items_id'],
+                                            'states_id' => $config['stale_agents_status']
+                                        ]);
+                                        $task->addVolume(1);
+                                        $cron_status = true;
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case Conf::STALE_AGENT_ACTION_TRASHBIN:
+                        //put linked assets in trashbin
+                        foreach ($iterator as $data) {
+                            $itemtype = $data['itemtype'];
+                            if (is_subclass_of($itemtype, CommonDBTM::class)) {
+                                $item = new $itemtype();
+                                if ($item->getFromDB($data['items_id']) && $item->fields['is_dynamic'] == 1) {
+                                    $item->delete([
+                                        'id' => $data['items_id']
+                                    ]);
+                                    $task->addVolume(1);
+                                    $cron_status = true;
+                                }
+                            }
+                        }
+                        break;
+                }
+            }
+        }
+        return $cron_status;
+    }
 }
