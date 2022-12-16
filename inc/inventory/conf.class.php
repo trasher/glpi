@@ -687,7 +687,7 @@ class Conf extends CommonGLPI
         echo "<tr class='tab_bg_1'>";
         echo "<td>" . __('Update agents who have not contacted the server for (in days)') . "</td>";
         echo "<td width='20%'>";
-        Dropdown::showNumber(
+        \Dropdown::showNumber(
             'stale_agents_delay',
             [
                 'value' => $config['stale_agents_delay'] ?? 0,
@@ -704,7 +704,7 @@ class Conf extends CommonGLPI
         if (isset($config['stale_agents_action'])) {
             $action = $config['stale_agents_action'];
         }
-        $rand = Dropdown::showFromArray(
+        $rand = \Dropdown::showFromArray(
             'stale_agents_action',
             self::getStaleAgentActions(),
             [
@@ -738,7 +738,7 @@ class Conf extends CommonGLPI
         echo "</td>";
         echo "<td width='20%'>";
         echo "<span id='blocaction2' style='display:none'>";
-        State::dropdown(
+        \State::dropdown(
             [
                 'name'   => 'stale_agents_status',
                 'value'  => $config['stale_agents_status'] ?? -1,
