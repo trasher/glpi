@@ -1685,7 +1685,7 @@ class Plugin extends CommonDBTM
         if ($with_lang) {
             self::loadLang($directory);
         }
-        return Toolbox::addslashes_deep(self::getInfo($directory));
+        return self::getInfo($directory);
     }
 
     /**
