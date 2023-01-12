@@ -555,8 +555,8 @@ class Software extends InventoryAsset
             'SELECT' => ['id', 'name', 'manufacturers_id'],
             'FROM'   => \Software::getTable(),
             'WHERE'  => [
-                'entities_id'       => new QueryParam(),
-                'is_recursive'      => new QueryParam(),
+                'entities_id'        => new QueryParam(),
+                'is_recursive'       => new QueryParam(),
                 'name'               => new QueryParam(),
                 'manufacturers_id'   => new QueryParam()
             ]
@@ -586,10 +586,10 @@ class Software extends InventoryAsset
 
             $stmt->bind_param(
                 'ssss',
-                $input['name'],
-                $input['manufacturers_id'],
                 $this->entities_id,
                 $this->is_recursive,
+                $input['name'],
+                $input['manufacturers_id']
             );
             $DB->executeStatement($stmt);
             $results = $stmt->get_result();
