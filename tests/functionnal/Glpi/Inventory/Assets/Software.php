@@ -944,4 +944,156 @@ class Software extends AbstractInventoryAsset
 
         $this->doInventory($xml_source, true);
     }
+
+    public function testDuplicatedDicoSoft()
+    {
+        global $DB;
+        $this->login();
+
+        $rule         = new \RuleDictionnarySoftware();
+        $rulecriteria = new \RuleCriteria();
+        $ruleaction   = new \RuleAction();
+
+        $rules_id = $rule->add([
+            'is_active'    => 1,
+            'name'         => 'Merge all rule',
+            'match'        => 'AND',
+            'sub_type'     => \RuleDictionnarySoftware::class,
+            'is_recursive' => 1,
+            'ranking'      => 1,
+        ]);
+        $this->integer((int) $rules_id)->isGreaterThan(0);
+
+        $this->integer((int) $rulecriteria->add([
+            'rules_id'    => $rules_id,
+            'criteria'  => "name",
+            'pattern'   => "/^Microsoft */",
+            'condition' => \Rule::REGEX_MATCH
+        ]))->isGreaterThan(0);
+
+        $this->integer((int) $ruleaction->add([
+            'rules_id'    => $rules_id,
+            'action_type' => 'assign',
+            'field'       => 'name',
+            'value'       => 'Mi Crosoft',
+        ]))->isGreaterThan(0);
+
+        $computer = new \Computer();
+        $soft = new \Software();
+        $version = new \SoftwareVersion();
+        $item_version = new \Item_SoftwareVersion();
+
+        //inventory with a software name containing an unbreakable space
+        $xml_source = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>
+<REQUEST>
+  <CONTENT>
+    <SOFTWARES>
+      <ARCH>i586</ARCH>
+      <FROM>registry</FROM>
+      <GUID>Office15.STANDARD</GUID>
+      <INSTALLDATE>18/08/2020</INSTALLDATE>
+      <NAME>Microsoft Office Standard 2013</NAME>
+      <NO_REMOVE>0</NO_REMOVE>
+      <PUBLISHER>Microsoft Corporation</PUBLISHER>
+      <SYSTEM_CATEGORY>application</SYSTEM_CATEGORY>
+      <UNINSTALL_STRING>&quot;C:\Program Files (x86)\Common Files\Microsoft Shared\OFFICE15\Office Setup Controller\setup.exe&quot; /uninstall STANDARD /dll OSETUP.DLL</UNINSTALL_STRING>
+      <VERSION>15.0.4569.1506</VERSION>
+    </SOFTWARES>
+    <HARDWARE>
+      <NAME>pc002</NAME>
+    </HARDWARE>
+    <BIOS>
+      <SSN>ggheb7ne7</SSN>
+    </BIOS>
+    <VERSIONCLIENT>FusionInventory-Agent_v2.3.19</VERSIONCLIENT>
+  </CONTENT>
+  <DEVICEID>test-pc002</DEVICEID>
+  <QUERY>INVENTORY</QUERY>
+</REQUEST>";
+
+        //create manually a computer
+        $computers_id = $computer->add([
+            'name'   => 'pc002',
+            'serial' => 'ggheb7ne7',
+            'entities_id' => 0
+        ]);
+        $this->integer($computers_id)->isGreaterThan(0);
+
+        $this->doInventory($xml_source, true);
+
+        //we have 1 software & versions
+        $softs = $soft->find(['name' => 'Mi Crosoft']);
+        $this->integer(count($softs))->isIdenticalTo(1);
+
+        //15.0.4569.1506
+        $versions = $version->find(['name' => '15.0.4569.1506']);
+        $this->integer(count($versions))->isIdenticalTo(1);
+
+        $version_data = array_pop($versions);
+        $this->boolean($item_version->getFromDBByCrit([
+            "itemtype" => "Computer",
+            "items_id" => $computers_id,
+            "softwareversions_id" => $version_data['id']
+        ]))->isTrue();
+
+        //inventory with two same software
+        $xml_source = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>
+        <REQUEST>
+          <CONTENT>
+            <SOFTWARES>
+              <ARCH>i586</ARCH>
+              <FROM>registry</FROM>
+              <GUID>Office15.STANDARD</GUID>
+              <INSTALLDATE>18/08/2020</INSTALLDATE>
+              <NAME>Microsoft Office Standard 2013</NAME>
+              <NO_REMOVE>0</NO_REMOVE>
+              <PUBLISHER>Microsoft Corporation</PUBLISHER>
+              <SYSTEM_CATEGORY>application</SYSTEM_CATEGORY>
+              <UNINSTALL_STRING>&quot;C:\Program Files (x86)\Common Files\Microsoft Shared\OFFICE15\Office Setup Controller\setup.exe&quot; /uninstall STANDARD /dll OSETUP.DLL</UNINSTALL_STRING>
+              <VERSION>15.0.4569.1506</VERSION>
+            </SOFTWARES>
+            <SOFTWARES>
+              <ARCH>i586</ARCH>
+              <FROM>registry</FROM>
+              <GUID>{90150000-0012-0000-0000-0000000FF1CE}</GUID>
+              <INSTALLDATE>11/01/2023</INSTALLDATE>
+              <NAME>Microsoft Office Standard 2013</NAME>
+              <PUBLISHER>Microsoft Corporation</PUBLISHER>
+              <SYSTEM_CATEGORY>system_component</SYSTEM_CATEGORY>
+              <UNINSTALL_STRING>MsiExec.exe /X{90150000-0012-0000-0000-0000000FF1CE}</UNINSTALL_STRING>
+              <VERSION>15.0.4569.1506</VERSION>
+            </SOFTWARES>
+            <SOFTWARES>
+              <ARCH>i586</ARCH>
+              <FROM>registry</FROM>
+              <GUID>{90150000-0012-0000-0000-0000000FF1CE}</GUID>
+              <INSTALLDATE>11/01/2023</INSTALLDATE>
+              <NAME>Microsoft Office Standard 2013</NAME>
+              <PUBLISHER>Microsoft Corporation</PUBLISHER>
+              <SYSTEM_CATEGORY>system_component</SYSTEM_CATEGORY>
+              <UNINSTALL_STRING>MsiExec.exe /X{90150000-0012-0000-0000-0000000FF1CE}</UNINSTALL_STRING>
+              <VERSION>16.0.4569.1506</VERSION>
+            </SOFTWARES>
+            <HARDWARE>
+              <NAME>pc002</NAME>
+            </HARDWARE>
+            <BIOS>
+              <SSN>ggheb7ne7</SSN>
+            </BIOS>
+            <VERSIONCLIENT>FusionInventory-Agent_v2.3.19</VERSIONCLIENT>
+          </CONTENT>
+          <DEVICEID>test-pc002</DEVICEID>
+          <QUERY>INVENTORY</QUERY>
+        </REQUEST>";
+
+        $this->doInventory($xml_source, true);
+        //we have 1 software & versions
+        $softs = $soft->find(['name' => 'Mi Crosoft']);
+        $this->integer(count($softs))->isIdenticalTo(1);
+
+        $softs = $soft->find(['name' => 'Microsoft']);
+        $this->integer(count($softs))->isIdenticalTo(0);
+
+    }
+
 }
