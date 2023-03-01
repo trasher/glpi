@@ -892,6 +892,7 @@ class AuthLDAP extends CommonDBTM
         $tests = self::testLDAPServer($this->getField('id'));
 
         TemplateRenderer::getInstance()->display('pages/setup/ldap/test_form.html.twig', [
+            'servername' => Sanitizer::sanitize($this->getField('name')),
             'tests' => $tests,
         ]);
     }
@@ -4544,7 +4545,7 @@ class AuthLDAP extends CommonDBTM
             && $item->can($item->getField('id'), READ)
         ) {
             $ong     = [];
-            $ong[1]  = _sx('button', 'Test');                     // test connexion
+            $ong[1]  = self::createTabEntry(_sx('button', 'Test'), 0, $item::getType(), "ti ti-stethoscope"); // test connexion
             $ong[2]  = User::getTypeName(Session::getPluralNumber());
             $ong[3]  = Group::getTypeName(Session::getPluralNumber());
            // TODO clean fields entity_XXX if not used
