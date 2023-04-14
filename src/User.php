@@ -1639,11 +1639,25 @@ class User extends CommonDBTM
             $group_fields[] = Toolbox::strtolower($data["ldap_field"]);
         }
         if (count($group_fields)) {
-           //Need to sort the array because edirectory don't like it!
+            //Need to sort the array because edirectory don't like it!
             sort($group_fields);
 
-           // If the groups must be retrieve from the ldap user object
-            $sr = @ ldap_read($ldap_connection, $userdn, "objectClass=*", $group_fields);
+            // If the groups must be retrieved from the ldap user object
+            $sr = @ldap_read($ldap_connection, $userdn, "objectClass=*", $group_fields);
+            if ($sr === false) {
+                trigger_error(
+                    AuthLDAP::buildError(
+                        $ldap_connection,
+                        sprintf(
+                            'Unable to read LDAP groups for user %s with filter %s and attributes %s',
+                            $userdn,
+                            "objectClass=*",
+                            implode(', ', $group_fields)
+                        )
+                    ),
+                    E_USER_WARNING
+                );
+            }
             $v  = AuthLDAP::get_entries_clean($ldap_connection, $sr);
 
             for ($i = 0; $i < $v['count']; $i++) {
@@ -1801,7 +1815,22 @@ class User extends CommonDBTM
             $fields  = array_filter($fields);
             $f       = self::getLdapFieldNames($fields);
 
-            $sr      = @ ldap_read($ldap_connection, $userdn, "objectClass=*", $f);
+            $sr      = @ldap_read($ldap_connection, $userdn, "objectClass=*", $f);
+            if ($sr === false) {
+                trigger_error(
+                    AuthLDAP::buildError(
+                        $ldap_connection,
+                        sprintf(
+                            'Unable to read LDAP for user %s with filter %s and attributes %s',
+                            $userdn,
+                            "objectClass=*",
+                            implode(', ', $f)
+                        )
+                    ),
+                    E_USER_WARNING
+                );
+            }
+
             $v       = AuthLDAP::get_entries_clean($ldap_connection, $sr);
 
             if (

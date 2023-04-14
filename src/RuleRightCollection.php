@@ -248,13 +248,28 @@ class RuleRightCollection extends RuleCollection
            //Get all the field to retrieve to be able to process rule matching
             $rule_fields = $this->getFieldsToLookFor();
 
-           //Get all the datas we need from ldap to process the rules
-            $sz         = @ldap_read(
+           //Get all the data we need from ldap to process the rules
+            $sz = @ldap_read(
                 $params_lower["connection"],
                 $params_lower["userdn"],
                 "objectClass=*",
                 $rule_fields
             );
+            if ($sz === false) {
+                trigger_error(
+                    AuthLDAP::buildError(
+                        $params_lower["connection"],
+                        sprintf(
+                            __('Unable to read LDAP directory for user %s with filter %s and attributes %s'),
+                            $params_lower["userdn"],
+                            'objectClass=*',
+                            implode(', ', $rule_fields)
+                        )
+                    ),
+                    E_USER_WARNING
+                );
+            }
+
             $rule_input = AuthLDAP::get_entries_clean($params_lower["connection"], $sz);
 
             if (count($rule_input)) {

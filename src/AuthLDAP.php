@@ -1907,7 +1907,10 @@ class AuthLDAP extends CommonDBTM
                 $sr = ldap_search($ds, $values['basedn'], $filter, $attrs, 0, -1, -1, LDAP_DEREF_NEVER, $controls);
                 if ($sr === false) {
                     trigger_error(
-                        sprintf('LDAP search failed with error (%s) %s', ldap_errno($ds), ldap_error($ds)),
+                        static::buildError(
+                            $ds,
+                            'LDAP search failed'
+                        ),
                         E_USER_WARNING
                     );
                     return false;
@@ -2520,10 +2523,23 @@ class AuthLDAP extends CommonDBTM
     public static function getGroupCNByDn($ldap_connection, $group_dn)
     {
 
-        $sr = @ ldap_read($ldap_connection, $group_dn, "objectClass=*", ["cn"]);
+        $sr = @ldap_read($ldap_connection, $group_dn, "objectClass=*", ["cn"]);
         if ($sr === false) {
-           //group does not exists
-            return false;
+            $errno = ldap_errno($ldap_connection);
+            if ($errno == 32) { //LDAP_NO_SUCH_OBJECT
+                //group does not exist
+                return false;
+            }
+            trigger_error(
+                static::buildError(
+                    $ldap_connection,
+                    sprintf(
+                        "Unable to getGroup from DN %s",
+                        $group_dn
+                    )
+                ),
+                E_USER_WARNING
+            );
         }
         $v  = self::get_entries_clean($ldap_connection, $sr);
         if (!is_array($v) || (count($v) == 0) || empty($v[0]["cn"][0])) {
@@ -3010,22 +3026,48 @@ class AuthLDAP extends CommonDBTM
 
         $ds = @ldap_connect($host, intval($port));
         if ($ds) {
-            @ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
-            @ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
-            @ldap_set_option($ds, LDAP_OPT_DEREF, $deref_options);
-            @ldap_set_option($ds, LDAP_OPT_NETWORK_TIMEOUT, $timeout);
-
+            $ldap_options = [
+                LDAP_OPT_PROTOCOL_VERSION => 3,
+                LDAP_OPT_REFERRALS        => 0,
+                LDAP_OPT_DEREF            => $deref_options,
+                LDAP_OPT_NETWORK_TIMEOUT  => $timeout
+            ];
             if (!empty($tls_certfile) && file_exists($tls_certfile)) {
-                @ldap_set_option(null, LDAP_OPT_X_TLS_CERTFILE, $tls_certfile);
+                $ldap_options[LDAP_OPT_X_TLS_CERTFILE] = $tls_certfile;
+            }
+            if (!empty($tls_keyfile) && file_exists($tls_keyfile)) {
+                $ldap_options[LDAP_OPT_X_TLS_KEYFILE] = $tls_keyfile;
             }
 
-            if (!empty($tls_keyfile) && file_exists($tls_keyfile)) {
-                @ldap_set_option(null, LDAP_OPT_X_TLS_KEYFILE, $tls_keyfile);
+            foreach ($ldap_options as $option => $value) {
+                if (!@ldap_set_option($ds, $option, $value)) {
+                    trigger_error(
+                        static::buildError(
+                            $ds,
+                            sprintf(
+                                "Unable to set LDAP option %s to %s",
+                                $option,
+                                $value
+                            )
+                        ),
+                        E_USER_WARNING
+                    );
+                }
             }
 
             if ($use_tls) {
                 if (!@ldap_start_tls($ds)) {
-                    return false;
+                    trigger_error(
+                        static::buildError(
+                            $ds,
+                            sprintf(
+                                "Unable to start TLS connection to LDAP server %s:%s",
+                                $host,
+                                $port
+                            )
+                        ),
+                        E_USER_WARNING
+                    );
                 }
             }
            // Auth bind
@@ -3035,6 +3077,18 @@ class AuthLDAP extends CommonDBTM
                 } else { // Anonymous bind
                     $b = @ldap_bind($ds);
                 }
+                if ($b === false) {
+                    trigger_error(
+                        static::buildError(
+                            $ds,
+                            sprintf(
+                                "Unable to bind%s",
+                                ($login != '' ? " with login $login" : ' anonymously')
+                            )
+                        ),
+                        E_USER_WARNING
+                    );
+                }
             } else {
                 $b = true;
             }
@@ -3042,6 +3096,14 @@ class AuthLDAP extends CommonDBTM
             if ($b) {
                 return $ds;
             }
+        } else {
+            trigger_error(
+                sprintf(
+                    "Unable to connect to LDAP server %s:%s",
+                    $host,
+                    $port
+                )
+            );
         }
         return false;
     }
@@ -3456,15 +3518,24 @@ class AuthLDAP extends CommonDBTM
      */
     public static function getObjectByDn($ds, $condition, $dn, $attrs = [], $clean = true)
     {
-        if ($result = @ ldap_read($ds, $dn, $condition, $attrs)) {
-            if ($clean) {
-                $info = self::get_entries_clean($ds, $result);
-            } else {
-                $info = ldap_get_entries($ds, $result);
+        if ($result = @ldap_read($ds, $dn, $condition, $attrs)) {
+            if (!$clean) {
+                Toolbox::deprecated('Use of $clean = false is deprecated');
             }
+            $info = self::get_entries_clean($ds, $result);
             if (is_array($info) && ($info['count'] == 1)) {
                 return $info[0];
             }
+        } else {
+            trigger_error(
+                static::buildError(
+                    $ds,
+                    sprintf(
+                        'Error reading LDAP directory for DN %s',
+                        $dn
+                    )
+                )
+            );
         }
 
         return false;
@@ -4283,7 +4354,17 @@ class AuthLDAP extends CommonDBTM
      */
     public static function get_entries_clean($link, $result)
     {
-        return ldap_get_entries($link, $result);
+        $entries = @ldap_get_entries($link, $result);
+        if ($entries === false) {
+            trigger_error(
+                static::buildError(
+                    $link,
+                    'Error while getting entries'
+                ),
+                E_USER_WARNING
+            );
+        }
+        return $entries;
     }
 
 
@@ -4594,5 +4675,20 @@ class AuthLDAP extends CommonDBTM
     public static function getIcon()
     {
         return "far fa-address-book";
+    }
+
+    public static function buildError($ds, $message): string
+    {
+        $diag_message = '';
+        $err_message  = '';
+        $message = sprintf(
+            "%s\nerror: %s (%s)%s%s",
+            $message,
+            ldap_error($ds),
+            ldap_errno($ds),
+            (ldap_get_option($ds, LDAP_OPT_DIAGNOSTIC_MESSAGE, $diag_message) ? "\nextended error: " . $diag_message : ''),
+            (ldap_get_option($ds, LDAP_OPT_ERROR_STRING, $err_message) ? "\nerr string: " . $err_message : '')
+        );
+        return $message;
     }
 }
