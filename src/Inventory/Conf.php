@@ -320,7 +320,7 @@ class Conf extends CommonGLPI
                 if (Session::haveRight(self::$rightname, self::UPDATECONFIG)) {
                     $tabs[1] = __('Configuration');
                 }
-                if ($item->enabled_inventory && Session::haveRight(self::$rightname, self::IMPORTFROMFILE)) {
+                if ($item->isNativeInventoryEnabled() && Session::haveRight(self::$rightname, self::IMPORTFROMFILE)) {
                     $tabs[2] = __('Import from file');
                 }
                 return $tabs;
@@ -338,7 +338,7 @@ class Conf extends CommonGLPI
                     break;
 
                 case 2:
-                    if ($item->enabled_inventory) {
+                    if ($item->isNativeInventoryEnabled()) {
                         $item->showUploadForm();
                     }
                     break;
@@ -379,7 +379,7 @@ class Conf extends CommonGLPI
         Html::showCheckbox([
             'name'      => 'enabled_inventory',
             'id'        => 'enabled_inventory',
-            'checked'   => $config['enabled_inventory']
+            'checked'   => $this->isNativeInventoryEnabled()
         ]);
         echo "</td>";
         echo "</tr>";
@@ -1149,5 +1149,17 @@ class Conf extends CommonGLPI
             'stale_agents_action'            => exportArrayToDB([0]),
             'stale_agents_status'            => 0,
         ];
+    }
+
+    public function isNativeInventoryEnabled(): bool
+    {
+        $plugin = new \Plugin();
+
+        if ($plugin->isInstalled('fusioninventory')) {
+            \Toolbox::logWarning('FusionInventory plugin is present, native inventory cannot be used');
+            return false;
+        }
+
+        return (bool)$this->enabled_inventory;
     }
 }
