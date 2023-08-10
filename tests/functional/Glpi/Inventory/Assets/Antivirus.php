@@ -41,6 +41,8 @@ include_once __DIR__ . '/../../../../abstracts/AbstractInventoryAsset.php';
 
 class Antivirus extends AbstractInventoryAsset
 {
+    const INV_FIXTURES = GLPI_ROOT . '/tests/fixtures/inventories/';
+
     protected function assetProvider(): array
     {
         return [
@@ -347,5 +349,41 @@ class Antivirus extends AbstractInventoryAsset
 
         $this->boolean($antivirus->getFromDB($antivirus_3_id))->isTrue();
         $this->integer($antivirus->fields['is_dynamic'])->isIdenticalTo(0);
+    }
+
+    public function testPartial()
+    {
+        $antivirus = new \ComputerAntivirus();
+
+        $json_str = file_get_contents(self::INV_FIXTURES . 'antivirus-1.json');
+        $json = json_decode($json_str);
+
+        $inventory = $this->doInventory($json);
+
+        $computers_id = $inventory->getItem()->fields['id'];
+        $this->integer($computers_id)->isGreaterThan(0);
+
+        //we have 1 antivirus linked to the computer
+        $results = $antivirus->find(['computers_id' => $computers_id]);
+        $this->integer(count($results))->isIdenticalTo(1);
+
+        $av = array_pop($results);
+        $this->string($av['name'])->isIdenticalTo('Microsoft Defender');
+        $this->string($av['antivirus_version'])->isIdenticalTo('101.23062.0010');
+
+        $json_str = file_get_contents(self::INV_FIXTURES . 'antivirus-2.json');
+        $json = json_decode($json_str);
+
+        $inventory = $this->doInventory($json);
+
+        $this->integer($inventory->getItem()->fields['id'])->isIdenticalTo($computers_id);
+
+        //we still have 1 antivirus linked to the computer, but no longer the same
+        $results = $antivirus->find(['computers_id' => $computers_id]);
+        $this->integer(count($results))->isIdenticalTo(1);
+
+        $av = array_pop($results);
+        $this->string($av['name'])->isIdenticalTo('Antivirus 2');
+        $this->string($av['antivirus_version'])->isIdenticalTo('2.7');
     }
 }

@@ -1,0 +1,32 @@
+{
+   "action": "inventory",
+   "content": {
+      "antivirus": [
+         {
+            "base_version": "1.0.222",
+            "company": "AV2 Edition",
+            "enabled": true,
+            "expiration": "2023-12-31",
+            "name": "Antivirus 2",
+            "uptodate": true,
+            "version": "2.7"
+         }
+      ],
+      "bios": {
+         "mmanufacturer": "ASUSTeK COMPUTER INC.",
+         "mmodel": "PRIME X570-P",
+         "msn": "121107128107632129086",
+         "skunumber": "SKU"
+      },
+      "hardware": {
+         "chassis_type": "Desktop",
+         "name": "antivirus-test",
+         "uuid": "1677aeb0-2cc5-4952-8a5f-dcdd7d4b5a29",
+         "vmsystem": "Physical"
+      },
+      "versionclient": "GLPI-Inventory_v1.6-dev"
+   },
+   "deviceid": "antivirus-test-2023-08-10-08-43-44",
+   "itemtype": "Computer",
+   "partial": false
+}
