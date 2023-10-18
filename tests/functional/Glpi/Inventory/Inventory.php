@@ -6754,7 +6754,7 @@ Compiled Tue 28-Sep-10 13:44 by prod_rel_team",
         $this->string($neteq->fields['comment'])->isIdenticalTo('A comment');
         $this->integer($neteq->fields['states_id'])->isIdenticalTo($states_id);
         //location is not set by rule on update, but is set from inventory data
-        $this->integer($neteq->fields['locations_id'])->isNotIdenticalTo($locations_id);
+        $this->integer($neteq->fields['locations_id'])->isIdenticalTo(getItemByTypeName(\Location::class, 'paris.pa3', true));
     }
 
     public function testBusinessRuleOnUpdateNetworkEquipment()
@@ -7173,7 +7173,7 @@ Compiled Tue 28-Sep-10 13:44 by prod_rel_team",
         $this->string($printer->fields['comment'])->isIdenticalTo('A comment');
         $this->integer($printer->fields['states_id'])->isIdenticalTo($states_id);
         //location is not set by rule on update, but is set from inventory data
-        $this->integer($printer->fields['locations_id'])->isNotIdenticalTo($locations_id);
+        $this->integer($printer->fields['locations_id'])->isIdenticalTo(getItemByTypeName(\Location::class, 'Location', true));
     }
 
     public function testBusinessRuleOnUpdatePrinter()
