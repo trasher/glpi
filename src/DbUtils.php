@@ -727,6 +727,7 @@ final class DbUtils
         $is_recursive = false,
         $complete_request = false
     ) {
+        Toolbox::deprecated('Use getEntitiesRestrictCriteria instead');
         /** @var \DBmysql $DB */
         global $DB;
 
