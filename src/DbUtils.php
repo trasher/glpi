@@ -507,7 +507,7 @@ final class DbUtils
      *
      * @return integer Number of elements in table
      */
-    public function countElementsInTable($table, $condition = [])
+    public function countElementsInTable($table, array $condition = [])
     {
         /** @var \DBmysql $DB */
         global $DB;
@@ -522,11 +522,6 @@ final class DbUtils
          }
        }*/
 
-        if (!is_array($condition)) {
-            if (empty($condition)) {
-                $condition = [];
-            }
-        }
         $condition['COUNT'] = 'cpt';
 
         $row = $DB->request($table, $condition)->current();
@@ -542,14 +537,9 @@ final class DbUtils
      *
      * @return int nb of elements in table
      */
-    public function countDistinctElementsInTable($table, $field, $condition = [])
+    public function countDistinctElementsInTable($table, $field, array $condition = [])
     {
 
-        if (!is_array($condition)) {
-            if (empty($condition)) {
-                $condition = [];
-            }
-        }
         $condition['COUNT'] = 'cpt';
         $condition['FIELDS'] = $field;
         $condition['DISTINCT'] = true;
@@ -565,10 +555,10 @@ final class DbUtils
      *
      * @return integer Number of elements in table
      */
-    public function countElementsInTableForMyEntities($table, $condition = [])
+    public function countElementsInTableForMyEntities($table, array $condition = [])
     {
 
-       /// TODO clean it / maybe include when review of SQL requests
+        // TODO clean it / maybe include when review of SQL requests
         $itemtype = $this->getItemTypeForTable($table);
         $item     = new $itemtype();
 
@@ -588,10 +578,10 @@ final class DbUtils
      *
      * @return integer number of elements in table
      */
-    public function countElementsInTableForEntity($table, $entity, $condition = [], $recursive = true)
+    public function countElementsInTableForEntity($table, $entity, array $condition = [], $recursive = true)
     {
 
-       /// TODO clean it / maybe include when review of SQL requests
+        // TODO clean it / maybe include when review of SQL requests
         $itemtype = $this->getItemTypeForTable($table);
         $item     = new $itemtype();
 
@@ -611,34 +601,21 @@ final class DbUtils
      * @param string  $table    Table name
      * @param array   $criteria Request criteria
      * @param boolean $usecache Use cache (false by default)
-     * @param string  $order    Result order (default '')
      *
-     * @return array containing all the datas
+     * @return array containing all the data
      */
-    public function getAllDataFromTable($table, $criteria = [], $usecache = false, $order = '')
+    public function getAllDataFromTable($table, array $criteria = [], $usecache = false)
     {
         /** @var \DBmysql $DB */
         global $DB;
 
         static $cache = [];
 
-        if (empty($criteria) && empty($order) && $usecache && isset($cache[$table])) {
+        if (empty($criteria) && $usecache && isset($cache[$table])) {
             return $cache[$table];
         }
 
         $data = [];
-
-        if (!is_array($criteria)) {
-            Toolbox::Deprecated('Criteria must be an array!');
-            if (empty($criteria)) {
-                $criteria = [];
-            }
-        }
-
-        if (!empty($order)) {
-            Toolbox::Deprecated('Order should be defined in criteria!');
-            $criteria['ORDER'] = $order; // Deprecated use case
-        }
 
         $iterator = $DB->request($table, $criteria);
 
