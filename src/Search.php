@@ -8246,8 +8246,7 @@ HTML;
                                                                         ]
                                                               ],
                     'condition'
-                                                              => getEntitiesRestrictRequest(
-                                                                  'AND',
+                                                              => getEntitiesRestrictCriteria(
                                                                   'NEWTABLE'
                                                               )
                 ];
@@ -8268,8 +8267,7 @@ HTML;
                                                                         ]
                                                               ],
                     'condition'
-                                                              => getEntitiesRestrictRequest(
-                                                                  'AND',
+                                                              => getEntitiesRestrictCriteria(
                                                                   'NEWTABLE'
                                                               )
                 ];
