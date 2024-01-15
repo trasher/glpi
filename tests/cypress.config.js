@@ -3,7 +3,6 @@ const { defineConfig } = require("cypress");
 module.exports = defineConfig({
     viewportWidth: 1920,
     viewportHeight: 1080,
-    chromeWebSecurity: false,
     e2e: {
         baseUrl: "https://glpi.localhost:443",
         setupNodeEvents(on, config) {
