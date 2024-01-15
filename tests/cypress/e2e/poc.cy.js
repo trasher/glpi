@@ -8,6 +8,13 @@ describe('POC Tests', () => {
         cy.waitForInputs();
         cy.get('textarea[name="content"]').type('this is a test');
     });
+    it('TinyMCE type', () => {
+        cy.visit('/front/ticket.form.php');
+        cy.waitForInputs();
+        cy.get('textarea[name="content"]').type('this is a test', {
+            interactive: true
+        });
+    });
     it('Flatpickr interactive', () => {
         cy.visit('/front/ticket.form.php');
         cy.waitForInputs();

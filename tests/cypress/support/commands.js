@@ -66,7 +66,18 @@ Cypress.Commands.overwrite('type', (originalFn, subject, text, options) => {
         cy.get(`textarea[name="${subject.attr('name')}"]`).invoke('attr', 'id').then((textarea_id) => {
             cy.window().then((win) => {
                 if (win.tinymce.get(textarea_id)) {
-                    win.tinymce.get(textarea_id).setContent(text);
+                    if (options !== undefined && options.interactive) {
+                        // Use 'should' off the 'window()' to wait for the required property to be set.
+                        cy.window().should('satisfy', () => {
+                            return typeof win.tinymce.get(textarea_id).dom.doc !== 'undefined';
+                        });
+                        cy.wrap(win.tinymce.get(textarea_id).dom.doc).within(() => {
+                            cy.get('#tinymce[contenteditable="true"]').should('exist');
+                            cy.get('#tinymce p').type(text, options);
+                        });
+                    } else {
+                        win.tinymce.get(textarea_id).setContent(text);
+                    }
                     return;
                 }
                 originalFn(subject, text, options);
