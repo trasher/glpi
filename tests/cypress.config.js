@@ -4,7 +4,7 @@ module.exports = defineConfig({
     viewportWidth: 1920,
     viewportHeight: 1080,
     e2e: {
-        baseUrl: "https://glpi.localhost:443",
+        baseUrl: "http://localhost:8088",
         setupNodeEvents(on, config) {
             // implement node event listeners here
             // Remove --start-maximized flag from Chrome
