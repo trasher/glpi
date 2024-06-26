@@ -37,7 +37,7 @@ namespace tests\units;
 
 use DbTestCase;
 
-class Appliance extends DbTestCase
+class ApplianceTest extends DbTestCase
 {
     public function testDefineTabs()
     {
@@ -46,35 +46,22 @@ class Appliance extends DbTestCase
             'Impact$1'           => 'Impact analysis',
             'ManualLink$1'       => 'Links',
         ];
-        $this
-         ->given($this->newTestedInstance)
-            ->then
-               ->array($this->testedInstance->defineTabs())
-               ->isIdenticalTo($expected, print_r($this->testedInstance->defineTabs(), true));
+
+        $appliance = new \Appliance();
+        $this->assertSame($expected, $appliance->defineTabs());
     }
 
     public function testGetTypes()
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
-        $this
-         ->given($this->newTestedInstance)
-            ->then
-               ->array($this->testedInstance->getTypes(true))
-               ->isIdenticalTo($CFG_GLPI['appliance_types']);
-
-        $this
-         ->given($this->newTestedInstance)
-            ->then
-               ->array($this->testedInstance->getTypes())
-               ->isIdenticalTo([]);
+        $appliance = new \Appliance();
+        $this->assertSame($CFG_GLPI['appliance_types'], $appliance->getTypes(true));
+        $this->assertSame([], $appliance->getTypes());
 
         $this->login();
-        $this
-         ->given($this->newTestedInstance)
-            ->then
-               ->array($this->testedInstance->getTypes())
-               ->isIdenticalTo($CFG_GLPI['appliance_types']);
+        $this->assertSame($CFG_GLPI['appliance_types'], $appliance->getTypes());
     }
 
     public function testClone()
@@ -82,108 +69,112 @@ class Appliance extends DbTestCase
         $this->login();
         $app = new \Appliance();
 
-       // Add
+        // Add
         $id = $app->add([
             'name'        => $this->getUniqueString(),
             'entities_id' => 0
         ]);
-        $this->integer($id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $id);
 
-       // Update
+        // Update
         $id = $app->getID();
-        $this->boolean($app->getFromDB($id))->isTrue();
+        $this->assertTrue($app->getFromDB($id));
 
         $date = date('Y-m-d H:i:s');
         $_SESSION['glpi_currenttime'] = $date;
 
         $iapp = new \Appliance_Item();
-        $this->integer(
+        $this->assertGreaterThan(
+            0,
             $iapp->add([
                 'appliances_id'   => $id,
                 'itemtype'        => 'Computer',
                 'items_id'        => getItemByTypeName('Computer', '_test_pc01', true)
             ])
-        )->isGreaterThan(0);
+        );
 
         $rapp = new \Appliance_Item_Relation();
-        $this->integer(
+        $this->assertGreaterThan(
+            0,
             $rapp->add([
                 'appliances_items_id'   => $iapp->fields['id'],
                 'itemtype'              => 'Location',
                 'items_id'              => getItemByTypeName('Location', '_location01', true)
             ])
-        )->isGreaterThan(0);
+        );
 
-       //add infocom
+        //add infocom
         $infocom = new \Infocom();
-        $this->integer(
+        $this->assertGreaterThan(
+            0,
             $infocom->add([
                 'itemtype'  => 'Appliance',
                 'items_id'  => $id
             ])
-        )->isGreaterThan(0);
+        );
 
-       //add document
+        //add document
         $document = new \Document();
         $docid = (int)$document->add(['name' => 'Test link document']);
-        $this->integer($docid)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $docid);
 
         $docitem = new \Document_Item();
-        $this->integer(
+        $this->assertGreaterThan(
+            0,
             $docitem->add([
                 'documents_id' => $docid,
                 'itemtype'     => 'Appliance',
                 'items_id'     => $id
             ])
-        )->isGreaterThan(0);
+        );
 
-       // Test item cloning
+        // Test item cloning
         $added = (int)$app->clone();
-        $this->integer($added)
-         ->isGreaterThan(0)
-         ->isNotEqualTo($app->fields['id']);
+        $this->assertGreaterThan(0, $added);
+        $this->assertNotEquals($app->fields['id'], $added);
 
         $clonedApp = new \Appliance();
-        $this->boolean($clonedApp->getFromDB($added))->isTrue();
+        $this->assertTrue($clonedApp->getFromDB($added));
 
         $fields = $app->fields;
 
-       // Check the values. Id and dates must be different, everything else must be equal
+        // Check the values. ID and dates must be different, everything else must be equal
         foreach ($fields as $k => $v) {
             switch ($k) {
                 case 'id':
-                    $this->variable($clonedApp->getField($k))->isNotEqualTo($app->getField($k));
+                    $this->assertNotEquals($app->getField($k), $clonedApp->getField($k));
                     break;
                 case 'date_mod':
                 case 'date_creation':
                     $dateClone = new \DateTime($clonedApp->getField($k));
                     $expectedDate = new \DateTime($date);
-                    $this->dateTime($dateClone)->isEqualTo($expectedDate);
+                    $this->assertEquals($expectedDate, $dateClone);
                     break;
                 case 'name':
-                    $this->variable($clonedApp->getField($k))->isEqualTo("{$app->getField($k)} (copy)");
+                    $this->assertEquals("{$app->getField($k)} (copy)", $clonedApp->getField($k));
                     break;
                 default:
-                    $this->variable($clonedApp->getField($k))->isEqualTo($app->getField($k));
+                    $this->assertEquals($app->getField($k), $clonedApp->getField($k));
             }
         }
 
-       //Infocom has been cloned
-        $this->integer(
+        //Infocom has been cloned
+        $this->assertSame(
+            1,
             countElementsInTable(
                 \Infocom::getTable(),
                 ['items_id' => $clonedApp->fields['id']]
             )
-        )->isIdenticalTo(1);
+        );
 
-       //documents has been cloned
-        $this->boolean($docitem->getFromDBByCrit(['itemtype' => 'Appliance', 'items_id' => $added]))->isTrue();
+        //documents has been cloned
+        $this->assertTrue($docitem->getFromDBByCrit(['itemtype' => 'Appliance', 'items_id' => $added]));
 
-       //items has been cloned
-        $this->boolean($iapp->getFromDBByCrit(['appliances_id' => $added]))->isTrue();
+        //items has been cloned
+        $this->assertTrue($iapp->getFromDBByCrit(['appliances_id' => $added]));
 
-       //relations has been cloned
-        $this->boolean($rapp->getFromDBByCrit(['appliances_items_id' => $iapp->fields['id']]))->isTrue();
+        //relations has been cloned
+        $this->assertTrue($rapp->getFromDBByCrit(['appliances_items_id' => $iapp->fields['id']]));
     }
 
     public function testMetaSearch()
@@ -191,31 +182,44 @@ class Appliance extends DbTestCase
         $this->login();
 
         $computer = new \Computer();
-        $this->integer($computers_id = $computer->add([
+        $computers_id = $computer->add([
             'name' => 'Test computer',
             'entities_id' => getItemByTypeName('Entity', '_test_root_entity', true)
-        ]));
+        ]);
+        $this->assertGreaterThan(0, $computers_id);
+
         $cluster = new \Cluster();
-        $this->integer($clusters_id = $cluster->add([
+        $clusters_id = $cluster->add([
             'name' => 'Test cluster',
             'entities_id' => getItemByTypeName('Entity', '_test_root_entity', true)
-        ]));
+        ]);
+        $this->assertGreaterThan(0, $clusters_id);
+
         $appliance = new \Appliance();
-        $this->integer($appliances_id = $appliance->add([
+        $appliances_id = $appliance->add([
             'name' => 'Test appliance',
             'entities_id' => getItemByTypeName('Entity', '_test_root_entity', true)
-        ]));
+        ]);
+        $this->assertGreaterThan(0, $appliances_id);
+
         $appliance_item = new \Appliance_Item();
-        $this->integer($appliance_item->add([
-            'appliances_id' => $appliances_id,
-            'itemtype'      => 'Computer',
-            'items_id'      => $computers_id
-        ]));
-        $this->integer($appliance_item->add([
-            'appliances_id' => $appliances_id,
-            'itemtype'      => 'Cluster',
-            'items_id'      => $clusters_id
-        ]));
+        $this->assertGreaterThan(
+            0,
+            $appliance_item->add([
+                'appliances_id' => $appliances_id,
+                'itemtype'      => 'Computer',
+                'items_id'      => $computers_id
+            ])
+        );
+
+        $this->assertGreaterThan(
+            0,
+            $appliance_item->add([
+                'appliances_id' => $appliances_id,
+                'itemtype'      => 'Cluster',
+                'items_id'      => $clusters_id
+            ])
+        );
 
         $criteria = [
             [
@@ -230,8 +234,8 @@ class Appliance extends DbTestCase
         $data = \Search::getDatas('Appliance', [
             'criteria' => $criteria,
         ]);
-        $this->integer($data['data']['totalcount'])->isEqualTo(1);
-        $this->string($data['data']['rows'][0]['Computer_1'][0]['name'])->isEqualTo('Test computer');
+        $this->assertSame(1, $data['data']['totalcount']);
+        $this->assertSame('Test computer', $data['data']['rows'][0]['Computer_1'][0]['name']);
 
         $criteria = [
             [
@@ -246,7 +250,7 @@ class Appliance extends DbTestCase
         $data = \Search::getDatas('Appliance', [
             'criteria' => $criteria,
         ]);
-        $this->integer($data['data']['totalcount'])->isEqualTo(1);
-        $this->string($data['data']['rows'][0]['Cluster_1'][0]['name'])->isEqualTo('Test cluster');
+        $this->assertSame(1, $data['data']['totalcount']);
+        $this->assertSame('Test cluster', $data['data']['rows'][0]['Cluster_1'][0]['name']);
     }
 }

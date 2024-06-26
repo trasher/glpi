@@ -44,25 +44,25 @@ class AuthLdapReplicate extends DbTestCase
     public function testCanCreate()
     {
         $this->login();
-        $this->boolean((bool)\AuthLdapReplicate::canCreate())->isTrue();
+        $this->assertTrue((bool)\AuthLdapReplicate::canCreate());
 
         $_SESSION['glpiactiveprofile']['config'] = READ;
-        $this->boolean((bool)\AuthLdapReplicate::canCreate())->isFalse();
+        $this->assertFalse((bool)\AuthLdapReplicate::canCreate());
 
         $_SESSION['glpiactiveprofile']['config'] = 0;
-        $this->boolean((bool)\AuthLdapReplicate::canCreate())->isFalse();
+        $this->assertFalse((bool)\AuthLdapReplicate::canCreate());
     }
 
     public function testCanPurge()
     {
         $this->login();
-        $this->boolean((bool)\AuthLdapReplicate::canPurge())->isTrue();
+        $this->assertTrue((bool)\AuthLdapReplicate::canPurge());
 
         $_SESSION['glpiactiveprofile']['config'] = READ;
-        $this->boolean((bool)\AuthLdapReplicate::canCreate())->isFalse();
+        $this->assertFalse((bool)\AuthLdapReplicate::canCreate());
 
         $_SESSION['glpiactiveprofile']['config'] = 0;
-        $this->boolean((bool)\AuthLdapReplicate::canCreate())->isFalse();
+        $this->assertFalse((bool)\AuthLdapReplicate::canCreate());
     }
 
     public function testGetForbiddenStandardMassiveAction()
@@ -70,7 +70,7 @@ class AuthLdapReplicate extends DbTestCase
         $this->login();
         $replicate = new \AuthLdapReplicate();
         $result    = $replicate->getForbiddenStandardMassiveAction();
-        $this->array($result)->isIdenticalTo([0 => 'update']);
+        $this->assertSame([0 => 'update'], $result);
     }
 
     public function testPrepareInputForAddAndUpdate()
@@ -78,28 +78,28 @@ class AuthLdapReplicate extends DbTestCase
         $replicate = new \AuthLdapReplicate();
 
         foreach (['prepareInputForAdd', 'prepareInputForUpdate'] as $method) {
-           //Do not set a port : no port added
+            //Do not set a port : no port added
             $result = $replicate->$method([
                 'name' => 'test',
                 'host' => 'host'
             ]);
-            $this->array($result)->nothasKey('port');
+            $this->assertArrayNotHasKey('port', $result);
 
-           //Port=0, change value to 389
+            //Port=0, change value to 389
             $result = $replicate->$method([
                 'name' => 'test',
                 'host' => 'host',
                 'port' => 0
             ]);
-            $this->integer($result['port'])->isIdenticalTo(389);
+            $this->assertSame(389, $result['port']);
 
-           //Port set : do not change it's value
+            //Port set : do not change its value
             $result = $replicate->$method([
                 'name' => 'test',
                 'host' => 'host',
                 'port' => 3389
             ]);
-            $this->integer($result['port'])->isIdenticalTo(3389);
+            $this->assertSame(3389, $result['port']);
         }
     }
 }

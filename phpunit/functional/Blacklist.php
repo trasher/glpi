@@ -53,14 +53,14 @@ class Blacklist extends DbTestCase
             \Blacklist::MANUFACTURER => 1,
             \Blacklist::IP => 4
         ];
-        $this->array(array_keys($defaults))->isIdenticalTo(array_keys($expecteds));
+        $this->assertSame(array_keys($expecteds), array_keys($defaults));
 
         foreach ($expecteds as $type => $expected) {
-            $this->array($defaults[$type])->hasSize($expected);
+            $this->assertCount($expected, $defaults[$type]);
         }
     }
 
-    protected function processProvider(): array
+    public static function processProvider(): array
     {
         return [
             [
@@ -115,6 +115,6 @@ class Blacklist extends DbTestCase
         }
         $input = (object)$input;
         $blacklist->processBlackList($input);
-        $this->object($input)->isEqualTo($expected);
+        $this->assertEquals($expected, $input);
     }
 }

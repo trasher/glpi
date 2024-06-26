@@ -41,14 +41,16 @@ class Appliance_Item_Relation extends DbTestCase
 {
     public function testGetForbiddenStandardMassiveAction()
     {
-        $this->newTestedInstance();
-        $this->array(
-            $this->testedInstance->getForbiddenStandardMassiveAction()
-        )->isIdenticalTo(['clone'/*, 'update', 'CommonDBConnexity:unaffect', 'CommonDBConnexity:affect'*/]);
+        $aritem = new \Appliance_Item_Relation();
+        $this->assertSame(
+            ['clone'],
+            $aritem->getForbiddenStandardMassiveAction()
+        );
     }
 
     public function testCountForApplianceItem()
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $appliance = new \Appliance();
@@ -56,7 +58,7 @@ class Appliance_Item_Relation extends DbTestCase
         $appliances_id = (int)$appliance->add([
             'name'   => 'Test appliance'
         ]);
-        $this->integer($appliances_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $appliances_id);
 
         $items_id = getItemByTypeName('Computer', '_test_pc01', true);
         $input = [
@@ -66,49 +68,41 @@ class Appliance_Item_Relation extends DbTestCase
         ];
         $appitem = new \Appliance_Item();
         $appliances_items_id = $appitem->add($input);
-        $this->integer($appliances_items_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $appliances_items_id);
 
         $input = [
             'appliances_items_id'   => $appliances_items_id,
             'itemtype'              => 'Location',
             'items_id'              => getItemByTypeName('Location', '_location01', true)
         ];
-        $this
-         ->given($this->newTestedInstance)
-            ->then
-               ->integer($this->testedInstance->add($input))
-               ->isGreaterThan(0);
+        $aritem = new \Appliance_Item_Relation();
+        $this->assertGreaterThan(0, $aritem->add($input));
 
-        $iterator = $DB->request([
-            'FROM'   => \Appliance_Item_Relation::getTable(),
-            'WHERE'  => ['appliances_items_id' => $appliances_items_id]
-        ]);
-
-        $this->boolean($appliance->getFromDB($appliances_id))->isTrue();
-        $this->boolean($appitem->getFromDB($appliances_items_id))->isTrue();
-       //not logged, no Appliances types
-        $this->integer(\Appliance_Item_Relation::countForMainItem($appitem))->isIdenticalTo(0);
+        $this->assertTrue($appliance->getFromDB($appliances_id));
+        $this->assertTrue($appitem->getFromDB($appliances_items_id));
+        //not logged, no Appliances types
+        $this->assertSame(0, \Appliance_Item_Relation::countForMainItem($appitem));
 
         $this->login();
         $this->setEntity(0, true); //locations are in root entity not recursive
-        $this->integer(\Appliance_Item_Relation::countForMainItem($appitem))->isIdenticalTo(1);
+        $this->assertSame(1, \Appliance_Item_Relation::countForMainItem($appitem));
         $relations = \Appliance_Item_Relation::getForApplianceItem($appliances_items_id);
-        $this->array($relations)->hasSize(1);
-        $this->string(array_pop($relations))->contains('_location01');
+        $this->assertCount(1, $relations);
+        $this->assertStringContainsString('_location01', array_pop($relations));
 
-        $this->boolean($appliance->delete(['id' => $appliances_id], true))->isTrue();
+        $this->assertTrue($appliance->delete(['id' => $appliances_id], true));
         $iterator = $DB->request([
             'FROM'   => \Appliance_Item::getTable(),
             'WHERE'  => ['appliances_id' => $appliances_id]
         ]);
-        $this->integer(count($iterator))->isIdenticalTo(0);
+        $this->assertCount(0, $iterator);
 
         $iterator = $DB->request([
             'FROM'   => \Appliance_Item_Relation::getTable(),
             'WHERE'  => ['appliances_items_id' => $appliances_items_id]
         ]);
-        $this->integer(count($iterator))->isIdenticalTo(0);
+        $this->assertCount(0, $iterator);
 
-        $this->array(\Appliance_Item_Relation::getForApplianceItem($appliances_items_id))->isEmpty();
+        $this->assertSame([], \Appliance_Item_Relation::getForApplianceItem($appliances_items_id));
     }
 }

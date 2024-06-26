@@ -37,53 +37,47 @@ namespace tests\units;
 
 require_once 'CommonDropdown.php';
 
-/* Test for inc/operatingsystem.class.php */
+/* Test for inc/operatingsystemkernel.class.php */
 
-class OperatingSystemEdition extends CommonDropdown
+class OperatingSystemKernel extends CommonDropdown
 {
     public function getObjectClass()
     {
-        return '\OperatingSystemEdition';
+        return '\OperatingSystemKernel';
     }
 
-    public function typenameProvider()
+    public static function typenameProvider()
     {
         return [
-            [\OperatingSystemEdition::getTypeName(), 'Editions'],
-            [\OperatingSystemEdition::getTypeName(0), 'Editions'],
-            [\OperatingSystemEdition::getTypeName(10), 'Editions'],
-            [\OperatingSystemEdition::getTypeName(1), 'Edition']
+            [\OperatingSystemKernel::getTypeName(), 'Kernels'],
+            [\OperatingSystemKernel::getTypeName(0), 'Kernels'],
+            [\OperatingSystemKernel::getTypeName(10), 'Kernels'],
+            [\OperatingSystemKernel::getTypeName(1), 'Kernel']
         ];
-    }
-
-    public function testMaybeTranslated()
-    {
-        $this
-         ->given($this->newTestedInstance)
-            ->then
-               ->boolean($this->testedInstance->maybeTranslated())->isTrue();
     }
 
     protected function getTabs()
     {
         return [
-            'OperatingSystemEdition$main' => 'Edition',
+            'OperatingSystemKernel$main'  => 'Kernel',
         ];
     }
 
     /**
-     * Create new Operating system in database
+     * Create new Kernel in database
      *
-     * @return void
+     * @return \CommonDBTM
      */
-    protected function newInstance()
+    protected function newInstance(): \CommonDBTM
     {
-        $this->newTestedInstance();
-        $this->integer(
-            (int)$this->testedInstance->add([
-                'name' => 'OS name ' . $this->getUniqueString()
+        $instance = new \OperatingSystemKernel();
+        $this->assertGreaterThan(
+            0,
+            $instance->add([
+                'name' => 'Kernel name ' . $this->getUniqueString()
             ])
-        )->isGreaterThan(0);
-        $this->boolean($this->testedInstance->getFromDB($this->testedInstance->getID()))->isTrue();
+        );
+        $this->assertTrue($instance->getFromDB($instance->getID()));
+        return $instance;
     }
 }

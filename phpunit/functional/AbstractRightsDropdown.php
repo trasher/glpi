@@ -44,7 +44,7 @@ use User;
 
 abstract class AbstractRightsDropdown extends \GLPITestCase
 {
-    protected function testGetPostedIdsProvider(): Generator
+    public static function getPostedIdsProvider(): Generator
     {
         $flat_values_set = [
             'users_id-3',
@@ -91,7 +91,7 @@ abstract class AbstractRightsDropdown extends \GLPITestCase
     }
 
     /**
-     * @dataprovider testGetPostedIdsProvider
+     * @dataProvider getPostedIdsProvider
      */
     public function testGetPostedIds(
         array $values,
@@ -99,6 +99,6 @@ abstract class AbstractRightsDropdown extends \GLPITestCase
         array $expected_ids
     ): void {
         $ids = \AbstractRightsDropdown::getPostedIds($values, $class);
-        $this->array($ids)->isEqualTo($expected_ids);
+        $this->assertSame($expected_ids, $ids);
     }
 }

@@ -46,7 +46,7 @@ class OperatingSystemArchitecture extends CommonDropdown
         return '\OperatingSystemArchitecture';
     }
 
-    public function typenameProvider()
+    public static function typenameProvider()
     {
         return [
             [\OperatingSystemArchitecture::getTypeName(), 'Operating system architectures'],
@@ -66,16 +66,18 @@ class OperatingSystemArchitecture extends CommonDropdown
     /**
      * Create new Architecture system in database
      *
-     * @return void
+     * @return \CommonDBTM
      */
-    protected function newInstance()
+    protected function newInstance(): \CommonDBTM
     {
-        $this->newTestedInstance();
-        $this->integer(
-            (int)$this->testedInstance->add([
+        $instance = new \OperatingSystemArchitecture();
+        $this->assertGreaterThan(
+            0,
+            $instance->add([
                 'name' => 'Arch name ' . $this->getUniqueString()
             ])
-        )->isGreaterThan(0);
-        $this->boolean($this->testedInstance->getFromDB($this->testedInstance->getID()))->isTrue();
+        );
+        $this->assertTrue($instance->getFromDB($instance->getID()));
+        return $instance;
     }
 }

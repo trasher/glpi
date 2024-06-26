@@ -46,7 +46,7 @@ class OperatingSystemKernelVersion extends CommonDropdown
         return '\OperatingSystemKernelVersion';
     }
 
-    public function typenameProvider()
+    public static function typenameProvider()
     {
         return [
             [\OperatingSystemKernelVersion::getTypeName(), 'Kernel versions'],
@@ -58,17 +58,18 @@ class OperatingSystemKernelVersion extends CommonDropdown
 
     public function testGetAdditionalFields()
     {
-        $this
-         ->given($this->newTestedInstance)
-            ->then
-               ->array($this->testedInstance->getAdditionalFields())->isIdenticalTo([
-                   [
-                       'label'  => 'Kernel',
-                       'name'   => 'Kernels',
-                       'list'   => true,
-                       'type'   => 'oskernel'
-                   ]
-               ]);
+        $instance = $this->newInstance();
+        $this->assertSame(
+            [
+                [
+                    'label'  => 'Kernel',
+                    'name'   => 'Kernels',
+                    'list'   => true,
+                    'type'   => 'oskernel'
+                ]
+            ],
+            $instance->getAdditionalFields()
+        );
     }
 
     protected function getTabs()
@@ -81,23 +82,26 @@ class OperatingSystemKernelVersion extends CommonDropdown
     /**
      * Create new kernel version in database
      *
-     * @return void
+     * @return \CommonDBTM
      */
-    protected function newInstance()
+    protected function newInstance(): \CommonDBTM
     {
         $kernel = new \OperatingSystemKernel();
-        $this->integer(
-            (int)$kernel->add([
+        $this->assertGreaterThan(
+            0,
+            $kernel->add([
                 'name'   => 'linux'
             ])
         );
-        $this->newTestedInstance();
-        $this->integer(
-            (int)$this->testedInstance->add([
+        $instance = new \OperatingSystemKernelVersion();
+        $this->assertGreaterThan(
+            0,
+            $instance->add([
                 'name'                        => 'Version name ' . $this->getUniqueString(),
                 'operatingsystemkernels_id'   => $kernel->getID()
             ])
-        )->isGreaterThan(0);
-        $this->boolean($this->testedInstance->getFromDB($this->testedInstance->getID()))->isTrue();
+        );
+        $this->assertTrue($instance->getFromDB($instance->getID()));
+        return $instance;
     }
 }

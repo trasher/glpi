@@ -47,36 +47,36 @@ class Certificate_Item extends DbTestCase
 
         $root_entity_id = getItemByTypeName('Entity', '_test_root_entity', true);
 
-        $this->newTestedInstance();
+        $cert_item = new \Certificate_Item();
         $cert = new \Certificate();
 
         $input = [
             'name'        => 'Test certificate',
             'entities_id' => $root_entity_id,
         ];
-        $cid1 = (int)$cert->add($input);
-        $this->integer($cid1)->isGreaterThan(0);
+        $cid1 = $cert->add($input);
+        $this->assertGreaterThan(0, $cid1);
 
         $input = [
             'name'        => 'Test certificate 2',
             'entities_id' => $root_entity_id,
         ];
-        $cid2 = (int)$cert->add($input);
-        $this->integer($cid2)->isGreaterThan(0);
+        $cid2 = $cert->add($input);
+        $this->assertGreaterThan(0, $cid2);
 
         $input = [
             'name'        => 'Test certificate 3',
             'entities_id' => $root_entity_id,
         ];
-        $cid3 = (int)$cert->add($input);
-        $this->integer($cid3)->isGreaterThan(0);
+        $cid3 = $cert->add($input);
+        $this->assertGreaterThan(0, $cid3);
 
         $input = [
             'name'        => 'Test certificate 4',
             'entities_id' => $root_entity_id,
         ];
-        $cid4 = (int)$cert->add($input);
-        $this->integer($cid4)->isGreaterThan(0);
+        $cid4 = $cert->add($input);
+        $this->assertGreaterThan(0, $cid4);
 
         $computer = getItemByTypeName('Computer', '_test_pc01');
         $printer = getItemByTypeName('Printer', '_test_printer_all');
@@ -86,75 +86,63 @@ class Certificate_Item extends DbTestCase
             'itemtype'        => 'Computer',
             'items_id'        => $computer->getID()
         ];
-        $this->integer(
-            (int)$this->testedInstance->add($input)
-        )->isGreaterThan(0);
+        $this->assertGreaterThan(0, $cert_item->add($input));
 
         $input['certificates_id'] = $cid2;
-        $this->integer(
-            (int)$this->testedInstance->add($input)
-        )->isGreaterThan(0);
+        $this->assertGreaterThan(0, $cert_item->add($input));
 
         $input['certificates_id'] = $cid3;
-        $this->integer(
-            (int)$this->testedInstance->add($input)
-        )->isGreaterThan(0);
+        $this->assertGreaterThan(0, $cert_item->add($input));
 
         $input = [
             'certificates_id' => $cid1,
             'itemtype'        => 'Printer',
             'items_id'        => $printer->getID()
         ];
-        $this->integer(
-            (int)$this->testedInstance->add($input)
-        )->isGreaterThan(0);
+        $this->assertGreaterThan(0, $cert_item->add($input));
 
         $input['certificates_id'] = $cid4;
-        $this->integer(
-            (int)$this->testedInstance->add($input)
-        )->isGreaterThan(0);
+        $this->assertGreaterThan(0, $cert_item->add($input));
 
-        $list_items = iterator_to_array($this->testedInstance->getListForItem($computer));
-        $this->array($list_items)
-         ->hasSize(3)
-         ->hasKeys([$cid1, $cid2, $cid3]);
+        $list_items = iterator_to_array($cert_item->getListForItem($computer));
+        $this->assertCount(3, $list_items);
+        $this->assertArrayHasKey($cid1, $list_items);
+        $this->assertArrayHasKey($cid2, $list_items);
+        $this->assertArrayHasKey($cid3, $list_items);
 
-        $list_items = iterator_to_array($this->testedInstance->getListForItem($printer));
-        $this->array($list_items)
-         ->hasSize(2)
-         ->hasKeys([$cid1, $cid4]);
+        $list_items = iterator_to_array($cert_item->getListForItem($printer));
+        $this->assertCount(2, $list_items);
+        $this->assertArrayHasKey($cid1, $list_items);
+        $this->assertArrayHasKey($cid4, $list_items);
 
-        $this->boolean($cert->getFromDB($cid1))->isTrue();
-        $this->exception(
-            function () use ($cert) {
-                $this->boolean($this->testedInstance->getListForItem($cert))->isFalse();
-            }
-        )->message->contains('Cannot use getListForItemParams() for a Certificate');
+        $this->assertTrue($cert->getFromDB($cid1));
 
-        $list_types = iterator_to_array($this->testedInstance->getDistinctTypes($cid1));
+        $list_types = iterator_to_array($cert_item->getDistinctTypes($cid1));
         $expected = [
             ['itemtype' => 'Computer'],
             ['itemtype' => 'Printer']
         ];
-        $this->array($list_types)->isIdenticalTo($expected);
+        $this->assertSame($expected, $list_types);
 
         foreach ($list_types as $type) {
-            $list_items = iterator_to_array($this->testedInstance->getTypeItems($cid1, $type['itemtype']));
-            $this->array($list_items)->hasSize(1);
+            $list_items = iterator_to_array($cert_item->getTypeItems($cid1, $type['itemtype']));
+            $this->assertCount(1, $list_items);
         }
 
-        $this->integer($this->testedInstance->countForItem($computer))->isIdenticalTo(3);
-        $this->integer($this->testedInstance->countForItem($printer))->isIdenticalTo(2);
+        $this->assertSame(3, $cert_item->countForItem($computer));
+        $this->assertSame(2, $cert_item->countForItem($printer));
 
         $computer = getItemByTypeName('Computer', '_test_pc02');
-        $this->integer($this->testedInstance->countForItem($computer))->isIdenticalTo(0);
+        $this->assertSame(0, $cert_item->countForItem($computer));
 
-        $this->exception(
-            function () use ($cert) {
-                $this->testedInstance->countForItem($cert);
-            }
-        )->message->contains('Cannot use getListForItemParams() for a Certificate');
+        $this->assertSame(2, $cert_item->countForMainItem($cert));
+    }
 
-        $this->integer($this->testedInstance->countForMainItem($cert))->isIdenticalTo(2);
+    public function testgetListForItemParamsForCertificate()
+    {
+        $cert = new \Certificate();
+        $cert_item = new \Certificate_Item();
+        $this->expectExceptionMessage('Cannot use getListForItemParams() for a Certificate');
+        $cert_item->countForItem($cert);
     }
 }

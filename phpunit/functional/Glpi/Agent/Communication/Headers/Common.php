@@ -41,7 +41,7 @@ use GLPITestCase;
 
 class Common extends GLPITestCase
 {
-    protected function namesProvider(): array
+    public static function namesProvider(): array
     {
         return [
             [
@@ -68,11 +68,11 @@ class Common extends GLPITestCase
      */
     public function testHeaders($propname, $headername)
     {
-        $this
-        ->if($this->newTestedInstance)
-        ->then
-         ->string($this->testedInstance->getHeaderName($propname))
-            ->isIdenticalTo($headername);
+        $instance = new \Glpi\Agent\Communication\Headers\Common();
+        $this->assertSame(
+            $headername,
+            $instance->getHeaderName($propname)
+        );
     }
 
    /* Useful only when legacy will no longer be the default */
@@ -90,38 +90,36 @@ class Common extends GLPITestCase
 
     public function testGetHeaders()
     {
-        $instance = $this->newTestedInstance;
+        $instance = new \Glpi\Agent\Communication\Headers\Common();
         $instance->setHeader('Content-Type', 'application/xml');
         $instance->setHeader('GLPI-Agent-ID', 'anything');
 
-        $this->array($instance->getHeaders())
-         ->hasKeys(['Content-Type', 'Pragma', 'GLPI-Agent-ID']);
+        $headers = $instance->getHeaders();
+        $this->assertArrayHasKey('Content-Type', $headers);
+        $this->assertArrayHasKey('Pragma', $headers);
+        $this->assertArrayHasKey('GLPI-Agent-ID', $headers);
 
-        $instance = $this->newTestedInstance;
+        $instance = new \Glpi\Agent\Communication\Headers\Common();
         $instance->setHeaders([
             'Content-Type' => 'application/xml',
             'GLPI-Agent-ID' => 'anything'
         ]);
 
-        $this->array($instance->getHeaders())
-         ->hasKeys(['Content-Type', 'Pragma', 'GLPI-Agent-ID']);
+        $headers = $instance->getHeaders();
+        $this->assertArrayHasKey('Content-Type', $headers);
+        $this->assertArrayHasKey('Pragma', $headers);
+        $this->assertArrayHasKey('GLPI-Agent-ID', $headers);
     }
 
     public function testGetRequireds()
     {
-        $this
-         ->if($this->newTestedInstance)
-         ->then
-         ->array($this->testedInstance->getRequireds())
-         ->hasSize(5);
+        $instance = new \Glpi\Agent\Communication\Headers\Common();
+        $this->assertCount(5, $instance->getRequireds());
     }
 
     public function testGetHeadersNames()
     {
-        $this
-         ->if($this->newTestedInstance)
-         ->then
-         ->array($this->testedInstance->getHeadersNames())
-         ->hasSize(1);
+        $instance = new \Glpi\Agent\Communication\Headers\Common();
+        $this->assertCount(1, $instance->getHeadersNames());
     }
 }
