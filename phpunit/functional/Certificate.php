@@ -41,34 +41,21 @@ use DbTestCase;
 
 class Certificate extends DbTestCase
 {
-    private $method;
-
-    public function beforeTestMethod($method)
-    {
-        parent::beforeTestMethod($method);
-       //to handle GLPI barbarian replacements.
-        $this->method = str_replace(
-            ['\\', 'beforeTestMethod'],
-            ['', $method],
-            __METHOD__
-        );
-    }
-
     public function testAdd()
     {
         $this->login();
         $obj = new \Certificate();
 
        // Add
-        $in = $this->getIn($this->method);
+        $in = $this->getIn($this->getUniqueString());
         $id = $obj->add($in);
-        $this->integer((int)$id)->isGreaterThan(0);
-        $this->boolean($obj->getFromDB($id))->isTrue();
+        $this->assertGreaterThan(0, $id);
+        $this->assertTrue($obj->getFromDB($id));
 
-       // getField methods
-        $this->variable($obj->getField('id'))->isEqualTo($id);
+        // getField methods
+        $this->assertEquals($id, $obj->getField('id'));
         foreach ($in as $k => $v) {
-            $this->variable($obj->getField($k))->isEqualTo($v);
+            $this->assertEquals($v, $obj->getField($k));
         }
     }
 
@@ -77,22 +64,22 @@ class Certificate extends DbTestCase
         $this->login();
         $obj = new \Certificate();
 
-       // Add
+        // Add
         $id = $obj->add([
             'name'        => $this->getUniqueString(),
             'entities_id' => 0
         ]);
-        $this->integer($id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $id);
 
-       // Update
+        // Update
         $id = $obj->getID();
-        $in = array_merge(['id' => $id], $this->getIn($this->method));
-        $this->boolean($obj->update($in))->isTrue();
-        $this->boolean($obj->getFromDB($id))->isTrue();
+        $in = array_merge(['id' => $id], $this->getIn($this->getUniqueString()));
+        $this->assertTrue($obj->update($in));
+        $this->assertTrue($obj->getFromDB($id));
 
-       // getField methods
+        // getField methods
         foreach ($in as $k => $v) {
-            $this->variable($obj->getField($k))->isEqualTo($v);
+            $this->assertEquals($v, $obj->getField($k));
         }
     }
 
@@ -101,18 +88,18 @@ class Certificate extends DbTestCase
         $this->login();
         $obj = new \Certificate();
 
-       // Add
+        // Add
         $id = $obj->add([
-            'name' => $this->method,
+            'name' => $this->getUniqueString(),
             'entities_id' => 0
         ]);
-        $this->integer($id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $id);
 
-       // Delete
+        // Delete
         $in = [
             'id' => $obj->getID(),
         ];
-        $this->boolean($obj->delete($in))->isTrue();
+        $this->assertTrue($obj->delete($in));
     }
 
     public function testClone()
@@ -120,48 +107,48 @@ class Certificate extends DbTestCase
         $this->login();
         $certificate = new \Certificate();
 
-       // Add
+        // Add
         $id = $certificate->add([
             'name'        => $this->getUniqueString(),
             'entities_id' => 0
         ]);
-        $this->integer($id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $id);
 
-       // Update
+        // Update
         $id = $certificate->getID();
-        $in = array_merge(['id' => $id], $this->getIn($this->method));
-        $this->boolean($certificate->update($in))->isTrue();
-        $this->boolean($certificate->getFromDB($id))->isTrue();
+        $in = array_merge(['id' => $id], $this->getIn($this->getUniqueString()));
+        $this->assertTrue($certificate->update($in));
+        $this->assertTrue($certificate->getFromDB($id));
 
         $date = date('Y-m-d H:i:s');
         $_SESSION['glpi_currenttime'] = $date;
 
-       // Test item cloning
+        // Test item cloning
         $added = $certificate->clone();
-        $this->integer((int)$added)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $added);
 
         $clonedCertificate = new \Certificate();
-        $this->boolean($clonedCertificate->getFromDB($added))->isTrue();
+        $this->assertTrue($clonedCertificate->getFromDB($added));
 
         $fields = $certificate->fields;
 
-       // Check the certificate values. Id and dates must be different, everything else must be equal
+        // Check the certificate values. ID and dates must be different, everything else must be equal
         foreach ($fields as $k => $v) {
             switch ($k) {
                 case 'id':
-                    $this->variable($clonedCertificate->getField($k))->isNotEqualTo($certificate->getField($k));
+                    $this->assertNotEquals($certificate->getField($k), $clonedCertificate->getField($k));
                     break;
                 case 'date_mod':
                 case 'date_creation':
                     $dateClone = new \DateTime($clonedCertificate->getField($k));
                     $expectedDate = new \DateTime($date);
-                    $this->dateTime($dateClone)->isEqualTo($expectedDate);
+                    $this->assertEquals($expectedDate, $dateClone);
                     break;
                 case 'name':
-                    $this->variable($clonedCertificate->getField($k))->isEqualTo("{$certificate->getField($k)} (copy)");
+                    $this->assertEquals("{$certificate->getField($k)} (copy)", $clonedCertificate->getField($k));
                     break;
                 default:
-                    $this->variable($clonedCertificate->getField($k))->isEqualTo($certificate->getField($k));
+                    $this->assertEquals($certificate->getField($k), $clonedCertificate->getField($k));
             }
         }
     }
@@ -199,55 +186,55 @@ class Certificate extends DbTestCase
         $this->login();
         $obj = new \Certificate();
 
-       // Add
+        // Add
         $id = $obj->add([
             'name'            => $this->getUniqueString(),
             'entities_id'     => 0,
             'date_expiration' => date('Y-m-d', time() - MONTH_TIMESTAMP)
         ]);
-        $this->integer($id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $id);
 
-       // set root entity config for certificates alerts
+        // set root entity config for certificates alerts
         $entity = new \Entity();
-        $entity->update([
-            'id'                                   => 0,
-            'use_certificates_alert'               => true,
-            'send_certificates_alert_before_delay' => true,
-            'certificates_alert_repeat_interval'   => 60
-        ]);
+        $this->assertTrue(
+            $entity->update([
+                'id'                                   => 0,
+                'use_certificates_alert'               => true,
+                'send_certificates_alert_before_delay' => true,
+                'certificates_alert_repeat_interval'   => 6 * HOUR_TIMESTAMP //60 minutes was not enough with phpunit...
+            ])
+        );
 
-       // force usage of notification (no alert sent otherwise)
+        // force usage of notification (no alert sent otherwise)
         $CFG_GLPI['use_notifications']  = true;
         $CFG_GLPI['notifications_ajax'] = 1;
 
-       // lanch glpi cron and force task certificate
+        // launch glpi cron and force task certificate
         $crontask = new \CronTask();
         $force    = -1;
         $ret      = $crontask->launch($force, 1, 'certificate');
+        $this->assertNotEquals(false, $ret);
 
-       // check presence of the id in alerts table
+        // check presence of the id in alerts table
         $alert  = new \Alert();
         $alerts = $alert->find();
 
-        $this->array($alerts)
-           ->hasSize(1);
+        $this->assertCount(1, $alerts);
         $alert_certificate = array_pop($alerts);
-        $this->array($alert_certificate)
-         ->string['itemtype']->isEqualTo('Certificate')
-         ->integer['items_id']->isEqualTo($id);
+        $this->assertEquals('Certificate', $alert_certificate['itemtype']);
+        $this->assertEquals($id, $alert_certificate['items_id']);
 
         // No new alert if the last one is less than 1 hour old
         $alert_id = $alert_certificate['id'];
         $ret      = $crontask->launch($force, 1, 'certificate');
+        $this->assertNotEquals(false, $ret);
         $alerts   = $alert->find();
 
-        $this->array($alerts)
-            ->hasSize(1);
+        $this->assertCount(1, $alerts);
         $alert_certificate = array_pop($alerts);
-        $this->array($alert_certificate)
-            ->string['itemtype']->isEqualTo('Certificate')
-            ->integer['items_id']->isEqualTo($id)
-            ->integer['id']->isEqualTo($alert_id);
+        $this->assertEquals('Certificate', $alert_certificate['itemtype']);
+        $this->assertEquals($id, $alert_certificate['items_id']);
+        $this->assertEquals($alert_id, $alert_certificate['id']);
 
         // New alert if the last one is more than 1 hour old
         $alert_id = $alert_certificate['id'];
@@ -256,14 +243,13 @@ class Certificate extends DbTestCase
             'date'  => date('Y-m-d', time() - DAY_TIMESTAMP)
         ]);
         $ret      = $crontask->launch($force, 1, 'certificate');
+        $this->assertNotEquals(false, $ret);
         $alerts   = $alert->find();
 
-        $this->array($alerts)
-            ->hasSize(1);
+        $this->assertCount(1, $alerts);
         $alert_certificate = array_pop($alerts);
-        $this->array($alert_certificate)
-            ->string['itemtype']->isEqualTo('Certificate')
-            ->integer['items_id']->isEqualTo($id)
-            ->integer['id']->isEqualTo($alert_id + 1);
+        $this->assertEquals('Certificate', $alert_certificate['itemtype']);
+        $this->assertEquals($id, $alert_certificate['items_id']);
+        $this->assertEquals($alert_id + 1, $alert_certificate['id']);
     }
 }

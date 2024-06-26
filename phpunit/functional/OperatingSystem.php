@@ -46,7 +46,7 @@ class OperatingSystem extends CommonDropdown
         return '\OperatingSystem';
     }
 
-    public function typenameProvider()
+    public static function typenameProvider()
     {
         return [
             [\OperatingSystem::getTypeName(), 'Operating systems'],
@@ -66,16 +66,19 @@ class OperatingSystem extends CommonDropdown
     /**
      * Create new Operating system in database
      *
-     * @return void
+     * @return \CommonDBTM
      */
-    protected function newInstance()
+    protected function newInstance(): \CommonDBTM
     {
-        $this->newTestedInstance();
-        $this->integer(
-            (int)$this->testedInstance->add([
+        $instance = new \OperatingSystem();
+        $this->assertGreaterThan(
+            0,
+            $instance->add([
                 'name' => 'OS name ' . $this->getUniqueString()
             ])
-        )->isGreaterThan(0);
-        $this->boolean($this->testedInstance->getFromDB($this->testedInstance->getID()))->isTrue();
+        );
+        $this->assertTrue($instance->getFromDB($instance->getID()));
+
+        return $instance;
     }
 }

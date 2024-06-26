@@ -43,67 +43,81 @@ class PCIVendor extends DbTestCase
 {
     public function testGetList()
     {
-        global $DB;
-
         $vendors = new \PCIVendor();
         $pciids = $vendors->getList();
         $nodb_count = count($pciids);
 
-        $this->array($pciids)->size->isGreaterThanOrEqualTo(15000);
+        $this->assertGreaterThan(15000, $nodb_count);
 
-        $this->integer(
+        $this->assertGreaterThan(
+            0,
             $vendors->add([
                 'name'  => 'Something to test',
                 'vendorid'  => '01ef',
                 'deviceid'  => '02ef'
             ])
-        )->isGreaterThan(0);
+        );
 
         $pciids = $vendors->getList();
         ++$nodb_count;
-        $this->array($pciids)->size->isIdenticalTo($nodb_count);
+        $this->assertCount($nodb_count, $pciids);
     }
 
     public function testGetManufacturer()
     {
         $vendors = new \PCIVendor();
 
-        $this->boolean($vendors->getManufacturer('one that does not exists'))->isFalse();
-        $this->string($vendors->getManufacturer('0010'))->isIdenticalTo("Allied Telesis, Inc (Wrong ID)");
+        $this->assertFalse($vendors->getManufacturer('one that does not exists'));
+        $this->assertSame(
+            "Allied Telesis, Inc (Wrong ID)",
+            $vendors->getManufacturer('0010')
+        );
 
-       //override
-        $this->integer(
+        //override
+        $this->assertGreaterThan(
+            0,
             $vendors->add([
                 'name'  => addslashes("UnAllied Telesis, Inc (Good ID)"),
                 'vendorid'  => '0010'
             ])
-        )->isGreaterThan(0);
-        $this->string($vendors->getManufacturer('0010'))->isIdenticalTo("UnAllied Telesis, Inc (Good ID)");
+        );
+        $this->assertSame(
+            "UnAllied Telesis, Inc (Good ID)",
+            $vendors->getManufacturer('0010')
+        );
     }
 
     public function testGetProductName()
     {
         $vendors = new \PCIVendor();
 
-        $this->boolean($vendors->getProductName('vendor does not exists', '9139'))->isFalse();
-        $this->boolean($vendors->getProductName('0010', 'device does not exists'))->isFalse();
-        $this->string($vendors->getProductName('0010', '8139'))->isIdenticalTo('AT-2500TX V3 Ethernet');
+        $this->assertFalse($vendors->getProductName('vendor does not exists', '9139'));
+        $this->assertFalse($vendors->getProductName('0010', 'device does not exists'));
+        $this->assertSame(
+            'AT-2500TX V3 Ethernet',
+            $vendors->getProductName('0010', '8139')
+        );
 
-       //override
-        $this->integer(
+        //override
+        $this->assertGreaterThan(
+            0,
             $vendors->add([
                 'name'  => 'not the good one',
                 'vendorid'  => '0002',
                 'deviceid'  => '8139'
             ])
-        )->isGreaterThan(0);
-        $this->integer(
+        );
+        $this->assertGreaterThan(
+            0,
             $vendors->add([
                 'name'  => 'Yeah, that works',
                 'vendorid'  => '0010',
                 'deviceid'  => '8139'
             ])
-        )->isGreaterThan(0);
-        $this->string($vendors->getProductName('0010', '8139'))->isIdenticalTo('Yeah, that works');
+        );
+        $this->assertSame(
+            'Yeah, that works',
+            $vendors->getProductName('0010', '8139')
+        );
     }
 }

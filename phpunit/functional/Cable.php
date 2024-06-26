@@ -50,30 +50,30 @@ class Cable extends DbTestCase
         $location = getItemByTypeName('Location', '_location01');
         $expected = $socket->getName() . " (" . $location->getName() . ")";
         $ret = \Dropdown::getDropdownName('glpi_sockets', $socket->getID());
-        $this->string($ret)->isIdenticalTo($expected);
+        $this->assertSame($expected, $ret);
 
-       // test of return with comments
+        // test of return with comments
         $expected = ['name'    => $expected,
             'comment' => "Comment for socket _socket01"
         ];
         $ret = \Dropdown::getDropdownName('glpi_sockets', $socket->getID(), true);
-        $this->array($ret)->isIdenticalTo($expected);
+        $this->assertSame($expected, $ret);
 
-       // test of return without $tooltip
+        // test of return without $tooltip
         $ret = \Dropdown::getDropdownName('glpi_sockets', $socket->getID(), true, true, false);
-        $this->array($ret)->isIdenticalTo($expected);
+        $this->assertSame($expected, $ret);
     }
 
     public function testAddNetworkPortThenSocket()
     {
         $this->login();
 
-       //First step add networkport
+        //First step add networkport
         $computer1 = getItemByTypeName('Computer', '_test_pc01');
         $networkport = new \NetworkPort();
 
-       // Be sure added
-        $nb_log = (int)countElementsInTable('glpi_logs');
+        // Be sure added
+        $nb_log = countElementsInTable('glpi_logs');
         $new_id = $networkport->add([
             'items_id'           => $computer1->getID(),
             'itemtype'           => 'Computer',
@@ -84,18 +84,18 @@ class Cable extends DbTestCase
             'instantiation_type' => 'NetworkPortEthernet',
             'name'               => 'eth1',
         ]);
-        $this->integer((int)$new_id)->isGreaterThan(0);
-        $this->integer((int)countElementsInTable('glpi_logs'))->isGreaterThan($nb_log);
+        $this->assertGreaterThan(0, $new_id);
+        $this->assertGreaterThan($nb_log, countElementsInTable('glpi_logs'));
 
-       //Second step add socket
-       //add socket model
+        //Second step add socket
+        //add socket model
         $socketModel = new SocketModel();
         $nb_log = (int)countElementsInTable('glpi_logs');
         $socketModel_id = $socketModel->add([
             'name' => 'socketModel1'
         ]);
-        $this->integer((int)$socketModel_id)->isGreaterThan(0);
-        $this->integer((int)countElementsInTable('glpi_logs'))->isGreaterThan($nb_log);
+        $this->assertGreaterThan(0, $socketModel_id);
+        $this->assertGreaterThan($nb_log, countElementsInTable('glpi_logs'));
 
         $socket = new Socket();
         $socket_id = $socket->add([
@@ -109,9 +109,9 @@ class Cable extends DbTestCase
             'locations_id'       => 0,
             'comment'            => 'comment',
         ]);
-        $this->integer((int)$socket_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $socket_id);
 
-       // check data in db
+        // check data in db
         $all_sockets = getAllDataFromTable('glpi_sockets', ['ORDER' => 'id']);
         $current_socket = end($all_sockets);
         unset($current_socket['id']);
@@ -129,31 +129,30 @@ class Cable extends DbTestCase
             'comment'            => 'comment',
         ];
 
-        $this->array($current_socket)->isIdenticalTo($expected);
+        $this->assertSame($expected, $current_socket);
     }
 
 
     public function testBackwardCompatibility()
     {
-
        //test when sockets_id is defined from NetworkPort instanciation (NetworkPortEthernet, NetworkPortFiberChannel)
        //before it was the NetworkPort instantiation that had the socket reference
        //now it's the socket that have the networkport reference
 
         $this->login();
 
-       //Second step add socket
-       //add socket model
+        //Second step add socket
+        //add socket model
         $socketModel = new SocketModel();
         $nb_log = (int)countElementsInTable('glpi_logs');
         $socketModel_id = $socketModel->add([
             'name' => 'socketModel1'
         ]);
-        $this->integer((int)$socketModel_id)->isGreaterThan(0);
-        $this->integer((int)countElementsInTable('glpi_logs'))->isGreaterThan($nb_log);
+        $this->assertGreaterThan(0, $socketModel_id);
+        $this->assertGreaterThan($nb_log, countElementsInTable('glpi_logs'));
 
         $socket = new Socket();
-        $nb_log = (int)countElementsInTable('glpi_logs');
+        $nb_log = countElementsInTable('glpi_logs');
         $socket_id = $socket->add([
             'name'               => 'socket1',
             'wiring_side'        => Socket::FRONT, //default is REAR
@@ -162,16 +161,16 @@ class Cable extends DbTestCase
             'locations_id'       => 0,
             'comment'            => 'comment',
         ]);
-        $this->integer((int)$socket_id)->isGreaterThan(0);
-        $this->integer((int)countElementsInTable('glpi_logs'))->isGreaterThan($nb_log);
+        $this->assertGreaterThan(0, $socket_id);
+        $this->assertGreaterThan($nb_log, countElementsInTable('glpi_logs'));
 
-       //Second step add networkport
-       // Do some installations
+        //Second step add networkport
+        // Do some installations
         $computer1 = getItemByTypeName('Computer', '_test_pc01');
         $networkport = new \NetworkPort();
 
-       // Be sure added
-        $nb_log = (int)countElementsInTable('glpi_logs');
+        // Be sure added
+        $nb_log = countElementsInTable('glpi_logs');
         $new_id = $networkport->add([
             'items_id'                    => $computer1->getID(),
             'itemtype'                    => 'Computer',
@@ -192,28 +191,28 @@ class Cable extends DbTestCase
             'NetworkName__ipaddresses'    => ['-1' => '192.168.20.1'],
             '_create_children'            => true // automatically add instancation, networkname and ipadresses
         ]);
-        $this->integer($new_id)->isGreaterThan(0);
-        $this->integer((int)countElementsInTable('glpi_logs'))->isGreaterThan($nb_log);
+        $this->assertGreaterThan(0, $new_id);
+        $this->assertGreaterThan($nb_log, countElementsInTable('glpi_logs'));
 
-       // retrieve NEtworkPortEthernet automatically created
+        // retrieve NetworkPortEthernet automatically created
         $all_netportethernets = getAllDataFromTable('glpi_networkportethernets', ['ORDER' => 'id']);
         $networkportethernet = end($all_netportethernets);
         $networkPortethernet_id = $networkportethernet['id'];
         unset($networkportethernet['date_mod']);
         unset($networkportethernet['date_creation']);
 
-       //specify sockets_id and update it
+        //specify sockets_id and update it
         $data = $networkportethernet;
         $data['id'] = $networkPortethernet_id;
         $data['sockets_id'] = $socket_id;
         $networkPort_ethernet = new \NetworkPortEthernet();
-        $this->boolean($networkPort_ethernet->update($data))->isTrue();
+        $this->assertTrue($networkPort_ethernet->update($data));
 
-       //reload socket to check if link to networkports_id is ok (with itemtype and items_id)
-        $this->boolean($socket->getFromDB($socket_id))->isTrue();
-        $this->string($socket->fields['itemtype'])->isIdenticalTo('Computer');
-        $this->integer($socket->fields['items_id'])->isIdenticalTo($computer1->getID());
-        $this->integer($socket->fields['networkports_id'])->isIdenticalTo($new_id);
+        //reload socket to check if link to networkports_id is ok (with itemtype and items_id)
+        $this->assertTrue($socket->getFromDB($socket_id));
+        $this->assertSame('Computer', $socket->fields['itemtype']);
+        $this->assertSame($computer1->getID(), $socket->fields['items_id']);
+        $this->assertSame($new_id, $socket->fields['networkports_id']);
     }
 
 
@@ -221,11 +220,11 @@ class Cable extends DbTestCase
     {
         $this->login();
 
-       //First step add networkport / socket for computer '_test_pc01'
+        //First step add networkport / socket for computer '_test_pc01'
         $computer1 = getItemByTypeName('Computer', '_test_pc01');
         $networkport1 = new \NetworkPort();
 
-       // Be sure added
+        // Be sure added
         $nb_log = (int)countElementsInTable('glpi_logs');
         $new1_id = $networkport1->add([
             'items_id'           => $computer1->getID(),
@@ -237,19 +236,19 @@ class Cable extends DbTestCase
             'instantiation_type' => 'NetworkPortEthernet',
             'name'               => 'eth1',
         ]);
-        $this->integer((int)$new1_id)->isGreaterThan(0);
-        $this->integer((int)countElementsInTable('glpi_logs'))->isGreaterThan($nb_log);
+        $this->assertGreaterThan(0, $new1_id);
+        $this->assertGreaterThan($nb_log, (int)countElementsInTable('glpi_logs'));
 
-       //add socket model
+        //add socket model
         $socketModel1 = new SocketModel();
         $nb_log = (int)countElementsInTable('glpi_logs');
         $socketModel1_id = $socketModel1->add([
             'name' => 'socketModel1'
         ]);
-        $this->integer((int)$socketModel1_id)->isGreaterThan(0);
-        $this->integer((int)countElementsInTable('glpi_logs'))->isGreaterThan($nb_log);
+        $this->assertGreaterThan(0, $socketModel1_id);
+        $this->assertGreaterThan($nb_log, (int)countElementsInTable('glpi_logs'));
 
-       //add socket
+        //add socket
         $socket1 = new Socket();
         $socket1_id = $socket1->add([
             'name'               => 'socket1',
@@ -262,9 +261,9 @@ class Cable extends DbTestCase
             'locations_id'       => 0,
             'comment'            => 'comment',
         ]);
-        $this->integer((int)$socket1_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $socket1_id);
 
-       // check data in db
+        // check data in db
         $all_sockets = getAllDataFromTable('glpi_sockets', ['ORDER' => 'id']);
         $current_socket = end($all_sockets);
         unset($current_socket['id']);
@@ -283,14 +282,14 @@ class Cable extends DbTestCase
             'comment'            => 'comment',
         ];
 
-        $this->array($current_socket)->isIdenticalTo($expected);
+        $this->assertSame($expected, $current_socket);
 
-       //Second step add networkport / socket form switch '_test_pc02'
+        //Second step add networkport / socket form switch '_test_pc02'
         $computer2 = getItemByTypeName('Computer', '_test_pc02');
         $networkport = new \NetworkPort();
 
-       // Be sure added
-        $nb_log = (int)countElementsInTable('glpi_logs');
+        // Be sure added
+        $nb_log = countElementsInTable('glpi_logs');
         $new2_id = $networkport->add([
             'items_id'           => $computer2->getID(),
             'itemtype'           => 'Computer',
@@ -301,19 +300,19 @@ class Cable extends DbTestCase
             'instantiation_type' => 'NetworkPortEthernet',
             'name'               => 'eth1',
         ]);
-        $this->integer((int)$new2_id)->isGreaterThan(0);
-        $this->integer((int)countElementsInTable('glpi_logs'))->isGreaterThan($nb_log);
+        $this->assertGreaterThan(0, $new2_id);
+        $this->assertGreaterThan($nb_log, countElementsInTable('glpi_logs'));
 
-       //add socket model
+        //add socket model
         $socketModel2 = new SocketModel();
         $nb_log = (int)countElementsInTable('glpi_logs');
         $socketModel2_id = $socketModel2->add([
             'name' => 'socketModel2'
         ]);
-        $this->integer((int)$socketModel2_id)->isGreaterThan(0);
-        $this->integer((int)countElementsInTable('glpi_logs'))->isGreaterThan($nb_log);
+        $this->assertGreaterThan(0, $socketModel2_id);
+        $this->assertGreaterThan($nb_log, countElementsInTable('glpi_logs'));
 
-       //add socket
+        //add socket
         $socket2 = new Socket();
         $socket2_id = $socket2->add([
             'name'               => 'socket2',
@@ -326,9 +325,9 @@ class Cable extends DbTestCase
             'locations_id'       => 0,
             'comment'            => 'comment',
         ]);
-        $this->integer((int)$socket2_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $socket2_id);
 
-       // check data in db
+        // check data in db
         $all_sockets = getAllDataFromTable('glpi_sockets', ['ORDER' => 'id']);
         $current_socket = end($all_sockets);
         unset($current_socket['id']);
@@ -346,37 +345,37 @@ class Cable extends DbTestCase
             'comment'            => 'comment',
         ];
 
-        $this->array($current_socket)->isIdenticalTo($expected);
+        $this->assertSame($expected, $current_socket);
 
-       //add CableStradn
+        //add CableStradn
         $cableStrand = new \CableStrand();
         $nb_log = (int)countElementsInTable('glpi_logs');
         $cableStrand_id = $cableStrand->add([
             'name' => 'cable_strand'
         ]);
-        $this->integer((int)$cableStrand_id)->isGreaterThan(0);
-        $this->integer((int)countElementsInTable('glpi_logs'))->isGreaterThan($nb_log);
+        $this->assertGreaterThan(0, $cableStrand_id);
+        $this->assertGreaterThan($nb_log, countElementsInTable('glpi_logs'));
 
-       //add State
+        //add State
         $cableState = new \State();
-        $nb_log = (int)countElementsInTable('glpi_logs');
+        $nb_log = countElementsInTable('glpi_logs');
         $cableState_id = $cableState->add([
             'name' => 'cable_state',
             'is_visible_cable' => true,
         ]);
-        $this->integer((int)$cableState_id)->isGreaterThan(0);
-        $this->integer((int)countElementsInTable('glpi_logs'))->isGreaterThan($nb_log);
+        $this->assertGreaterThan(0, $cableState_id);
+        $this->assertGreaterThan($nb_log, countElementsInTable('glpi_logs'));
 
-       //add Cabletype
+        //add Cabletype
         $cableType = new \CableType();
-        $nb_log = (int)countElementsInTable('glpi_logs');
+        $nb_log = countElementsInTable('glpi_logs');
         $cableType_id = $cableType->add([
             'name' => 'cable_type'
         ]);
-        $this->integer((int)$cableType_id)->isGreaterThan(0);
-        $this->integer((int)countElementsInTable('glpi_logs'))->isGreaterThan($nb_log);
+        $this->assertGreaterThan(0, $cableType_id);
+        $this->assertGreaterThan($nb_log, countElementsInTable('glpi_logs'));
 
-       //add cable
+        //add cable
         $cable = new \Cable();
         $cable_id = $cable->add([
             'name'                  => 'cable',
@@ -393,20 +392,20 @@ class Cable extends DbTestCase
             'cablestrands_id'       => $cableStrand_id,
             'color'                 => '#f72f04',
             'otherserial'           => 'otherserial',
-            'sates_id'              => $cableState_id,
+            'states_id'             => $cableState_id,
             'users_id_tech'         => 2,
             'cabletypes_id'         => $cableType_id,
             'comment'               => 'comment',
         ]);
-        $this->integer((int)$cable_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $cable_id);
 
-       // check data in db
+        // check data in db
         $all_cables = getAllDataFromTable('glpi_cables', ['ORDER' => 'id']);
         $current_cable = end($all_cables);
-        unset($current_cable['id']);
         unset($current_cable['date_mod']);
         unset($current_cable['date_creation']);
         $expected = [
+            'id'                    => $cable_id,
             'name'                  => 'cable',
             'entities_id'           => $computer1->fields['entities_id'],
             'is_recursive'          => 0,
@@ -421,10 +420,12 @@ class Cable extends DbTestCase
             'cablestrands_id'       => $cableStrand_id,
             'color'                 => '#f72f04',
             'otherserial'           => 'otherserial',
-            'sates_id'              => $cableState_id,
+            'states_id'              => $cableState_id,
             'users_id_tech'         => 2,
             'cabletypes_id'         => $cableType_id,
             'comment'               => 'comment',
+            'is_deleted' => 0
         ];
+        $this->assertSame($expected, $current_cable);
     }
 }

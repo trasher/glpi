@@ -41,14 +41,16 @@ class Appliance_Item extends DbTestCase
 {
     public function testGetForbiddenStandardMassiveAction()
     {
-        $this->newTestedInstance();
-        $this->array(
-            $this->testedInstance->getForbiddenStandardMassiveAction()
-        )->isIdenticalTo(['clone', 'update', 'CommonDBConnexity:unaffect', 'CommonDBConnexity:affect']);
+        $aitem = new \Appliance_Item();
+        $this->assertSame(
+            ['clone', 'update', 'CommonDBConnexity:unaffect', 'CommonDBConnexity:affect'],
+            $aitem->getForbiddenStandardMassiveAction()
+        );
     }
 
     public function testCountForAppliance()
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $appliance = new \Appliance();
@@ -56,12 +58,12 @@ class Appliance_Item extends DbTestCase
         $appliance_1 = (int)$appliance->add([
             'name'   => 'Test appliance'
         ]);
-        $this->integer($appliance_1)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $appliance_1);
 
         $appliance_2 = (int)$appliance->add([
             'name'   => 'Test appliance'
         ]);
-        $this->integer($appliance_2)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $appliance_2);
 
         $itemtypes = [
             'Computer'  => '_test_pc01',
@@ -72,7 +74,7 @@ class Appliance_Item extends DbTestCase
         foreach ($itemtypes as $itemtype => $itemname) {
             $items_id = getItemByTypeName($itemtype, $itemname, true);
             foreach ([$appliance_1, $appliance_2] as $app) {
-               //no printer on appliance_2
+                //no printer on appliance_2
                 if ($itemtype == 'Printer' && $app == $appliance_2) {
                     continue;
                 }
@@ -82,34 +84,31 @@ class Appliance_Item extends DbTestCase
                     'itemtype'        => $itemtype,
                     'items_id'        => $items_id
                 ];
-                $this
-                ->given($this->newTestedInstance)
-                  ->then
-                     ->integer($this->testedInstance->add($input))
-                     ->isGreaterThan(0);
+                $aitem = new \Appliance_Item();
+                $this->assertGreaterThan(0, $aitem->add($input));
             }
         }
 
-        $this->boolean($appliance->getFromDB($appliance_1))->isTrue();
-       //not logged, no Appliances types
-        $this->integer(\Appliance_Item::countForMainItem($appliance))->isIdenticalTo(0);
+        $this->assertTrue($appliance->getFromDB($appliance_1));
+        //not logged, no Appliances types
+        $this->assertSame(0, \Appliance_Item::countForMainItem($appliance));
 
         $this->login();
-        $this->integer(\Appliance_Item::countForMainItem($appliance))->isIdenticalTo(3);
+        $this->assertSame(3, \Appliance_Item::countForMainItem($appliance));
 
-        $this->boolean($appliance->getFromDB($appliance_2))->isTrue();
-        $this->integer(\Appliance_Item::countForMainItem($appliance))->isIdenticalTo(2);
+        $this->assertTrue($appliance->getFromDB($appliance_2));
+        $this->assertSame(2, \Appliance_Item::countForMainItem($appliance));
 
-        $this->boolean($appliance->getFromDB($appliance_1))->isTrue();
-        $this->boolean($appliance->delete(['id' => $appliance_1], true))->isTrue();
+        $this->assertTrue($appliance->getFromDB($appliance_1));
+        $this->assertTrue($appliance->delete(['id' => $appliance_1], true));
 
-        $this->boolean($appliance->getFromDB($appliance_2))->isTrue();
-        $this->boolean($appliance->delete(['id' => $appliance_2], true))->isTrue();
+        $this->assertTrue($appliance->getFromDB($appliance_2));
+        $this->assertTrue($appliance->delete(['id' => $appliance_2], true));
 
         $iterator = $DB->request([
             'FROM'   => \Appliance_Item::getTable(),
             'WHERE'  => ['appliances_id' => [$appliance_1, $appliance_2]]
         ]);
-        $this->integer(count($iterator))->isIdenticalTo(0);
+        $this->assertCount(0, $iterator);
     }
 }

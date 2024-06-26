@@ -43,70 +43,93 @@ class USBVendor extends DbTestCase
 {
     public function testGetList()
     {
-        global $DB;
-
         $vendors = new \USBVendor();
         $usbids = $vendors->getList();
         $nodb_count = count($usbids);
 
-        $this->array($usbids)->size->isGreaterThanOrEqualTo(20000);
+        $this->assertGreaterThanOrEqual(20000, $nodb_count);
 
-        $this->integer(
+        $this->assertGreaterThan(
+            0,
             $vendors->add([
                 'name'  => 'Something to test',
                 'vendorid'  => '01ef',
                 'deviceid'  => '02ef'
             ])
-        )->isGreaterThan(0);
+        );
 
         $usbids = $vendors->getList();
         ++$nodb_count;
-        $this->array($usbids)->size->isIdenticalTo($nodb_count);
+        $this->assertCount($nodb_count, $usbids);
     }
 
     public function testGetManufacturer()
     {
         $vendors = new \USBVendor();
 
-        $this->boolean($vendors->getManufacturer('one that does not exists'))->isFalse();
-        $this->string($vendors->getManufacturer('0001'))->isIdenticalTo("Fry's Electronics");
-        $this->string($vendors->getManufacturer('17e9'))->isIdenticalTo("DisplayLink");
-        $this->string($vendors->getManufacturer('17E9'))->isIdenticalTo("DisplayLink");
+        $this->assertFalse($vendors->getManufacturer('one that does not exists'));
+        $this->assertSame(
+            "Fry's Electronics",
+            $vendors->getManufacturer('0001')
+        );
+        $this->assertSame(
+            "DisplayLink",
+            $vendors->getManufacturer('17e9')
+        );
+        $this->assertSame(
+            "DisplayLink",
+            $vendors->getManufacturer('17E9')
+        );
 
-       //override
-        $this->integer(
+        //override
+        $this->assertGreaterThan(
+            0,
             $vendors->add([
                 'name'  => addslashes("Farnsworth's Electronics"),
                 'vendorid'  => '0001'
             ])
-        )->isGreaterThan(0);
-        $this->string($vendors->getManufacturer('0001'))->isIdenticalTo("Farnsworth's Electronics");
+        );
+        $this->assertSame(
+            "Farnsworth's Electronics",
+            $vendors->getManufacturer('0001')
+        );
     }
 
     public function testGetProductName()
     {
         $vendors = new \USBVendor();
 
-        $this->boolean($vendors->getProductName('vendor does not exists', '7778'))->isFalse();
-        $this->boolean($vendors->getProductName('0001', 'device does not exists'))->isFalse();
-        $this->string($vendors->getProductName('0001', '7778'))->isIdenticalTo('Counterfeit flash drive [Kingston]');
-        $this->string($vendors->getProductName('0bdb', '1926'))->isIdenticalTo('H5321 gw Mobile Broadband Module');
+        $this->assertFalse($vendors->getProductName('vendor does not exists', '7778'));
+        $this->assertFalse($vendors->getProductName('0001', 'device does not exists'));
+        $this->assertSame(
+            'Counterfeit flash drive [Kingston]',
+            $vendors->getProductName('0001', '7778')
+        );
+        $this->assertSame(
+            'H5321 gw Mobile Broadband Module',
+            $vendors->getProductName('0bdb', '1926')
+        );
 
-       //override
-        $this->integer(
+        //override
+        $this->assertGreaterThan(
+            0,
             $vendors->add([
                 'name'  => 'not the good one',
                 'vendorid'  => '0002',
                 'deviceid'  => '7778'
             ])
-        )->isGreaterThan(0);
-        $this->integer(
+        );
+        $this->assertGreaterThan(
+            0,
             $vendors->add([
                 'name'  => 'Yeah, that works',
                 'vendorid'  => '0001',
                 'deviceid'  => '7778'
             ])
-        )->isGreaterThan(0);
-        $this->string($vendors->getProductName('0001', '7778'))->isIdenticalTo('Yeah, that works');
+        );
+        $this->assertSame(
+            'Yeah, that works',
+            $vendors->getProductName('0001', '7778')
+        );
     }
 }
