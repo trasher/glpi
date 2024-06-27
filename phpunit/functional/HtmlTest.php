@@ -41,77 +41,77 @@ use Glpi\Toolbox\FrontEnd;
 
 /* Test for inc/html.class.php */
 
-class Html extends \GLPITestCase
+class HtmlTest extends \GLPITestCase
 {
     public function testConvDate()
     {
-        $this->variable(\Html::convDate(null))->isNull();
-        $this->variable(\Html::convDate('NULL'))->isNull();
-        $this->variable(\Html::convDate(''))->isNull();
-        $this->variable(\Html::convDate('0000-00-00'))->isNull();
-        $this->variable(\Html::convDate('0000-00-00 00:00:00'))->isNull();
+        $this->assertNull(\Html::convDate(null));
+        $this->assertNull(\Html::convDate('NULL'));
+        $this->assertNull(\Html::convDate(''));
+        $this->assertNull(\Html::convDate('0000-00-00'));
+        $this->assertNull(\Html::convDate('0000-00-00 00:00:00'));
 
         $mydate = date('Y-m-d H:i:s');
 
         $expected = date('Y-m-d');
         unset($_SESSION['glpidate_format']);
-        $this->string(\Html::convDate($mydate))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::convDate($mydate));
         $_SESSION['glpidate_format'] = 0;
-        $this->string(\Html::convDate($mydate))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::convDate($mydate));
 
-        $this->string(\Html::convDate(date('Y-m-d')))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::convDate(date('Y-m-d')));
 
         $expected = date('d-m-Y');
-        $this->string(\Html::convDate($mydate, 1))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::convDate($mydate, 1));
 
         $expected = date('m-d-Y');
-        $this->string(\Html::convDate($mydate, 2))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::convDate($mydate, 2));
 
         $expected_error = 'Failed to parse time string (not a date) at position 0 (n): The timezone could not be found in the database';
-        $this->string(\Html::convDate('not a date', 2))->isIdenticalTo('not a date');
+        $this->assertSame('not a date', \Html::convDate('not a date', 2));
         $this->hasPhpLogRecordThatContains($expected_error, LogLevel::CRITICAL);
     }
 
     public function testConvDateTime()
     {
-        $this->variable(\Html::convDateTime(null))->isNull();
-        $this->variable(\Html::convDateTime('NULL'))->isNull;
+        $this->assertNull(\Html::convDateTime(null));
+        $this->assertNull(\Html::convDateTime('NULL'));
 
         $timestamp = time();
 
         $mydate = date('Y-m-d H:i:s', $timestamp);
 
         $expected = date('Y-m-d H:i', $timestamp);
-        $this->string(\Html::convDateTime($mydate))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::convDateTime($mydate));
 
         $expected = date('Y-m-d H:i:s', $timestamp);
-        $this->string(\Html::convDateTime($mydate, null, true))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::convDateTime($mydate, null, true));
 
         $expected = date('d-m-Y H:i', $timestamp);
-        $this->string(\Html::convDateTime($mydate, 1))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::convDateTime($mydate, 1));
 
         $expected = date('d-m-Y H:i:s', $timestamp);
-        $this->string(\Html::convDateTime($mydate, 1, true))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::convDateTime($mydate, 1, true));
 
         $expected = date('m-d-Y H:i', $timestamp);
-        $this->string(\Html::convDateTime($mydate, 2))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::convDateTime($mydate, 2));
 
         $expected = date('m-d-Y H:i:s', $timestamp);
-        $this->string(\Html::convDateTime($mydate, 2, true))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::convDateTime($mydate, 2, true));
     }
 
     public function testCleanInputText()
     {
         $origin = 'This is a \'string\' with some "replacements" needed, but not « others »!';
         $expected = 'This is a &apos;string&apos; with some &quot;replacements&quot; needed, but not « others »!';
-        $this->string(\Html::cleanInputText($origin))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::cleanInputText($origin));
     }
 
     public function cleanParametersURL()
     {
         $url = 'http://host/glpi/path/to/file.php?var1=2&var2=3';
         $expected = 'http://host/glpi/path/to/file.php';
-        $this->string(\Html::cleanParametersURL($url))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::cleanParametersURL($url));
     }
 
     public function testResume_text()
@@ -122,18 +122,18 @@ class Html extends \GLPITestCase
         $expected = 'This is a very long string which will be truncated by a dedicated method. ' .
          'If the string is not truncated, well... We\'re wrong and got a very serious issue in our codebase!' .
          'And if the string has been correctly truncated, well... All is ok then, let\'s show i&nbsp;(...)';
-        $this->string(\Html::resume_text($origin))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::resume_text($origin));
 
         $origin = 'A string that is longer than 10 characters.';
         $expected = 'A string t&nbsp;(...)';
-        $this->string(\Html::resume_text($origin, 10))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::resume_text($origin, 10));
     }
 
     public function testCleanPostForTextArea()
     {
         $origin = "A text that \\\"would\\\" be entered in a \\'textarea\\'\\nWith breakline\\r\\nand breaklines.";
         $expected = "A text that \"would\" be entered in a 'textarea'\nWith breakline\nand breaklines.";
-        $this->string(\Html::cleanPostForTextArea($origin))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::cleanPostForTextArea($origin));
 
         $aorigin = [
             $origin,
@@ -143,7 +143,7 @@ class Html extends \GLPITestCase
             $expected,
             "Another\none!"
         ];
-        $this->array(\Html::cleanPostForTextArea($aorigin))->isIdenticalTo($aexpected);
+        $this->assertSame($aexpected, \Html::cleanPostForTextArea($aorigin));
     }
 
     public function testFormatNumber()
@@ -151,109 +151,109 @@ class Html extends \GLPITestCase
         $_SESSION['glpinumber_format'] = 0;
         $origin = '';
         $expected = '0.00';
-        $this->string(\Html::formatNumber($origin))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::formatNumber($origin));
 
         $origin = '1207.3';
 
         $expected = '1 207.30';
-        $this->string(\Html::formatNumber($origin))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::formatNumber($origin));
 
         $expected = '1207.30';
-        $this->string(\Html::formatNumber($origin, true))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::formatNumber($origin, true));
 
         $origin = 124556.693;
         $expected = '124 556.69';
-        $this->string(\Html::formatNumber($origin))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::formatNumber($origin));
 
         $origin = 120.123456789;
 
         $expected = '120.12';
-        $this->string(\Html::formatNumber($origin))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::formatNumber($origin));
 
         $expected = '120.12346';
-        $this->string(\Html::formatNumber($origin, false, 5))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::formatNumber($origin, false, 5));
 
         $expected = '120';
-        $this->string(\Html::formatNumber($origin, false, 0))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::formatNumber($origin, false, 0));
 
         $origin = 120.999;
         $expected = '121.00';
-        $this->string(\Html::formatNumber($origin))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::formatNumber($origin));
         $expected = '121';
-        $this->string(\Html::formatNumber($origin, false, 0))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::formatNumber($origin, false, 0));
 
-        $this->string(\Html::formatNumber('-'))->isIdenticalTo('-');
+        $this->assertSame('-', \Html::formatNumber('-'));
 
         $_SESSION['glpinumber_format'] = 2;
 
         $origin = '1207.3';
         $expected = '1 207,30';
-        $this->string(\Html::formatNumber($origin))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::formatNumber($origin));
 
         $_SESSION['glpinumber_format'] = 3;
 
         $origin = '1207.3';
         $expected = '1207.30';
-        $this->string(\Html::formatNumber($origin))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::formatNumber($origin));
 
         $_SESSION['glpinumber_format'] = 4;
 
         $origin = '1207.3';
         $expected = '1207,30';
-        $this->string(\Html::formatNumber($origin))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::formatNumber($origin));
 
         $_SESSION['glpinumber_format'] = 1337;
         $origin = '1207.3';
 
         $expected = '1,207.30';
-        $this->string(\Html::formatNumber($origin))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::formatNumber($origin));
     }
 
     public function testTimestampToString()
     {
         $expected = '0 seconds';
-        $this->string(\Html::timestampToString(null))->isIdenticalTo($expected);
-        $this->string(\Html::timestampToString(''))->isIdenticalTo($expected);
-        $this->string(\Html::timestampToString(0))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::timestampToString(null));
+        $this->assertSame($expected, \Html::timestampToString(''));
+        $this->assertSame($expected, \Html::timestampToString(0));
 
         $tstamp = 57226;
         $expected = '15 hours 53 minutes 46 seconds';
-        $this->string(\Html::timestampToString($tstamp))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::timestampToString($tstamp));
 
         $tstamp = -57226;
         $expected = '- 15 hours 53 minutes 46 seconds';
-        $this->string(\Html::timestampToString($tstamp))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::timestampToString($tstamp));
 
         $tstamp = 1337;
         $expected = '22 minutes 17 seconds';
-        $this->string(\Html::timestampToString($tstamp))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::timestampToString($tstamp));
 
         $expected = '22 minutes';
-        $this->string(\Html::timestampToString($tstamp, false))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::timestampToString($tstamp, false));
 
         $tstamp = 54;
         $expected = '54 seconds';
-        $this->string(\Html::timestampToString($tstamp))->isIdenticalTo($expected);
-        $this->string(\Html::timestampToString($tstamp, false))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::timestampToString($tstamp));
+        $this->assertSame($expected, \Html::timestampToString($tstamp, false));
 
         $tstamp = 157226;
         $expected = '1 days 19 hours 40 minutes 26 seconds';
-        $this->string(\Html::timestampToString($tstamp))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::timestampToString($tstamp));
 
         $expected = '1 days 19 hours 40 minutes';
-        $this->string(\Html::timestampToString($tstamp, false))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::timestampToString($tstamp, false));
 
         $expected = '43 hours 40 minutes 26 seconds';
-        $this->string(\Html::timestampToString($tstamp, true, false))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::timestampToString($tstamp, true, false));
 
         $expected = '43 hours 40 minutes';
-        $this->string(\Html::timestampToString($tstamp, false, false))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::timestampToString($tstamp, false, false));
     }
 
     public function testGetMenuInfos()
     {
         $menu = \Html::getMenuInfos();
-        $this->integer(count($menu))->isIdenticalTo(8);
+        $this->assertSame(8, count($menu));
 
         $expected = [
             'assets',
@@ -265,9 +265,7 @@ class Html extends \GLPITestCase
             'config',
             'preference'
         ];
-        $this->array($menu)
-         ->hasSize(count($expected))
-         ->hasKeys($expected);
+        $this->assertSame($expected, array_keys($menu));
 
         $expected = [
             'Computer',
@@ -287,8 +285,8 @@ class Html extends \GLPITestCase
             'Cable',
             'Item_DeviceSimcard'
         ];
-        $this->string($menu['assets']['title'])->isIdenticalTo('Assets');
-        $this->array($menu['assets']['types'])->isIdenticalTo($expected);
+        $this->assertSame('Assets', $menu['assets']['title']);
+        $this->assertSame($expected, $menu['assets']['types']);
 
         $expected = [
             'Ticket',
@@ -299,8 +297,8 @@ class Html extends \GLPITestCase
             'TicketRecurrent',
             'RecurrentChange',
         ];
-        $this->string($menu['helpdesk']['title'])->isIdenticalTo('Assistance');
-        $this->array($menu['helpdesk']['types'])->isIdenticalTo($expected);
+        $this->assertSame('Assistance', $menu['helpdesk']['title']);
+        $this->assertSame($expected, $menu['helpdesk']['types']);
 
         $expected = [
             'SoftwareLicense',
@@ -317,8 +315,8 @@ class Html extends \GLPITestCase
             'Appliance',
             'Database'
         ];
-        $this->string($menu['management']['title'])->isIdenticalTo('Management');
-        $this->array($menu['management']['types'])->isIdenticalTo($expected);
+        $this->assertSame('Management', $menu['management']['title']);
+        $this->assertSame($expected, $menu['management']['types']);
 
         $expected = [
             'Project',
@@ -331,12 +329,12 @@ class Html extends \GLPITestCase
             'SavedSearch',
             'Impact'
         ];
-        $this->string($menu['tools']['title'])->isIdenticalTo('Tools');
-        $this->array($menu['tools']['types'])->isIdenticalTo($expected);
+        $this->assertSame('Tools', $menu['tools']['title']);
+        $this->assertSame($expected, $menu['tools']['types']);
 
         $expected = [];
-        $this->string($menu['plugins']['title'])->isIdenticalTo('Plugins');
-        $this->array($menu['plugins']['types'])->isIdenticalTo($expected);
+        $this->assertSame('Plugins', $menu['plugins']['title']);
+        $this->assertSame($expected, $menu['plugins']['types']);
 
         $expected = [
             'User',
@@ -348,8 +346,8 @@ class Html extends \GLPITestCase
             'Glpi\\Event',
             'Glpi\Inventory\Inventory'
         ];
-        $this->string($menu['admin']['title'])->isIdenticalTo('Administration');
-        $this->array($menu['admin']['types'])->isIdenticalTo($expected);
+        $this->assertSame('Administration', $menu['admin']['title']);
+        $this->assertSame($expected, $menu['admin']['types']);
 
         $expected = [
             'CommonDropdown',
@@ -364,25 +362,23 @@ class Html extends \GLPITestCase
             'Link',
             'Plugin'
         ];
-        $this->string($menu['config']['title'])->isIdenticalTo('Setup');
-        $this->array($menu['config']['types'])->isIdenticalTo($expected);
+        $this->assertSame('Setup', $menu['config']['title']);
+        $this->assertSame($expected, $menu['config']['types']);
 
-        $this->string($menu['preference']['title'])->isIdenticalTo('My settings');
-        $this->array($menu['preference'])->notHasKey('types');
-        $this->string($menu['preference']['default'])->isIdenticalTo('/front/preference.php');
+        $this->assertSame('My settings', $menu['preference']['title']);
+        $this->assertArrayNotHasKey('types', $menu['preference']);
+        $this->assertSame('/front/preference.php', $menu['preference']['default']);
     }
 
     public function testGetCopyrightMessage()
     {
         $message = \Html::getCopyrightMessage();
-        $this->string($message)
-         ->contains(GLPI_VERSION)
-         ->contains(GLPI_YEAR);
+        $this->assertStringContainsString(GLPI_VERSION, $message);
+        $this->assertStringContainsString(GLPI_YEAR, $message);
 
         $message = \Html::getCopyrightMessage(false);
-        $this->string($message)
-         ->notContains(GLPI_VERSION)
-         ->contains(GLPI_YEAR);
+        $this->assertStringNotContainsString(GLPI_VERSION, $message);
+        $this->assertStringContainsString(GLPI_YEAR, $message);
     }
 
     public function testCss()
@@ -404,7 +400,7 @@ class Html extends \GLPITestCase
 
        //create test files
         foreach ($fake_files as $fake_file) {
-            $this->boolean(touch(GLPI_TMP_DIR . '/' . $fake_file))->isTrue();
+            $this->assertTrue(touch(GLPI_TMP_DIR . '/' . $fake_file));
         }
 
        //expect minified file
@@ -413,7 +409,7 @@ class Html extends \GLPITestCase
             ['file.min.css', $base_attrs],
             $base_expected
         );
-        $this->string(\Html::css($dir . '/file.css'))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::css($dir . '/file.css'));
 
        //explicitely require not minified file
         $expected = str_replace(
@@ -421,7 +417,7 @@ class Html extends \GLPITestCase
             ['file.css', $base_attrs],
             $base_expected
         );
-        $this->string(\Html::css($dir . '/file.css', [], false))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::css($dir . '/file.css', [], false));
 
        //activate debug mode: expect not minified file
         $_SESSION['glpi_use_mode'] = \Session::DEBUG_MODE;
@@ -430,7 +426,7 @@ class Html extends \GLPITestCase
             ['file.css', $base_attrs],
             $base_expected
         );
-        $this->string(\Html::css($dir . '/file.css'))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::css($dir . '/file.css'));
         $_SESSION['glpi_use_mode'] = \Session::NORMAL_MODE;
 
        //expect original file
@@ -439,7 +435,7 @@ class Html extends \GLPITestCase
             ['nofile.css', $base_attrs],
             $base_expected
         );
-        $this->string(\Html::css($dir . '/nofile.css'))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::css($dir . '/nofile.css'));
 
        //expect original file
         $expected = str_replace(
@@ -447,7 +443,7 @@ class Html extends \GLPITestCase
             ['other.css', $base_attrs],
             $base_expected
         );
-        $this->string(\Html::css($dir . '/other.css'))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::css($dir . '/other.css'));
 
        //expect original file
         $expected = str_replace(
@@ -455,7 +451,7 @@ class Html extends \GLPITestCase
             ['other-min.css', $base_attrs],
             $base_expected
         );
-        $this->string(\Html::css($dir . '/other-min.css'))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::css($dir . '/other-min.css'));
 
        //expect minified file, print media
         $expected = str_replace(
@@ -463,7 +459,7 @@ class Html extends \GLPITestCase
             ['file.min.css', 'media="print"'],
             $base_expected
         );
-        $this->string(\Html::css($dir . '/file.css', ['media' => 'print']))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::css($dir . '/file.css', ['media' => 'print']));
 
        //expect minified file, screen media
         $expected = str_replace(
@@ -471,7 +467,7 @@ class Html extends \GLPITestCase
             ['file.min.css', $base_attrs],
             $base_expected
         );
-        $this->string(\Html::css($dir . '/file.css', ['media' => '']))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::css($dir . '/file.css', ['media' => '']));
 
        //expect minified file and specific version
         $fake_version = '0.0.1';
@@ -480,7 +476,7 @@ class Html extends \GLPITestCase
             ['file.min.css', $base_attrs, FrontEnd::getVersionCacheKey($fake_version)],
             $base_expected
         );
-        $this->string(\Html::css($dir . '/file.css', ['version' => $fake_version]))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::css($dir . '/file.css', ['version' => $fake_version]));
 
        //expect minified file with added attributes
         $expected = str_replace(
@@ -488,7 +484,7 @@ class Html extends \GLPITestCase
             ['file.min.css', 'attribute="one" ' . $base_attrs],
             $base_expected
         );
-        $this->string($expected, \Html::css($dir . '/file.css', ['attribute' => 'one']))->isIdenticalTo($expected);
+        $this->assertSame($expected, $expected, \Html::css($dir . '/file.css', ['attribute' => 'one']));
 
        //remove test files
         foreach ($fake_files as $fake_file) {
@@ -523,7 +519,7 @@ class Html extends \GLPITestCase
             'file.min.js',
             $base_expected
         );
-        $this->string(\Html::script($dir . '/file.js'))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::script($dir . '/file.js'));
 
        //explicitely require not minified file
         $expected = str_replace(
@@ -531,7 +527,7 @@ class Html extends \GLPITestCase
             'file.js',
             $base_expected
         );
-        $this->string(\Html::script($dir . '/file.js', [], false))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::script($dir . '/file.js', [], false));
 
        //activate debug mode: expect not minified file
         $_SESSION['glpi_use_mode'] = \Session::DEBUG_MODE;
@@ -540,7 +536,7 @@ class Html extends \GLPITestCase
             'file.js',
             $base_expected
         );
-        $this->string($expected, \Html::script($dir . '/file.js'))->isIdenticalTo($expected);
+        $this->assertSame($expected, $expected, \Html::script($dir . '/file.js'));
         $_SESSION['glpi_use_mode'] = \Session::NORMAL_MODE;
 
        //expect original file
@@ -549,7 +545,7 @@ class Html extends \GLPITestCase
             'nofile.js',
             $base_expected
         );
-        $this->string(\Html::script($dir . '/nofile.js'))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::script($dir . '/nofile.js'));
 
        //expect original file
         $expected = str_replace(
@@ -557,7 +553,7 @@ class Html extends \GLPITestCase
             'other.js',
             $base_expected
         );
-        $this->string(\Html::script($dir . '/other.js'))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::script($dir . '/other.js'));
 
        //expect original file
         $expected = str_replace(
@@ -565,7 +561,7 @@ class Html extends \GLPITestCase
             'other-min.js',
             $base_expected
         );
-        $this->string(\Html::script($dir . '/other-min.js'))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::script($dir . '/other-min.js'));
 
        //expect minified file and specific version
         $fake_version = '0.0.1';
@@ -574,7 +570,7 @@ class Html extends \GLPITestCase
             ['file.min.js', FrontEnd::getVersionCacheKey($fake_version)],
             $base_expected
         );
-        $this->string(\Html::script($dir . '/file.js', ['version' => $fake_version]))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::script($dir . '/file.js', ['version' => $fake_version]));
 
        //remove test files
         foreach ($fake_files as $fake_file) {
@@ -595,69 +591,56 @@ class Html extends \GLPITestCase
 
         $expected = '';
         $message = \Html::manageRefreshPage();
-        $this->string($message)->isIdenticalTo($expected);
+        $this->assertSame($expected, $message);
 
        //Set session refresh to one minute
         $_SESSION['glpirefresh_views'] = 1;
         $expected = str_replace("##CALLBACK##", "window.location.reload()", $base_script);
         $expected = str_replace("##TIMER##", 1 * MINUTE_TIMESTAMP * 1000, $expected);
         $message = \Html::manageRefreshPage();
-        $this->string($message)->isIdenticalTo($expected);
+        $this->assertSame($expected, $message);
 
         $expected = str_replace("##CALLBACK##", '$(\'#mydiv\').remove();', $base_script);
         $expected = str_replace("##TIMER##", 1 * MINUTE_TIMESTAMP * 1000, $expected);
         $message = \Html::manageRefreshPage(false, '$(\'#mydiv\').remove();');
-        $this->string($message)->isIdenticalTo($expected);
+        $this->assertSame($expected, $message);
 
         $expected = str_replace("##CALLBACK##", "window.location.reload()", $base_script);
         $expected = str_replace("##TIMER##", 3 * MINUTE_TIMESTAMP * 1000, $expected);
         $message = \Html::manageRefreshPage(3);
-        $this->string($message)->isIdenticalTo($expected);
+        $this->assertSame($expected, $message);
 
         $expected = str_replace("##CALLBACK##", '$(\'#mydiv\').remove();', $base_script);
         $expected = str_replace("##TIMER##", 3 * MINUTE_TIMESTAMP * 1000, $expected);
         $message = \Html::manageRefreshPage(3, '$(\'#mydiv\').remove();');
-        $this->string($message)->isIdenticalTo($expected);
+        $this->assertSame($expected, $message);
     }
 
     public function testGenerateMenuSession()
     {
        //login to get session
         $auth = new \Auth();
-        $this->boolean($auth->login(TU_USER, TU_PASS, true))->isTrue();
+        $this->assertTrue($auth->login(TU_USER, TU_PASS, true));
 
         $menu = \Html::generateMenuSession(true);
 
-        $this->array($_SESSION)
-         ->hasKey('glpimenu');
+        $this->assertArrayHasKey('glpimenu', $_SESSION);
 
-        $this->array($menu)
-            ->isIdenticalTo($_SESSION['glpimenu'])
-            ->hasKey('assets')
-            ->hasKey('helpdesk')
-            ->hasKey('management')
-            ->hasKey('tools')
-            ->hasKey('plugins')
-            ->hasKey('admin')
-            ->hasKey('config')
-            ->hasKey('preference');
+        $this->assertSame($menu, $_SESSION['glpimenu']);
 
         foreach ($menu as $menu_entry) {
-            $this->array($menu_entry)
-            ->hasKey('title');
+            $this->assertArrayHasKey('title', $menu_entry);
 
             if (isset($menu_entry['content'])) {
-                $this->array($menu_entry)
-                 ->hasKey('types');
+                $this->assertArrayHasKey('types', $menu_entry);
 
                 foreach ($menu_entry['content'] as $submenu_label => $submenu) {
                     if ($submenu_label === 'is_multi_entries') {
                         continue;
                     }
 
-                    $this->array($submenu)
-                    ->hasKey('title')
-                    ->hasKey('page');
+                    $this->assertArrayHasKey('title', $submenu);
+                    $this->assertArrayHasKey('page', $submenu);
                 }
             }
         }
@@ -665,32 +648,26 @@ class Html extends \GLPITestCase
 
     public function testFuzzySearch()
     {
-       //login to get session
+        //login to get session
         $auth = new \Auth();
-        $this->boolean($auth->login(TU_USER, TU_PASS, true))->isTrue();
+        $this->assertTrue($auth->login(TU_USER, TU_PASS, true));
 
-       // init menu
+        // init menu
         \Html::generateMenuSession(true);
 
-       // test modal
+        // test modal
         $modal = \Html::FuzzySearch('getHtml');
-        $this->string($modal)
-         ->contains('id="fuzzysearch"')
-         ->matches('/class="results[^"]*"/');
+        $this->assertStringContainsString('id="fuzzysearch"', $modal);
+        $this->assertMatchesRegularExpression('/class="results[^"]*"/', $modal);
 
        // test retrieving entries
         $default = json_decode(\Html::FuzzySearch(), true);
         $entries = json_decode(\Html::FuzzySearch('getList'), true);
-        $this->array($default)
-         ->isNotEmpty()
-         ->isIdenticalTo($entries)
-         ->hasKey(0)
-         ->size->isGreaterThan(5);
+        $this->assertSame($default, $entries);
 
         foreach ($default as $entry) {
-            $this->array($entry)
-            ->hasKey('title')
-            ->hasKey('url');
+            $this->assertArrayHasKey('title', $entry);
+            $this->assertArrayHasKey('url', $entry);
         }
     }
 
@@ -699,19 +676,19 @@ class Html extends \GLPITestCase
         $value = 'Should be \' "escaped" éè!';
         $expected = 'Should be &#039; &quot;escaped&quot; &eacute;&egrave;!';
         $result = \Html::entities_deep($value);
-        $this->string($result)->isIdenticalTo($expected);
+        $this->assertSame($expected, $result);
 
         $result = \Html::entities_deep([$value, $value, $value]);
-        $this->array($result)->isIdenticalTo([$expected, $expected, $expected]);
+        $this->assertSame([$expected, $expected, $expected], $result);
     }
 
     public function testCleanParametersURL()
     {
         $url = 'http://perdu.com';
-        $this->string(\Html::cleanParametersURL($url))->isIdenticalTo($url);
+        $this->assertSame($url, \Html::cleanParametersURL($url));
 
         $purl = $url . '?with=some&args=none';
-        $this->string(\Html::cleanParametersURL($url))->isIdenticalTo($url);
+        $this->assertSame($url, \Html::cleanParametersURL($url));
     }
 
     public function testDisplayMessageAfterRedirect()
@@ -721,31 +698,35 @@ class Html extends \GLPITestCase
             WARNING  => ['Oooops, I did it again!']
         ];
 
-        $this->output(
-            function () {
-                \Html::displayMessageAfterRedirect();
-            }
-        )
-         ->matches('/class="[^"]*bg-danger[^"]*".*Error.*Something went really wrong :\(/s')
-         ->matches('/class="[^"]*bg-warning[^"]*".*Warning.*Oooops, I did it again!/s');
+        ob_start();
+        \Html::displayMessageAfterRedirect();
+        $output = ob_get_clean();
 
-        $this->array($_SESSION['MESSAGE_AFTER_REDIRECT'])->isEmpty();
+        $this->assertMatchesRegularExpression(
+            '/class="[^"]*bg-danger[^"]*".*Error.*Something went really wrong :\(/s',
+            $output
+        );
+
+        $this->assertMatchesRegularExpression(
+            '/class="[^"]*bg-warning[^"]*".*Warning.*Oooops, I did it again!/s',
+            $output
+        );
+
+        $this->assertEmpty($_SESSION['MESSAGE_AFTER_REDIRECT']);
     }
 
     public function testDisplayBackLink()
     {
-        $this->output(
-            function () {
-                \Html::displayBackLink();
-            }
-        )->isIdenticalTo("<a href='javascript:history.back();'>Back</a>");
+        ob_start();
+        \Html::displayBackLink();
+        $output = ob_get_clean();
+        $this->assertSame("<a href='javascript:history.back();'>Back</a>", $output);
 
         $_SERVER['HTTP_REFERER'] = 'originalpage.html';
-        $this->output(
-            function () {
-                \Html::displayBackLink();
-            }
-        )->isIdenticalTo("<a href='originalpage.html'>Back</a>");
+        ob_start();
+        \Html::displayBackLink();
+        $output = ob_get_clean();
+        $this->assertSame("<a href='originalpage.html'>Back</a>", $output);
         $_SERVER['HTTP_REFERER'] = ''; // reset referer to prevent having this var in test loop mode
     }
 
@@ -753,52 +734,52 @@ class Html extends \GLPITestCase
     {
         $string = 'Are U\' OK?';
         $expected = 'onclick="if (window.confirm(\'Are U\\\' OK?\')){ ;return true;} else { return false;}"';
-        $this->string(\Html::addConfirmationOnAction($string))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::addConfirmationOnAction($string));
 
         $strings = ['Are you', 'OK?'];
         $expected = 'onclick="if (window.confirm(\'Are you\nOK?\')){ ;return true;} else { return false;}"';
-        $this->string(\Html::addConfirmationOnAction($strings))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::addConfirmationOnAction($strings));
 
         $actions = '$("#mydiv").focus();';
         $expected = 'onclick="if (window.confirm(\'Are U\\\' OK?\')){ $("#mydiv").focus();return true;} else { return false;}"';
-        $this->string(\Html::addConfirmationOnAction($string, $actions))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::addConfirmationOnAction($string, $actions));
     }
 
     public function testJsFunctions()
     {
-        $this->string(\Html::jsHide('myid'))->isIdenticalTo("$('#myid').hide();\n");
-        $this->string(\Html::jsShow('myid'))->isIdenticalTo("$('#myid').show();\n");
-        $this->string(\Html::jsGetElementbyID('myid'))->isIdenticalTo("$('#myid')");
-        $this->string(\Html::jsSetDropdownValue('myid', 'myval'))->isIdenticalTo("$('#myid').trigger('setValue', 'myval');");
-        $this->string(\Html::jsGetDropdownValue('myid'))->isIdenticalTo("$('#myid').val()");
+        $this->assertSame("$('#myid').hide();\n", \Html::jsHide('myid'));
+        $this->assertSame("$('#myid').show();\n", \Html::jsShow('myid'));
+        $this->assertSame("$('#myid')", \Html::jsGetElementbyID('myid'));
+        $this->assertSame("$('#myid').trigger('setValue', 'myval');", \Html::jsSetDropdownValue('myid', 'myval'));
+        $this->assertSame("$('#myid').val()", \Html::jsGetDropdownValue('myid'));
     }
 
     public function testCleanId()
     {
         $id = 'myid';
-        $this->string(\Html::cleanId($id))->isIdenticalTo($id);
+        $this->assertSame($id, \Html::cleanId($id));
 
         $id = 'array[]';
         $expected = 'array__';
-        $this->string(\Html::cleanId($id))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::cleanId($id));
     }
 
     public function testImage()
     {
         $path = '/path/to/image.png';
         $expected = '<img src="/path/to/image.png" title="" alt=""  />';
-        $this->string(\Html::image($path))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::image($path));
 
         $options = [
             'title'  => 'My title',
             'alt'    => 'no img text'
         ];
         $expected = '<img src="/path/to/image.png" title="My title" alt="no img text"  />';
-        $this->string(\Html::image($path, $options))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::image($path, $options));
 
         $options = ['url' => 'mypage.php'];
         $expected = '<a href="mypage.php" ><img src="/path/to/image.png" title="" alt="" class=\'pointer\' /></a>';
-        $this->string(\Html::image($path, $options))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::image($path, $options));
     }
 
     public function testLink()
@@ -807,28 +788,28 @@ class Html extends \GLPITestCase
         $url = 'mylink.php';
 
         $expected = '<a href="mylink.php" >My link</a>';
-        $this->string(\Html::link($text, $url))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::link($text, $url));
 
         $options = [
             'confirm'   => 'U sure?'
         ];
         $expected = '<a href="mylink.php" onclick="if (window.confirm(&apos;U sure?&apos;)){ ;return true;} else { return false;}">My link</a>';
-        $this->string(\Html::link($text, $url, $options))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::link($text, $url, $options));
 
         $options['confirmaction'] = 'window.close();';
         $expected = '<a href="mylink.php" onclick="if (window.confirm(&apos;U sure?&apos;)){ window.close();return true;} else { return false;}">My link</a>';
-        $this->string(\Html::link($text, $url, $options))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::link($text, $url, $options));
     }
 
     public function testHidden()
     {
         $name = 'hiddenfield';
         $expected = '<input type="hidden" name="hiddenfield"  />';
-        $this->string(\Html::hidden($name))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::hidden($name));
 
         $options = ['value'  => 'myval'];
         $expected = '<input type="hidden" name="hiddenfield" value="myval" />';
-        $this->string(\Html::hidden($name, $options))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::hidden($name, $options));
 
         $options = [
             'value'  => [
@@ -837,7 +818,7 @@ class Html extends \GLPITestCase
             ]
         ];
         $expected = "<input type=\"hidden\" name=\"hiddenfield[0]\" value=\"a value\" />\n<input type=\"hidden\" name=\"hiddenfield[1]\" value=\"another one\" />\n";
-        $this->string(\Html::hidden($name, $options))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::hidden($name, $options));
 
         $options = [
             'value'  => [
@@ -846,14 +827,14 @@ class Html extends \GLPITestCase
             ]
         ];
         $expected = "<input type=\"hidden\" name=\"hiddenfield[one]\" value=\"a value\" />\n<input type=\"hidden\" name=\"hiddenfield[two]\" value=\"another one\" />\n";
-        $this->string(\Html::hidden($name, $options))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::hidden($name, $options));
     }
 
     public function testInput()
     {
         $name = 'in_put';
         $expected = '<input type="text" name="in_put" class="form-control" />';
-        $this->string(\Html::input($name))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::input($name));
 
         $options = [
             'value'     => 'myval',
@@ -861,7 +842,7 @@ class Html extends \GLPITestCase
             'data-id'   => 12
         ];
         $expected = '<input type="text" name="in_put" value="myval" class="a_class" data-id="12" />';
-        $this->string(\Html::input($name, $options))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::input($name, $options));
 
         $options = [
             'type'      => 'number',
@@ -869,10 +850,10 @@ class Html extends \GLPITestCase
             'value'     => 'myval',
         ];
         $expected = '<input type="number" name="in_put" min="10" value="myval" class="form-control" />';
-        $this->string(\Html::input($name, $options))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Html::input($name, $options));
     }
 
-    public function providerGetBackUrl()
+    public static function providerGetBackUrl()
     {
         return [
             [
@@ -903,7 +884,7 @@ class Html extends \GLPITestCase
      */
     public function testGetBackUrl($url_in, $url_out)
     {
-        $this->string(\Html::getBackUrl($url_in))->isIdenticalTo($url_out);
+        $this->assertSame($url_out, \Html::getBackUrl($url_in));
     }
 
     public function testGetScssFileHash()
@@ -951,13 +932,17 @@ SCSS
             'imports/colors.scss'  => md5_file(vfsStream::url('glpi/css/imports/colors.scss')),
         ];
 
-       // Composite scss file hash corresponds to self md5 suffixed by all imported scss md5
-        $this->string(\Html::getScssFileHash(vfsStream::url('glpi/css/all.scss')))
-         ->isEqualTo($files_md5['all.scss'] . $files_md5['imports/borders.scss'] . $files_md5['imports/colors.scss']);
+        // Composite scss file hash corresponds to self md5 suffixed by all imported scss md5
+        $this->assertEquals(
+            $files_md5['all.scss'] . $files_md5['imports/borders.scss'] . $files_md5['imports/colors.scss'],
+            \Html::getScssFileHash(vfsStream::url('glpi/css/all.scss'))
+        );
 
-       // Simple scss file hash corresponds to self md5
-        $this->string(\Html::getScssFileHash(vfsStream::url('glpi/css/another.scss')))
-         ->isEqualTo($files_md5['another.scss']);
+        // Simple scss file hash corresponds to self md5
+        $this->assertEquals(
+            $files_md5['another.scss'],
+            \Html::getScssFileHash(vfsStream::url('glpi/css/another.scss'))
+        );
     }
 
 
@@ -1052,12 +1037,12 @@ SCSS
         $values = \Html::getGenericDateTimeSearchItems($options);
 
         foreach ($check_values as $key => $value) {
-            $this->array($values)->hasKey($key);
-            $this->string($values[$key])->isEqualTo($value);
+            $this->assertArrayHasKey($key, $values);
+            $this->assertEquals($value, $values[$key]);
         }
 
         foreach ($unwanted as $key) {
-            $this->array($values)->notHasKey($key);
+            $this->assertArrayNotHasKey($key, $values);
         }
     }
 }

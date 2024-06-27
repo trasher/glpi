@@ -39,18 +39,18 @@ use DbTestCase;
 
 /* Test for inc/software.class.php */
 
-class Software extends DbTestCase
+class SoftwareTest extends DbTestCase
 {
     public function testTypeName()
     {
-        $this->string(\Software::getTypeName(1))->isIdenticalTo('Software');
-        $this->string(\Software::getTypeName(0))->isIdenticalTo('Software');
-        $this->string(\Software::getTypeName(10))->isIdenticalTo('Software');
+        $this->assertSame('Software', \Software::getTypeName(1));
+        $this->assertSame('Software', \Software::getTypeName(0));
+        $this->assertSame('Software', \Software::getTypeName(10));
     }
 
     public function testGetMenuShorcut()
     {
-        $this->string(\Software::getMenuShorcut())->isIdenticalTo('s');
+        $this->assertSame('s', \Software::getMenuShorcut());
     }
 
     public function testGetTabNameForItem()
@@ -63,9 +63,9 @@ class Software extends DbTestCase
             'is_recursive' => 1
         ];
         $softwares_id = $software->add($input);
-        $this->integer((int)$softwares_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$softwares_id);
         $software->getFromDB($softwares_id);
-        $this->string($software->getTabNameForItem($software, 1))->isEmpty();
+        $this->assertEmpty($software->getTabNameForItem($software, 1));
     }
 
     public function defineTabs()
@@ -74,30 +74,30 @@ class Software extends DbTestCase
 
         $software = new \Software();
         $tabs     = $software->defineTabs();
-        $this->array($tabs)->hasSize(16);
+        $this->assertCount(16, $tabs);
 
         $_SESSION['glpiactiveprofile']['license'] = 0;
         $tabs = $software->defineTabs();
-        $this->array($tabs)->hasSize(15);
+        $this->assertCount(15, $tabs);
 
         $_SESSION['glpiactiveprofile']['link'] = 0;
         $tabs = $software->defineTabs();
-        $this->array($tabs)->hasSize(14);
+        $this->assertCount(14, $tabs);
 
         $_SESSION['glpiactiveprofile']['infocom'] = 0;
         $tabs = $software->defineTabs();
-        $this->array($tabs)->hasSize(13);
+        $this->assertCount(13, $tabs);
 
         $_SESSION['glpiactiveprofile']['document'] = 0;
         $tabs = $software->defineTabs();
-        $this->array($tabs)->hasSize(12);
+        $this->assertCount(12, $tabs);
     }
 
     public function testPrepareInputForUpdate()
     {
         $software = new \Software();
         $result   = $software->prepareInputForUpdate(['is_update' => 0]);
-        $this->array($result)->isIdenticalTo(['is_update' => 0, 'softwares_id' => 0]);
+        $this->assertSame(['is_update' => 0, 'softwares_id' => 0], $result);
     }
 
     public function testPrepareInputForAdd()
@@ -108,13 +108,13 @@ class Software extends DbTestCase
         $result   = $software->prepareInputForAdd($input);
         $expected = ['name' => 'A name', 'is_update' => 0, 'softwares_id' => 0, '_oldID' => 3, 'softwarecategories_id' => 0];
 
-        $this->array($result)->isIdenticalTo($expected);
+        $this->assertSame($expected, $result);
 
         $input    = ['name' => 'A name', 'is_update' => 0, 'withtemplate' => 0];
         $result   = $software->prepareInputForAdd($input);
         $expected = ['name' => 'A name', 'is_update' => 0, 'softwares_id' => 0, 'softwarecategories_id' => 0];
 
-        $this->array($result)->isIdenticalTo($expected);
+        $this->assertSame($expected, $result);
 
         $input    = ['is_update'             => 0,
             'withtemplate'          => 0,
@@ -126,7 +126,7 @@ class Software extends DbTestCase
             'softwares_id'          => 0
         ];
 
-        $this->array($result)->isIdenticalTo($expected);
+        $this->assertSame($expected, $result);
     }
 
     public function testPrepareInputForAddWithCategory()
@@ -135,7 +135,7 @@ class Software extends DbTestCase
         $criteria = new \RuleCriteria();
         $action   = new \RuleAction();
 
-       //Create a software category
+        //Create a software category
         $category      = new \SoftwareCategory();
         $categories_id = $category->importExternal('Application');
 
@@ -147,24 +147,26 @@ class Software extends DbTestCase
             'condition'   => 0,
             'description' => ''
         ]);
-        $this->integer((int)$rules_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$rules_id);
 
-        $this->integer(
-            (int)$criteria->add([
+        $this->assertGreaterThan(
+            0,
+            $criteria->add([
                 'rules_id'  => $rules_id,
                 'criteria'  => 'name',
                 'condition' => \Rule::PATTERN_IS,
                 'pattern'   => 'MySoft'
             ])
-        )->isGreaterThan(0);
+        );
 
-        $this->integer(
-            (int)$action->add(['rules_id'    => $rules_id,
+        $this->assertGreaterThan(
+            0,
+            $action->add(['rules_id'    => $rules_id,
                 'action_type' => 'assign',
                 'field'       => 'softwarecategories_id',
                 'value'       => $categories_id
             ])
-        )->isGreaterThan(0);
+        );
 
         $input    = ['name'             => 'MySoft',
             'is_update'        => 0,
@@ -183,7 +185,7 @@ class Software extends DbTestCase
             'softwarecategories_id' => "$categories_id"
         ];
 
-        $this->array($result)->isIdenticalTo($expected);
+        $this->assertSame($expected, $result);
     }
 
     public function testPost_addItem()
@@ -198,16 +200,16 @@ class Software extends DbTestCase
             'is_template'  => 0,
             'entities_id'  => 0
         ]);
-        $this->integer((int)$softwares_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$softwares_id);
 
-        $this->variable($software->fields['is_template'])->isEqualTo(0);
-        $this->string($software->fields['name'])->isIdenticalTo('MySoft');
+        $this->assertEquals(0, $software->fields['is_template']);
+        $this->assertSame('MySoft', $software->fields['name']);
 
         $query = ['itemtype' => 'Software', 'items_id' => $softwares_id];
-        $this->integer((int)countElementsInTable('glpi_infocoms', $query))->isIdenticalTo(0);
-        $this->integer((int)countElementsInTable('glpi_contracts_items', $query))->isIdenticalTo(0);
+        $this->assertSame(0, (int)countElementsInTable('glpi_infocoms', $query));
+        $this->assertSame(0, (int)countElementsInTable('glpi_contracts_items', $query));
 
-       //Force creation of infocom when an asset is added
+        //Force creation of infocom when an asset is added
         $CFG_GLPI['auto_create_infocoms'] = 1;
 
         $softwares_id = $software->add([
@@ -215,10 +217,10 @@ class Software extends DbTestCase
             'is_template'  => 0,
             'entities_id'  => 0
         ]);
-        $this->integer((int)$softwares_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$softwares_id);
 
         $query = ['itemtype' => 'Software', 'items_id' => $softwares_id];
-        $this->integer((int)countElementsInTable('glpi_infocoms', $query))->isIdenticalTo(1);
+        $this->assertSame(1, (int)countElementsInTable('glpi_infocoms', $query));
     }
 
     public function testPost_addItemWithTemplate()
@@ -231,47 +233,52 @@ class Software extends DbTestCase
             'is_template'   => 1,
             'template_name' => 'template'
         ]);
-        $this->integer((int)$softwares_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $softwares_id);
 
         $infocom = new \Infocom();
-        $this->integer(
-            (int)$infocom->add([
+        //No idea why, but infocom already exists with phpunit
+        $infocom->getFromDBByCrit(['itemtype' => 'Software', 'items_id' => $softwares_id]);
+        $infocom->delete(['id' => $infocom->getID()], true);
+        $this->assertGreaterThan(
+            0,
+            $infocom->add([
                 'itemtype' => 'Software',
                 'items_id' => $softwares_id,
                 'value'    => '500'
             ])
-        )->isGreaterThan(0);
+        );
 
         $contract     = new \Contract();
         $contracts_id = $contract->add([
             'name'         => 'contract01',
             'entities_id'  => 0
         ]);
-        $this->integer((int)$contracts_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$contracts_id);
 
         $contract_item = new \Contract_Item();
-        $this->integer(
-            (int)$contract_item->add([
+        $this->assertGreaterThan(
+            0,
+            $contract_item->add([
                 'itemtype'     => 'Software',
                 'items_id'     => $softwares_id,
                 'contracts_id' => $contracts_id
             ])
-        )->isGreaterThan(0);
+        );
 
         $softwares_id_2 = $software->add([
             'name'         => 'MySoft',
             'id'           => $softwares_id,
             'entities_id'  => 0
         ]);
-        $this->integer((int)$softwares_id_2)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$softwares_id_2);
 
-        $this->boolean($software->getFromDB($softwares_id_2))->isTrue();
-        $this->variable($software->fields['is_template'])->isEqualTo(0);
-        $this->string($software->fields['name'])->isIdenticalTo('MySoft');
+        $this->assertTrue($software->getFromDB($softwares_id_2));
+        $this->assertEquals(0, $software->fields['is_template']);
+        $this->assertSame('MySoft', $software->fields['name']);
 
         $query = ['itemtype' => 'Software', 'items_id' => $softwares_id_2];
-        $this->integer((int)countElementsInTable('glpi_infocoms', $query))->isIdenticalTo(1);
-        $this->integer((int)countElementsInTable('glpi_contracts_items', $query))->isIdenticalTo(1);
+        $this->assertSame(1, (int)countElementsInTable('glpi_infocoms', $query));
+        $this->assertSame(1, (int)countElementsInTable('glpi_contracts_items', $query));
     }
 
     public function testCleanDBonPurge()
@@ -279,7 +286,7 @@ class Software extends DbTestCase
         global $CFG_GLPI;
         $this->login();
 
-       //Force creation of infocom when an asset is added
+        //Force creation of infocom when an asset is added
         $CFG_GLPI['auto_create_infocoms'] = 1;
 
         $software     = new \Software();
@@ -288,28 +295,29 @@ class Software extends DbTestCase
             'is_template'  => 0,
             'entities_id'  => 0
         ]);
-        $this->integer((int)$softwares_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$softwares_id);
 
         $contract     = new \Contract();
         $contracts_id = $contract->add([
             'name'         => 'contract02',
             'entities_id'  => 0
         ]);
-        $this->integer((int)$contracts_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$contracts_id);
 
         $contract_item = new \Contract_Item();
-        $this->integer(
-            (int)$contract_item->add([
+        $this->assertGreaterThan(
+            0,
+            $contract_item->add([
                 'itemtype'     => 'Software',
                 'items_id'     => $softwares_id,
                 'contracts_id' => $contracts_id
             ])
-        )->isGreaterThan(0);
+        );
 
-        $this->boolean($software->delete(['id' => $softwares_id], true))->isTrue();
+        $this->assertTrue($software->delete(['id' => $softwares_id], true));
         $query = ['itemtype' => 'Software', 'items_id' => $softwares_id];
-        $this->integer((int)countElementsInTable('glpi_infocoms', $query))->isIdenticalTo(0);
-        $this->integer((int)countElementsInTable('glpi_contracts_items', $query))->isIdenticalTo(0);
+        $this->assertSame(0, (int)countElementsInTable('glpi_infocoms', $query));
+        $this->assertSame(0, (int)countElementsInTable('glpi_contracts_items', $query));
 
        //TODO : test Change_Item, Item_Problem, Item_Project
     }
@@ -327,8 +335,8 @@ class Software extends DbTestCase
             'is_template'  => 0,
             'entities_id'  => 0
         ]);
-        $this->integer((int)$softwares_id)->isGreaterThan(0);
-        $this->boolean($software->getFromDB($softwares_id))->isTrue();
+        $this->assertGreaterThan(0, (int)$softwares_id);
+        $this->assertTrue($software->getFromDB($softwares_id));
 
         return $software;
     }
@@ -337,7 +345,7 @@ class Software extends DbTestCase
     {
         $software = $this->createSoft();
 
-       //create a license with 3 installations
+        //create a license with 3 installations
         $license = new \SoftwareLicense();
         $license_id = $license->add([
             'name'         => 'a_software_license',
@@ -345,9 +353,9 @@ class Software extends DbTestCase
             'entities_id'  => 0,
             'number'       => 3
         ]);
-        $this->integer((int)$license_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$license_id);
 
-       //attach 2 licenses
+        //attach 2 licenses
         $license_computer = new \Item_SoftwareLicense();
         foreach (['_test_pc01', '_test_pc02'] as $pcid) {
             $computer = getItemByTypeName('Computer', $pcid);
@@ -358,29 +366,29 @@ class Software extends DbTestCase
                 'is_deleted'            => 0,
                 'is_dynamic'            => 0
             ];
-            $this->integer((int)$license_computer->add($input_comp))->isGreaterThan(0);
+            $this->assertGreaterThan(0, (int)$license_computer->add($input_comp));
         }
 
-        $this->boolean($software->getFromDB($software->getID()))->isTrue();
-        $this->variable($software->fields['is_valid'])->isEqualTo(1);
+        $this->assertTrue($software->getFromDB($software->getID()));
+        $this->assertEquals(1, $software->fields['is_valid']);
 
-       //Descrease number to one
-        $this->boolean(
+        //Decrease number to one
+        $this->assertTrue(
             $license->update(['id' => $license->getID(), 'number' => 1])
-        )->isTrue();
+        );
         \Software::updateValidityIndicator($software->getID());
 
         $software->getFromDB($software->getID());
-        $this->variable($software->fields['is_valid'])->isEqualTo(0);
+        $this->assertEquals(0, $software->fields['is_valid']);
 
-       //Increase number to ten
-        $this->boolean(
+        //Increase number to ten
+        $this->assertTrue(
             $license->update(['id' => $license->getID(), 'number' => 10])
-        )->isTrue();
+        );
         \Software::updateValidityIndicator($software->getID());
 
         $software->getFromDB($software->getID());
-        $this->variable($software->fields['is_valid'])->isEqualTo(1);
+        $this->assertEquals(1, $software->fields['is_valid']);
     }
 
     public function testGetEmpty()
@@ -390,12 +398,12 @@ class Software extends DbTestCase
         $software = new \Software();
         $CFG_GLPI['default_software_helpdesk_visible'] = 0;
         $software->getEmpty();
-        $this->variable($software->fields['is_helpdesk_visible'])->isEqualTo(0);
+        $this->assertEquals(0, $software->fields['is_helpdesk_visible']);
 
         $CFG_GLPI['default_software_helpdesk_visible'] = 1;
 
         $software->getEmpty();
-        $this->variable($software->fields['is_helpdesk_visible'])->isEqualTo(1);
+        $this->assertEquals(1, $software->fields['is_helpdesk_visible']);
     }
 
     public function testGetSpecificMassiveActions()
@@ -404,36 +412,36 @@ class Software extends DbTestCase
 
         $software = new \Software();
         $result = $software->getSpecificMassiveActions();
-        $this->array($result)->hasSize(5);
+        $this->assertCount(5, $result);
 
         $all_rights = $_SESSION['glpiactiveprofile']['software'];
 
         $_SESSION['glpiactiveprofile']['software'] = 0;
         $result = $software->getSpecificMassiveActions();
-        $this->array($result)->isEmpty();
+        $this->assertEmpty($result);
 
         $_SESSION['glpiactiveprofile']['software'] = READ;
         $result = $software->getSpecificMassiveActions();
-        $this->array($result)->isEmpty();
+        $this->assertEmpty($result);
 
         $_SESSION['glpiactiveprofile']['software'] = $all_rights;
         $_SESSION['glpiactiveprofile']['knowbase'] = 0;
         $result = $software->getSpecificMassiveActions();
-        $this->array($result)->hasSize(4);
+        $this->assertCount(4, $result);
 
         $_SESSION['glpiactiveprofile']['rule_dictionnary_software'] = 0;
         $result = $software->getSpecificMassiveActions();
-        $this->array($result)->hasSize(4);
+        $this->assertCount(4, $result);
     }
 
     public function testGetSearchOptionsNew()
     {
         $software = new \Software();
         $result   = $software->rawSearchOptions();
-        $this->array($result)->hasSize(43);
+        $this->assertCount(43, $result);
 
         $this->login();
         $result   = $software->rawSearchOptions();
-        $this->array($result)->hasSize(59);
+        $this->assertCount(59, $result);
     }
 }

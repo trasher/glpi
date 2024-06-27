@@ -36,18 +36,26 @@
 namespace tests\units;
 
 use DbTestCase;
-use SoftwareVersion as CoreSoftwareVersion;
 
-/* Test for inc/softwareversion.class.php */
-
-class SoftwareVersion extends DbTestCase
+class DomainRelation extends DbTestCase
 {
-    public function testDropdownForOneSoftware()
+    public function testDeleteProtectedRelations()
     {
-        $this
-         ->string(CoreSoftwareVersion::dropdownForOneSoftware([
-             "display" => false
-         ]))
-         ->isNotEmpty();
+        $this->login();
+
+        $relation = new \DomainRelation();
+        $this->assertGreaterThan(
+            0,
+            $unprotected_id = $relation->add([
+                'name' => __FUNCTION__
+            ])
+        );
+
+        // Should not be able to delete the domain relations added to GLPI by default
+        $this->assertFalse($relation->delete(['id' => \DomainRelation::BELONGS]));
+        $this->assertFalse($relation->delete(['id' => \DomainRelation::MANAGE]));
+
+        // Should be able to delete the domain relation added by the test
+        $this->assertTrue($relation->delete(['id' => $unprotected_id]));
     }
 }

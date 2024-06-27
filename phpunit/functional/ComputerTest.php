@@ -39,7 +39,7 @@ use DbTestCase;
 
 /* Test for inc/computer.class.php */
 
-class Computer extends DbTestCase
+class ComputerTest extends DbTestCase
 {
     protected function getUniqueString()
     {
@@ -56,7 +56,7 @@ class Computer extends DbTestCase
         unset($fields['date_creation']);
         unset($fields['date_mod']);
         $fields['name'] = $this->getUniqueString();
-        $this->integer((int)$computer->add(\Toolbox::addslashes_deep($fields)))->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$computer->add(\Toolbox::addslashes_deep($fields)));
         return $computer;
     }
 
@@ -68,7 +68,7 @@ class Computer extends DbTestCase
         unset($pfields['date_creation']);
         unset($pfields['date_mod']);
         $pfields['name'] = $this->getUniqueString();
-        $this->integer((int)$printer->add(\Toolbox::addslashes_deep($pfields)))->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$printer->add(\Toolbox::addslashes_deep($pfields)));
         return $printer;
     }
 
@@ -86,7 +86,7 @@ class Computer extends DbTestCase
             'itemtype'     => $printer->getType(),
             'items_id'     => $printer->getID(),
         ];
-        $this->integer((int)$link->add($in))->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$link->add($in));
 
        // Change the computer
         $CFG_GLPI['is_contact_autoupdate']  = 1;
@@ -102,15 +102,15 @@ class Computer extends DbTestCase
             'states_id'    => $this->getUniqueInteger(),
             'locations_id' => $this->getUniqueInteger(),
         ];
-        $this->boolean($computer->update(\Toolbox::addslashes_deep($in)))->isTrue();
-        $this->boolean($computer->getFromDB($computer->getID()))->isTrue();
-        $this->boolean($printer->getFromDB($printer->getID()))->isTrue();
+        $this->assertTrue($computer->update(\Toolbox::addslashes_deep($in)));
+        $this->assertTrue($computer->getFromDB($computer->getID()));
+        $this->assertTrue($printer->getFromDB($printer->getID()));
         unset($in['id']);
         foreach ($in as $k => $v) {
            // Check the computer new values
-            $this->variable($computer->getField($k))->isEqualTo($v);
+            $this->assertEquals($v, $computer->getField($k));
            // Check the printer and test propagation occurs
-            $this->variable($printer->getField($k))->isEqualTo($v);
+            $this->assertEquals($v, $printer->getField($k));
         }
 
        //reset values
@@ -122,15 +122,15 @@ class Computer extends DbTestCase
             'states_id'    => 0,
             'locations_id' => 0,
         ];
-        $this->boolean($computer->update($in))->isTrue();
-        $this->boolean($computer->getFromDB($computer->getID()))->isTrue();
-        $this->boolean($printer->getFromDB($printer->getID()))->isTrue();
+        $this->assertTrue($computer->update($in));
+        $this->assertTrue($computer->getFromDB($computer->getID()));
+        $this->assertTrue($printer->getFromDB($printer->getID()));
         unset($in['id']);
         foreach ($in as $k => $v) {
            // Check the computer new values
-            $this->variable($computer->getField($k))->isEqualTo($v);
+            $this->assertEquals($v, $computer->getField($k));
            // Check the printer and test propagation occurs
-            $this->variable($printer->getField($k))->isEqualTo($v);
+            $this->assertEquals($v, $printer->getField($k));
         }
 
        // Change the computer again
@@ -147,15 +147,15 @@ class Computer extends DbTestCase
             'states_id'    => $this->getUniqueInteger(),
             'locations_id' => $this->getUniqueInteger(),
         ];
-        $this->boolean($computer->update(\Toolbox::addslashes_deep($in2)))->isTrue();
-        $this->boolean($computer->getFromDB($computer->getID()))->isTrue();
-        $this->boolean($printer->getFromDB($printer->getID()))->isTrue();
+        $this->assertTrue($computer->update(\Toolbox::addslashes_deep($in2)));
+        $this->assertTrue($computer->getFromDB($computer->getID()));
+        $this->assertTrue($printer->getFromDB($printer->getID()));
         unset($in2['id']);
         foreach ($in2 as $k => $v) {
            // Check the computer new values
-            $this->variable($computer->getField($k))->isEqualTo($v);
+            $this->assertEquals($v, $computer->getField($k));
            // Check the printer and test propagation DOES NOT occurs
-            $this->variable($printer->getField($k))->isEqualTo($in[$k]);
+            $this->assertEquals($in[$k], $printer->getField($k));
         }
 
        // Restore configuration
@@ -171,7 +171,7 @@ class Computer extends DbTestCase
             ]
         );
 
-        $this->integer((int)$cpuid)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$cpuid);
 
         $link = new \Item_DeviceProcessor();
         $linkid = $link->add(
@@ -184,7 +184,7 @@ class Computer extends DbTestCase
             ]
         );
 
-        $this->integer((int)$linkid)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$linkid);
 
        // Change the computer
         $CFG_GLPI['state_autoupdate_mode']  = -1;
@@ -193,15 +193,15 @@ class Computer extends DbTestCase
             'states_id'    => $this->getUniqueInteger(),
             'locations_id' => $this->getUniqueInteger(),
         ];
-        $this->boolean($computer->update($in))->isTrue();
-        $this->boolean($computer->getFromDB($computer->getID()))->isTrue();
-        $this->boolean($link->getFromDB($link->getID()))->isTrue();
+        $this->assertTrue($computer->update($in));
+        $this->assertTrue($computer->getFromDB($computer->getID()));
+        $this->assertTrue($link->getFromDB($link->getID()));
         unset($in['id']);
         foreach ($in as $k => $v) {
            // Check the computer new values
-            $this->variable($computer->getField($k))->isEqualTo($v);
+            $this->assertEquals($v, $computer->getField($k));
            // Check the printer and test propagation occurs
-            $this->variable($link->getField($k))->isEqualTo($v);
+            $this->assertEquals($v, $link->getField($k));
         }
 
        //reset
@@ -209,15 +209,15 @@ class Computer extends DbTestCase
             'states_id'    => 0,
             'locations_id' => 0,
         ];
-        $this->boolean($computer->update($in))->isTrue();
-        $this->boolean($computer->getFromDB($computer->getID()))->isTrue();
-        $this->boolean($link->getFromDB($link->getID()))->isTrue();
+        $this->assertTrue($computer->update($in));
+        $this->assertTrue($computer->getFromDB($computer->getID()));
+        $this->assertTrue($link->getFromDB($link->getID()));
         unset($in['id']);
         foreach ($in as $k => $v) {
            // Check the computer new values
-            $this->variable($computer->getField($k))->isEqualTo($v);
+            $this->assertEquals($v, $computer->getField($k));
            // Check the printer and test propagation occurs
-            $this->variable($link->getField($k))->isEqualTo($v);
+            $this->assertEquals($v, $link->getField($k));
         }
 
        // Change the computer again
@@ -227,15 +227,15 @@ class Computer extends DbTestCase
             'states_id'    => $this->getUniqueInteger(),
             'locations_id' => $this->getUniqueInteger(),
         ];
-        $this->boolean($computer->update($in2))->isTrue();
-        $this->boolean($computer->getFromDB($computer->getID()))->isTrue();
-        $this->boolean($link->getFromDB($link->getID()))->isTrue();
+        $this->assertTrue($computer->update($in2));
+        $this->assertTrue($computer->getFromDB($computer->getID()));
+        $this->assertTrue($link->getFromDB($link->getID()));
         unset($in2['id']);
         foreach ($in2 as $k => $v) {
            // Check the computer new values
-            $this->variable($computer->getField($k))->isEqualTo($v);
+            $this->assertEquals($v, $computer->getField($k));
            // Check the printer and test propagation DOES NOT occurs
-            $this->variable($link->getField($k))->isEqualTo($in[$k]);
+            $this->assertEquals($in[$k], $link->getField($k));
         }
 
        // Restore configuration
@@ -269,8 +269,8 @@ class Computer extends DbTestCase
             'states_id'    => $this->getUniqueInteger(),
             'locations_id' => $this->getUniqueInteger(),
         ];
-        $this->boolean($computer->update(\Toolbox::addslashes_deep($in)))->isTrue();
-        $this->boolean($computer->getFromDB($computer->getID()))->isTrue();
+        $this->assertTrue($computer->update(\Toolbox::addslashes_deep($in)));
+        $this->assertTrue($computer->getFromDB($computer->getID()));
 
         $printer = new \Printer();
         $pid = $printer->add(
@@ -280,7 +280,7 @@ class Computer extends DbTestCase
             ]
         );
 
-        $this->integer((int)$pid)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$pid);
 
        // Create the link
         $link = new \Computer_Item();
@@ -288,15 +288,15 @@ class Computer extends DbTestCase
             'itemtype'     => $printer->getType(),
             'items_id'     => $printer->getID(),
         ];
-        $this->integer((int)$link->add($in2))->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$link->add($in2));
 
-        $this->boolean($printer->getFromDB($printer->getID()))->isTrue();
+        $this->assertTrue($printer->getFromDB($printer->getID()));
         unset($in['id']);
         foreach ($in as $k => $v) {
            // Check the computer new values
-            $this->variable($computer->getField($k))->isEqualTo($v);
+            $this->assertEquals($v, $computer->getField($k));
            // Check the printer and test propagation occurs
-            $this->variable($printer->getField($k))->isEqualTo($v);
+            $this->assertEquals($v, $printer->getField($k));
         }
 
        //create devices
@@ -308,7 +308,7 @@ class Computer extends DbTestCase
             ]
         );
 
-        $this->integer((int)$cpuid)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$cpuid);
 
         $link = new \Item_DeviceProcessor();
         $linkid = $link->add(
@@ -319,18 +319,18 @@ class Computer extends DbTestCase
             ]
         );
 
-        $this->integer((int)$linkid)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$linkid);
 
         $in3 = ['states_id'    => $in['states_id'],
             'locations_id' => $in['locations_id'],
         ];
 
-        $this->boolean($link->getFromDB($link->getID()))->isTrue();
+        $this->assertTrue($link->getFromDB($link->getID()));
         foreach ($in3 as $k => $v) {
            // Check the computer new values
-            $this->variable($computer->getField($k))->isEqualTo($v);
+            $this->assertEquals($v, $computer->getField($k));
            // Check the printer and test propagation occurs
-            $this->variable($link->getField($k))->isEqualTo($v);
+            $this->assertEquals($v, $link->getField($k));
         }
 
        // Restore configuration
@@ -346,29 +346,24 @@ class Computer extends DbTestCase
         ]);
         $prev = false;
         foreach (\Computer::getFromIter($iter) as $comp) {
-            $this->object($comp)->isInstanceOf('Computer');
-            $this->array($comp->fields)
-            ->hasKey('name')
-            ->string['name']->isNotEqualTo($prev);
+            $this->assertInstanceOf(\Computer::class, $comp);
+            $this->assertArrayHasKey('name', $comp->fields);
+            $this->assertNotEquals($prev, $comp->fields['name']);
             $prev = $comp->fields['name'];
         }
-        $this->boolean((bool)$prev)->isTrue(); // we are retrieve something
+        $this->assertTrue((bool)$prev); // we are retrieve something
     }
 
     public function testGetFromDbByCrit()
     {
         $comp = new \Computer();
-        $this->boolean($comp->getFromDBByCrit(['name' => '_test_pc01']))->isTrue();
-        $this->string($comp->getField('name'))->isIdenticalTo('_test_pc01');
+        $this->assertTrue($comp->getFromDBByCrit(['name' => '_test_pc01']));
+        $this->assertSame('_test_pc01', $comp->getField('name'));
 
-        $this->when(
-            function () use ($comp) {
-                $this->boolean($comp->getFromDBByCrit(['name' => ['LIKE', '_test%']]))->isFalse();
-            }
-        )->error()
-         ->withType(E_USER_WARNING)
-         ->withMessage('getFromDBByCrit expects to get one result, 9 found in query "SELECT `id` FROM `glpi_computers` WHERE `name` LIKE \'_test%\'".')
-         ->exists();
+        $this->expectExceptionMessage(
+            'getFromDBByCrit expects to get one result, 9 found in query "SELECT `id` FROM `glpi_computers` WHERE `name` LIKE \'_test%\'".'
+        );
+        $this->assertFalse($comp->getFromDBByCrit(['name' => ['LIKE', '_test%']]));
     }
 
     public function testClone()
@@ -385,39 +380,42 @@ class Computer extends DbTestCase
 
        //add note
         $note = new \Notepad();
-        $this->integer(
+        $this->assertGreaterThan(
+            0,
             $note->add([
                 'itemtype'  => 'Computer',
                 'items_id'  => $id
             ])
-        )->isGreaterThan(0);
+        );
 
        //add os
         $os = new \OperatingSystem();
         $osid = $os->add([
             'name'   => 'My own OS'
         ]);
-        $this->integer($osid)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $osid);
 
         $ios = new \Item_OperatingSystem();
-        $this->integer(
+        $this->assertGreaterThan(
+            0,
             $ios->add([
                 'operatingsystems_id' => $osid,
                 'itemtype'            => 'Computer',
                 'items_id'            => $id,
             ])
-        )->isGreaterThan(0);
+        );
 
-       //add infocom
+        //add infocom
         $infocom = new \Infocom();
-        $this->integer(
+        $this->assertGreaterThan(
+            0,
             $infocom->add([
                 'itemtype'  => 'Computer',
                 'items_id'  => $id
             ])
-        )->isGreaterThan(0);
+        );
 
-       //add device
+        //add device
         $cpu = new \DeviceProcessor();
         $cpuid = $cpu->add(
             [
@@ -426,7 +424,7 @@ class Computer extends DbTestCase
             ]
         );
 
-        $this->integer((int)$cpuid)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$cpuid);
 
         $link = new \Item_DeviceProcessor();
         $linkid = $link->add(
@@ -436,60 +434,61 @@ class Computer extends DbTestCase
                 'deviceprocessors_id'   => $cpuid
             ]
         );
-        $this->integer((int)$linkid)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$linkid);
 
-       //add document
+        //add document
         $document = new \Document();
         $docid = (int)$document->add(['name' => 'Test link document']);
-        $this->integer($docid)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $docid);
 
         $docitem = new \Document_Item();
-        $this->integer(
+        $this->assertGreaterThan(
+            0,
             $docitem->add([
                 'documents_id' => $docid,
                 'itemtype'     => 'Computer',
                 'items_id'     => $id
             ])
-        )->isGreaterThan(0);
+        );
 
         //add antivirus
         $antivirus = new \ComputerAntivirus();
         $antivirus_id = (int)$antivirus->add(['name' => 'Test link antivirus', 'computers_id' => $id]);
-        $this->integer($antivirus_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $antivirus_id);
 
        //clone!
         $computer = new \Computer(); //$computer->fields contents is already escaped!
-        $this->boolean($computer->getFromDB($id))->isTrue();
+        $this->assertTrue($computer->getFromDB($id));
         $added = $computer->clone();
-        $this->integer((int)$added)->isGreaterThan(0);
-        $this->integer($added)->isNotEqualTo($computer->fields['id']);
+        $this->assertGreaterThan(0, (int)$added);
+        $this->assertNotEquals($computer->fields['id'], $added);
 
         $clonedComputer = new \Computer();
-        $this->boolean($clonedComputer->getFromDB($added))->isTrue();
+        $this->assertTrue($clonedComputer->getFromDB($added));
 
         $fields = $computer->fields;
 
-       // Check the computers values. Id and dates must be different, everything else must be equal
+        // Check the computers values. Id and dates must be different, everything else must be equal
         foreach ($fields as $k => $v) {
             switch ($k) {
                 case 'id':
-                    $this->variable($clonedComputer->getField($k))->isNotEqualTo($computer->getField($k));
+                    $this->assertNotEquals($computer->getField($k), $clonedComputer->getField($k));
                     break;
                 case 'date_mod':
                 case 'date_creation':
                     $dateClone = new \DateTime($clonedComputer->getField($k));
                     $expectedDate = new \DateTime($date);
-                    $this->dateTime($dateClone)->isEqualTo($expectedDate);
+                    $this->assertEquals($expectedDate, $dateClone);
                     break;
                 case 'name':
-                    $this->variable($clonedComputer->getField($k))->isEqualTo("{$computer->getField($k)} (copy)");
+                    $this->assertEquals("{$computer->getField($k)} (copy)", $clonedComputer->getField($k));
                     break;
                 default:
-                    $this->variable($clonedComputer->getField($k))->isEqualTo($computer->getField($k));
+                    $this->assertEquals($computer->getField($k), $clonedComputer->getField($k));
             }
         }
 
-       //TODO: would be better to check each Computer::getCloneRelations() ones.
+        //TODO: would be better to check each Computer::getCloneRelations() ones.
         $relations = [
             \Infocom::class => 1,
             \Notepad::class  => 1,
@@ -497,7 +496,8 @@ class Computer extends DbTestCase
         ];
 
         foreach ($relations as $relation => $expected) {
-            $this->integer(
+            $this->assertSame(
+                $expected,
                 countElementsInTable(
                     $relation::getTable(),
                     [
@@ -505,15 +505,15 @@ class Computer extends DbTestCase
                         'items_id'  => $clonedComputer->fields['id'],
                     ]
                 )
-            )->isIdenticalTo($expected);
+            );
         }
 
         //check antivirus
-        $this->boolean($antivirus->getFromDBByCrit(['computers_id' => $clonedComputer->fields['id']]))->isTrue();
+        $this->assertTrue($antivirus->getFromDBByCrit(['computers_id' => $clonedComputer->fields['id']]));
 
-       //check processor has been cloned
-        $this->boolean($link->getFromDBByCrit(['itemtype' => 'Computer', 'items_id' => $added]))->isTrue();
-        $this->boolean($docitem->getFromDBByCrit(['itemtype' => 'Computer', 'items_id' => $added]))->isTrue();
+        //check processor has been cloned
+        $this->assertTrue($link->getFromDBByCrit(['itemtype' => 'Computer', 'items_id' => $added]));
+        $this->assertTrue($docitem->getFromDBByCrit(['itemtype' => 'Computer', 'items_id' => $added]));
     }
 
     public function testCloneWithAutoCreateInfocom()
@@ -532,7 +532,8 @@ class Computer extends DbTestCase
 
         // add infocom
         $infocom = new \Infocom();
-        $this->integer(
+        $this->assertGreaterThan(
+            0,
             $infocom->add([
                 'itemtype'  => 'Computer',
                 'items_id'  => $id,
@@ -540,20 +541,20 @@ class Computer extends DbTestCase
                 'use_date'  => '2021-01-02',
                 'value'     => '800.00'
             ])
-        )->isGreaterThan(0);
+        );
 
         // clone!
         $computer = new \Computer(); //$computer->fields contents is already escaped!
-        $this->boolean($computer->getFromDB($id))->isTrue();
+        $this->assertTrue($computer->getFromDB($id));
         $infocom_auto_create_original = $CFG_GLPI["infocom_auto_create"] ?? 0;
         $CFG_GLPI["infocom_auto_create"] = 1;
         $added = $computer->clone();
         $CFG_GLPI["infocom_auto_create"] = $infocom_auto_create_original;
-        $this->integer((int)$added)->isGreaterThan(0);
-        $this->integer($added)->isNotEqualTo($computer->fields['id']);
+        $this->assertGreaterThan(0, (int)$added);
+        $this->assertNotEquals($computer->fields['id'], $added);
 
         $clonedComputer = new \Computer();
-        $this->boolean($clonedComputer->getFromDB($added))->isTrue();
+        $this->assertTrue($clonedComputer->getFromDB($added));
 
         $iterator = $DB->request([
             'SELECT' => ['buy_date', 'use_date', 'value'],
@@ -563,12 +564,15 @@ class Computer extends DbTestCase
                 'items_id'  => $clonedComputer->fields['id']
             ]
         ]);
-        $this->integer($iterator->count())->isEqualTo(1);
-        $this->array($iterator->current())->isIdenticalTo([
-            'buy_date'  => '2021-01-01',
-            'use_date'  => '2021-01-02',
-            'value'     => '800.0000' //DB stores 4 decimal places
-        ]);
+        $this->assertEquals(1, $iterator->count());
+        $this->assertSame(
+            [
+                'buy_date'  => '2021-01-01',
+                'use_date'  => '2021-01-02',
+                'value'     => '800.0000' //DB stores 4 decimal places
+            ],
+            $iterator->current()
+        );
     }
 
     public function testCloneWithSpecificName()
@@ -578,10 +582,10 @@ class Computer extends DbTestCase
         $clone_id = $computer->clone([
             'name' => 'testCloneWithSpecificName'
         ]);
-        $this->integer($clone_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $clone_id);
         $result = $computer->getFromDB($clone_id);
-        $this->boolean($result)->isTrue();
-        $this->string($computer->fields['name'])->isEqualTo('testCloneWithSpecificName');
+        $this->assertTrue($result);
+        $this->assertEquals('testCloneWithSpecificName', $computer->fields['name']);
     }
 
     public function testClonedRelationNamesFromTemplate()
@@ -595,7 +599,7 @@ class Computer extends DbTestCase
             'template_name' => __FUNCTION__ . '_template',
             'is_template' => 1
         ]);
-        $this->integer($templates_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $templates_id);
 
         // Add a network port to the template
         $networkPort = new \NetworkPort();
@@ -608,7 +612,7 @@ class Computer extends DbTestCase
             'items_devicenetworkcards_id' => 0,
             '_create_children' => true
         ]);
-        $this->integer($networkports_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $networkports_id);
 
         // Create computer from template
         $computer = new \Computer();
@@ -616,15 +620,17 @@ class Computer extends DbTestCase
             'name' => __FUNCTION__,
             'id' => $templates_id
         ]);
-        $this->integer($computers_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $computers_id);
 
         // Get network port from computer
-        $this->boolean($networkPort->getFromDBByCrit([
-            'itemtype' => 'Computer',
-            'items_id' => $computers_id,
-        ]))->isTrue();
+        $this->assertTrue(
+            $networkPort->getFromDBByCrit([
+                'itemtype' => 'Computer',
+                'items_id' => $computers_id,
+            ])
+        );
         // Network port name should not have a "copy" suffix
-        $this->string($networkPort->fields['name'])->isEqualTo(__FUNCTION__);
+        $this->assertEquals(__FUNCTION__, $networkPort->fields['name']);
     }
 
     public function testCloneWithAutoName()
@@ -636,10 +642,10 @@ class Computer extends DbTestCase
             'name' => 'testCloneWithAutoName'
         ]);
         $clone_id = $computer->clone();
-        $this->integer($clone_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $clone_id);
         $result = $computer->getFromDB($clone_id);
-        $this->boolean($result)->isTrue();
-        $this->string($computer->fields['name'])->isEqualTo('testCloneWithAutoName (copy)');
+        $this->assertTrue($result);
+        $this->assertEquals('testCloneWithAutoName (copy)', $computer->fields['name']);
     }
 
     public function testTransfer()
@@ -653,14 +659,14 @@ class Computer extends DbTestCase
             'name'         => 'GLPI',
             'entities_id'  => $computer->fields['entities_id']
         ]);
-        $this->integer($softwares_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $softwares_id);
 
         $version = new \SoftwareVersion();
         $versions_id = $version->add([
             'softwares_id' => $softwares_id,
             'name'         => '9.5'
         ]);
-        $this->integer($versions_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $versions_id);
 
         $link = new \Item_SoftwareVersion();
         $link_id  = $link->add([
@@ -668,17 +674,18 @@ class Computer extends DbTestCase
             'items_id'              => $cid,
             'softwareversions_id'   => $versions_id
         ]);
-        $this->integer($link_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $link_id);
 
         $entities_id = getItemByTypeName('Entity', '_test_child_2', true);
         $oentities_id = (int)$computer->fields['entities_id'];
-        $this->integer($entities_id)->isNotEqualTo($oentities_id);
+        $this->assertNotEquals($oentities_id, $entities_id);
 
-       //transer to another entity
+       //transfer to another entity
         $transfer = new \Transfer();
 
-        $this->mockGenerator->orphanize('__construct');
-        $ma = new \mock\MassiveAction([], [], 'process');
+        $ma = $this->getMockBuilder(\MassiveAction::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         \MassiveAction::processMassiveActionsForOneItemtype(
             $ma,
@@ -688,11 +695,11 @@ class Computer extends DbTestCase
         $transfer->moveItems(['Computer' => [$cid]], $entities_id, [$cid, 'keep_software' => 1]);
         unset($_SESSION['glpitransfer_list']);
 
-        $this->boolean($computer->getFromDB($cid))->isTrue();
-        $this->integer((int)$computer->fields['entities_id'])->isidenticalTo($entities_id);
+        $this->assertTrue($computer->getFromDB($cid));
+        $this->assertSame($entities_id, (int)$computer->fields['entities_id']);
 
-        $this->boolean($soft->getFromDB($softwares_id))->isTrue();
-        $this->integer($soft->fields['entities_id'])->isidenticalTo($oentities_id);
+        $this->assertTrue($soft->getFromDB($softwares_id));
+        $this->assertSame($oentities_id, $soft->fields['entities_id']);
 
         global $DB;
         $softwares = $DB->request([
@@ -702,7 +709,7 @@ class Computer extends DbTestCase
                 'items_id'  => $cid
             ]
         ]);
-        $this->integer(count($softwares))->isidenticalTo(1);
+        $this->assertSame(1, count($softwares));
     }
 
     public function testClearSavedInputAfterUpdate()
@@ -720,7 +727,7 @@ class Computer extends DbTestCase
             'id'    => $cid,
             'comment'  => 'test'
         ]);
-        $this->boolean($result)->isTrue();
+        $this->assertTrue($result);
 
         // Check that there is no savedInput after update
         if (isset($_SESSION['saveInput']) && is_array($_SESSION['saveInput'])) {
@@ -751,7 +758,7 @@ class Computer extends DbTestCase
         );
 
         $computer_agent = $computer->getInventoryAgent();
-        $this->variable($computer_agent)->isNull();
+        $this->assertNull($computer_agent);
 
         $agenttype_id = getItemByTypeName(\AgentType::class, 'Core', true);
 
@@ -801,23 +808,23 @@ class Computer extends DbTestCase
 
         // most recent agent directly linked
         $computer_agent = $computer->getInventoryAgent();
-        $this->object($computer_agent)->isInstanceOf(\Agent::class);
-        $this->array($computer_agent->fields)->isEqualTo($agent1->fields);
+        $this->assertInstanceOf(\Agent::class, $computer_agent);
+        $this->assertEquals($agent1->fields, $computer_agent->fields);
 
-        $this->boolean($agent1->delete(['id' => $agent1->fields['id']]))->isTrue();
+        $this->assertTrue($agent1->delete(['id' => $agent1->fields['id']]));
 
         // most recent agent directly linked
         $computer_agent = $computer->getInventoryAgent();
-        $this->object($computer_agent)->isInstanceOf(\Agent::class);
-        $this->array($computer_agent->fields)->isEqualTo($agent2->fields);
+        $this->assertInstanceOf(\Agent::class, $computer_agent);
+        $this->assertEquals($agent2->fields, $computer_agent->fields);
 
-        $this->boolean($agent2->delete(['id' => $agent2->fields['id']]))->isTrue();
+        $this->assertTrue($agent2->delete(['id' => $agent2->fields['id']]));
 
         // most recent agent found from linked items, as there is no more agent linked directly
         $computer_agent = $computer->getInventoryAgent();
-        $this->object($computer_agent)->isInstanceOf(\Agent::class);
+        $this->assertInstanceOf(\Agent::class, $computer_agent);
         $printer1_agent = $printer1->getInventoryAgent();
-        $this->object($printer1_agent)->isInstanceOf(\Agent::class);
-        $this->array($computer_agent->fields)->isEqualTo($printer1_agent->fields);
+        $this->assertInstanceOf(\Agent::class, $printer1_agent);
+        $this->assertEquals($printer1_agent->fields, $computer_agent->fields);
     }
 }

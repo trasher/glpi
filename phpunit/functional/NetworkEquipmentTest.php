@@ -39,7 +39,7 @@ use DbTestCase;
 
 /* Test for inc/networkequipment.class.php */
 
-class NetworkEquipment extends DbTestCase
+class NetworkEquipmentTest extends DbTestCase
 {
     public function testNetEquipmentCRUD()
     {
@@ -52,10 +52,10 @@ class NetworkEquipment extends DbTestCase
             'entities_id'  => 0
         ];
         $netequipments_id = $device->add($input);
-        $this->integer($netequipments_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $netequipments_id);
 
-        $this->boolean($device->getFromDB($netequipments_id))->isTrue();
-        $this->string($device->fields['name'])->isIdenticalTo('Test equipment');
+        $this->assertTrue($device->getFromDB($netequipments_id));
+        $this->assertSame('Test equipment', $device->fields['name']);
 
        //create ports attached
         $netport = new \NetworkPort();
@@ -68,10 +68,10 @@ class NetworkEquipment extends DbTestCase
             'instantiation_type' => 'NetworkPortEthernet'
         ];
         $netports_id = $netport->add($input);
-        $this->integer($netports_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $netports_id);
 
-        $this->boolean($netport->getFromDB($netports_id))->isTrue();
-        $this->string($netport->fields['name'])->isIdenticalTo('Test port');
+        $this->assertTrue($netport->getFromDB($netports_id));
+        $this->assertSame('Test port', $netport->fields['name']);
 
         $input = [
             'itemtype'           => $device->getType(),
@@ -82,17 +82,17 @@ class NetworkEquipment extends DbTestCase
             'instantiation_type' => 'NetworkPortAggregate'
         ];
         $netports_id = $netport->add($input);
-        $this->integer($netports_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $netports_id);
 
-        $this->boolean($netport->getFromDB($netports_id))->isTrue();
-        $this->string($netport->fields['name'])->isIdenticalTo('Another test port');
+        $this->assertTrue($netport->getFromDB($netports_id));
+        $this->assertSame('Another test port', $netport->fields['name']);
 
-        $this->integer($netport->countForItem($device))->isIdenticalTo(2);
+        $this->assertSame(2, $netport->countForItem($device));
 
        //remove network equipment
-        $this->boolean($device->delete(['id' => $netequipments_id], true))->isTrue();
+        $this->assertTrue($device->delete(['id' => $netequipments_id], true));
 
        //see if links are dropped
-        $this->integer($netport->countForItem($device))->isIdenticalTo(0);
+        $this->assertSame(0, $netport->countForItem($device));
     }
 }

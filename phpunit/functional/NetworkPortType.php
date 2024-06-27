@@ -48,13 +48,16 @@ class NetworkPortType extends DbTestCase
         $iterator = $DB->request([
             'FROM'   => \NetworkPortType::getTable()
         ]);
-        $this->integer(count($iterator))->isGreaterThanOrEqualTo(300);
+        $this->assertGreaterThanOrEqual(
+            300,
+            count($iterator)
+        );
 
         $iterator = $DB->request([
             'FROM'   => \NetworkPortType::getTable(),
             'WHERE'  => ['is_importable' => true]
         ]);
-        $this->integer(count($iterator))->isIdenticalTo(7);
+        $this->assertSame(7, count($iterator));
 
         $expecteds = [
             [
@@ -111,7 +114,7 @@ class NetworkPortType extends DbTestCase
                 'date_creation' => $row['date_creation'],
                 'date_mod' => $row['date_mod'],
             ];
-            $this->array($row)->isEqualTo($expected);
+            $this->assertEquals($expected, $row);
         }
     }
 }

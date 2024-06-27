@@ -49,7 +49,7 @@ class NetworkPortMetrics extends DbTestCase
             'name'   => 'My network equipment',
             'entities_id'  => 0
         ]);
-        $this->integer($neteq_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $neteq_id);
 
         $port = [
             'name'         => 'Gigabit0/1/2',
@@ -68,12 +68,12 @@ class NetworkPortMetrics extends DbTestCase
 
         $netport = new \NetworkPort();
         $netports_id = $netport->add($port);
-        $this->integer($netports_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $netports_id);
 
        //create port, check if metrics has been addded
         $metrics = new \NetworkPortMetrics();
         $values = $metrics->getMetrics($netport);
-        $this->array($values)->hasSize(1);
+        $this->assertCount(1, $values);
 
         $value = array_pop($values);
         $expected = [
@@ -87,7 +87,7 @@ class NetworkPortMetrics extends DbTestCase
             'date_creation' => $_SESSION['glpi_currenttime'],
             'date_mod' => $_SESSION['glpi_currenttime'],
         ];
-        $this->array($value)->isEqualTo($expected);
+        $this->assertEquals($expected, $value);
 
        //update port, check metrics
         $port['ifmtu'] = 1500;
@@ -96,9 +96,9 @@ class NetworkPortMetrics extends DbTestCase
         $port['ifinerrors'] = 0;
         $port['ifouterrors'] = 0;
 
-        $this->boolean($netport->update($port + ['id' => $netports_id]))->isTrue();
+        $this->assertTrue($netport->update($port + ['id' => $netports_id]));
         $values = $metrics->getMetrics($netport);
-        $this->array($values)->hasSize(1); // Still 1 row, as there should be only one row per date
+        $this->assertCount(1, $values); // Still 1 row, as there should be only one row per date
 
         $updated_value = array_pop($values);
 
@@ -113,7 +113,7 @@ class NetworkPortMetrics extends DbTestCase
             'date_creation' => $_SESSION['glpi_currenttime'],
             'date_mod' => $_SESSION['glpi_currenttime'],
         ];
-        $this->array($updated_value)->isEqualTo($expected);
+        $this->assertEquals($expected, $updated_value);
 
        //check logs => no bytes nor errors
         global $DB;
@@ -124,11 +124,10 @@ class NetworkPortMetrics extends DbTestCase
             ]
         ]);
 
-        $this->integer(count($iterator))->isIdenticalTo(2);
+        $this->assertSame(2, count($iterator));
         foreach ($iterator as $row) {
-            $this->integer($row['id_search_option'])
-            ->isNotEqualTo(34) //ifinbytes SO from NetworkPort
-            ->isNotEqualTo(35); //ifinerrors SO from NetworkPort
+            $this->assertNotEquals(34, $row['id_search_option']);
+            $this->assertNotEquals(35, $row['id_search_option']);
         }
     }
 }

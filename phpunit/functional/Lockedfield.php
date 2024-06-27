@@ -51,52 +51,52 @@ class Lockedfield extends DbTestCase
             'entities_id'  => 0,
             'is_dynamic'   => 1
         ]);
-        $this->integer($cid)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $cid);
 
         $lockedfield = new \Lockedfield();
-        $this->boolean($lockedfield->isHandled($computer))->isTrue();
-        $this->array($lockedfield->getLockedValues($computer->getType(), $cid))->isEmpty();
+        $this->assertTrue($lockedfield->isHandled($computer));
+        $this->assertEmpty($lockedfield->getLockedValues($computer->getType(), $cid));
 
         //update computer manually, to add a locked field
-        $this->boolean(
-            (bool)$computer->update(['id' => $cid, 'otherserial' => 'AZERTY'])
-        )->isTrue();
+        $this->assertTrue(
+            $computer->update(['id' => $cid, 'otherserial' => 'AZERTY'])
+        );
 
-        $this->boolean($computer->getFromDB($cid))->isTrue();
-        $this->array($lockedfield->getLockedValues($computer->getType(), $cid))->isIdenticalTo(['otherserial' => null]);
+        $this->assertTrue($computer->getFromDB($cid));
+        $this->assertSame(['otherserial' => null], $lockedfield->getLockedValues($computer->getType(), $cid));
 
         //ensure new dynamic update does not override otherserial again
-        $this->boolean(
-            (bool)$computer->update([
+        $this->assertTrue(
+            $computer->update([
                 'id' => $cid,
                 'otherserial'  => '789012',
                 'is_dynamic'   => 1
             ])
-        )->isTrue();
+        );
 
-        $this->boolean($computer->getFromDB($cid))->isTrue();
-        $this->variable($computer->fields['otherserial'])->isEqualTo('AZERTY');
-        $this->array($lockedfield->getLockedValues($computer->getType(), $cid))->isIdenticalTo(['otherserial' => '789012']);
+        $this->assertTrue($computer->getFromDB($cid));
+        $this->assertEquals('AZERTY', $computer->fields['otherserial']);
+        $this->assertSame(['otherserial' => '789012'], $lockedfield->getLockedValues($computer->getType(), $cid));
 
         //ensure new dynamic update do not set new lock on regular update
-        $this->boolean(
-            (bool)$computer->update([
+        $this->assertTrue(
+            $computer->update([
                 'id' => $cid,
                 'name'         => 'Computer name changed',
                 'is_dynamic'   => 1
             ])
-        )->isTrue();
+        );
 
-        $this->boolean($computer->getFromDB($cid))->isTrue();
-        $this->variable($computer->fields['name'])->isEqualTo('Computer name changed');
-        $this->array($lockedfield->getLockedValues($computer->getType(), $cid))->isIdenticalTo(['otherserial' => '789012']);
+        $this->assertTrue($computer->getFromDB($cid));
+        $this->assertEquals('Computer name changed', $computer->fields['name']);
+        $this->assertSame(['otherserial' => '789012'], $lockedfield->getLockedValues($computer->getType(), $cid));
 
         //ensure regular update do work on locked field
-        $this->boolean(
-            (bool)$computer->update(['id' => $cid, 'otherserial' => 'QWERTY'])
-        )->isTrue();
-        $this->boolean($computer->getFromDB($cid))->isTrue();
-        $this->variable($computer->fields['otherserial'])->isEqualTo('QWERTY');
+        $this->assertTrue(
+            $computer->update(['id' => $cid, 'otherserial' => 'QWERTY'])
+        );
+        $this->assertTrue($computer->getFromDB($cid));
+        $this->assertEquals('QWERTY', $computer->fields['otherserial']);
     }
 
     public function testGlobalLock()
@@ -109,54 +109,55 @@ class Lockedfield extends DbTestCase
             'entities_id'  => 0,
             'is_dynamic'   => 1
         ]);
-        $this->integer($cid)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $cid);
 
         $lockedfield = new \Lockedfield();
-        $this->boolean($lockedfield->isHandled($computer))->isTrue();
-        $this->array($lockedfield->getLockedValues($computer->getType(), $cid))->isEmpty();
+        $this->assertTrue($lockedfield->isHandled($computer));
+        $this->assertEmpty($lockedfield->getLockedValues($computer->getType(), $cid));
 
         //add a global lock on otherserial field
-        $this->integer(
+        $this->assertGreaterThan(
+            0,
             $lockedfield->add([
                 'item' => 'Computer - otherserial'
             ])
-        )->isGreaterThan(0);
+        );
 
-        $this->boolean($computer->getFromDB($cid))->isTrue();
-        $this->array($lockedfield->getLockedValues($computer->getType(), $cid))->isIdenticalTo(['otherserial' => null]);
+        $this->assertTrue($computer->getFromDB($cid));
+        $this->assertSame(['otherserial' => null], $lockedfield->getLockedValues($computer->getType(), $cid));
 
         //ensure new dynamic update does not override otherserial again
-        $this->boolean(
-            (bool)$computer->update([
+        $this->assertTrue(
+            $computer->update([
                 'id' => $cid,
                 'otherserial'  => 'changed',
                 'is_dynamic' => 1
             ])
-        )->isTrue();
+        );
 
-        $this->boolean($computer->getFromDB($cid))->isTrue();
-        $this->variable($computer->fields['otherserial'])->isEqualTo('789012');
-        $this->array($lockedfield->getLockedValues($computer->getType(), $cid))->isIdenticalTo(['otherserial' => null]);
+        $this->assertTrue($computer->getFromDB($cid));
+        $this->assertEquals('789012', $computer->fields['otherserial']);
+        $this->assertSame(['otherserial' => null], $lockedfield->getLockedValues($computer->getType(), $cid));
 
         //ensure new dynamic update do not set new lock on regular update
-        $this->boolean(
-            (bool)$computer->update([
+        $this->assertTrue(
+            $computer->update([
                 'id' => $cid,
                 'name' => 'Computer name changed',
                 'is_dynamic' => 1
             ])
-        )->isTrue();
+        );
 
-        $this->boolean($computer->getFromDB($cid))->isTrue();
-        $this->variable($computer->fields['name'])->isEqualTo('Computer name changed');
-        $this->array($lockedfield->getLockedValues($computer->getType(), $cid))->isIdenticalTo(['otherserial' => null]);
+        $this->assertTrue($computer->getFromDB($cid));
+        $this->assertEquals('Computer name changed', $computer->fields['name']);
+        $this->assertSame(['otherserial' => null], $lockedfield->getLockedValues($computer->getType(), $cid));
 
         //ensure regular update do work on locked field
-        $this->boolean(
-            (bool)$computer->update(['id' => $cid, 'otherserial' => 'QWERTY'])
-        )->isTrue();
-        $this->boolean($computer->getFromDB($cid))->isTrue();
-        $this->variable($computer->fields['otherserial'])->isEqualTo('QWERTY');
+        $this->assertTrue(
+            $computer->update(['id' => $cid, 'otherserial' => 'QWERTY'])
+        );
+        $this->assertTrue($computer->getFromDB($cid));
+        $this->assertEquals('QWERTY', $computer->fields['otherserial']);
     }
 
     /**
@@ -167,11 +168,12 @@ class Lockedfield extends DbTestCase
         $lockedfield = new \Lockedfield();
 
         //add a global lock on otherserial field
-        $this->integer(
+        $this->assertGreaterThan(
+            0,
             $lockedfield->add([
                 'item' => 'Computer - otherserial'
             ])
-        )->isGreaterThan(0);
+        );
 
         $computer = new \Computer();
         $cid = (int)$computer->add([
@@ -181,49 +183,49 @@ class Lockedfield extends DbTestCase
             'entities_id'  => 0,
             'is_dynamic'   => 1
         ]);
-        $this->integer($cid)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $cid);
 
-        $this->boolean($computer->getFromDB($cid))->isTrue();
-        $this->variable($computer->fields['otherserial'])->isEqualTo('');
+        $this->assertTrue($computer->getFromDB($cid));
+        $this->assertEquals('', $computer->fields['otherserial']);
 
-        $this->boolean($lockedfield->isHandled($computer))->isTrue();
+        $this->assertTrue($lockedfield->isHandled($computer));
         //lockedfield value must be null because it's a global lock
-        $this->array($lockedfield->getLockedValues($computer->getType(), $cid))->isIdenticalTo(['otherserial' => null]);
+        $this->assertSame(['otherserial' => null], $lockedfield->getLockedValues($computer->getType(), $cid));
 
         //ensure new dynamic update does not override otherserial again
-        $this->boolean(
-            (bool)$computer->update([
+        $this->assertTrue(
+            $computer->update([
                 'id' => $cid,
                 'otherserial'  => 'changed',
                 'is_dynamic' => 1
             ])
-        )->isTrue();
+        );
 
-        $this->boolean($computer->getFromDB($cid))->isTrue();
-        $this->variable($computer->fields['otherserial'])->isEqualTo('');
+        $this->assertTrue($computer->getFromDB($cid));
+        $this->assertEquals('', $computer->fields['otherserial']);
         //lockedfield must be null because it's a global lock
-        $this->array($lockedfield->getLockedValues($computer->getType(), $cid))->isIdenticalTo(['otherserial' => null]);
+        $this->assertSame(['otherserial' => null], $lockedfield->getLockedValues($computer->getType(), $cid));
 
         //ensure new dynamic update do not set new lock on regular update
-        $this->boolean(
-            (bool)$computer->update([
+        $this->assertTrue(
+            $computer->update([
                 'id' => $cid,
                 'name' => 'Computer name changed',
                 'is_dynamic' => 1
             ])
-        )->isTrue();
+        );
 
-        $this->boolean($computer->getFromDB($cid))->isTrue();
-        $this->variable($computer->fields['name'])->isEqualTo('Computer name changed');
+        $this->assertTrue($computer->getFromDB($cid));
+        $this->assertEquals('Computer name changed', $computer->fields['name']);
         //lockedfield must be null because it's a global lock
-        $this->array($lockedfield->getLockedValues($computer->getType(), $cid))->isIdenticalTo(['otherserial' => null]);
+        $this->assertSame(['otherserial' => null], $lockedfield->getLockedValues($computer->getType(), $cid));
 
         //ensure regular update do work on locked field
-        $this->boolean(
-            (bool)$computer->update(['id' => $cid, 'otherserial' => 'QWERTY'])
-        )->isTrue();
-        $this->boolean($computer->getFromDB($cid))->isTrue();
-        $this->variable($computer->fields['otherserial'])->isEqualTo('QWERTY');
+        $this->assertTrue(
+            $computer->update(['id' => $cid, 'otherserial' => 'QWERTY'])
+        );
+        $this->assertTrue($computer->getFromDB($cid));
+        $this->assertEquals('QWERTY', $computer->fields['otherserial']);
     }
 
     public function testNoRelation()
@@ -252,11 +254,12 @@ class Lockedfield extends DbTestCase
         $lockedfield = new \Lockedfield();
 
         //add a global lock on manufacturers_id field
-        $this->integer(
+        $this->assertGreaterThan(
+            0,
             $lockedfield->add([
                 'item' => 'Computer - manufacturers_id'
             ])
-        )->isGreaterThan(0);
+        );
 
         $converter = new \Glpi\Inventory\Converter();
         $data = $converter->convert($xml);
@@ -267,8 +270,8 @@ class Lockedfield extends DbTestCase
         if ($inventory->inError()) {
             $this->dump($inventory->getErrors());
         }
-        $this->boolean($inventory->inError())->isFalse();
-        $this->array($inventory->getErrors())->isEmpty();
+        $this->assertFalse($inventory->inError());
+        $this->assertEmpty($inventory->getErrors());
 
         //check matchedlogs
         $criteria = [
@@ -284,26 +287,25 @@ class Lockedfield extends DbTestCase
             'WHERE' => []
         ];
         $iterator = $DB->request($criteria);
-        $this->string($iterator->current()['name'])->isIdenticalTo('Computer import (by serial + uuid)');
+        $this->assertSame('Computer import (by serial + uuid)', $iterator->current()['name']);
 
         //check created agent
         $agents = $DB->request(['FROM' => \Agent::getTable()]);
-        $this->integer(count($agents))->isIdenticalTo(1);
+        $this->assertSame(1, count($agents));
         $agent = $agents->current();
-        $this->array($agent)
-            ->string['deviceid']->isIdenticalTo('glpixps.teclib.infra-2018-10-03-08-42-36')
-            ->string['itemtype']->isIdenticalTo('Computer');
+        $this->assertSame('glpixps.teclib.infra-2018-10-03-08-42-36', $agent['deviceid']);
+        $this->assertSame('Computer', $agent['itemtype']);
 
         //check created computer
         $computers_id = $agent['items_id'];
 
-        $this->integer($computers_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $computers_id);
         $computer = new \Computer();
-        $this->boolean($computer->getFromDB($computers_id))->isTrue();
-        $this->integer($computer->fields['manufacturers_id'])->isEqualTo(0);
+        $this->assertTrue($computer->getFromDB($computers_id));
+        $this->assertEquals(0, $computer->fields['manufacturers_id']);
 
         //ensure no new manufacturer has been added
-        $this->integer(countElementsInTable(\Manufacturer::getTable()))->isIdenticalTo($existing_manufacturers);
+        $this->assertSame($existing_manufacturers, countElementsInTable(\Manufacturer::getTable()));
     }
 
     public function testNoLocation()
@@ -343,8 +345,8 @@ class Lockedfield extends DbTestCase
         if ($inventory->inError()) {
             $this->dump($inventory->getErrors());
         }
-        $this->boolean($inventory->inError())->isFalse();
-        $this->array($inventory->getErrors())->isEmpty();
+        $this->assertFalse($inventory->inError());
+        $this->assertEmpty($inventory->getErrors());
 
         //check matchedlogs
         $criteria = [
@@ -360,27 +362,27 @@ class Lockedfield extends DbTestCase
             'WHERE' => []
         ];
         $iterator = $DB->request($criteria);
-        $this->string($iterator->current()['name'])->isIdenticalTo('Printer import (by serial)');
+        $this->assertSame('Printer import (by serial)', $iterator->current()['name']);
 
         $printers_id = $inventory->getItem()->fields['id'];
-        $this->integer($printers_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $printers_id);
 
         $printer = new \Printer();
-        $this->boolean($printer->getFromDB($printers_id))->isTrue();
-        $this->integer($printer->fields['locations_id'])->isEqualTo(0);
+        $this->assertTrue($printer->getFromDB($printers_id));
+        $this->assertEquals(0, $printer->fields['locations_id']);
 
         //ensure no new location has been added
-        $this->integer(countElementsInTable(\Location::getTable()))->isIdenticalTo($existing_locations);
+        $this->assertSame($existing_locations, countElementsInTable(\Location::getTable()));
 
         //manually update to lock locations_id field
         $locations_id = getItemByTypeName('Location', '_location02', true);
-        $this->boolean(
+        $this->assertTrue(
             $printer->update([
                 'id' => $printers_id,
                 'locations_id' => $locations_id
             ])
-        )->isTrue();
-        $this->array($lockedfield->getLockedValues($printer->getType(), $printers_id))->isIdenticalTo(['locations_id' => null]);
+        );
+        $this->assertSame(['locations_id' => null], $lockedfield->getLockedValues($printer->getType(), $printers_id));
 
         //Replay, with a location
         $xml = "<?xml version=\"1.0\"?>
@@ -415,16 +417,16 @@ class Lockedfield extends DbTestCase
         if ($inventory->inError()) {
             $this->dump($inventory->getErrors());
         }
-        $this->boolean($inventory->inError())->isFalse();
-        $this->array($inventory->getErrors())->isEmpty();
+        $this->assertFalse($inventory->inError());
+        $this->assertEmpty($inventory->getErrors());
 
-        $this->boolean($printer->getFromDB($printers_id))->isTrue();
-        $this->integer($printer->fields['locations_id'])->isEqualTo($locations_id);
+        $this->assertTrue($printer->getFromDB($printers_id));
+        $this->assertEquals($locations_id, $printer->fields['locations_id']);
 
         //ensure no new location has been added
-        $this->integer(countElementsInTable(\Location::getTable()))->isIdenticalTo($existing_locations);
+        $this->assertSame($existing_locations, countElementsInTable(\Location::getTable()));
 
-        $this->array($lockedfield->getLockedValues($printer->getType(), $printers_id))->isIdenticalTo(['locations_id' => 'Greffe Charron']);
+        $this->assertSame(['locations_id' => 'Greffe Charron'], $lockedfield->getLockedValues($printer->getType(), $printers_id));
     }
 
     public function testNoLocationGlobal()
@@ -458,11 +460,12 @@ class Lockedfield extends DbTestCase
         $lockedfield = new \Lockedfield();
 
         //add a global lock on locations_id field
-        $this->integer(
+        $this->assertGreaterThan(
+            0,
             $lockedfield->add([
                 'item' => 'Printer - locations_id'
             ])
-        )->isGreaterThan(0);
+        );
 
         $converter = new \Glpi\Inventory\Converter();
         $data = $converter->convert($xml);
@@ -473,8 +476,8 @@ class Lockedfield extends DbTestCase
         if ($inventory->inError()) {
             $this->dump($inventory->getErrors());
         }
-        $this->boolean($inventory->inError())->isFalse();
-        $this->array($inventory->getErrors())->isEmpty();
+        $this->assertFalse($inventory->inError());
+        $this->assertEmpty($inventory->getErrors());
 
         //check matchedlogs
         $criteria = [
@@ -490,17 +493,17 @@ class Lockedfield extends DbTestCase
             'WHERE' => []
         ];
         $iterator = $DB->request($criteria);
-        $this->string($iterator->current()['name'])->isIdenticalTo('Printer import (by serial)');
+        $this->assertSame('Printer import (by serial)', $iterator->current()['name']);
 
         $printers_id = $inventory->getItem()->fields['id'];
-        $this->integer($printers_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $printers_id);
 
         $printer = new \Printer();
-        $this->boolean($printer->getFromDB($printers_id))->isTrue();
-        $this->integer($printer->fields['locations_id'])->isEqualTo(0);
+        $this->assertTrue($printer->getFromDB($printers_id));
+        $this->assertEquals(0, $printer->fields['locations_id']);
 
         //ensure no new location has been added
-        $this->integer(countElementsInTable(\Location::getTable()))->isIdenticalTo($existing_locations);
+        $this->assertSame($existing_locations, countElementsInTable(\Location::getTable()));
     }
 
     public function testLockedDdValue()
@@ -543,8 +546,8 @@ class Lockedfield extends DbTestCase
         if ($inventory->inError()) {
             $this->dump($inventory->getErrors());
         }
-        $this->boolean($inventory->inError())->isFalse();
-        $this->array($inventory->getErrors())->isEmpty();
+        $this->assertFalse($inventory->inError());
+        $this->assertEmpty($inventory->getErrors());
 
         //check matchedlogs
         $criteria = [
@@ -560,28 +563,28 @@ class Lockedfield extends DbTestCase
             'WHERE' => []
         ];
         $iterator = $DB->request($criteria);
-        $this->string($iterator->current()['name'])->isIdenticalTo('Printer import (by serial)');
+        $this->assertSame('Printer import (by serial)', $iterator->current()['name']);
 
         $printers_id = $inventory->getItem()->fields['id'];
-        $this->integer($printers_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $printers_id);
 
         $printer = new \Printer();
-        $this->boolean($printer->getFromDB($printers_id))->isTrue();
-        $this->integer($printer->fields['locations_id'])->isGreaterThan(0);
+        $this->assertTrue($printer->getFromDB($printers_id));
+        $this->assertGreaterThan(0, $printer->fields['locations_id']);
 
         //ensure new location has been added
         ++$existing_locations;
-        $this->integer(countElementsInTable(\Location::getTable()))->isIdenticalTo($existing_locations);
+        $this->assertSame($existing_locations, countElementsInTable(\Location::getTable()));
 
         //manually update to lock locations_id field
         $locations_id = getItemByTypeName('Location', '_location02', true);
-        $this->boolean(
+        $this->assertTrue(
             $printer->update([
                 'id' => $printers_id,
                 'locations_id' => $locations_id
             ])
-        )->isTrue();
-        $this->array($lockedfield->getLockedValues($printer->getType(), $printers_id))->isIdenticalTo(['locations_id' => null]);
+        );
+        $this->assertSame(['locations_id' => null], $lockedfield->getLockedValues($printer->getType(), $printers_id));
 
         //Replay, with a location, to ensure location has not been updated, and locked value is correct.
         $data = $converter->convert($xml);
@@ -592,16 +595,16 @@ class Lockedfield extends DbTestCase
         if ($inventory->inError()) {
             $this->dump($inventory->getErrors());
         }
-        $this->boolean($inventory->inError())->isFalse();
-        $this->array($inventory->getErrors())->isEmpty();
+        $this->assertFalse($inventory->inError());
+        $this->assertEmpty($inventory->getErrors());
 
-        $this->boolean($printer->getFromDB($printers_id))->isTrue();
-        $this->integer($printer->fields['locations_id'])->isEqualTo($locations_id);
+        $this->assertTrue($printer->getFromDB($printers_id));
+        $this->assertEquals($locations_id, $printer->fields['locations_id']);
 
         //ensure no new location has been added
-        $this->integer(countElementsInTable(\Location::getTable()))->isIdenticalTo($existing_locations);
+        $this->assertSame($existing_locations, countElementsInTable(\Location::getTable()));
 
-        $this->array($lockedfield->getLockedValues($printer->getType(), $printers_id))->isIdenticalTo(['locations_id' => 'Greffe Charron']);
+        $this->assertSame(['locations_id' => 'Greffe Charron'], $lockedfield->getLockedValues($printer->getType(), $printers_id));
     }
 
     public function testLockedRelations()
@@ -662,50 +665,50 @@ class Lockedfield extends DbTestCase
         if ($inventory->inError()) {
             $this->dump($inventory->getErrors());
         }
-        $this->boolean($inventory->inError())->isFalse();
-        $this->array($inventory->getErrors())->isEmpty();
+        $this->assertFalse($inventory->inError());
+        $this->assertEmpty($inventory->getErrors());
 
         $computers_id = $inventory->getItem()->fields['id'];
-        $this->integer($computers_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $computers_id);
 
-        $this->boolean($computer->getFromDB($computers_id))->isTrue();
+        $this->assertTrue($computer->getFromDB($computers_id));
 
-        $this->boolean($cos->getFromDBByCrit(['items_id' => $computers_id]))->isTrue();
+        $this->assertTrue($cos->getFromDBByCrit(['items_id' => $computers_id]));
 
         //check OS version
-        $this->boolean($aos->getFromDBByCrit(['name' => 'x86_64']))->isTrue();
+        $this->assertTrue($aos->getFromDBByCrit(['name' => 'x86_64']));
         $archs_id = $aos->fields['id'];
-        $this->integer($cos->fields['operatingsystemarchitectures_id'])->isIdenticalTo($archs_id);
+        $this->assertSame($archs_id, $cos->fields['operatingsystemarchitectures_id']);
 
         //check antivirus manufacturer
-        $this->boolean($iav->getFromDBByCrit(['computers_id' => $computers_id]))->isTrue();
-        $this->boolean($manufacturer->getFromDBByCrit(['name' => 'Microsoft Corporation']))->isTrue();
+        $this->assertTrue($iav->getFromDBByCrit(['computers_id' => $computers_id]));
+        $this->assertTrue($manufacturer->getFromDBByCrit(['name' => 'Microsoft Corporation']));
         $manufacturers_id = $manufacturer->fields['id'];
-        $this->integer($iav->fields['manufacturers_id'])->isIdenticalTo($manufacturers_id);
+        $this->assertSame($manufacturers_id, $iav->fields['manufacturers_id']);
 
         //manually update OS architecture field
         $newarchs_id = $aos->add(['name' => 'i386']);
-        $this->integer($newarchs_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $newarchs_id);
 
-        $this->boolean(
+        $this->assertTrue(
             $cos->update([
                 'id' => $cos->fields['id'],
                 'operatingsystemarchitectures_id' => $newarchs_id
             ])
-        )->isTrue();
-        $this->array($lockedfield->getLockedValues($cos->getType(), $cos->fields['id']))->isIdenticalTo(['operatingsystemarchitectures_id' => null]);
+        );
+        $this->assertSame(['operatingsystemarchitectures_id' => null], $lockedfield->getLockedValues($cos->getType(), $cos->fields['id']));
 
         //manually update AV manufacturer field
         $newmanufacturers_id = $manufacturer->add(['name' => 'Crosoft']);
-        $this->integer($newmanufacturers_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $newmanufacturers_id);
 
-        $this->boolean(
+        $this->assertTrue(
             $iav->update([
                 'id' => $iav->fields['id'],
                 'manufacturers_id' => $newmanufacturers_id
             ])
-        )->isTrue();
-        $this->array($lockedfield->getLockedValues($iav->getType(), $iav->fields['id']))->isIdenticalTo(['manufacturers_id' => null]);
+        );
+        $this->assertSame(['manufacturers_id' => null], $lockedfield->getLockedValues($iav->getType(), $iav->fields['id']));
 
         //replay
         $data = $converter->convert($xml);
@@ -715,20 +718,20 @@ class Lockedfield extends DbTestCase
         if ($inventory->inError()) {
             $this->dump($inventory->getErrors());
         }
-        $this->boolean($inventory->inError())->isFalse();
-        $this->array($inventory->getErrors())->isEmpty();
+        $this->assertFalse($inventory->inError());
+        $this->assertEmpty($inventory->getErrors());
 
         //make sure architecture is still the correct one
-        $this->boolean($cos->getFromDBByCrit(['items_id' => $computers_id]))->isTrue();
-        $this->integer($cos->fields['operatingsystemarchitectures_id'])->isIdenticalTo($newarchs_id);
+        $this->assertTrue($cos->getFromDBByCrit(['items_id' => $computers_id]));
+        $this->assertSame($newarchs_id, $cos->fields['operatingsystemarchitectures_id']);
 
-        $this->array($lockedfield->getLockedValues($cos->getType(), $cos->fields['id']))->isIdenticalTo(['operatingsystemarchitectures_id' => 'x86_64']);
+        $this->assertSame(['operatingsystemarchitectures_id' => 'x86_64'], $lockedfield->getLockedValues($cos->getType(), $cos->fields['id']));
 
         //make sure manufacturer is still the correct one
-        $this->boolean($iav->getFromDBByCrit(['computers_id' => $computers_id]))->isTrue();
-        $this->integer($iav->fields['manufacturers_id'])->isIdenticalTo($newmanufacturers_id);
+        $this->assertTrue($iav->getFromDBByCrit(['computers_id' => $computers_id]));
+        $this->assertSame($newmanufacturers_id, $iav->fields['manufacturers_id']);
 
-        $this->array($lockedfield->getLockedValues($iav->getType(), $iav->fields['id']))->isIdenticalTo(['manufacturers_id' => 'Microsoft Corporation']);
+        $this->assertSame(['manufacturers_id' => 'Microsoft Corporation'], $lockedfield->getLockedValues($iav->getType(), $iav->fields['id']));
     }
 
     public function testLockDatabasesManufacturer()
@@ -764,8 +767,8 @@ class Lockedfield extends DbTestCase
         ];
 
         $rules_id = $rule->add($input);
-        $this->integer($rules_id)->isGreaterThan(0);
-        $this->boolean($collection->moveRule($rules_id, 0, $collection::MOVE_BEFORE))->isTrue();
+        $this->assertGreaterThan(0, $rules_id);
+        $this->assertTrue($collection->moveRule($rules_id, 0, $collection::MOVE_BEFORE));
 
         // Add criteria
         foreach ($criteria as $crit) {
@@ -775,7 +778,7 @@ class Lockedfield extends DbTestCase
                 'pattern'   => $crit['pattern'],
                 'condition' => $crit['condition'],
             ];
-            $this->integer((int)$rulecriteria->add($input))->isGreaterThan(0);
+            $this->assertGreaterThan(0, (int)$rulecriteria->add($input));
         }
 
         // Add action
@@ -786,7 +789,7 @@ class Lockedfield extends DbTestCase
             'field'       => $action['field'],
             'value'       => $action['value'],
         ];
-        $this->integer((int)$ruleaction->add($input))->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$ruleaction->add($input));
 
         //UPDATE rule
         $criteria = [
@@ -822,8 +825,8 @@ class Lockedfield extends DbTestCase
 
         $prev_rules_id = $rules_id;
         $rules_id = $rule->add($input);
-        $this->integer($rules_id)->isGreaterThan(0);
-        $this->boolean($collection->moveRule($rules_id, $prev_rules_id, $collection::MOVE_BEFORE))->isTrue();
+        $this->assertGreaterThan(0, $rules_id);
+        $this->assertTrue($collection->moveRule($rules_id, $prev_rules_id, $collection::MOVE_BEFORE));
 
         // Add criteria
         foreach ($criteria as $crit) {
@@ -833,7 +836,7 @@ class Lockedfield extends DbTestCase
                 'pattern'   => $crit['pattern'],
                 'condition' => $crit['condition'],
             ];
-            $this->integer((int)$rulecriteria->add($input))->isGreaterThan(0);
+            $this->assertGreaterThan(0, (int)$rulecriteria->add($input));
         }
 
         // Add action
@@ -844,7 +847,7 @@ class Lockedfield extends DbTestCase
             'field'       => $action['field'],
             'value'       => $action['value'],
         ];
-        $this->integer((int)$ruleaction->add($input))->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$ruleaction->add($input));
 
         //keep only postgresql
         $json = json_decode(file_get_contents(GLPI_ROOT . '/vendor/glpi-project/inventory_format/examples/computer_2_partial_dbs.json'));
@@ -856,33 +859,33 @@ class Lockedfield extends DbTestCase
         if ($inventory->inError()) {
             $this->dump($inventory->getErrors());
         }
-        $this->boolean($inventory->inError())->isFalse();
-        $this->array($inventory->getErrors())->isEmpty();
+        $this->assertFalse($inventory->inError());
+        $this->assertEmpty($inventory->getErrors());
 
         //check created databases & instances
-        $this->integer(countElementsInTable(\DatabaseInstance::getTable()))->isIdenticalTo(1);
+        $this->assertSame(1, countElementsInTable(\DatabaseInstance::getTable()));
 
         //ensure database version has been updated
         $database = new \DatabaseInstance();
-        $this->boolean($database->getFromDBByCrit(['name' => 'PostgreSQL 13']))->isTrue();
-        $this->string($database->fields['version'])->isIdenticalTo('13.2.3');
+        $this->assertTrue($database->getFromDBByCrit(['name' => 'PostgreSQL 13']));
+        $this->assertSame('13.2.3', $database->fields['version']);
 
         $manufacturer = new \Manufacturer();
-        $this->boolean($manufacturer->getFromDBByCrit(['name' => 'PostgreSQL']))->isTrue();
+        $this->assertTrue($manufacturer->getFromDBByCrit(['name' => 'PostgreSQL']));
         $manufacturers_id = $manufacturer->fields['id'];
-        $this->integer($database->fields['manufacturers_id'])->isIdenticalTo($manufacturers_id);
+        $this->assertSame($manufacturers_id, $database->fields['manufacturers_id']);
 
         $newmanufacturers_id = $manufacturer->add(['name' => 'For test']);
-        $this->integer($newmanufacturers_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $newmanufacturers_id);
 
         //manually update manufacturer to lock it
-        $this->boolean(
+        $this->assertTrue(
             $database->update([
                 'id' => $database->fields['id'],
                 'manufacturers_id' => $newmanufacturers_id
             ])
-        )->isTrue();
-        $this->array($lockedfield->getLockedValues($database->getType(), $database->fields['id']))->isIdenticalTo(['manufacturers_id' => null]);
+        );
+        $this->assertSame(['manufacturers_id' => null], $lockedfield->getLockedValues($database->getType(), $database->fields['id']));
 
         $json = json_decode(file_get_contents(GLPI_ROOT . '/vendor/glpi-project/inventory_format/examples/computer_2_partial_dbs.json'));
         $pgsql = $json->content->databases_services[1];
@@ -893,17 +896,17 @@ class Lockedfield extends DbTestCase
         if ($inventory->inError()) {
             $this->dump($inventory->getErrors());
         }
-        $this->boolean($inventory->inError())->isFalse();
-        $this->array($inventory->getErrors())->isEmpty();
+        $this->assertFalse($inventory->inError());
+        $this->assertEmpty($inventory->getErrors());
 
         //check created databases & instances
-        $this->integer(countElementsInTable(\DatabaseInstance::getTable()))->isIdenticalTo(1);
+        $this->assertSame(1, countElementsInTable(\DatabaseInstance::getTable()));
 
         //make sure manufacturer is still the correct one
         $database = new \DatabaseInstance();
-        $this->boolean($database->getFromDBByCrit(['name' => 'PostgreSQL 13']))->isTrue();
-        $this->string($database->fields['version'])->isIdenticalTo('13.2.3');
-        $this->integer($database->fields['manufacturers_id'])->isIdenticalTo($newmanufacturers_id);
-        $this->array($lockedfield->getLockedValues($database->getType(), $database->fields['id']))->isIdenticalTo(['manufacturers_id' => 'PostgreSQL']);
+        $this->assertTrue($database->getFromDBByCrit(['name' => 'PostgreSQL 13']));
+        $this->assertSame('13.2.3', $database->fields['version']);
+        $this->assertSame($newmanufacturers_id, $database->fields['manufacturers_id']);
+        $this->assertSame(['manufacturers_id' => 'PostgreSQL'], $lockedfield->getLockedValues($database->getType(), $database->fields['id']));
     }
 }
