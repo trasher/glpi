@@ -1603,17 +1603,8 @@ class DbUtilsTest extends DbTestCase
         ];
     }
 
-    /**
-     * @dataProvider fixItemtypeCaseProvider
-     */
-    /*
-    FIXME: vfsstream stuff cause issue I did not find how to deal with:
-    Exception: stream_wrapper_register(): Protocol vfs:// is already defined.
-
-    public function testGetItemtypeWithFixedCase($itemtype, $expected)
+    public static function setUpBeforeClass(): void
     {
-        $instance = new \DbUtils();
-
         vfsStream::setup(
             'glpi',
             null,
@@ -1645,7 +1636,17 @@ class DbUtilsTest extends DbTestCase
                 ],
             ]
         );
+    }
 
+    /**
+     * @dataProvider fixItemtypeCaseProvider
+     */
+    /*
+    FIXME: putting vfsstream setupo in setUpBeforeClass mada this one work using --filter testGetItemtypeWithFixedCase
+    but that's still failing running the whole file oO
+    public function testGetItemtypeWithFixedCase($itemtype, $expected)
+    {
+        $instance = new \DbUtils();
         $result = $instance->fixItemtypeCase($itemtype, vfsStream::url('glpi'));
         $this->assertEquals($expected, $result);
     }*/
