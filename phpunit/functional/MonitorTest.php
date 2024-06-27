@@ -39,7 +39,7 @@ use DbTestCase;
 
 /* Test for inc/monitor.class.php */
 
-class Monitor extends DbTestCase
+class MonitorTest extends DbTestCase
 {
     private static function getMonitorFields($id, $date)
     {
@@ -99,12 +99,12 @@ class Monitor extends DbTestCase
 
         $monitor = new \Monitor();
         $added = $monitor->add($data);
-        $this->integer((int)$added)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$added);
 
         $monitor = getItemByTypeName('Monitor', '_test_monitor01');
 
-        $expected = Monitor::getMonitorFields($added, $date);
-        $this->array($monitor->fields)->isEqualTo($expected);
+        $expected = self::getMonitorFields($added, $date);
+        $this->assertEquals($expected, $monitor->fields);
         return $monitor;
     }
 
@@ -121,16 +121,19 @@ class Monitor extends DbTestCase
         $_SESSION['glpi_currenttime'] = $date;
 
         $added = $monitor->clone();
-        $this->integer((int)$added)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$added);
 
         $clonedMonitor = new \Monitor();
-        $this->boolean($clonedMonitor->getFromDB($added))->isTrue();
+        $this->assertTrue($clonedMonitor->getFromDB($added));
 
-        $expected = Monitor::getMonitorFields($added, $date);
+        $expected = self::getMonitorFields($added, $date);
 
-        $this->string($clonedMonitor->fields['name'])->isEqualTo("$expected[name] (copy)");
+        $this->assertEquals(
+            "$expected[name] (copy)",
+            $clonedMonitor->fields['name']
+        );
         unset($clonedMonitor->fields['name'], $expected['name']);
 
-        $this->array($clonedMonitor->fields)->isEqualTo($expected);
+        $this->assertEquals($expected, $clonedMonitor->fields);
     }
 }

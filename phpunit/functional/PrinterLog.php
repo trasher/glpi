@@ -48,7 +48,7 @@ class PrinterLog extends DbTestCase
             'name'   => 'Inventoried printer',
             'entities_id'  => 0
         ]);
-        $this->integer($printers_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $printers_id);
 
         $now = new \DateTime();
 
@@ -65,7 +65,7 @@ class PrinterLog extends DbTestCase
             'scanned' => 7846,
             'date' => $cdate1->format('Y-m-d')
         ];
-        $this->integer($log->add($input))->isGreaterThan(0);
+        $this->assertGreaterThan(0, $log->add($input));
 
         $cdate2 = clone $now;
         $cdate2->sub(new \DateInterval('P6M'));
@@ -78,7 +78,7 @@ class PrinterLog extends DbTestCase
             'scanned' => 15542,
             'date' => $cdate2->format('Y-m-d')
         ];
-        $this->integer($log->add($input))->isGreaterThan(0);
+        $this->assertGreaterThan(0, $log->add($input));
 
         $input = [
             'printers_id' => $printers_id,
@@ -89,12 +89,12 @@ class PrinterLog extends DbTestCase
             'scanned' => 28177,
             'date' => $now->format('Y-m-d')
         ];
-        $this->integer($log->add($input))->isGreaterThan(0);
+        $this->assertGreaterThan(0, $log->add($input));
 
        //per default, get 1Y old, first not included
-        $this->array($log->getMetrics($printer))->hasSize(2);
+        $this->assertCount(2, $log->getMetrics($printer));
 
        //change filter to include first one
-        $this->array($log->getMetrics($printer, ['date' => ['>=', $cdate1->format('Y-m-d')]]))->hasSize(3);
+        $this->assertCount(3, $log->getMetrics($printer, ['date' => ['>=', $cdate1->format('Y-m-d')]]));
     }
 }

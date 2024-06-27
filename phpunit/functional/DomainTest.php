@@ -39,13 +39,13 @@ use DbTestCase;
 
 /* Test for inc/software.class.php */
 
-class Domain extends DbTestCase
+class DomainTest extends DbTestCase
 {
     public function testTypeName()
     {
-        $this->string(\Domain::getTypeName(1))->isIdenticalTo('Domain');
-        $this->string(\Domain::getTypeName(0))->isIdenticalTo('Domains');
-        $this->string(\Domain::getTypeName(10))->isIdenticalTo('Domains');
+        $this->assertSame('Domain', \Domain::getTypeName(1));
+        $this->assertSame('Domains', \Domain::getTypeName(0));
+        $this->assertSame('Domains', \Domain::getTypeName(10));
     }
 
     public function testPrepareInput()
@@ -53,9 +53,9 @@ class Domain extends DbTestCase
         $domain = new \Domain();
         $expected = ['date_creation' => 'NULL', 'date_expiration' => null];
         $result   = $domain->prepareInputForUpdate(['date_creation' => '', 'date_expiration' => null]);
-        $this->array($result)->isIdenticalTo($expected);
+        $this->assertSame($expected, $result);
         $result   = $domain->prepareInputForAdd(['date_creation' => '', 'date_expiration' => null]);
-        $this->array($result)->isIdenticalTo($expected);
+        $this->assertSame($expected, $result);
     }
 
     public function testCleanDBonPurge()
@@ -66,33 +66,35 @@ class Domain extends DbTestCase
         $domains_id = (int)$domain->add([
             'name'   => 'glpi-project.org'
         ]);
-        $this->integer($domains_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $domains_id);
 
         $domain_item = new \Domain_Item();
-        $this->integer(
+        $this->assertGreaterThan(
+            0,
             $domain_item->add([
                 'domains_id'   => $domains_id,
                 'itemtype'     => 'Computer',
                 'items_id'     => getItemByTypeName('Computer', '_test_pc01', true)
             ])
-        )->isGreaterThan(0);
+        );
 
         $record = new \DomainRecord();
         foreach (['www', 'ftp', 'mail'] as $sub) {
-            $this->integer(
-                (int)$record->add([
+            $this->assertGreaterThan(
+                0,
+                $record->add([
                     'name'         => $sub,
                     'data'         => 'glpi-project.org.',
                     'domains_id'   => $domains_id
                 ])
-            )->isGreaterThan(0);
+            );
         }
 
-        $this->integer((int)countElementsInTable($domain_item->getTable(), ['domains_id' => $domains_id]))->isIdenticalTo(1);
-        $this->integer((int)countElementsInTable($record->getTable(), ['domains_id' => $domains_id]))->isIdenticalTo(3);
-        $this->boolean($domain->delete(['id' => $domains_id], true))->isTrue();
-        $this->integer((int)countElementsInTable($domain_item->getTable(), ['domains_id' => $domains_id]))->isIdenticalTo(0);
-        $this->integer((int)countElementsInTable($record->getTable(), ['domains_id' => $domains_id]))->isIdenticalTo(0);
+        $this->assertSame(1, countElementsInTable($domain_item->getTable(), ['domains_id' => $domains_id]));
+        $this->assertSame(3, countElementsInTable($record->getTable(), ['domains_id' => $domains_id]));
+        $this->assertTrue($domain->delete(['id' => $domains_id], true));
+        $this->assertSame(0, countElementsInTable($domain_item->getTable(), ['domains_id' => $domains_id]));
+        $this->assertSame(0, countElementsInTable($record->getTable(), ['domains_id' => $domains_id]));
     }
 
     public function testGetEntitiesToNotify()
@@ -100,37 +102,42 @@ class Domain extends DbTestCase
         global $DB;
         $this->login();
 
-        $this->array(\Entity::getEntitiesToNotify('use_domains_alert'))->isEmpty();
+        $this->assertEmpty(\Entity::getEntitiesToNotify('use_domains_alert'));
 
         $entity = getItemByTypeName('Entity', '_test_root_entity');
-        $this->boolean(
+        $this->assertTrue(
             $entity->update([
                 'id'                                      => $entity->fields['id'],
                 'use_domains_alert'                       => 1,
                 'send_domains_alert_close_expiries_delay' => 7,
                 'send_domains_alert_expired_delay'        => 1
             ])
-        )->isTrue();
-        $this->boolean($entity->getFromDB($entity->fields['id']))->isTrue();
+        );
+        $this->assertTrue($entity->getFromDB($entity->fields['id']));
 
-        $this->array(\Entity::getEntitiesToNotify('use_domains_alert'))->isIdenticalTo([
-            getItemByTypeName('Entity', '_test_root_entity', true)   => 1,
-            getItemByTypeName('Entity', '_test_child_1', true)       => 1,
-            getItemByTypeName('Entity', '_test_child_2', true)       => 1,
-        ]);
+        $this->assertSame(
+            [
+                getItemByTypeName('Entity', '_test_root_entity', true)   => 1,
+                getItemByTypeName('Entity', '_test_child_1', true)       => 1,
+                getItemByTypeName('Entity', '_test_child_2', true)       => 1,
+            ],
+            \Entity::getEntitiesToNotify('use_domains_alert')
+        );
 
         $iterator = $DB->request(\Domain::expiredDomainsCriteria($entity->fields['id']));
-        $this->string($iterator->getSql())->isIdenticalTo(
+        $this->assertSame(
             "SELECT * FROM `glpi_domains` WHERE " .
             "NOT (`date_expiration` IS NULL) AND `entities_id` = '{$entity->fields['id']}' AND `is_deleted` = '0' " .
-            "AND DATEDIFF(CURDATE(), `date_expiration`) > 1 AND DATEDIFF(CURDATE(), `date_expiration`) > 0"
+            "AND DATEDIFF(CURDATE(), `date_expiration`) > 1 AND DATEDIFF(CURDATE(), `date_expiration`) > 0",
+            $iterator->getSql()
         );
 
         $iterator = $DB->request(\Domain::closeExpiriesDomainsCriteria($entity->fields['id']));
-        $this->string($iterator->getSql())->isIdenticalTo(
+        $this->assertSame(
             "SELECT * FROM `glpi_domains` WHERE " .
             "NOT (`date_expiration` IS NULL) AND `entities_id` = '{$entity->fields['id']}' AND `is_deleted` = '0' " .
-            "AND DATEDIFF(CURDATE(), `date_expiration`) > -7 AND DATEDIFF(CURDATE(), `date_expiration`) < 0"
+            "AND DATEDIFF(CURDATE(), `date_expiration`) > -7 AND DATEDIFF(CURDATE(), `date_expiration`) < 0",
+            $iterator->getSql()
         );
     }
 
@@ -141,26 +148,28 @@ class Domain extends DbTestCase
         $domains_id = (int)$domain->add([
             'name'   => 'glpi-project.org'
         ]);
-        $this->integer($domains_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $domains_id);
 
         $record = new \DomainRecord();
         foreach (['www', 'ftp', 'mail'] as $sub) {
-            $this->integer(
-                (int)$record->add([
+            $this->assertGreaterThan(
+                0,
+                $record->add([
                     'name'         => $sub,
                     'data'         => 'glpi-project.org.',
                     'domains_id'   => $domains_id
                 ])
-            )->isGreaterThan(0);
+            );
         }
 
         $entities_id = getItemByTypeName('Entity', '_test_child_2', true);
 
-       //transer to another entity
+        //transfer to another entity
         $transfer = new \Transfer();
 
-        $this->mockGenerator->orphanize('__construct');
-        $ma = new \mock\MassiveAction([], [], 'process');
+        $ma = $this->getMockBuilder(\MassiveAction::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         \MassiveAction::processMassiveActionsForOneItemtype(
             $ma,
@@ -170,8 +179,8 @@ class Domain extends DbTestCase
         $transfer->moveItems(['Domain' => [$domains_id]], $entities_id, [$domains_id]);
         unset($_SESSION['glpitransfer_list']);
 
-        $this->boolean($domain->getFromDB($domains_id))->isTrue();
-        $this->integer((int)$domain->fields['entities_id'])->isidenticalTo($entities_id);
+        $this->assertTrue($domain->getFromDB($domains_id));
+        $this->assertSame($entities_id, (int)$domain->fields['entities_id']);
 
         global $DB;
         $records = $DB->request([
@@ -179,7 +188,7 @@ class Domain extends DbTestCase
             'WHERE'  => ['domains_id' => $domains_id]
         ]);
         foreach ($records as $row) {
-            $this->integer((int)$row['entities_id'])->isidenticalTo($entities_id);
+            $this->assertSame($entities_id, (int)$row['entities_id']);
         }
     }
 
@@ -202,35 +211,35 @@ class Domain extends DbTestCase
             'entities_id'     => $entities_id,
             'date_expiration' => date('Y-m-d', time() - MONTH_TIMESTAMP), // expired for a long time (> 7 days)
         ]);
-        $this->integer($domain_1_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $domain_1_id);
 
         $domain_2_id = $domain->add([
             'name'            => $this->getUniqueString(),
             'entities_id'     => $entities_id,
             'date_expiration' => date('Y-m-d', time() - DAY_TIMESTAMP), // expired recently (< 7 days)
         ]);
-        $this->integer($domain_2_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $domain_2_id);
 
         $domain_3_id = $domain->add([
             'name'            => $this->getUniqueString(),
             'entities_id'     => $entities_id,
             'date_expiration' => date('Y-m-d', time() + DAY_TIMESTAMP), // will expire soon (< 7 days)
         ]);
-        $this->integer($domain_3_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $domain_3_id);
 
         $domain_4_id = $domain->add([
             'name'            => $this->getUniqueString(),
             'entities_id'     => $entities_id,
             'date_expiration' => date('Y-m-d', time() + MONTH_TIMESTAMP), // will expire in a long time (> 7 days)
         ]);
-        $this->integer($domain_4_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $domain_4_id);
 
         $domain_5_id = $domain->add([
             'name'            => $this->getUniqueString(),
             'entities_id'     => $entities_id,
             'date_expiration' => null, // does not expire
         ]);
-        $this->integer($domain_5_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $domain_5_id);
 
         // Set root entity config domains alerts
         $entity = new \Entity();
@@ -240,12 +249,12 @@ class Domain extends DbTestCase
             'send_domains_alert_close_expiries_delay' => 7, // alert on domains that will expire in less than 7 days
             'send_domains_alert_expired_delay'        => 7, // alert on domains expired since, at least, 7 days
         ]);
-        $this->boolean($updated)->isTrue();
+        $this->assertTrue($updated);
 
         $result = $domain->cronDomainsAlert($crontask);
-        $this->integer($result)->isEqualTo(1); // 1 = fully processed
+        $this->assertEquals(1, $result); // 1 = fully processed
 
-        $this->integer(countElementsInTable(\Alert::getTable()))->isEqualTo(2);
+        $this->assertEquals(2, countElementsInTable(\Alert::getTable()));
 
         $expired_alerts = $alert->find(
             [
@@ -255,13 +264,14 @@ class Domain extends DbTestCase
         );
         $expired_alert = reset($expired_alerts);
         unset($expired_alert['id']);
-        $this->array($expired_alert)->isEqualTo(
+        $this->assertEquals(
             [
                 'date'     => $_SESSION["glpi_currenttime"],
                 'itemtype' => 'Domain',
                 'items_id' => $domain_1_id,
                 'type'     => \Alert::END,
-            ]
+            ],
+            $expired_alert
         );
 
         $expiring_alerts = $alert->find(
@@ -273,16 +283,17 @@ class Domain extends DbTestCase
         $expiring_alert = reset($expiring_alerts);
 
         unset($expiring_alert['id']);
-        $this->array($expiring_alert)->isEqualTo(
+        $this->assertEquals(
             [
                 'date'     => $_SESSION["glpi_currenttime"],
                 'itemtype' => 'Domain',
                 'items_id' => $domain_3_id,
                 'type'     => \Alert::NOTICE,
-            ]
+            ],
+            $expiring_alert
         );
 
         $result = $domain->cronDomainsAlert($crontask);
-        $this->integer($result)->isEqualTo(0); // 0 = nothing to do (alerts were already sent)
+        $this->assertEquals(0, $result); // 0 = nothing to do (alerts were already sent)
     }
 }

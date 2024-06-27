@@ -56,8 +56,8 @@ class NetworkName extends DbTestCase
             'addressable'        => 0,
         ]);
 
-        $this->integer((int)$ipnetwork_id)->isGreaterThan(0);
-        $this->boolean($IPNetwork->getFromDB($ipnetwork_id))->isTrue();
+        $this->assertGreaterThan(0, (int)$ipnetwork_id);
+        $this->assertTrue($IPNetwork->getFromDB($ipnetwork_id));
         $current_ipnetwork = $IPNetwork->fields;
 
         unset($current_ipnetwork['id']);
@@ -93,7 +93,7 @@ class NetworkName extends DbTestCase
             "comment"       => null,
             "network"       => "1.1.1.0 / 255.255.255.0",
         ];
-        $this->array($current_ipnetwork)->isIdenticalTo($expected);
+        $this->assertSame($expected, $current_ipnetwork);
 
        //Second add NetworkName
         $Networkname = new \NetworkName();
@@ -108,8 +108,8 @@ class NetworkName extends DbTestCase
             'ipnetworks_id' => 0
         ]);
 
-        $this->integer((int)$networkname_id)->isGreaterThan(0);
-        $this->boolean($Networkname->getFromDB($networkname_id))->isTrue();
+        $this->assertGreaterThan(0, (int)$networkname_id);
+        $this->assertTrue($Networkname->getFromDB($networkname_id));
         $current_networkname = $Networkname->fields;
 
         unset($current_networkname['id']);
@@ -127,6 +127,6 @@ class NetworkName extends DbTestCase
             "is_deleted"    => 0,
             "is_dynamic"    => 0,
         ];
-        $this->array($current_networkname)->isIdenticalTo($expected);
+        $this->assertSame($expected, $current_networkname);
     }
 }

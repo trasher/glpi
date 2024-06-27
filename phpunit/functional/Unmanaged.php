@@ -107,7 +107,7 @@ Compiled Fri 26-Mar-10 09:14 by prod_rel_team</DESCRIPTION>
             'serial'      => 'FOC147UJEU4',
             'entities_id' => 0
         ]);
-        $this->integer($networkequipments_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $networkequipments_id);
 
         $converter = new \Glpi\Inventory\Converter();
         $data = json_decode($converter->convert($net_xml_source));
@@ -120,10 +120,10 @@ Compiled Fri 26-Mar-10 09:14 by prod_rel_team</DESCRIPTION>
                 var_dump($error);
             }
         }
-        $this->boolean($inventory->inError())->isFalse();
-        $this->array($inventory->getErrors())->isIdenticalTo([]);
+        $this->assertFalse($inventory->inError());
+        $this->assertSame([], $inventory->getErrors());
 
-        $this->integer(count($networkEquipment->find(['NOT' => ['name' => ['LIKE', '_test_%']]])))->isIdenticalTo(1);
+        $this->assertSame(1, count($networkEquipment->find(['NOT' => ['name' => ['LIKE', '_test_%']]])));
 
         //inventory computer
         $comp_xml_source = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>
@@ -168,8 +168,8 @@ Compiled Fri 26-Mar-10 09:14 by prod_rel_team</DESCRIPTION>
                 var_dump($error);
             }
         }
-        $this->boolean($inventory->inError())->isFalse();
-        $this->array($inventory->getErrors())->isIdenticalTo([]);
+        $this->assertFalse($inventory->inError());
+        $this->assertSame([], $inventory->getErrors());
 
         $networkPort = new \NetworkPort();
         $networkports = $networkPort->find(['mac' => 'cc:f9:54:a1:03:35']);
@@ -184,18 +184,20 @@ Compiled Fri 26-Mar-10 09:14 by prod_rel_team</DESCRIPTION>
 
         $networkports = $networkPort->find(['mac' => 'cc:f9:54:a1:03:35']);
 
-        $this->integer(count($networkports))->isIdenticalTo(
+        $this->assertSame(
             1,
+            count($networkports),
             "The MAC address cc:f9:54:a1:03:35 must be tied to only one port"
         );
 
         $a_networkport = current($networkports);
-        $this->integer($a_networkport['id'])->isIdenticalTo(
+        $this->assertSame(
             $networkports_id,
+            $a_networkport['id'],
             'The networkport ID is not the same between the unknown device and the computer'
         );
 
-        $this->string($a_networkport['itemtype'])->isIdenticalTo('Computer');
+        $this->assertSame('Computer', $a_networkport['itemtype']);
     }
 
     /**
@@ -216,7 +218,7 @@ Compiled Fri 26-Mar-10 09:14 by prod_rel_team</DESCRIPTION>
             'serial' => 'XXS6BEF3',
             'comment' => 'with a comment'
         ]);
-        $this->integer($unmanageds_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $unmanageds_id);
 
         // * Add networkport
         $netport = new \NetworkPort();
@@ -228,7 +230,7 @@ Compiled Fri 26-Mar-10 09:14 by prod_rel_team</DESCRIPTION>
             'mac' => '00:00:00:43:ae:0f',
             'is_dynamic' => 1
         ]);
-        $this->integer($networkports_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $networkports_id);
 
         $netname = new \NetworkName();
         $networknames_id = $netname->add([
@@ -237,10 +239,11 @@ Compiled Fri 26-Mar-10 09:14 by prod_rel_team</DESCRIPTION>
             'name' => '',
             'is_dynamic' => 1
         ]);
-        $this->integer($networknames_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $networknames_id);
 
         $ip = new \IPAddress();
-        $this->integer(
+        $this->assertGreaterThan(
+            0,
             $ip->add([
                 'entities_id' => 0,
                 'itemtype' => $netname->getType(),
@@ -248,28 +251,30 @@ Compiled Fri 26-Mar-10 09:14 by prod_rel_team</DESCRIPTION>
                 'name' => '192.168.20.1',
                 'is_dynamic' => 1
             ])
-        )->isGreaterThan(0);
+        );
 
         //convert to NetworkEquipment
         $unmanaged->convert($unmanageds_id);
 
-        $this->integer(
+        $this->assertSame(
+            1,
             countElementsInTable(\NetworkEquipment::getTable(), ['NOT' => ['name' => ['LIKE', '_test_%']]]),
             'No NetworkEquipment added'
-        )->isIdenticalTo(1);
+        );
 
-        $this->integer(
+        $this->assertSame(
+            0,
             countElementsInTable(\Unmanaged::getTable(), ['NOT' => ['name' => ['LIKE', '_test_%']]]),
             'Unmanaged has not been deleted'
-        )->isIdenticalTo(0);
+        );
 
         $neteq = new \NetworkEquipment();
-        $this->boolean($neteq->getFromDBByCrit(['name' => 'switch']))->isTrue();
+        $this->assertTrue($neteq->getFromDBByCrit(['name' => 'switch']));
 
-        $this->string($neteq->fields['serial'])->isIdenticalTo('XXS6BEF3');
-        $this->integer($neteq->fields['is_dynamic'])->isIdenticalTo(1);
-        $this->string($neteq->fields['comment'])->isIdenticalTo('with a comment');
-        $this->string($neteq->fields['sysdescr'])->isIdenticalTo('Any Cisco equipment');
+        $this->assertSame('XXS6BEF3', $neteq->fields['serial']);
+        $this->assertSame(1, $neteq->fields['is_dynamic']);
+        $this->assertSame('with a comment', $neteq->fields['comment']);
+        $this->assertSame('Any Cisco equipment', $neteq->fields['sysdescr']);
 
         $netport->getFromDBByCrit([]);
         unset($netport->fields['date_mod']);
@@ -304,7 +309,7 @@ Compiled Fri 26-Mar-10 09:14 by prod_rel_team</DESCRIPTION>
             'trunk' => 0,
             'lastup' => null
         ];
-        $this->array($netport->fields)->isEqualTo($expected);
+        $this->assertEquals($expected, $netport->fields);
 
         $netname->getFromDBByCrit(['items_id' => $networkports_id]);
         unset($netname->fields['date_mod']);
@@ -322,7 +327,7 @@ Compiled Fri 26-Mar-10 09:14 by prod_rel_team</DESCRIPTION>
             'is_deleted'  => 0,
             'is_dynamic'  => 1,
         ];
-        $this->array($netname->fields)->isEqualTo($expected);
+        $this->assertEquals($expected, $netname->fields);
 
         $ip->getFromDBByCrit(['name' => '192.168.20.1']);
         $expected = [
@@ -341,6 +346,6 @@ Compiled Fri 26-Mar-10 09:14 by prod_rel_team</DESCRIPTION>
             'mainitemtype'  => 'NetworkEquipment'
         ];
         unset($ip->fields['id']);
-        $this->array($ip->fields)->isEqualTo($expected);
+        $this->assertEquals($expected, $ip->fields);
     }
 }

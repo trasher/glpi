@@ -43,38 +43,39 @@ class ComputerVirtualMachine extends DbTestCase
     {
         $this->login();
 
-        $this->newTestedInstance();
-        $obj = $this->testedInstance;
+        $obj = new \ComputerVirtualMachine();
         $uuid = 'c37f7ce8-af95-4676-b454-0959f2c5e162';
 
-       // Add
+        // Add
         $computer = getItemByTypeName('Computer', '_test_pc01');
-        $this->object($computer)->isInstanceOf('\Computer');
+        $this->assertInstanceOf('\Computer', $computer);
 
-        $this->integer(
-            $id = (int)$obj->add([
+        $this->assertGreaterThan(
+            0,
+            $id = $obj->add([
                 'computers_id' => $computer->fields['id'],
                 'name'         => 'Virtu Hall',
                 'uuid'         => $uuid,
                 'vcpu'         => 1,
                 'ram'          => 1024
             ])
-        )->isGreaterThan(0);
-        $this->boolean($obj->getFromDB($id))->isTrue();
-        $this->string($obj->fields['uuid'])->isIdenticalTo($uuid);
+        );
+        $this->assertTrue($obj->getFromDB($id));
+        $this->assertSame($uuid, $obj->fields['uuid']);
 
-        $this->boolean($obj->findVirtualMachine(['name' => 'Virtu Hall']))->isFalse();
-       //n machin exists yet
-        $this->boolean($obj->findVirtualMachine(['uuid' => $uuid]))->isFalse();
+        $this->assertFalse($obj->findVirtualMachine(['name' => 'Virtu Hall']));
+        //a machine exists yet
+        $this->assertFalse($obj->findVirtualMachine(['uuid' => $uuid]));
 
-        $this->integer(
-            $cid = (int)$computer->add([
+        $this->assertGreaterThan(
+            0,
+            $cid = $computer->add([
                 'name'         => 'Virtu Hall',
                 'uuid'         => $uuid,
                 'entities_id'  => 0
             ])
-        )->isGreaterThan(0);
+        );
 
-        $this->variable($obj->findVirtualMachine(['uuid' => $uuid]))->isEqualTo($cid);
+        $this->assertEquals($cid, $obj->findVirtualMachine(['uuid' => $uuid]));
     }
 }

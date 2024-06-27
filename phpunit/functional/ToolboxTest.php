@@ -51,26 +51,26 @@ use Psr\Log\LogLevel;
 
 /* Test for inc/toolbox.class.php */
 
-class Toolbox extends DbTestCase
+class ToolboxTest extends DbTestCase
 {
     public function testGetRandomString()
     {
         for ($len = 20; $len < 50; $len += 5) {
            // Low strength
             $str = \Toolbox::getRandomString($len);
-            $this->integer(strlen($str))->isIdenticalTo($len);
-            $this->boolean(ctype_alnum($str))->isTrue();
+            $this->assertSame($len, strlen($str));
+            $this->assertTrue(ctype_alnum($str));
         }
     }
 
-    protected function slugifyProvider()
+    public static function slugifyProvider()
     {
         return [
             [
                 'string'   => 'My - string èé  Ê À ß',
                 'expected' => 'my-string-ee-e-a-ss'
             ], [
-            //https://github.com/glpi-project/glpi/issues/2946
+                //https://github.com/glpi-project/glpi/issues/2946
                 'string'   => 'Έρευνα ικανοποίησης - Αιτήματα',
                 'expected' => 'ereuna-ikanopoieses-aitemata'
             ], [
@@ -85,17 +85,17 @@ class Toolbox extends DbTestCase
      */
     public function testSlugify($string, $expected)
     {
-        $this->string(\Toolbox::slugify($string))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Toolbox::slugify($string));
     }
 
-    protected function filenameProvider()
+    public static function filenameProvider()
     {
         return [
             [
                 'name'  => '00-logoteclib.png',
                 'expected'  => '00-logoteclib.png',
             ], [
-            // Space is missing between "France" and "très" due to a bug in laminas-mail
+                // Space is missing between "France" and "très" due to a bug in laminas-mail
                 'name'  => '01-Screenshot-2018-4-12 Observatoire - Francetrès haut débit.png',
                 'expected'  => '01-screenshot-2018-4-12-observatoire-francetres-haut-debit.png',
             ], [
@@ -137,11 +137,11 @@ class Toolbox extends DbTestCase
      */
     public function testFilename($name, $expected)
     {
-        $this->string(\Toolbox::filename($name))->isIdenticalTo($expected);
-        $this->integer(strlen($expected))->isLessThanOrEqualTo(255);
+        $this->assertSame($expected, \Toolbox::filename($name));
+        $this->assertLessThanOrEqual(255, strlen($expected));
     }
 
-    public function dataGetSize()
+    public static function dataGetSize()
     {
         return [
             [1,                                  '1 o'],
@@ -160,31 +160,37 @@ class Toolbox extends DbTestCase
      */
     public function testGetSize($input, $expected)
     {
-        $this->string(\Toolbox::getSize($input))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Toolbox::getSize($input));
     }
 
     public function testGetIPAddress()
     {
-       // Save values
+        // Save values
         $saveServer = $_SERVER;
 
-       // Test REMOTE_ADDR
+        // Test REMOTE_ADDR
         $_SERVER['REMOTE_ADDR'] = '123.123.123.123';
         $ip = \Toolbox::getRemoteIpAddress();
-        $this->variable($ip)->isEqualTo('123.123.123.123');
+        $this->assertEquals('123.123.123.123', $ip);
 
-       // Restore values
+        // Restore values
         $_SERVER = $saveServer;
     }
 
     public function testFormatOutputWebLink()
     {
-        $this->string(\Toolbox::formatOutputWebLink('www.glpi-project.org/'))
-         ->isIdenticalTo('http://www.glpi-project.org/');
-        $this->string(\Toolbox::formatOutputWebLink('http://www.glpi-project.org/'))
-         ->isIdenticalTo('http://www.glpi-project.org/');
-        $this->string(\Toolbox::formatOutputWebLink('https://www.glpi-project.org/'))
-         ->isIdenticalTo('https://www.glpi-project.org/');
+        $this->assertSame(
+            'http://www.glpi-project.org/',
+            \Toolbox::formatOutputWebLink('www.glpi-project.org/')
+        );
+        $this->assertSame(
+            'http://www.glpi-project.org/',
+            \Toolbox::formatOutputWebLink('http://www.glpi-project.org/')
+        );
+        $this->assertSame(
+            'https://www.glpi-project.org/',
+            \Toolbox::formatOutputWebLink('https://www.glpi-project.org/')
+        );
     }
 
     public function testgetBijectiveIndex()
@@ -200,11 +206,11 @@ class Toolbox extends DbTestCase
                 703 => 'AAA',
             ] as $number => $bij_string
         ) {
-            $this->string(\Toolbox::getBijectiveIndex($number))->isIdenticalTo($bij_string);
+            $this->assertSame($bij_string, \Toolbox::getBijectiveIndex($number));
         }
     }
 
-    protected function cleanIntegerProvider()
+    public static function cleanIntegerProvider()
     {
         return [
             [1, '1'],
@@ -220,10 +226,10 @@ class Toolbox extends DbTestCase
      */
     public function testCleanInteger($value, $expected)
     {
-        $this->variable(\Toolbox::cleanInteger($value))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Toolbox::cleanInteger($value));
     }
 
-    protected function jsonDecodeProvider()
+    public static function jsonDecodeProvider()
     {
         return [
             [
@@ -244,13 +250,11 @@ class Toolbox extends DbTestCase
      */
     public function testJsonDecode($json, $expected)
     {
-        $this
-         ->variable(\Toolbox::jsonDecode($json, true))
-         ->isIdenticalTo($expected);
+        $this->assertSame($expected, \Toolbox::jsonDecode($json, true));
     }
 
 
-    protected function isJSONProvider()
+    public static function isJSONProvider()
     {
         return [
             [
@@ -287,11 +291,12 @@ class Toolbox extends DbTestCase
     /**
      * @dataProvider isJsonProvider
      */
-    public function testIsJSON($json, $expected)
+    public function testIsJSON($json, bool $expected)
     {
-        $this
-         ->variable(\Toolbox::isJSON($json, true))
-         ->isIdenticalTo($expected);
+        $this->assertSame(
+            $expected,
+            \Toolbox::isJSON($json)
+        );
     }
 
 
@@ -299,11 +304,11 @@ class Toolbox extends DbTestCase
     public function testInvalidJsonDecode()
     {
         $invalid = '"Monitor":"6","Computer":"35"';
-        $this->variable(\Toolbox::jsonDecode($invalid, true))->isIdenticalTo($invalid);
+        $this->assertSame($invalid, \Toolbox::jsonDecode($invalid, true));
         $this->hasPhpLogRecordThatContains('Unable to decode JSON string! Is this really JSON?', LogLevel::NOTICE);
     }
 
-    protected function ucProvider()
+    public static function ucProvider()
     {
         return [
             ['hello you', 'Hello you'],
@@ -318,10 +323,10 @@ class Toolbox extends DbTestCase
      */
     public function testUcfirst($in, $out)
     {
-        $this->string(\Toolbox::ucfirst($in))->isIdenticalTo($out);
+        $this->assertSame($out, \Toolbox::ucfirst($in));
     }
 
-    protected function shortcutProvider()
+    public static function shortcutProvider()
     {
         return [
             ['My menu', 'm', '<u>M</u>y menu'],
@@ -336,10 +341,10 @@ class Toolbox extends DbTestCase
      */
     public function testShortcut($string, $letter, $expected)
     {
-        $this->string(\Toolbox::shortcut($string, $letter))->isIdenticalTo($expected);
+        $this->assertSame($expected, \Toolbox::shortcut($string, $letter));
     }
 
-    protected function strposProvider()
+    public static function strposProvider()
     {
         return [
             ['Where is Charlie?', 'W', 0, 0],
@@ -359,10 +364,13 @@ class Toolbox extends DbTestCase
      */
     public function testStrpos($string, $search, $offset, $expected)
     {
-        $this->variable(\Toolbox::strpos($string, $search, $offset))->isIdenticalTo($expected);
+        $this->assertSame(
+            $expected,
+            \Toolbox::strpos($string, $search, $offset)
+        );
     }
 
-    protected function padProvider()
+    public static function padProvider()
     {
         return [
             ['GLPI', 10, " ", STR_PAD_RIGHT, 'GLPI      '],
@@ -380,11 +388,13 @@ class Toolbox extends DbTestCase
      */
     public function testStr_pad($string, $length, $char, $pad, $expected)
     {
-        $this->string(\Toolbox::str_pad($string, $length, $char, $pad))
-         ->isIdenticalTo($expected);
+        $this->assertSame(
+            $expected,
+            \Toolbox::str_pad($string, $length, $char, $pad)
+        );
     }
 
-    protected function strlenProvider()
+    public static function strlenProvider()
     {
         return [
             ['GLPI', 4],
@@ -397,10 +407,10 @@ class Toolbox extends DbTestCase
      */
     public function testStrlen($string, $length)
     {
-        $this->integer(\Toolbox::strlen($string))->isIdenticalTo($length);
+        $this->assertSame($length, \Toolbox::strlen($string));
     }
 
-    protected function substrProvider()
+    public static function substrProvider()
     {
         return [
             ['I want a substring', 0, -1, 'I want a substring'],
@@ -417,11 +427,13 @@ class Toolbox extends DbTestCase
      */
     public function testSubstr($string, $start, $length, $expected)
     {
-        $this->string(\Toolbox::substr($string, $start, $length))
-         ->isIdenticalTo($expected);
+        $this->assertSame(
+            $expected,
+            \Toolbox::substr($string, $start, $length)
+        );
     }
 
-    protected function lowercaseProvider()
+    public static function lowercaseProvider()
     {
         return [
             ['GLPI', 'glpi'],
@@ -435,10 +447,10 @@ class Toolbox extends DbTestCase
      */
     public function testStrtolower($upper, $lower)
     {
-        $this->string(\Toolbox::strtolower($upper))->isIdenticalTo($lower);
+        $this->assertSame($lower, \Toolbox::strtolower($upper));
     }
 
-    protected function uppercaseProvider()
+    public static function uppercaseProvider()
     {
         return [
             ['glpi', 'GLPI'],
@@ -452,10 +464,10 @@ class Toolbox extends DbTestCase
      */
     public function testStrtoupper($lower, $upper)
     {
-        $this->string(\Toolbox::strtoupper($lower))->isIdenticalTo($upper);
+        $this->assertSame($upper, \Toolbox::strtoupper($lower));
     }
 
-    protected function utfProvider()
+    public static function utfProvider()
     {
         return [
             ['a simple string', true],
@@ -470,37 +482,37 @@ class Toolbox extends DbTestCase
      */
     public function testSeems_utf8($string, $utf)
     {
-        $this->boolean(\Toolbox::seems_utf8($string))->isIdenticalTo($utf);
+        $this->assertSame($utf, \Toolbox::seems_utf8($string));
     }
 
     public function testSaveAndDeletePicture()
     {
-       // Save an image twice
+        // Save an image twice
         $test_file = __DIR__ . '/../files/test.png';
         copy(__DIR__ . '/../../pics/add_dropdown.png', $test_file); // saved image will be removed from FS
         $first_pict = \Toolbox::savePicture($test_file);
-        $this->string($first_pict)->matches('#[^/]+/.+\.png#'); // generated random name inside subdir
+        $this->assertMatchesRegularExpression('#[^/]+/.+\.png#', $first_pict); // generated random name inside subdir
 
         copy(__DIR__ . '/../../pics/add_dropdown.png', $test_file); // saved image will be removed from FS
         $second_pict = \Toolbox::savePicture($test_file);
-        $this->string($second_pict)->matches('#[^/]+/.+\.png#'); // generated random name inside subdir
+        $this->assertMatchesRegularExpression('#[^/]+/.+\.png#', $second_pict); // generated random name inside subdir
 
-       // Check that second saving of same image is not overriding first saved image.
-        $this->string($first_pict)->isNotEqualTo($second_pict);
+        // Check that second saving of same image is not overriding first saved image.
+        $this->assertNotEquals($second_pict, $first_pict);
 
-       // Delete saved images
-        $this->boolean(\Toolbox::deletePicture($first_pict))->isTrue();
-        $this->boolean(\Toolbox::deletePicture($second_pict))->isTrue();
+        // Delete saved images
+        $this->assertTrue(\Toolbox::deletePicture($first_pict));
+        $this->assertTrue(\Toolbox::deletePicture($second_pict));
 
-       // Save not an image
-        $this->boolean(\Toolbox::savePicture(__DIR__ . '/../notanimage.jpg'))->isFalse();
+        // Save not an image
+        $this->assertFalse(\Toolbox::savePicture(__DIR__ . '/../notanimage.jpg'));
 
-       // Save and delete unexisting files
-        $this->boolean(\Toolbox::savePicture('notafile.jpg'))->isFalse();
-        $this->boolean(\Toolbox::deletePicture('notafile.jpg'))->isFalse();
+        // Save and delete nonexistent files
+        $this->assertFalse(\Toolbox::savePicture('notafile.jpg'));
+        $this->assertFalse(\Toolbox::deletePicture('notafile.jpg'));
     }
 
-    protected function getPictureUrlProvider()
+    public static function getPictureUrlProvider()
     {
         global $CFG_GLPI;
 
@@ -525,7 +537,7 @@ class Toolbox extends DbTestCase
      */
     public function testGetPictureUrl($path, $url)
     {
-        $this->variable(\Toolbox::getPictureUrl($path))->isIdenticalTo($url);
+        $this->assertSame($url, \Toolbox::getPictureUrl($path));
     }
 
     /**
@@ -596,26 +608,29 @@ class Toolbox extends DbTestCase
             'mime'     => 'image/png',
             'tag'      => $img_tag,
         ]);
-        $this->integer((int)$doc_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$doc_id);
 
         $content_text   = '<img id="' . $img_tag . '" width="10" height="10" />';
         $expected_url   = str_replace('{docid}', $doc_id, $expected_url);
         $expected_result = '<a href="' . $expected_url . '" target="_blank" ><img alt="' . $img_tag . '" width="10" src="' . $expected_url . '" /></a>';
 
         // Processed data is expected to be sanitized, and expected result should remain sanitized
-        $this->string(
+        $this->assertEquals(
+            Sanitizer::sanitize($expected_result),
             \Toolbox::convertTagToImage(Sanitizer::sanitize($content_text), $item, [$doc_id => ['tag' => $img_tag]])
-        )->isEqualTo(Sanitizer::sanitize($expected_result));
+        );
 
         // Processed data may also be escaped using Toolbox::addslashes_deep(), and expected result should be escaped too
-        $this->string(
+        $this->assertEquals(
+            \Toolbox::addslashes_deep($expected_result),
             \Toolbox::convertTagToImage(\Toolbox::addslashes_deep($content_text), $item, [$doc_id => ['tag' => $img_tag]])
-        )->isEqualTo(\Toolbox::addslashes_deep($expected_result));
+        );
 
         // Processed data may also be not sanitized, and expected result should not be sanitized
-        $this->string(
+        $this->assertEquals(
+            $expected_result,
             \Toolbox::convertTagToImage($content_text, $item, [$doc_id => ['tag' => $img_tag]])
-        )->isEqualTo($expected_result);
+        );
     }
 
     /**
@@ -654,7 +669,7 @@ class Toolbox extends DbTestCase
 
         $img_tag = uniqid('', true);
 
-       // Create document in DB
+        // Create document in DB
         $document = new \Document();
         $doc_id = $document->add([
             'name'     => 'basic document',
@@ -662,25 +677,25 @@ class Toolbox extends DbTestCase
             'mime'     => 'image/png',
             'tag'      => $img_tag,
         ]);
-        $this->integer((int)$doc_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$doc_id);
 
         $content_text   = '<img id="' . $img_tag . '" width="10" height="10" />';
         $expected_url   = str_replace('{docid}', $doc_id, $expected_url);
         $expected_result = '<a href="' . $expected_url . '" target="_blank" ><img alt="' . $img_tag . '" width="10" src="' . $expected_url . '" /></a>';
 
-       // Save old config
+        // Save old config
         global $CFG_GLPI;
         $old_url_base = $CFG_GLPI['url_base'];
 
-       // Get result
+        // Get result
         $CFG_GLPI['url_base'] = $url_base;
         $result = \Toolbox::convertTagToImage($content_text, $item, [$doc_id => ['tag' => $img_tag]]);
 
-       // Restore config
+        // Restore config
         $CFG_GLPI['url_base'] = $old_url_base;
 
-       // Validate result
-        $this->string($result)->isEqualTo($expected_result);
+        // Validate result
+        $this->assertEquals($expected_result, $result);
     }
 
     /**
@@ -704,7 +719,7 @@ class Toolbox extends DbTestCase
             'mime'     => 'image/png',
             'tag'      => $img_tag_1,
         ]);
-        $this->integer((int)$doc_id_1)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$doc_id_1);
 
         $document = new \Document();
         $doc_id_2 = $document->add([
@@ -713,7 +728,7 @@ class Toolbox extends DbTestCase
             'mime'     => 'image/png',
             'tag'      => $img_tag_2,
         ]);
-        $this->integer((int)$doc_id_2)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$doc_id_2);
 
         $document = new \Document();
         $doc_id_3 = $document->add([
@@ -722,7 +737,7 @@ class Toolbox extends DbTestCase
             'mime'     => 'image/png',
             'tag'      => $img_tag_3,
         ]);
-        $this->integer((int)$doc_id_3)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$doc_id_3);
 
         $doc_data = [
             $doc_id_1 => ['tag' => $img_tag_1],
@@ -741,19 +756,22 @@ class Toolbox extends DbTestCase
         }
 
         // Processed data is expected to be sanitized, and expected result should remain sanitized
-        $this->string(
+        $this->assertEquals(
+            Sanitizer::sanitize($expected_result),
             \Toolbox::convertTagToImage(Sanitizer::sanitize($content_text), $item, $doc_data)
-        )->isEqualTo(Sanitizer::sanitize($expected_result));
+        );
 
         // Processed data may also be escaped using Toolbox::addslashes_deep(), and expected result should be escaped too
-        $this->string(
+        $this->assertEquals(
+            \Toolbox::addslashes_deep($expected_result),
             \Toolbox::convertTagToImage(\Toolbox::addslashes_deep($content_text), $item, $doc_data)
-        )->isEqualTo(\Toolbox::addslashes_deep($expected_result));
+        );
 
         // Processed data may also be not sanitized, and expected result should not be sanitized
-        $this->string(
+        $this->assertEquals(
+            $expected_result,
             \Toolbox::convertTagToImage($content_text, $item, $doc_data)
-        )->isEqualTo($expected_result);
+        );
     }
 
     /**
@@ -775,7 +793,7 @@ class Toolbox extends DbTestCase
             'mime'     => 'image/png',
             'tag'      => $img_tag,
         ]);
-        $this->integer((int)$doc_id_1)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$doc_id_1);
 
         $document = new \Document();
         $doc_id_2 = $document->add([
@@ -784,7 +802,7 @@ class Toolbox extends DbTestCase
             'mime'     => 'image/png',
             'tag'      => $img_tag,
         ]);
-        $this->integer((int)$doc_id_2)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$doc_id_2);
 
         $content_text    = '<img id="' . $img_tag . '" width="10" height="10" />';
         $expected_url_1    = '/front/document.send.php?docid=' . $doc_id_1;
@@ -798,28 +816,34 @@ class Toolbox extends DbTestCase
 
 
         // Processed data is expected to be sanitized, and expected result should remain sanitized
-        $this->string(
+        $this->assertEquals(
+            Sanitizer::sanitize($expected_result_1),
             \Toolbox::convertTagToImage(Sanitizer::sanitize($content_text), $item, [$doc_id_1 => ['tag' => $img_tag]])
-        )->isEqualTo(Sanitizer::sanitize($expected_result_1));
-        $this->string(
+        );
+        $this->assertEquals(
+            Sanitizer::sanitize($expected_result_2),
             \Toolbox::convertTagToImage(Sanitizer::sanitize($content_text), $item, [$doc_id_2 => ['tag' => $img_tag]])
-        )->isEqualTo(Sanitizer::sanitize($expected_result_2));
+        );
 
         // Processed data may also be escaped using Toolbox::addslashes_deep(), and expected result should be escaped too
-        $this->string(
+        $this->assertEquals(
+            \Toolbox::addslashes_deep($expected_result_1),
             \Toolbox::convertTagToImage(\Toolbox::addslashes_deep($content_text), $item, [$doc_id_1 => ['tag' => $img_tag]])
-        )->isEqualTo(\Toolbox::addslashes_deep($expected_result_1));
-        $this->string(
+        );
+        $this->assertEquals(
+            \Toolbox::addslashes_deep($expected_result_2),
             \Toolbox::convertTagToImage(\Toolbox::addslashes_deep($content_text), $item, [$doc_id_2 => ['tag' => $img_tag]])
-        )->isEqualTo(\Toolbox::addslashes_deep($expected_result_2));
+        );
 
         // Processed data may also be not sanitized, and expected result should not be sanitized
-        $this->string(
+        $this->assertEquals(
+            $expected_result_1,
             \Toolbox::convertTagToImage($content_text, $item, [$doc_id_1 => ['tag' => $img_tag]])
-        )->isEqualTo($expected_result_1);
-        $this->string(
+        );
+        $this->assertEquals(
+            $expected_result_2,
             \Toolbox::convertTagToImage($content_text, $item, [$doc_id_2 => ['tag' => $img_tag]])
-        )->isEqualTo($expected_result_2);
+        );
     }
 
     /**
@@ -841,7 +865,7 @@ class Toolbox extends DbTestCase
             'mime'     => 'image/png',
             'tag'      => $img_tag,
         ]);
-        $this->integer((int)$doc_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$doc_id);
 
         $content_text     = '<img id="' . $img_tag . '" width="10" height="10" />';
         $content_text    .= $content_text;
@@ -852,19 +876,22 @@ class Toolbox extends DbTestCase
         $expected_result .= $expected_result;
 
         // Processed data is expected to be sanitized, and expected result should remain sanitized
-        $this->string(
+        $this->assertEquals(
+            Sanitizer::sanitize($expected_result),
             \Toolbox::convertTagToImage(Sanitizer::sanitize($content_text), $item, [$doc_id => ['tag' => $img_tag]])
-        )->isEqualTo(Sanitizer::sanitize($expected_result));
+        );
 
         // Processed data may also be escaped using Toolbox::addslashes_deep(), and expected result should be escaped too
-        $this->string(
+        $this->assertEquals(
+            \Toolbox::addslashes_deep($expected_result),
             \Toolbox::convertTagToImage(\Toolbox::addslashes_deep($content_text), $item, [$doc_id => ['tag' => $img_tag]])
-        )->isEqualTo(\Toolbox::addslashes_deep($expected_result));
+        );
 
         // Processed data may also be not sanitized, and expected result should not be sanitized
-        $this->string(
+        $this->assertEquals(
+            $expected_result,
             \Toolbox::convertTagToImage($content_text, $item, [$doc_id => ['tag' => $img_tag]])
-        )->isEqualTo($expected_result);
+        );
     }
 
     protected function shortenNumbers()
@@ -911,11 +938,13 @@ class Toolbox extends DbTestCase
      */
     public function testShortenNumber($number, int $precision, string $expected)
     {
-        $this->string(\Toolbox::shortenNumber($number, $precision, false))
-         ->isEqualTo($expected);
+        $this->assertEquals(
+            $expected,
+            \Toolbox::shortenNumber($number, $precision, false)
+        );
     }
 
-    protected function colors()
+    public static function colors()
     {
         return [
             [
@@ -943,11 +972,13 @@ class Toolbox extends DbTestCase
      */
     public function testGetFgColor(string $bg_color, int $offset, string $fg_color)
     {
-        $this->string(\Toolbox::getFgColor($bg_color, $offset))
-         ->isEqualTo($fg_color);
+        $this->assertEquals(
+            $fg_color,
+            \Toolbox::getFgColor($bg_color, $offset)
+        );
     }
 
-    protected function testIsCommonDBTMProvider()
+    public static function testIsCommonDBTMProvider()
     {
         return [
             [
@@ -974,10 +1005,13 @@ class Toolbox extends DbTestCase
      */
     public function testIsCommonDBTM(string $class, bool $is_commondbtm)
     {
-        $this->boolean(\Toolbox::isCommonDBTM($class))->isEqualTo($is_commondbtm);
+        $this->assertSame(
+            $is_commondbtm,
+            \Toolbox::isCommonDBTM($class)
+        );
     }
 
-    protected function testIsAPIDeprecatedProvider()
+    public static function testIsAPIDeprecatedProvider()
     {
         return [
             [
@@ -1004,10 +1038,13 @@ class Toolbox extends DbTestCase
      */
     public function testIsAPIDeprecated(string $class, bool $is_deprecated)
     {
-        $this->boolean(\Toolbox::isAPIDeprecated($class))->isEqualTo($is_deprecated);
+        $this->assertSame(
+            $is_deprecated,
+            \Toolbox::isAPIDeprecated($class)
+        );
     }
 
-    protected function urlProvider()
+    public static function urlProvider()
     {
         return [
             ['http://localhost', true],
@@ -1058,52 +1095,42 @@ class Toolbox extends DbTestCase
     /**
      * @dataProvider urlProvider
      */
-    public function testIsValidWebUrl($url, $result)
+    public function testIsValidWebUrl(string $url, bool $result)
     {
-        $this->boolean(\Toolbox::isValidWebUrl($url))->isIdenticalTo((bool)$result, $url);
+        $this->assertSame(
+            $result,
+            \Toolbox::isValidWebUrl($url),
+            $url
+        );
     }
 
     public function testDeprecated()
     {
-        $this->when(
-            function () {
-                \Toolbox::deprecated('Calling this function is deprecated');
-            }
-        )->error()
-         ->withType(E_USER_DEPRECATED)
-         ->withMessage('Calling this function is deprecated')
-         ->exists();
-
-        // Test planned deprecation in the past
-        $this->when(
-            function () {
-                \Toolbox::deprecated('Calling this function is deprecated', true, '10.0');
-            }
-        )->error()
-            ->withType(E_USER_DEPRECATED)
-            ->withMessage('Calling this function is deprecated')
-            ->exists();
-
-        // Test planned deprecation in current version
-        $this->when(
-            function () {
-                \Toolbox::deprecated('Calling this function is deprecated', true, GLPI_VERSION);
-            }
-        )->error()
-            ->withType(E_USER_DEPRECATED)
-            ->withMessage('Calling this function is deprecated')
-            ->exists();
-
-        // Test planned deprecation in the future
-        $this->when(
-            function () {
-                \Toolbox::deprecated('Calling this function is deprecated', true, '99.0');
-            }
-        )->error()
-            ->withType(E_USER_DEPRECATED)
-            ->withMessage('Calling this function is deprecated')
-            ->notExists();
+        $this->expectExceptionMessage('Calling this function is deprecated');
+        \Toolbox::deprecated('Calling this function is deprecated');
     }
+
+    public function testDeprecatedPast()
+    {
+        // Test planned deprecation in the past
+        $this->expectExceptionMessage('Calling this function is deprecated');
+        \Toolbox::deprecated('Calling this function is deprecated', true, '10.0');
+    }
+
+    public function testDeprecatedCurrent()
+    {
+        // Test planned deprecation in current version
+        $this->expectExceptionMessage('Calling this function is deprecated');
+        \Toolbox::deprecated('Calling this function is deprecated', true, GLPI_VERSION);
+    }
+
+    public function testFutureDeprecated()
+    {
+        // Test planned deprecation in the future does NOT throw an error
+        \Toolbox::deprecated('Calling this function is deprecated', true, '99.0');
+        $this->assertTrue(true); //non empty test
+    }
+
 
     public function hasTraitProvider()
     {
@@ -1125,20 +1152,20 @@ class Toolbox extends DbTestCase
     /**
      * @dataProvider hasTraitProvider
      */
-    public function testHasTrait($class, $trait, $result)
+    public function testHasTrait(string $class, string $trait, bool $result)
     {
-        $this->boolean(\Toolbox::hasTrait($class, $trait))->isIdenticalTo((bool)$result);
+        $this->assertSame($result, \Toolbox::hasTrait($class, $trait));
     }
 
     public function testGetDocumentsFromTag()
     {
        // No tag provided in the tested text
         $output = \Toolbox::getDocumentsFromTag('');
-        $this->array($output)->hasSize(0);
+        $this->AssertCount(0, $output);
 
        // Create a document to emulate a document upload
         $filename = 'foo.png';
-        copy(__DIR__ . '/../fixtures/uploads/foo.png', GLPI_TMP_DIR . '/' . $filename);
+        copy(__DIR__ . '/../../tests/fixtures/uploads/foo.png', GLPI_TMP_DIR . '/' . $filename);
         $tag = \Rule::getUuid();
         $input = [
             'filename' => 'foo.png',
@@ -1154,10 +1181,10 @@ class Toolbox extends DbTestCase
         ];
         $document = new \Document();
         $document->add($input);
-        $this->boolean($document->isnewItem())->isFalse();
+        $this->assertFalse($document->isnewItem());
 
         $output = \Toolbox::getDocumentsFromTag("foo #$tag# bar ");
-        $this->array($output)->hasSize(1);
+        $this->AssertCount(1, $output);
     }
 
     public function appendParametersProvider()
@@ -1214,7 +1241,7 @@ class Toolbox extends DbTestCase
      */
     public function testAppendParameters(array $params, string $separator, string $expected)
     {
-        $this->string(\Toolbox::append_params($params, $separator))->isEqualTo($expected);
+        $this->assertEquals($expected, \Toolbox::append_params($params, $separator));
     }
 
     /**
@@ -1286,7 +1313,7 @@ class Toolbox extends DbTestCase
     /**
      * Tests for Toolbox::IsFloat()
      *
-     * @dataprovider testIsFloatProvider
+     * @dataProvider testIsFloatProvider
      *
      * @param mixed $value
      * @param bool $expected
@@ -1296,21 +1323,11 @@ class Toolbox extends DbTestCase
      */
     public function testIsFloat($value, bool $expected, ?string $warning = null): void
     {
-        $result = null;
-
-        if (! is_null($warning)) {
-            $this->when(function () use ($value, &$result) {
-                $result = \Toolbox::isFloat($value);
-            })
-                ->error()
-                ->withType(E_USER_WARNING)
-                ->withMessage($warning)
-                ->exists();
-        } else {
-            $result = \Toolbox::isFloat($value);
+        if (!is_null($warning)) {
+            $this->expectExceptionMessage($warning);
         }
-
-        $this->boolean($result)->isEqualTo($expected);
+        $result = \Toolbox::isFloat($value);
+        $this->assertEquals($expected, $result);
     }
 
     /**
@@ -1377,7 +1394,7 @@ class Toolbox extends DbTestCase
     /**
      * Tests for Toolbox::getDecimalNumbers()
      *
-     * @dataprovider testgetDecimalNumbersProvider
+     * @dataProvider testgetDecimalNumbersProvider
      *
      * @param mixed $value
      * @param int $decimals
@@ -1387,21 +1404,11 @@ class Toolbox extends DbTestCase
      */
     public function testGetDecimalNumbers($value, int $decimals, ?string $warning = null): void
     {
-        $result = null;
-
-        if (! is_null($warning)) {
-            $this->when(function () use ($value, &$result) {
-                $result = \Toolbox::getDecimalNumbers($value);
-            })
-                ->error()
-                ->withType(E_USER_WARNING)
-                ->withMessage($warning)
-                ->exists();
-        } else {
-            $result = \Toolbox::getDecimalNumbers($value);
+        if (!is_null($warning)) {
+            $this->expectExceptionMessage($warning);
         }
-
-        $this->integer($result)->isEqualTo($decimals);
+        $result = \Toolbox::getDecimalNumbers($value);
+        $this->assertEquals($decimals, $result);
     }
 
     /**
@@ -1470,7 +1477,7 @@ class Toolbox extends DbTestCase
     /**
      * Tests for Toolbox::getMioSizeFromString()
      *
-     * @dataprovider testGetMioSizeFromStringProvider
+     * @dataProvider testGetMioSizeFromStringProvider
      *
      * @param string $value
      * @param mixed $expected
@@ -1480,7 +1487,7 @@ class Toolbox extends DbTestCase
     public function testGetMioSizeFromString(string $size, $expected): void
     {
         $result = \Toolbox::getMioSizeFromString($size);
-        $this->variable($result)->isEqualTo($expected);
+        $this->assertEquals($expected, $result);
     }
 
     protected function safeUrlProvider(): iterable
@@ -1565,6 +1572,6 @@ class Toolbox extends DbTestCase
         if ($allowlist !== null) {
             $params[] = $allowlist;
         }
-        $this->boolean(call_user_func_array('Toolbox::isUrlSafe', $params))->isEqualTo($expected);
+        $this->assertSame($expected, call_user_func_array('Toolbox::isUrlSafe', $params));
     }
 }

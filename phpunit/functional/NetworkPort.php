@@ -60,8 +60,8 @@ class NetworkPort extends DbTestCase
             'instantiation_type' => 'NetworkPortEthernet',
             'name'               => 'eth1',
         ]);
-        $this->integer((int)$new_id)->isGreaterThan(0);
-        $this->integer((int)countElementsInTable('glpi_logs'))->isGreaterThan($nb_log);
+        $this->assertGreaterThan(0, (int)$new_id);
+        $this->assertGreaterThan($nb_log, (int)countElementsInTable('glpi_logs'));
 
        // check data in db
         $all_netports = getAllDataFromTable('glpi_networkports', ['ORDER' => 'id']);
@@ -97,11 +97,11 @@ class NetworkPort extends DbTestCase
             'trunk' => 0,
             'lastup' => null
         ];
-        $this->array($current_networkport)->isIdenticalTo($expected);
+        $this->assertSame($expected, $current_networkport);
 
         $all_netportethernets = getAllDataFromTable('glpi_networkportethernets', ['ORDER' => 'id']);
         $networkportethernet = end($all_netportethernets);
-        $this->boolean($networkportethernet)->isFalse();
+        $this->assertFalse($networkportethernet);
 
        // be sure added and have no logs
         $nb_log = (int)countElementsInTable('glpi_logs');
@@ -113,8 +113,8 @@ class NetworkPort extends DbTestCase
             'mac'                => '00:24:81:eb:c6:d1',
             'instantiation_type' => 'NetworkPortEthernet',
         ], [], false);
-        $this->integer((int)$new_id)->isGreaterThan(0);
-        $this->integer((int)countElementsInTable('glpi_logs'))->isIdenticalTo($nb_log);
+        $this->assertGreaterThan(0, (int)$new_id);
+        $this->assertSame($nb_log, (int)countElementsInTable('glpi_logs'));
     }
 
     public function testAddCompleteNetworkPort()
@@ -148,8 +148,8 @@ class NetworkPort extends DbTestCase
             'NetworkName__ipaddresses'    => ['-1' => '192.168.20.1'],
             '_create_children'            => true // automatically add instancation, networkname and ipadresses
         ]);
-        $this->integer($new_id)->isGreaterThan(0);
-        $this->integer((int)countElementsInTable('glpi_logs'))->isGreaterThan($nb_log);
+        $this->assertGreaterThan(0, $new_id);
+        $this->assertGreaterThan($nb_log, (int)countElementsInTable('glpi_logs'));
 
        // check data in db
        // 1 -> NetworkPortEthernet
@@ -164,7 +164,7 @@ class NetworkPort extends DbTestCase
             'type'                        => 'T',
             'speed'                       => 1000,
         ];
-        $this->array($networkportethernet)->isIdenticalTo($expected);
+        $this->assertSame($expected, $networkportethernet);
 
        // 2 -> NetworkName
         $all_networknames = getAllDataFromTable('glpi_networknames', ['ORDER' => 'id']);
@@ -184,7 +184,7 @@ class NetworkPort extends DbTestCase
             'is_deleted'    => 0,
             'is_dynamic'    => 0,
         ];
-        $this->array($networkname)->isIdenticalTo($expected);
+        $this->assertSame($expected, $networkname);
 
        // 3 -> IPAddress
         $all_ipadresses = getAllDataFromTable('glpi_ipaddresses', ['ORDER' => 'id']);
@@ -207,7 +207,7 @@ class NetworkPort extends DbTestCase
             'mainitems_id' => $computer1->getID(),
             'mainitemtype' => 'Computer',
         ];
-        $this->array($ipadress)->isIdenticalTo($expected);
+        $this->assertSame($expected, $ipadress);
 
        // be sure added and have no logs
         $nb_log = (int)countElementsInTable('glpi_logs');
@@ -230,8 +230,8 @@ class NetworkPort extends DbTestCase
             'NetworkName_fqdns_id'        => 0,
             'NetworkName__ipaddresses'    => ['-1' => '192.168.20.2']
         ], [], false);
-        $this->integer((int)$new_id)->isGreaterThan(0);
-        $this->integer((int)countElementsInTable('glpi_logs'))->isIdenticalTo($nb_log);
+        $this->assertGreaterThan(0, (int)$new_id);
+        $this->assertSame($nb_log, (int)countElementsInTable('glpi_logs'));
     }
 
     public function testClone()
@@ -269,15 +269,15 @@ class NetworkPort extends DbTestCase
             'NetworkName__ipaddresses'    => ['-1' => '192.168.20.1'],
             '_create_children'            => true // automatically add instancation, networkname and ipadresses
         ]);
-        $this->integer($new_id)->isGreaterThan(0);
-        $this->integer((int)countElementsInTable('glpi_logs'))->isGreaterThan($nb_log);
+        $this->assertGreaterThan(0, $new_id);
+        $this->assertGreaterThan($nb_log, (int)countElementsInTable('glpi_logs'));
 
        // Test item cloning
         $added = $networkport->clone();
-        $this->integer((int)$added)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$added);
 
         $clonedNetworkport = new \NetworkPort();
-        $this->boolean($clonedNetworkport->getFromDB($added))->isTrue();
+        $this->assertTrue($clonedNetworkport->getFromDB($added));
 
         $fields = $networkport->fields;
 
@@ -285,19 +285,22 @@ class NetworkPort extends DbTestCase
         foreach ($fields as $k => $v) {
             switch ($k) {
                 case 'id':
-                    $this->variable($clonedNetworkport->getField($k))->isNotEqualTo($networkport->getField($k));
+                    $this->assertNotEquals(
+                        $networkport->getField($k),
+                        $clonedNetworkport->getField($k)
+                    );
                     break;
                 case 'date_mod':
                 case 'date_creation':
                     $dateClone = new \DateTime($clonedNetworkport->getField($k));
                     $expectedDate = new \DateTime($date);
-                    $this->dateTime($dateClone)->isEqualTo($expectedDate);
+                    $this->assertEquals($expectedDate, $dateClone);
                     break;
                 case 'name':
-                    $this->variable($clonedNetworkport->getField($k))->isEqualTo("{$networkport->getField($k)} (copy)");
+                    $this->assertEquals("{$networkport->getField($k)} (copy)", $clonedNetworkport->getField($k));
                     break;
                 default:
-                    $this->variable($clonedNetworkport->getField($k))->isEqualTo($networkport->getField($k));
+                    $this->assertEquals($networkport->getField($k), $clonedNetworkport->getField($k));
             }
         }
 
@@ -309,20 +312,26 @@ class NetworkPort extends DbTestCase
         foreach ($fields as $k => $v) {
             switch ($k) {
                 case 'id':
-                    $this->variable($clonedInstantiation->getField($k))->isNotEqualTo($instantiation->getField($k));
+                    $this->assertNotEquals(
+                        $instantiation->getField($k),
+                        $clonedInstantiation->getField($k)
+                    );
                     break;
                 case 'networkports_id':
-                    $this->variable($clonedInstantiation->getField($k))->isNotEqualTo($instantiation->getField($k));
-                    $this->variable($clonedInstantiation->getField($k))->isEqualTo($clonedNetworkport->getID());
+                    $this->assertNotEquals(
+                        $instantiation->getField($k),
+                        $clonedInstantiation->getField($k)
+                    );
+                    $this->assertEquals($clonedNetworkport->getID(), $clonedInstantiation->getField($k));
                     break;
                 case 'date_mod':
                 case 'date_creation':
                     $dateClone = new \DateTime($clonedInstantiation->getField($k));
                     $expectedDate = new \DateTime($date);
-                    $this->dateTime($dateClone)->isEqualTo($expectedDate);
+                    $this->assertEquals($expectedDate, $dateClone);
                     break;
                 default:
-                    $this->variable($clonedInstantiation->getField($k))->isEqualTo($instantiation->getField($k));
+                    $this->assertEquals($instantiation->getField($k), $clonedInstantiation->getField($k));
             }
         }
     }
@@ -349,13 +358,13 @@ class NetworkPort extends DbTestCase
             'instantiation_type' => 'NetworkPortEthernet',
             'name'               => 'eth1',
         ]);
-        $this->integer((int)$np_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$np_id);
 
         $result = $networkport->update([
             'id'                 => $np_id,
             'comment'            => 'test',
         ]);
-        $this->boolean($result)->isTrue();
+        $this->assertTrue($result);
 
         // Check that there is no savedInput after update
         if (isset($_SESSION['saveInput']) && is_array($_SESSION['saveInput'])) {
@@ -381,7 +390,7 @@ class NetworkPort extends DbTestCase
             'instantiation_type' => 'NetworkPortEthernet',
             'name'               => 'eth1',
         ]);
-        $this->integer((int)$np_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$np_id);
 
         // Display all columns
         $so = $netport->rawSearchOptions();
@@ -394,22 +403,20 @@ class NetworkPort extends DbTestCase
                     'users_id' => \Session::getLoginUserID(),
                     'num' => $column['id'],
                 ];
-                $this->integer((int) $displaypref->add($input))->isGreaterThan(0);
+                $this->assertGreaterThan(0, (int) $displaypref->add($input));
                 $so_display[] = $column;
             }
         }
 
         // Check that all columns are displayed and correct values
         foreach (['showForItem', 'displayTabContentForItem'] as $method) {
-            $result = $this->output(
-                function () use ($method, $computer1) {
-                    \NetworkPort::$method($computer1);
-                }
-            );
+            ob_start();
+            \NetworkPort::$method($computer1);
+            $result = ob_get_clean();
             foreach ($so_display as $column) {
-                $result->contains($column['name']);
+                $this->assertStringContainsString($column['name'], $result);
                 if (isset($netport->fields[$column['field']])) {
-                    $result->contains((string)$netport->fields[$column['field']]);
+                    $this->assertStringContainsString((string)$netport->fields[$column['field']], $result);
                 }
             }
         }

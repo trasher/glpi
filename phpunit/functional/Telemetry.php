@@ -69,73 +69,80 @@ class Telemetry extends DbTestCase
         ];
 
         $result = \Telemetry::grabGlpiInfos();
-        $this->string($result['uuid'])
-         ->hasLength(40);
+        $this->assertEquals(40, strlen($result['uuid']));
         $expected['uuid'] = $result['uuid'];
         $expected['plugins'] = $result['plugins'];
-        $this->array($result)->isIdenticalTo($expected);
+        $this->assertSame($expected, $result);
 
         $plugins = new \Plugin();
-        $this->integer((int)$plugins->add(['directory' => 'testplugin',
-            'name'      => 'testplugin',
-            'version'   => '0.x.z'
-        ]))
-         ->isGreaterThan(0);
+        $this->assertGreaterThan(
+            0,
+            $plugins->add(['directory' => 'testplugin',
+                'name'      => 'testplugin',
+                'version'   => '0.x.z'
+            ])
+        );
 
         $expected['plugins'][] = [
             'key'       => 'testplugin',
             'version'   => '0.x.z'
         ];
-        $this->array(\Telemetry::grabGlpiInfos())->isIdenticalTo($expected);
+        $this->assertSame($expected, \Telemetry::grabGlpiInfos());
 
-       //enable ldap server
+        //enable ldap server
         $ldap = getItemByTypeName('AuthLDAP', '_local_ldap');
-        $this->boolean($ldap->update([
-            'id'        => $ldap->getID(),
-            'is_active' => true
-        ]))->isTrue();
+        $this->assertTrue(
+            $ldap->update([
+                'id'        => $ldap->getID(),
+                'is_active' => true
+            ])
+        );
 
         $expected['usage']['ldap_enabled'] = true;
-        $this->array(\Telemetry::grabGlpiInfos())->isIdenticalTo($expected);
+        $this->assertSame($expected, \Telemetry::grabGlpiInfos());
 
         $groups = new \Group();
         for ($i = 0; $i < 501; $i++) {
-            $this->integer(
-                (int)$groups->add(['name' => 'Tele test'])
-            )->isGreaterThan(0);
+            $this->assertGreaterThan(
+                0,
+                $groups->add(['name' => 'Tele test'])
+            );
         }
 
         $expected['usage']['avg_groups'] = '500-1000';
-        $this->array(\Telemetry::grabGlpiInfos())->isIdenticalTo($expected);
+        $this->assertSame($expected, \Telemetry::grabGlpiInfos());
 
         global $CFG_GLPI;
         $CFG_GLPI['use_notifications'] = 1;
 
-        $this->array(\Telemetry::grabGlpiInfos())->isIdenticalTo($expected);
+        $this->assertSame($expected, \Telemetry::grabGlpiInfos());
 
         $CFG_GLPI['notifications_mailing'] = 1;
         $CFG_GLPI['notifications_ajax']    = 1;
         $expected['usage']['notifications'] = ['mailing', 'ajax'];
-        $this->array(\Telemetry::grabGlpiInfos())->isIdenticalTo($expected);
+        $this->assertSame($expected, \Telemetry::grabGlpiInfos());
 
         $collector = new \MailCollector();
-        $this->integer(
-            (int)$collector->add([
+        $this->assertGreaterThan(
+            0,
+            $collector->add([
                 'name'        => 'Collector1',
                 'is_active'   => 1
             ])
-        )->isGreaterThan(0);
+        );
 
         $expected['usage']['mailcollector_enabled'] = true;
-        $this->array(\Telemetry::grabGlpiInfos())->isIdenticalTo($expected);
+        $this->assertSame($expected, \Telemetry::grabGlpiInfos());
 
-        $this->boolean($collector->update([
-            'id'        => $collector->getID(),
-            'is_active' => false
-        ]))->isTrue();
+        $this->assertTrue(
+            $collector->update([
+                'id'        => $collector->getID(),
+                'is_active' => false
+            ])
+        );
 
         $expected['usage']['mailcollector_enabled'] = false;
-        $this->array(\Telemetry::grabGlpiInfos())->isIdenticalTo($expected);
+        $this->assertSame($expected, \Telemetry::grabGlpiInfos());
     }
 
     public function testGrabDbInfos()
@@ -152,9 +159,9 @@ class Telemetry extends DbTestCase
             'sql_mode'  => $dbinfos['Server SQL Mode']
         ];
         $infos = \Telemetry::grabDbInfos();
-        $this->string($infos['size'])->isNotEmpty();
+        $this->assertNotEmpty($infos['size']);
         $expected['size'] = $infos['size'];
-        $this->array($infos)->isIdenticalTo($expected);
+        $this->assertSame($expected, $infos);
     }
 
     public function testGrabPhpInfos()
@@ -172,17 +179,14 @@ class Telemetry extends DbTestCase
             ]
         ];
 
-        $this->array(\Telemetry::grabPhpInfos())->isIdenticalTo($expected);
+        $this->assertSame($expected, \Telemetry::grabPhpInfos());
     }
 
     public function testGrabOsInfos()
     {
-        $expected = [
-            'family',
-            'distribution',
-            'version'
-        ];
         $osinfos = \Telemetry::grabOsInfos();
-        $this->array($osinfos)->hasKeys($expected);
+        $this->assertArrayHasKey('family', $osinfos);
+        $this->assertArrayHasKey('distribution', $osinfos);
+        $this->assertArrayHasKey('version', $osinfos);
     }
 }

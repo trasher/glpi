@@ -44,9 +44,10 @@ class Log extends DbTestCase
     private function createComputer()
     {
         $computer = new \Computer();
-        $this->integer(
-            (int)$computer->add(['entities_id' => getItemByTypeName('Entity', '_test_root_entity', true)], [], false)
-        )->isGreaterThan(0);
+        $this->assertGreaterThan(
+            0,
+            $computer->add(['entities_id' => getItemByTypeName('Entity', '_test_root_entity', true)], [], false)
+        );
         return $computer;
     }
 
@@ -72,7 +73,7 @@ class Log extends DbTestCase
         unset($log_data['date_mod']);
 
         $log = new \Log();
-        $this->integer((int)$log->add($log_data))->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$log->add($log_data));
 
         return $log;
     }
@@ -83,7 +84,7 @@ class Log extends DbTestCase
 
         $user_names = ['Huey', 'Dewey', 'Louie', 'Phooey'];
 
-       // Add at least one item per user
+        // Add at least one item per user
         foreach ($user_names as $user_name) {
             $this->createLogEntry(
                 $computer,
@@ -94,7 +95,7 @@ class Log extends DbTestCase
             );
         }
 
-       // Add 10 items affected randomly to users
+        // Add 10 items affected randomly to users
         for ($i = 0; $i < 10; $i++) {
             $this->createLogEntry(
                 $computer,
@@ -108,10 +109,10 @@ class Log extends DbTestCase
         $expected_user_names = ['Dewey', 'Huey', 'Louie', 'Phooey'];
         $expected_result = array_combine($expected_user_names, $expected_user_names);
 
-        $this->array(\Log::getDistinctUserNamesValuesInItemLog($computer))->isIdenticalTo($expected_result);
+        $this->assertSame($expected_result, \Log::getDistinctUserNamesValuesInItemLog($computer));
     }
 
-    protected function dataLogToAffectedField()
+    public static function dataLogToAffectedField()
     {
         $item_related_linked_action_values = implode(
             ',',
@@ -430,7 +431,7 @@ class Log extends DbTestCase
 
         $this->createLogEntry($computer, $log_data);
 
-        $this->array(\Log::getDistinctAffectedFieldValuesInItemLog($computer))->isIdenticalTo($expected_result);
+        $this->assertSame($expected_result, \Log::getDistinctAffectedFieldValuesInItemLog($computer));
     }
 
     public function testValuesSortInGetDistinctAffectedFieldValuesInItemLog()
@@ -446,14 +447,14 @@ class Log extends DbTestCase
         $previous_value = null;
         foreach ($result as $key => $value) {
             if (null !== $previous_value) {
-                $this->boolean('Others' === $value || strcmp($previous_value, $value) < 0)->isTrue();
+                $this->assertTrue('Others' === $value || strcmp($previous_value, $value) < 0);
             }
 
             $previous_value = $value;
         }
     }
 
-    protected function dataLinkedActionLabel()
+    public static function dataLinkedActionLabel()
     {
         return [
             [0, null],
@@ -492,7 +493,7 @@ class Log extends DbTestCase
      */
     public function testGetLinkedActionLabel($linked_action, $expected_label)
     {
-        $this->variable(\Log::getLinkedActionLabel($linked_action))->isIdenticalTo($expected_label);
+        $this->assertSame($expected_label, \Log::getLinkedActionLabel($linked_action));
     }
 
     /**
@@ -506,16 +507,18 @@ class Log extends DbTestCase
 
         $expected_key = $linked_action;
         if (0 === $linked_action) {
-           //Special case for field update
+            //Special case for field update
             $expected_value = __('Update a field');
         } else if (null === $expected_value) {
-           //Null values fallbacks to 'Others'.
+            //Null values fallbacks to 'Others'.
             $expected_key = 'other';
             $expected_value = __('Others');
         }
 
-        $this->array(\Log::getDistinctLinkedActionValuesInItemLog($computer))
-         ->isIdenticalTo([$expected_key => $expected_value]);
+        $this->assertSame(
+            [$expected_key => $expected_value],
+            \Log::getDistinctLinkedActionValuesInItemLog($computer)
+        );
     }
 
     public function testValuesSortInGetDistinctLinkedActionValuesInItemLog()
@@ -531,14 +534,14 @@ class Log extends DbTestCase
         $previous_value = null;
         foreach ($result as $key => $value) {
             if (null !== $previous_value) {
-                $this->boolean('Others' === $value || strcmp($previous_value, $value) < 0)->isTrue();
+                $this->assertTrue('Others' === $value || strcmp($previous_value, $value) < 0);
             }
 
             $previous_value = $value;
         }
     }
 
-    protected function dataFiltersValuesToSqlCriteria()
+    public static function dataFiltersValuesToSqlCriteria()
     {
         return [
             [
@@ -737,7 +740,7 @@ class Log extends DbTestCase
      */
     public function testConvertFiltersValuesToSqlCriteria($filters_values, $expected_result)
     {
-        $this->array(\Log::convertFiltersValuesToSqlCriteria($filters_values))->isIdenticalTo($expected_result);
+        $this->assertSame($expected_result, \Log::convertFiltersValuesToSqlCriteria($filters_values));
     }
 
     protected function userNameFormattingProvider()
@@ -769,7 +772,7 @@ class Log extends DbTestCase
                 'ORDER'  => 'id DESC',
                 'LIMIT'  => 1
             ]);
-            $this->integer(count($iterator))->isIdenticalTo(1);
+            $this->assertSame(1, count($iterator));
             return $iterator->current();
         };
 
@@ -777,22 +780,22 @@ class Log extends DbTestCase
 
         // ID should always be displayed regardless of user preferences or server default
         $_SESSION['glpiis_ids_visible'] = false;
-        $this->string($log_event()['user_name'])->isIdenticalTo($expected_name . " ($user_id)");
+        $this->assertSame($expected_name . " ($user_id)", $log_event()['user_name']);
         $_SESSION['glpiis_ids_visible'] = true;
-        $this->string($log_event()['user_name'])->isIdenticalTo($expected_name . " ($user_id)");
+        $this->assertSame($expected_name . " ($user_id)", $log_event()['user_name']);
         $CFG_GLPI['is_ids_visible'] = false;
-        $this->string($log_event()['user_name'])->isIdenticalTo($expected_name . " ($user_id)");
+        $this->assertSame($expected_name . " ($user_id)", $log_event()['user_name']);
         $CFG_GLPI['is_ids_visible'] = true;
-        $this->string($log_event()['user_name'])->isIdenticalTo($expected_name . " ($user_id)");
+        $this->assertSame($expected_name . " ($user_id)", $log_event()['user_name']);
 
         // Name order should always be realname firstname regardless of user preferences or server default
         $_SESSION['glpinames_format'] = \User::FIRSTNAME_BEFORE;
-        $this->string($log_event()['user_name'])->isIdenticalTo($expected_name . " ($user_id)");
+        $this->assertSame($expected_name . " ($user_id)", $log_event()['user_name']);
         $_SESSION['glpinames_format'] = \User::REALNAME_BEFORE;
-        $this->string($log_event()['user_name'])->isIdenticalTo($expected_name . " ($user_id)");
+        $this->assertSame($expected_name . " ($user_id)", $log_event()['user_name']);
         $CFG_GLPI['names_format'] = \User::FIRSTNAME_BEFORE;
-        $this->string($log_event()['user_name'])->isIdenticalTo($expected_name . " ($user_id)");
+        $this->assertSame($expected_name . " ($user_id)", $log_event()['user_name']);
         $CFG_GLPI['names_format'] = \User::REALNAME_BEFORE;
-        $this->string($log_event()['user_name'])->isIdenticalTo($expected_name . " ($user_id)");
+        $this->assertSame($expected_name . " ($user_id)", $log_event()['user_name']);
     }
 }

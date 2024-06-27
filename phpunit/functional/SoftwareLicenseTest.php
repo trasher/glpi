@@ -42,13 +42,13 @@ use DbTestCase;
 /**
  * @engine isolate
  */
-class SoftwareLicense extends DbTestCase
+class SoftwareLicenseTest extends DbTestCase
 {
     public function testTypeName()
     {
-        $this->string(\SoftwareLicense::getTypeName(1))->isIdenticalTo('License');
-        $this->string(\SoftwareLicense::getTypeName(0))->isIdenticalTo('Licenses');
-        $this->string(\SoftwareLicense::getTypeName(10))->isIdenticalTo('Licenses');
+        $this->assertSame('License', \SoftwareLicense::getTypeName(1));
+        $this->assertSame('Licenses', \SoftwareLicense::getTypeName(0));
+        $this->assertSame('Licenses', \SoftwareLicense::getTypeName(10));
     }
 
     public function testPrepareInputForAdd()
@@ -60,7 +60,7 @@ class SoftwareLicense extends DbTestCase
             'name'         => 'not_inserted_software_license',
             'entities_id'  => 0
         ];
-        $this->boolean($license->prepareInputForAdd($input))->isFalse();
+        $this->assertFalse($license->prepareInputForAdd($input));
         $this->hasSessionMessages(ERROR, ['Please select a software for this license']);
 
        //With a softwares_id, import ok
@@ -70,7 +70,7 @@ class SoftwareLicense extends DbTestCase
             'softwarelicenses_id' => 0, 'level' => 1,
             'completename' => 'inserted_sofwarelicense'
         ];
-        $this->array($license->prepareInputForAdd($input))->isIdenticalTo($expected);
+        $this->assertSame($expected, $license->prepareInputForAdd($input));
 
        //withtemplate, empty 'expire' should be ignored. id will be replaced in _oldID
         $input = [ 'name' => 'other_inserted_sofwarelicense', 'softwares_id' => 1,
@@ -81,7 +81,7 @@ class SoftwareLicense extends DbTestCase
             'softwarelicenses_id' => 0, 'level' => 1,
             'completename' => 'other_inserted_sofwarelicense', '_oldID' => 1
         ];
-        $this->array($license->prepareInputForAdd($input))->isIdenticalTo($expected);
+        $this->assertSame($expected, $license->prepareInputForAdd($input));
     }
 
     /**
@@ -97,8 +97,8 @@ class SoftwareLicense extends DbTestCase
             'is_template'  => 0,
             'entities_id'  => 0
         ]);
-        $this->integer((int)$softwares_id)->isGreaterThan(0);
-        $this->boolean($software->getFromDB($softwares_id))->isTrue();
+        $this->assertGreaterThan(0, (int)$softwares_id);
+        $this->assertTrue($software->getFromDB($softwares_id));
 
         return $software;
     }
@@ -110,7 +110,7 @@ class SoftwareLicense extends DbTestCase
         $license = new \SoftwareLicense();
         $input = [ 'name' => 'not_inserted_software_license_child'];
 
-        $this->boolean($license->add($input))->isFalse();
+        $this->assertFalse($license->add($input));
         $this->hasSessionMessages(ERROR, ['Please select a software for this license']);
 
         $software     = $this->createSoft();
@@ -121,13 +121,13 @@ class SoftwareLicense extends DbTestCase
             'softwares_id' => $software->getID(),
             'entities_id'  => 0
         ]);
-        $this->integer((int)$parentlicense_id)->isGreaterThan(0);
-        $this->boolean($parentlicense->getFromDB($parentlicense_id))->isTrue();
+        $this->assertGreaterThan(0, (int)$parentlicense_id);
+        $this->assertTrue($parentlicense->getFromDB($parentlicense_id));
 
-        $this->string($parentlicense->fields['completename'])->isIdenticalTo("a_software_license");
-        $this->string($parentlicense->fields['name'])->isIdenticalTo('a_software_license');
-        $this->variable($parentlicense->fields['expire'])->isNull();
-        $this->variable($parentlicense->fields['level'])->isEqualTo(1);
+        $this->assertSame("a_software_license", $parentlicense->fields['completename']);
+        $this->assertSame('a_software_license', $parentlicense->fields['name']);
+        $this->assertNull($parentlicense->fields['expire']);
+        $this->assertEquals(1, $parentlicense->fields['level']);
 
         $input  = [
             'softwares_id'          => $software->getID(),
@@ -137,13 +137,13 @@ class SoftwareLicense extends DbTestCase
             'entities_id'           => $parentlicense->fields['entities_id']
         ];
         $lic_id = $license->add($input);
-        $this->integer($lic_id)->isGreaterThan($parentlicense_id);
-        $this->boolean($license->getFromDB($lic_id))->isTrue();
+        $this->assertGreaterThan($parentlicense_id, $lic_id);
+        $this->assertTrue($license->getFromDB($lic_id));
 
-        $this->string($license->fields['completename'])->isIdenticalTo("a_software_license > a_child_license");
-        $this->string($license->fields['name'])->isIdenticalTo('a_child_license');
-        $this->string($license->fields['expire'])->isIdenticalTo('2017-01-01');
-        $this->variable($license->fields['level'])->isEqualTo(2);
+        $this->assertSame("a_software_license > a_child_license", $license->fields['completename']);
+        $this->assertSame('a_child_license', $license->fields['name']);
+        $this->assertSame('2017-01-01', $license->fields['expire']);
+        $this->assertEquals(2, $license->fields['level']);
     }
 
     public function testComputeValidityIndicator()
@@ -162,8 +162,8 @@ class SoftwareLicense extends DbTestCase
             'entities_id'  => 0
         ];
         $lic_id = $license->add($input);
-        $this->integer((int)$lic_id)->isGreaterThan(0);
-        $this->boolean($license->getFromDB($lic_id))->isTrue();
+        $this->assertGreaterThan(0, (int)$lic_id);
+        $this->assertTrue($license->getFromDB($lic_id));
 
         $license_computer = new \Item_SoftwareLicense();
         $comp1            = getItemByTypeName('Computer', '_test_pc01');
@@ -176,17 +176,17 @@ class SoftwareLicense extends DbTestCase
             'is_deleted'            => 0,
             'is_dynamic'            => 0
         ];
-        $this->integer((int)$license_computer->add($input_comp))->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$license_computer->add($input_comp));
 
        //Test if number is illimited
-        $this->variable(\SoftwareLicense::computeValidityIndicator($lic_id, -1))->isEqualTo(1);
-        $this->variable(\SoftwareLicense::computeValidityIndicator($lic_id, 0))->isEqualTo(0);
+        $this->assertEquals(1, \SoftwareLicense::computeValidityIndicator($lic_id, -1));
+        $this->assertEquals(0, \SoftwareLicense::computeValidityIndicator($lic_id, 0));
 
         $input_comp['computers_id'] = $comp2->getID();
-        $this->integer((int)$license_computer->add($input_comp))->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$license_computer->add($input_comp));
 
-        $this->variable(\SoftwareLicense::computeValidityIndicator($lic_id, 2))->isEqualTo(1);
-        $this->variable(\SoftwareLicense::computeValidityIndicator($lic_id, 1))->isEqualTo(0);
+        $this->assertEquals(1, \SoftwareLicense::computeValidityIndicator($lic_id, 2));
+        $this->assertEquals(0, \SoftwareLicense::computeValidityIndicator($lic_id, 1));
     }
 
     public function testPrepareInputForUpdate()
@@ -205,11 +205,11 @@ class SoftwareLicense extends DbTestCase
             'entities_id'  => 0
         ];
         $lic_id = $license->add($input);
-        $this->integer((int)$lic_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$lic_id);
 
         $input    = ['id' => $lic_id, 'number' => 3];
         $expected = ['id' => $lic_id, 'number' => 3, 'is_valid' => 1];
-        $this->array($license->prepareInputForUpdate($input))->isIdenticalTo($expected);
+        $this->assertSame($expected, $license->prepareInputForUpdate($input));
     }
 
     public function testUpdateValidityIndicator()
@@ -228,8 +228,8 @@ class SoftwareLicense extends DbTestCase
             'entities_id'  => 0
         ];
         $lic_id = $license->add($input);
-        $this->integer((int)$lic_id)->isGreaterThan(0);
-        $this->boolean($license->getFromDB($lic_id))->isTrue();
+        $this->assertGreaterThan(0, (int)$lic_id);
+        $this->assertTrue($license->getFromDB($lic_id));
 
         $this->createLicenseInstall(
             $license,
@@ -243,7 +243,7 @@ class SoftwareLicense extends DbTestCase
             'items_id'              => $comp1->getID(),
             'itemtype'              => 'Computer'
         ];
-        $this->boolean($license_computer->deleteByCriteria($input, true))->isTrue();
+        $this->assertTrue($license_computer->deleteByCriteria($input, true));
 
         $orig_number = $license->getField('number');
        //Change the number of assets to 1
@@ -252,14 +252,14 @@ class SoftwareLicense extends DbTestCase
             'number' => 1,
         ];
         $license->update($input);
-        $this->boolean($license->getFromDB($license->getID()))->isTrue();
+        $this->assertTrue($license->getFromDB($license->getID()));
 
-        $this->integer((int)$license->getID())->isGreaterThan(0);
-        $this->variable($input['number'])->isEqualTo($license->fields['number']);
+        $this->assertGreaterThan(0, (int)$license->getID());
+        $this->assertEquals($license->fields['number'], $input['number']);
 
        //Update validity indicator
         $license->updateValidityIndicator($license->getID());
-        $this->variable($license->fields['is_valid'])->isEqualTo(0);
+        $this->assertEquals(0, $license->fields['is_valid']);
 
        //cleanup
         $input = [
@@ -270,7 +270,7 @@ class SoftwareLicense extends DbTestCase
 
        //Update validity indicator
         $license->updateValidityIndicator($license->fields['id']);
-        $this->variable($license->fields['is_valid'])->isEqualTo(1);
+        $this->assertEquals(1, $license->fields['is_valid']);
     }
 
     private function createLicenseInstall(\SoftwareLicense $license, $computers)
@@ -291,6 +291,6 @@ class SoftwareLicense extends DbTestCase
             'is_dynamic'            => 0,
             'is_deleted'            => 0
         ];
-        $this->integer((int)$license_computer->add($input))->isGreaterThan(0);
+        $this->assertGreaterThan(0, (int)$license_computer->add($input));
     }
 }

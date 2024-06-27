@@ -55,8 +55,8 @@ class NetworkPort_NetworkPort extends DbTestCase
             'instantiation_type' => 'NetworkPortEthernet',
             'name'               => 'eth1',
         ]);
-        $this->integer((int)$ports_id)->isGreaterThan(0);
-        $this->integer((int)countElementsInTable('glpi_logs'))->isGreaterThan($nb_log);
+        $this->assertGreaterThan(0, (int)$ports_id);
+        $this->assertGreaterThan($nb_log, (int)countElementsInTable('glpi_logs'));
 
         return $ports_id;
     }
@@ -72,18 +72,19 @@ class NetworkPort_NetworkPort extends DbTestCase
         $id_2 = $this->createPort($computer2, '00:24:81:eb:c6:d1');
 
         $wired = new \NetworkPort_NetworkPort();
-        $this->integer(
+        $this->assertGreaterThan(
+            0,
             $wired->add([
                 'networkports_id_1' => $id_1,
                 'networkports_id_2' => $id_2
             ])
-        )->isGreaterThan(0);
+        );
 
-        $this->boolean($wired->getFromDBForNetworkPort($id_1))->isTrue();
-        $this->boolean($wired->getFromDBForNetworkPort($id_2))->isTrue();
+        $this->assertTrue($wired->getFromDBForNetworkPort($id_1));
+        $this->assertTrue($wired->getFromDBForNetworkPort($id_2));
 
-        $this->integer($wired->getOppositeContact($id_1))->isIdenticalTo($id_2);
-        $this->integer($wired->getOppositeContact($id_2))->isIdenticalTo($id_1);
+        $this->assertSame($id_2, $wired->getOppositeContact($id_1));
+        $this->assertSame($id_1, $wired->getOppositeContact($id_2));
     }
 
     public function testHub()
@@ -95,24 +96,24 @@ class NetworkPort_NetworkPort extends DbTestCase
 
         $wired = new \NetworkPort_NetworkPort();
         $hubs_id = $wired->createHub($ports_id);
-        $this->integer($hubs_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $hubs_id);
 
         $unmanaged = new \Unmanaged();
-        $this->boolean($unmanaged->getFromDB($hubs_id))->isTrue();
+        $this->assertTrue($unmanaged->getFromDB($hubs_id));
 
-        $this->integer($unmanaged->fields['hub'])->isIdenticalTo(1);
-        $this->string($unmanaged->fields['name'])->isIdenticalTo('Hub');
-        $this->integer($unmanaged->fields['entities_id'])->isIdenticalTo(0);
-        $this->string($unmanaged->fields['comment'])->isIdenticalTo('Port: ' . $ports_id);
+        $this->assertSame(1, $unmanaged->fields['hub']);
+        $this->assertSame('Hub', $unmanaged->fields['name']);
+        $this->assertSame(0, $unmanaged->fields['entities_id']);
+        $this->assertSame('Port: ' . $ports_id, $unmanaged->fields['comment']);
 
         $opposites_id = $wired->getOppositeContact($ports_id);
-        $this->integer($opposites_id)->isGreaterThan(0);
+        $this->assertGreaterThan(0, $opposites_id);
         $netport = new \NetworkPort();
-        $this->boolean($netport->getFromDB($opposites_id))->isTrue();
+        $this->assertTrue($netport->getFromDB($opposites_id));
 
-        $this->integer($netport->fields['items_id'])->isIdenticalTo($hubs_id);
-        $this->string($netport->fields['itemtype'])->isIdenticalTo($unmanaged->getType());
-        $this->string($netport->fields['name'])->isIdenticalTo('Hub link');
-        $this->string($netport->fields['instantiation_type'])->isIdenticalTo(\NetworkPortEthernet::getType());
+        $this->assertSame($hubs_id, $netport->fields['items_id']);
+        $this->assertSame($unmanaged->getType(), $netport->fields['itemtype']);
+        $this->assertSame('Hub link', $netport->fields['name']);
+        $this->assertSame(\NetworkPortEthernet::getType(), $netport->fields['instantiation_type']);
     }
 }
