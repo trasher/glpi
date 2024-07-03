@@ -36,6 +36,7 @@
 namespace tests\units;
 
 use DbTestCase;
+use Monolog\Logger;
 
 /* Test for inc/computer.class.php */
 
@@ -360,10 +361,11 @@ class ComputerTest extends DbTestCase
         $this->assertTrue($comp->getFromDBByCrit(['name' => '_test_pc01']));
         $this->assertSame('_test_pc01', $comp->getField('name'));
 
-        $this->expectExceptionMessage(
-            'getFromDBByCrit expects to get one result, 9 found in query "SELECT `id` FROM `glpi_computers` WHERE `name` LIKE \'_test%\'".'
-        );
         $this->assertFalse($comp->getFromDBByCrit(['name' => ['LIKE', '_test%']]));
+        $this->hasPhpLogRecordThatContains(
+            'getFromDBByCrit expects to get one result, 9 found in query "SELECT `id` FROM `glpi_computers` WHERE `name` LIKE \'_test%\'".',
+            Logger::WARNING
+        );
     }
 
     public function testClone()
@@ -680,7 +682,7 @@ class ComputerTest extends DbTestCase
         $oentities_id = (int)$computer->fields['entities_id'];
         $this->assertNotEquals($oentities_id, $entities_id);
 
-       //transfer to another entity
+        //transfer to another entity
         $transfer = new \Transfer();
 
         $ma = $this->getMockBuilder(\MassiveAction::class)

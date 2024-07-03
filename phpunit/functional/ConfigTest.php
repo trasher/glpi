@@ -272,7 +272,7 @@ class ConfigTest extends DbTestCase
             $this->assertSame($expected, \Config::getLibraryDir($mailer));
         }
 
-        $expected = realpath(__DIR__ . '/../src/autoload');
+        $expected = realpath(__DIR__ . '/../../tests/src/autoload');
         $this->assertSame($expected, \Config::getLibraryDir('getItemByTypeName'));
     }
 

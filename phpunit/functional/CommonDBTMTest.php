@@ -41,6 +41,7 @@ use Document;
 use Document_Item;
 use Entity;
 use Glpi\Toolbox\Sanitizer;
+use Monolog\Logger;
 use SoftwareVersion;
 
 /* Test for inc/commondbtm.class.php */
@@ -144,12 +145,16 @@ class CommonDBTMTest extends DbTestCase
         $this->assertFalse($instance->isNewItem());
 
         $instance = new \Computer();
-        $this->expectExceptionMessage(
-            'getFromDBByRequest expects to get one result, 2 found in query "SELECT `glpi_computers`.* FROM `glpi_computers` WHERE `contact` = \'johndoe\'".'
-        );
         $result = $instance->getFromDbByRequest([
             'WHERE' => ['contact' => 'johndoe'],
         ]);
+        $this->hasPhpLogRecordThatContains(
+            'getFromDBByRequest expects to get one result, 2 found in query "SELECT `glpi_computers`.* FROM `glpi_computers` WHERE `contact` = \'johndoe\'".',
+            Logger::WARNING
+        );
+        $this->assertFalse($result);
+        // the instance must not be populated
+        $this->assertTrue($instance->isNewItem());
     }
 
     public function testGetFromResultSet()
@@ -326,7 +331,6 @@ class CommonDBTMTest extends DbTestCase
         $this->assertTrue($res);
 
         //multiple update case
-        $this->expectExceptionMessage('Update would change too many rows!');
         $res = $DB->updateOrInsert(
             \Computer::getTable(),
             [
@@ -336,6 +340,11 @@ class CommonDBTMTest extends DbTestCase
             [
                 'name'   => 'serial-to-change'
             ]
+        );
+        $this->assertFalse($res);
+        $this->hasPhpLogRecordThatContains(
+            'Update would change too many rows!',
+            Logger::WARNING
         );
     }
 
@@ -401,7 +410,6 @@ class CommonDBTMTest extends DbTestCase
         $this->assertTrue($res);
 
         //multiple update case
-        $this->expectExceptionMessage('Update would change too many rows!');
         $res = $DB->updateOrInsert(
             \Computer::getTable(),
             [
@@ -410,6 +418,11 @@ class CommonDBTMTest extends DbTestCase
             [
                 'name'   => 'serial-to-change'
             ]
+        );
+        $this->assertFalse($res);
+        $this->hasPhpLogRecordThatContains(
+            'Update would change too many rows!',
+            Logger::WARNING
         );
     }
 
@@ -1373,17 +1386,19 @@ class CommonDBTMTest extends DbTestCase
     {
         $computer = new \Computer();
 
+        $this->assertGreaterThan(0, $computer->add(['name' => $value, 'entities_id' => 0]));
+        $this->assertEquals($truncated, $computer->fields['name']);
         if ($value !== $truncated) {
-            $this->expectExceptionMessage(
+            $this->hasPhpLogRecordThatContains(
                 sprintf(
                     '%s exceed 255 characters long (%s), it will be truncated.',
                     $value,
                     $length
-                )
+                ),
+                Logger::WARNING
             );
         }
-        $this->assertGreaterThan(0, $computer->add(['name' => $value, 'entities_id' => 0]));
-        $this->assertEquals($truncated, $computer->fields['name']);
+
     }
 
     public function testCheckUnicity()

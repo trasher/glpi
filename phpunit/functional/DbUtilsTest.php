@@ -36,6 +36,7 @@
 namespace tests\units;
 
 use DbTestCase;
+use Monolog\Logger;
 use org\bovigo\vfs\vfsStream;
 
 /* Test for inc/dbutils.class.php */
@@ -235,8 +236,11 @@ class DbUtilsTest extends DbTestCase
         require_once __DIR__ . '/../../tests/fixtures/pluginbarfoo.php';
 
         $instance = new \DbUtils();
-        $this->expectExceptionMessage('Unexpected sanitized itemtype "Glpi\\\\Event" encountered.');
         $instance->getItemForItemtype(addslashes('Glpi\Event'));
+        $this->hasPhpLogRecordThatContains(
+            'Unexpected sanitized itemtype "Glpi\\\\Event" encountered.',
+            Logger::WARNING
+        );
     }
 
     public function testGetItemForItemtypeSanitized2()
@@ -244,8 +248,11 @@ class DbUtilsTest extends DbTestCase
         require_once __DIR__ . '/../../tests/fixtures/pluginbarfoo.php';
 
         $instance = new \DbUtils();
-        $this->expectExceptionMessage('Unexpected sanitized itemtype "GlpiPlugin\\\\Bar\\\\Foo" encountered.');
         $instance->getItemForItemtype(addslashes('GlpiPlugin\Bar\Foo'));
+        $this->hasPhpLogRecordThatContains(
+            'Unexpected sanitized itemtype "GlpiPlugin\\\\Bar\\\\Foo" encountered.',
+            Logger::WARNING
+        );
     }
 
     public function testGetItemForItemtypeAbstract()
@@ -253,8 +260,11 @@ class DbUtilsTest extends DbTestCase
         require_once __DIR__ . '/../../tests/fixtures/pluginbarabstractstuff.php';
 
         $instance = new \DbUtils();
-        $this->expectExceptionMessage('Cannot instanciate "CommonDevice" as it is an abstract class.');
         $instance->getItemForItemtype('CommonDevice');
+        $this->hasPhpLogRecordThatContains(
+            'Cannot instanciate "CommonDevice" as it is an abstract class.',
+            Logger::WARNING
+        );
     }
 
     public function testGetItemForItemtypeAbstract2()
@@ -262,8 +272,11 @@ class DbUtilsTest extends DbTestCase
         require_once __DIR__ . '/../../tests/fixtures/pluginbarabstractstuff.php';
 
         $instance = new \DbUtils();
-        $this->expectExceptionMessage('Cannot instanciate "GlpiPlugin\Bar\AbstractStuff" as it is an abstract class.');
         $instance->getItemForItemtype('GlpiPlugin\Bar\AbstractStuff');
+        $this->hasPhpLogRecordThatContains(
+            'Cannot instanciate "GlpiPlugin\Bar\AbstractStuff" as it is an abstract class.',
+            Logger::WARNING
+        );
     }
 
     public static function dataPlural()
@@ -513,8 +526,8 @@ class DbUtilsTest extends DbTestCase
         $this->assertTrue($instance->isIndex('glpi_users', 'locations_id'));
         $this->assertTrue($instance->isIndex('glpi_users', 'unicityloginauth'));
 
-        $this->expectExceptionMessage('Table fakeTable does not exists');
-        $instance->isIndex('fakeTable', 'id');
+        $this->assertFalse($instance->isIndex('fakeTable', 'id'));
+        $this->hasPhpLogRecordThatContains('Table fakeTable does not exists', Logger::WARNING);
     }
 
     public function testProceduralIsIndex()
@@ -526,8 +539,8 @@ class DbUtilsTest extends DbTestCase
         $this->assertTrue(isIndex('glpi_users', 'locations_id'));
         $this->assertTrue(isIndex('glpi_users', 'unicityloginauth'));
 
-        $this->expectExceptionMessage('Table fakeTable does not exists');
-        isIndex('fakeTable', 'id');
+        $this->assertFalse(isIndex('fakeTable', 'id'));
+        $this->hasPhpLogRecordThatContains('Table fakeTable does not exists', Logger::WARNING);
     }
 
     public function testGetEntityRestrict()
@@ -1381,15 +1394,21 @@ class DbUtilsTest extends DbTestCase
     public function testGetDateCriteriaError1()
     {
         $instance = new \DbUtils();
-        $this->expectExceptionMessage('Invalid "2023-02-19\', INTERVAL 1 DAY)))))" date value.');
         $instance->getDateCriteria('date', '2023-02-19\', INTERVAL 1 DAY)))))', null);
+        $this->hasPhpLogRecordThatContains(
+            'Invalid "2023-02-19\', INTERVAL 1 DAY)))))" date value.',
+            Logger::WARNING
+        );
     }
 
     public function testGetDateCriteriaError2()
     {
         $instance = new \DbUtils();
-        $this->expectExceptionMessage('Invalid "2023-02-19\', INTERVAL 1 DAY)))))" date value.');
         $instance->getDateCriteria('date', null, '2023-02-19\', INTERVAL 1 DAY)))))');
+        $this->hasPhpLogRecordThatContains(
+            'Invalid "2023-02-19\', INTERVAL 1 DAY)))))" date value.',
+            Logger::WARNING
+        );
     }
 
     public static function autoNameProvider()
@@ -1540,8 +1559,11 @@ class DbUtilsTest extends DbTestCase
         if (!$deprecated) {
             $autoname = $call();
         } else {
-            $this->expectExceptionMessage('Handling of encoded/escaped value in autoName() is deprecated.');
             $autoname = $call();
+            $this->hasPhpLogRecordThatContains(
+                'Handling of encoded/escaped value in autoName() is deprecated.',
+                Logger::NOTICE
+            );
         }
         $this->assertSame($expected, $autoname);
     }
