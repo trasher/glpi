@@ -3581,12 +3581,12 @@ JS;
         }
 
         $plugins = [
-            'autolink',
             'autoresize',
             'code',
             'directionality',
             'fullscreen',
             'link',
+            'autolink',
             'lists',
             'quickbars',
             'searchreplace',
