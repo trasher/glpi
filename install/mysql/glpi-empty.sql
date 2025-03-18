@@ -9130,7 +9130,8 @@ CREATE TABLE `glpi_networkporttypes` (
 DROP TABLE IF EXISTS `glpi_printerlogs`;
 CREATE TABLE `glpi_printerlogs` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `printers_id` int unsigned NOT NULL,
+  `itemtype` varchar(100) NOT NULL,
+  `items_id` int unsigned NOT NULL DEFAULT '0',
   `total_pages` int NOT NULL DEFAULT '0',
   `bw_pages` int NOT NULL DEFAULT '0',
   `color_pages` int NOT NULL DEFAULT '0',
@@ -9147,7 +9148,7 @@ CREATE TABLE `glpi_printerlogs` (
   `date_mod` timestamp NULL DEFAULT NULL,
   `faxed` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `unicity` (`printers_id`,`date`),
+  UNIQUE KEY `unicity` (`itemtype`,`items_id`,`date`),
   KEY `date` (`date`),
   KEY `date_mod` (`date_mod`),
   KEY `date_creation` (`date_creation`)

@@ -111,7 +111,10 @@ class IsInventoriableCapacityTest extends DbTestCase
         $classname_1  = $definition_1->getAssetClassName();
         $definition_2 = $this->initAssetDefinition(
             capacities: [
-                new \Glpi\Asset\Capacity(name: \Glpi\Asset\Capacity\IsInventoriableCapacity::class),
+                new \Glpi\Asset\Capacity(
+                    name: \Glpi\Asset\Capacity\IsInventoriableCapacity::class,
+                    config: new \Glpi\Asset\CapacityConfig(['inventory_mainasset' => \Glpi\Inventory\MainAsset\GenericPrinterAsset::class])
+                ),
                 new \Glpi\Asset\Capacity(name: \Glpi\Asset\Capacity\HasHistoryCapacity::class),
             ]
         );
@@ -137,10 +140,12 @@ class IsInventoriableCapacityTest extends DbTestCase
         $this->assertContains($classname_1, $CFG_GLPI['agent_types']);
         $this->assertContains($classname_1, $CFG_GLPI['environment_types']);
         $this->assertContains($classname_1, $CFG_GLPI['process_types']);
+        $this->assertNotContains($classname_1, $CFG_GLPI['printer_types']);
         $this->assertContains($classname_2, $CFG_GLPI['inventory_types']);
         $this->assertContains($classname_2, $CFG_GLPI['agent_types']);
         $this->assertContains($classname_2, $CFG_GLPI['environment_types']);
         $this->assertContains($classname_2, $CFG_GLPI['process_types']);
+        $this->assertContains($classname_2, $CFG_GLPI['printer_types']);
 
         // Disable capacity and check class is unregistered from global config
         $this->assertTrue($definition_1->update(['id' => $definition_1->getID(), 'capacities' => []]));

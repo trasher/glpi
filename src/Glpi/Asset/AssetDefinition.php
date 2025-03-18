@@ -618,6 +618,22 @@ TWIG, $twig_params);
     }
 
     /**
+     * Get configuration for capacity
+     *
+     * @param CapacityInterface $capacity
+     * @return ?CapacityConfig
+     *
+     */
+    public function getCapacityConfiguration(CapacityInterface $capacity): ?CapacityConfig
+    {
+        if (isset($this->getDecodedCapacities()[$capacity::class])) {
+            return $this->getDecodedCapacities()[$capacity::class]->getConfig();
+        }
+
+        return null;
+    }
+
+    /**
      * Get configuration entry for capacity
      *
      * @param CapacityInterface $capacity
