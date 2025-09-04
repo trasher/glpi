@@ -691,7 +691,7 @@ class MailCollectorTest extends DbTestCase
         $criteria = new RuleCriteria();
         $criteria_input = [
             'criteria' => 'to',
-            'condition' => Rule::PATTERN_CONTAIN,
+            'condition' => Rule::PATTERN_IS,
             'pattern' => 'refuse@glpi-project.org',
             'rules_id' => $rule_id,
         ];
