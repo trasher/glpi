@@ -42,6 +42,10 @@ use Laminas\Mail\Storage\Message;
 use NotificationTarget;
 use NotificationTargetSoftwareLicense;
 use NotificationTargetTicket;
+use Rule;
+use RuleAction;
+use RuleCriteria;
+use RuleMailCollector;
 use SoftwareLicense;
 use Ticket;
 use Psr\Log\LogLevel;
@@ -672,6 +676,37 @@ class MailCollectorTest extends DbTestCase
 
         // Force notification_uuid
         Config::setConfigurationValues('core', ['notification_uuid' => 't3StN0t1f1c4tiOnUUID']);
+
+        // Create rule to reject mails sent to refuse@glpi-project.org
+        $rule     = new RuleMailCollector();
+        $rule_id = $rule->add($rule_input = [
+            'name'         => __FUNCTION__,
+            'match'        => 'AND',
+            'is_active'    => 1,
+            'sub_type'     => RuleMailCollector::class,
+        ]);
+        $this->checkInput($rule, $rule_id, $rule_input);
+
+        // Add criteria
+        $criteria = new RuleCriteria();
+        $criteria_input = [
+            'criteria' => 'to',
+            'condition' => Rule::PATTERN_IS,
+            'pattern' => 'refuse@glpi-project.org',
+            'rules_id' => $rule_id,
+        ];
+        $criteria_id = $criteria->add($criteria_input);
+        $this->checkInput($criteria, $criteria_id, $criteria_input);
+
+        // Create action
+        $action   = new RuleAction();
+        $action_id = $action->add($action_input = [
+            'rules_id'    => $rule_id,
+            'action_type' => 'assign',
+            'field'       => '_refuse_email_no_response',
+            'value'       => 1,
+        ]);
+        $this->checkInput($action, $action_id, $action_input);
 
         //assign email to user
         $nuid = getItemByTypeName('User', 'normal', true);
