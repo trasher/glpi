@@ -73,10 +73,10 @@ class ComputerTest extends FrontBaseClass
         //load computer form
         $computers_id = getItemByTypeName(\Computer::class, '_test_pc01', true);
         $crawler = $this->http_client->request('GET', $this->base_uri . 'front/computer.form.php?id=' . $computers_id);
-        $this->assertNotContains(' Locked by you!', $crawler->html());
+        $this->assertStringNotContainsString(' Locked by you!', $crawler->html());
 
         //load again - still no lock.
         $crawler = $this->http_client->request('GET', $this->base_uri . 'front/computer.form.php?id=' . $computers_id);
-        $this->assertNotContains(' Locked by you!', $crawler->html());
+        $this->assertStringNotContainsString(' Locked by you!', $crawler->html());
     }
 }
