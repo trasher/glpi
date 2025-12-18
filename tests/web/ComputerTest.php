@@ -70,13 +70,24 @@ class ComputerTest extends FrontBaseClass
     {
         $this->logIn();
 
+        \Config::setConfigurationValues('core', [
+            'lock_use_lock_item' => 1,
+            'lock_items_types' => "['Computer']",
+        ]);
+
         //load computer form
         $computers_id = getItemByTypeName(\Computer::class, '_test_pc01', true);
         $crawler = $this->http_client->request('GET', $this->base_uri . 'front/computer.form.php?id=' . $computers_id);
-        $this->assertStringNotContainsString(' Locked by you!', $crawler->html());
+        $this->assertStringNotContainsString(' Locked by you!', $crawler->html(), 'Computer should not be locked on initial load.');
 
         //load again - still no lock.
         $crawler = $this->http_client->request('GET', $this->base_uri . 'front/computer.form.php?id=' . $computers_id);
-        $this->assertStringNotContainsString(' Locked by you!', $crawler->html());
+        $this->assertStringNotContainsString(' Locked by you!', $crawler->html(), 'Computer should not be locked on page reload.');
+
+        //reset config
+        \Config::setConfigurationValues('core', [
+            'lock_use_lock_item' => 0,
+            'lock_items_types' => "[]",
+        ]);
     }
 }
