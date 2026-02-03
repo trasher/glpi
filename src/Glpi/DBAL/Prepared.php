@@ -8,7 +8,6 @@
  * http://glpi-project.org
  *
  * @copyright 2015-2026 Teclib' and contributors.
- * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
  * ---------------------------------------------------------------------
@@ -33,56 +32,23 @@
  * ---------------------------------------------------------------------
  */
 
-/**
- *  Sub query class
- **/
-abstract class AbstractQuery
+namespace Glpi\DBAL;
+
+abstract class Prepared
 {
-    protected ?string $alias = null;
+    protected string $sql;
     /** @var array<int, mixed> */
-    protected array $values = [];
+    protected array $values;
 
-    /**
-     * Create a query
-     *
-     * @param string $alias Alias for the whole subquery
-     */
-    public function __construct($alias = null)
+    public function setSQL(string $sql): static
     {
-        $this->alias = $alias;
+        $this->sql = $sql;
+        return $this;
     }
 
-    /**
-     * Get alias
-     *
-     * @return string|null
-     */
-    public function getAlias()
+    public function getSQL(): string
     {
-        return $this->alias;
-    }
-
-    /**
-     *
-     * Get SQL query
-     *
-     * @return string
-     *
-     * @psalm-taint-escape sql
-     */
-    abstract public function getQuery();
-
-    public function __toString()
-    {
-        return $this->getQuery();
-    }
-
-    /**
-    * @return array<int, mixed>
-    */
-    public function getValues(): array
-    {
-        return $this->values;
+        return $this->sql;
     }
 
     /**
@@ -92,5 +58,18 @@ abstract class AbstractQuery
     {
         $this->values = $values;
         return $this;
+    }
+
+    /**
+     * @return array<int, mixed>
+     */
+    public function getValues(): array
+    {
+        return $this->values;
+    }
+
+    public function __toString()
+    {
+        return $this->getSQL();
     }
 }

@@ -8,7 +8,6 @@
  * http://glpi-project.org
  *
  * @copyright 2015-2026 Teclib' and contributors.
- * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
  * ---------------------------------------------------------------------
@@ -45,6 +44,9 @@ class QueryExpression
     private string $expression;
 
     private ?string $alias;
+    /** @var array<int, mixed> */
+    private array $values = [];
+
 
     /**
      * Create a query expression
@@ -81,5 +83,22 @@ class QueryExpression
     public function __toString()
     {
         return $this->getValue();
+    }
+
+    /**
+     * @return array<int, mixed>
+     */
+    public function getValues(): array
+    {
+        return $this->values;
+    }
+
+    /**
+     * @param array<int, mixed> $values
+     */
+    public function setValues(array $values): static
+    {
+        $this->values = $values;
+        return $this;
     }
 }
