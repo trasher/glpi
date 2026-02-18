@@ -33,6 +33,9 @@
  * ---------------------------------------------------------------------
  */
 
-namespace Glpi\DBAL;
+namespace Glpi\DBAL\Parts;
 
-class Delete extends Prepared {}
+class Having extends Where
+{
+    protected string $clause = 'HAVING';
+}

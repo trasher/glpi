@@ -33,13 +33,12 @@
  * ---------------------------------------------------------------------
  */
 
-use Glpi\DBAL\Prepared;
+use Glpi\DBAL\Parts\BasePart;
 use Glpi\DBAL\QueryExpression;
 use Glpi\DBAL\QueryFunction;
 use Glpi\Exception\Database\StatementException;
 use Glpi\Message\MessageType;
 use Glpi\Progress\AbstractProgressIndicator;
-
 use function Safe\preg_replace;
 
 /**
@@ -765,7 +764,7 @@ class Migration
     public function executeMigration()
     {
         foreach ($this->queries[self::PRE_QUERY] as $query) {
-            if ($query['query'] instanceof Prepared) {
+            if ($query['query'] instanceof BasePart) {
                 $stmt = $this->db->prepare($query['query']->getSQL());
                 $this->db->executeStatement($stmt, $query['query']->getValues());
             } else {
@@ -784,7 +783,7 @@ class Migration
         }
 
         foreach ($this->queries[self::POST_QUERY] as $query) {
-            if ($query['query'] instanceof Prepared) {
+            if ($query['query'] instanceof BasePart) {
                 $stmt = $this->db->prepare($query['query']->getSQL());
                 $this->db->executeStatement($stmt, $query['query']->getValues());
             } else {

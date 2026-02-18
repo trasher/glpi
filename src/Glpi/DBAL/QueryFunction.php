@@ -35,6 +35,7 @@
 
 namespace Glpi\DBAL;
 
+use AbstractQuery;
 use DBmysqlIterator;
 
 use function Safe\preg_match;
@@ -98,6 +99,13 @@ class QueryFunction
             $params = [$params];
         }
 
+        $values = [];
+        foreach ($params as $param) {
+            if ($param instanceof QueryExpression || $param instanceof AbstractQuery) {
+                $values = array_merge($values, $param->getValues());
+            }
+        }
+
         // Map camelCase function names to SQL function names
         $func_name = match (true) {
             // if the name is in camelCase, convert camelCase to snake_case
@@ -106,8 +114,7 @@ class QueryFunction
             default => $name,
         };
         $func_name = strtoupper($func_name);
-        //FIXME: no idea how to handle possible statement values, and even if there are some...
-        return self::getExpression($func_name, $params, [], $args[1] ?? null);
+        return self::getExpression($func_name, $params, $values, $args[1] ?? null);
     }
 
     /**
@@ -158,6 +165,7 @@ class QueryFunction
         if (is_array($condition)) {
             $iterator = new DBmysqlIterator(null);
             $condition = new QueryExpression($iterator->analyseCrit($condition));
+            $condition->setValues($iterator->getValues());
             $values = $iterator->getValues();
         } elseif ($condition instanceof QueryExpression) {
             $values = array_merge($values, $condition->getValues());
@@ -216,7 +224,13 @@ class QueryFunction
             $exp .= ' SEPARATOR ' . $DB::quoteValue($separator);
         }
         $exp .= ')';
-        return new QueryExpression($exp, $alias);
+
+        $values = [];
+        if ($expression instanceof QueryExpression) {
+            $values = array_merge($values, $expression->getValues());
+        }
+        $qexpr = new QueryExpression($exp, $alias);
+        return $qexpr->setValues($values);
     }
 
     /**
@@ -236,7 +250,13 @@ class QueryFunction
             $exp .= 'DISTINCT ';
         }
         $exp .= $expression . ')';
-        return new QueryExpression($exp, $alias);
+
+        $values = [];
+        if ($expression instanceof QueryExpression) {
+            $values = array_merge($values, $expression->getValues());
+        }
+        $qexpr = new QueryExpression($exp, $alias);
+        return $qexpr->setValues($values);
     }
 
     /**
@@ -256,7 +276,13 @@ class QueryFunction
             $exp .= 'DISTINCT ';
         }
         $exp .= $expression . ')';
-        return new QueryExpression($exp, $alias);
+
+        $values = [];
+        if ($expression instanceof QueryExpression) {
+            $values = array_merge($values, $expression->getValues());
+        }
+        $qexpr = new QueryExpression($exp, $alias);
+        return $qexpr->setValues($values);
     }
 
     /**
@@ -271,7 +297,13 @@ class QueryFunction
         global $DB;
 
         $expression = $expression instanceof QueryExpression ? $expression : $DB::quoteName($expression);
-        return new QueryExpression('CAST(' . $expression . ' AS ' . $type . ')', $alias);
+
+        $values = [];
+        if ($expression instanceof QueryExpression) {
+            $values = array_merge($values, $expression->getValues());
+        }
+        $qexpr = new QueryExpression('CAST(' . $expression . ' AS ' . $type . ')', $alias);
+        return $qexpr->setValues($values);
     }
 
     /**
@@ -285,7 +317,14 @@ class QueryFunction
     {
         global $DB;
         $expression = $expression instanceof QueryExpression ? $expression : $DB::quoteName($expression);
-        return new QueryExpression('CONVERT(' . $expression . ' USING ' . $transcoding . ')', $alias);
+
+        $values = [];
+        if ($expression instanceof QueryExpression) {
+            $values = array_merge($values, $expression->getValues());
+        }
+        $qexpr = new QueryExpression('CONVERT(' . $expression . ' USING ' . $transcoding . ')', $alias);
+        return $qexpr->setValues($values);
+
     }
 
     /**

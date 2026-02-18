@@ -33,69 +33,61 @@
  * ---------------------------------------------------------------------
  */
 
-namespace Glpi\DBAL;
+namespace Glpi\DBAL\Parts;
 
-use RuntimeException;
+use DBmysqlIterator;
 
-/**
- *  Query expression class
- **/
-class QueryExpression
+abstract class BasePart
 {
-    private string $expression;
-
-    private ?string $alias;
+    protected string $sql;
     /** @var array<int, mixed> */
-    private array $values = [];
-
-
-    /**
-     * Create a query expression
-     *
-     * @param string|QueryExpression $expression The query expression
-     * @param ?string $alias     The query expression alias
-     */
-    public function __construct($expression, ?string $alias = null)
-    {
-        if ($expression === null || $expression === '' || $expression === false) {
-            throw new RuntimeException('Cannot build an empty expression');
-        }
-        $this->expression = $expression;
-        $this->alias = $alias;
-
-        if ($expression instanceof QueryExpression) {
-            $this->setValues($expression->getValues());
-        }
-    }
+    protected array $values;
 
     /**
-     * Query expression value
-     *
-     * @return string
-     *
-     * @psalm-taint-escape sql
+     * @param array<string|int, mixed> $criteria
      */
-    public function getValue()
+    public function withCriteria(array $criteria): static
     {
         global $DB;
-        $sql = $this->expression;
-        if (!empty($this->alias)) {
-            $sql .= ' AS ' . $DB::quoteName($this->alias);
-        }
-        return $sql;
-    }
 
-    public function __toString()
-    {
-        return $this->getValue();
+        if (empty($criteria)) {
+            return $this;
+        }
+
+        $iterator = new DBmysqlIterator($DB);
+        $it_criteria = $this->getFromClause();
+        if (property_exists($this, 'clause')) {
+            $it_criteria += [$this->clause => $criteria];
+        } else {
+            $it_criteria += $criteria;
+        }
+        $iterator->buildQuery($it_criteria);
+
+        return $this
+            ->setSQL($iterator->getSql())
+            ->setValues($iterator->getValues())
+        ;
     }
 
     /**
-     * @return array<int, mixed>
+     * @return array{FROM: string}
      */
-    public function getValues(): array
+    public function getFromClause(): array
     {
-        return $this->values;
+        return [
+            'FROM' => 'table',
+        ];
+    }
+
+    public function setSQL(string $sql): static
+    {
+        $this->sql = $sql;
+        return $this;
+    }
+
+    public function getSQL(): string
+    {
+        return $this->sql ?? '';
     }
 
     /**
@@ -105,5 +97,18 @@ class QueryExpression
     {
         $this->values = $values;
         return $this;
+    }
+
+    /**
+     * @return array<int, mixed>
+     */
+    public function getValues(): array
+    {
+        return $this->values ?? [];
+    }
+
+    public function __toString()
+    {
+        return $this->getSQL();
     }
 }

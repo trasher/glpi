@@ -33,6 +33,16 @@
  * ---------------------------------------------------------------------
  */
 
-namespace Glpi\DBAL;
+namespace Glpi\DBAL\Parts;
 
-class Insert extends Prepared {}
+class LeftJoin extends BasePart
+{
+    public function setSQL(string $sql): static
+    {
+        parent::setSQL($sql);
+
+        //remove FROM clause from SQL
+        $this->sql = trim(str_replace('SELECT * FROM `table`', '', $this->sql));
+        return $this;
+    }
+}

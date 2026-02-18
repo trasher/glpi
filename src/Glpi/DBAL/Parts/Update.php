@@ -33,6 +33,6 @@
  * ---------------------------------------------------------------------
  */
 
-namespace Glpi\DBAL;
+namespace Glpi\DBAL\Parts;
 
-class Update extends Prepared {}
+class Update extends BasePart {}
