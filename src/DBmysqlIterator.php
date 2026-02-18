@@ -753,6 +753,7 @@ class DBmysqlIterator implements SeekableIterator, Countable
                 }
 
                 if ($jointablekey instanceof QuerySubQuery) {
+                    $this->values = array_merge($this->values, $jointablekey->getValues());
                     $jointablekey = $jointablekey->getQuery();
                 } else {
                     $jointablekey = DBmysql::quoteName($jointablekey);

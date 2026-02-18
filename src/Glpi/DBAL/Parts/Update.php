@@ -32,6 +32,6 @@
  * ---------------------------------------------------------------------
  */
 
-namespace Glpi\DBAL;
+namespace Glpi\DBAL\Parts;
 
-class Delete extends Prepared {}
+class Update extends BasePart {}
