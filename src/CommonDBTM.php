@@ -425,10 +425,11 @@ class CommonDBTM extends CommonGLPI
         } elseif (count($iter) > 1) {
             throw new TooManyResultsException(
                 sprintf(
-                    '`%1$s::getFromDBByCrit()` expects to get one result, %2$s found in query "%3$s".',
+                    '`%1$s::getFromDBByCrit()` expects to get one result, %2$s found in query "%3$s" with values: %4$s.',
                     static::class,
                     count($iter),
-                    $iter->getSql()
+                    $iter->getSql(),
+                    var_export($iter->getValues(), true)
                 )
             );
         }

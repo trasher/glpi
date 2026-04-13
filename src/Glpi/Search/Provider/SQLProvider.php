@@ -49,7 +49,6 @@ use Config;
 use Consumable;
 use CronTask;
 use DBConnection;
-use DBmysql;
 use DBmysqlIterator;
 use Document;
 use Dropdown;
@@ -58,6 +57,10 @@ use Entity_KnowbaseItem;
 use Glpi\Application\View\TemplateRenderer;
 use Glpi\Asset\Asset_PeripheralAsset;
 use Glpi\DBAL\Operator;
+use Glpi\DBAL\Parts\Having;
+use Glpi\DBAL\Parts\LeftJoin;
+use Glpi\DBAL\Parts\Select;
+use Glpi\DBAL\Parts\Where;
 use Glpi\DBAL\QueryExpression;
 use Glpi\DBAL\QueryFunction;
 use Glpi\DBAL\QuerySubQuery;
@@ -82,7 +85,6 @@ use KnowbaseItem;
 use KnowbaseItem_Profile;
 use KnowbaseItem_User;
 use Link;
-use mysqli_result;
 use Notification;
 use OLA;
 use Override;
@@ -128,17 +130,20 @@ final class SQLProvider implements SearchProviderInterface
         return $data;
     }
 
-    private static function buildSelect(array $data, string $itemtable): string
+    private static function buildSelect(array $data, string $itemtable): Select
     {
         global $DB;
 
         // request currentuser for SQL supervision, not displayed
         $SELECT = "SELECT DISTINCT `$itemtable`.`id` AS id, " . $DB->quote($_SESSION['glpiname'] ?? '') . " AS currentuser,
                         " . Search::addDefaultSelect($data['itemtype']);
+        $SELECT_VALUES = [];
 
         // Add select for all toview item
         foreach ($data['toview'] as $val) {
-            $SELECT .= Search::addSelect($data['itemtype'], $val);
+            $addselect = Search::addSelect($data['itemtype'], $val);
+            $SELECT .= $addselect->getSQL();
+            $SELECT_VALUES = array_merge($SELECT_VALUES, $addselect->getValues());
         }
 
         $as_map = isset($data['search']['as_map']) && (int) $data['search']['as_map'] === 1;
@@ -146,7 +151,11 @@ final class SQLProvider implements SearchProviderInterface
             $SELECT .= ' `glpi_locations`.`id` AS loc_id, ';
         }
 
-        return $SELECT;
+        $ret = new Select();
+        return $ret
+            ->setSQL($SELECT)
+            ->setValues($SELECT_VALUES)
+        ;
     }
 
     /**
@@ -624,7 +633,7 @@ final class SQLProvider implements SearchProviderInterface
                                     $tocompute,
                                     new QueryExpression($DB::quoteValue(Search::SHORTSEP)),
                                     "{$table}{$addtable}.id",
-                                ]),
+                                ])->setValues($tocompute->getValues()),
                                 separator: Search::LONGSEP,
                                 distinct: true,
                                 order_by: "{$table}{$addtable}.id",
@@ -1126,26 +1135,30 @@ final class SQLProvider implements SearchProviderInterface
     /**
      * Return where part related to system criteria of main itemtype.
      *
-     * @param string $itemtype  Main itemtype
+     * @param class-string<CommonDBTM> $itemtype  Main itemtype
      *
-     * @return string
+     * @return ?Select
      */
-    private static function getMainItemtypeSystemSQLCriteria(string $itemtype): string
+    private static function getMainItemtypeSystemSQLCriteria(string $itemtype): ?Select
     {
         global $DB;
+        $select = new Select();
 
         if (!is_a($itemtype, CommonDBTM::class, true)) {
-            return '';
+            return null;
         }
 
         $criteria = $itemtype::getSystemSQLCriteria($itemtype::getTable());
 
         if (count($criteria) === 0) {
-            return '';
+            return null;
         }
 
         $dbi = new DBmysqlIterator($DB);
-        return $dbi->analyseCrit($criteria);
+        return $select
+            ->setSql($dbi->analyseCrit($criteria))
+            ->setValues($dbi->getValues())
+        ;
     }
 
     /**
@@ -1416,16 +1429,18 @@ final class SQLProvider implements SearchProviderInterface
                 return;
             }
             if (is_a($value, QueryExpression::class)) {
+                $values = $value->getValues();
                 $search_str = '';
                 $iterator = new DBmysqlIterator(null);
                 foreach ($SEARCH as $token) {
                     if ($iterator->isOperator($token)) {
                         $search_str .= " $token ";
                     } else {
-                        $search_str .= $DB::quoteValue($token);
+                        $search_str .= " ?";
+                        $values[] = trim($token);
                     }
                 }
-                $criteria[] = new QueryExpression($value . ' ' . trim($search_str));
+                $criteria[] = (new QueryExpression($value . $search_str))->setValues($values);
             } elseif (isset($criteria[$value])) {
                 $criteria[] = [$value => $SEARCH];
             } else {
@@ -1643,7 +1658,9 @@ final class SQLProvider implements SearchProviderInterface
                         }
                     }
                     $regs[1] .= $regs[2];
-                    return [new QueryExpression("(INET_ATON(" . $DB::quoteName("$table.$field") . ") " . $regs[1] . " INET_ATON(" . $DB::quoteValue($regs[3]) . "))")];
+                    $qexpr = new QueryExpression("(INET_ATON(`$table`.`$field`) " . $regs[1] . " INET_ATON(?))");
+                    $qexpr->setValues([$regs[3]]);
+                    return [$qexpr];
                 }
                 break;
 
@@ -1960,14 +1977,14 @@ final class SQLProvider implements SearchProviderInterface
                                 $date_computation,
                                 $regs[1],
                                 $regs[2],
-                                $DB::quoteValue($regs[3])
+                                '?'
                             );
                             if ($nott) {
                                 $ret .= ")";
                             }
-                            return [
-                                new QueryExpression($ret),
-                            ];
+                            $qexpr = new QueryExpression($ret);
+                            $qexpr->setValues([$regs[3]]);
+                            return [$qexpr];
                         }
                         return [];
                     }
@@ -2017,20 +2034,22 @@ final class SQLProvider implements SearchProviderInterface
                             }
                         }
                         $regs[1] .= $regs[2];
-                        return [
-                            new QueryExpression(
-                                sprintf(
-                                    "%s %s %s",
-                                    $tocompute,
-                                    $regs[1],
-                                    $DB::quoteValue($regs[3] . $regs[4])
-                                )
-                            ),
-                        ];
+                        $qexpr = new QueryExpression(
+                            sprintf(
+                                "%s %s %s",
+                                $tocompute,
+                                $regs[1],
+                                '?'
+                            )
+                        );
+                        $qexpr->setValues([$regs[3] . $regs[4]]);
+                        return [$qexpr];
                     }
 
+                    $values = $tocompute instanceof QueryExpression ? $tocompute->getValues() : [];
                     if (is_numeric($val) && !$decimal_contains) {
                         $numeric_val = floatval($val);
+
 
                         if (in_array($searchtype, ["notequals", "notcontains"])) {
                             $nott = !$nott;
@@ -2042,7 +2061,7 @@ final class SQLProvider implements SearchProviderInterface
                                 $nott
                                 && ($val != 'NULL') && ($val != 'null')
                             ) {
-                                $ADD = [new QueryExpression("$tocompute IS NULL")];
+                                $ADD = [(new QueryExpression("$tocompute IS NULL"))->setValues($values)];
                             }
                             $val1 = floatval($numeric_val - $searchopt[$ID]["width"]);
                             $val2 = floatval($numeric_val + $searchopt[$ID]["width"]);
@@ -2050,8 +2069,8 @@ final class SQLProvider implements SearchProviderInterface
                                 return [
                                     'OR' => array_merge(
                                         [
-                                            new QueryExpression("$tocompute < $val1"),
-                                            new QueryExpression("$tocompute > $val2"),
+                                            (new QueryExpression("$tocompute < ?"))->setValues(array_merge($values, [$val1])),
+                                            (new QueryExpression("$tocompute > ?"))->setValues(array_merge($values, [$val2])),
                                         ],
                                         $ADD
                                     ),
@@ -2059,25 +2078,31 @@ final class SQLProvider implements SearchProviderInterface
                             }
                             return array_merge(
                                 [
-                                    new QueryExpression("$tocompute >= $val1"),
-                                    new QueryExpression("$tocompute <= $val2"),
+                                    (new QueryExpression("$tocompute >= ?"))->setValues(array_merge($values, [$val1])),
+                                    (new QueryExpression("$tocompute <= ?"))->setValues(array_merge($values, [$val2])),
                                 ],
                                 $ADD
                             );
                         }
                         if (!$nott) {
-                            return [new QueryExpression($tocompute . ' = ' . $numeric_val)];
+                            $values[] = $numeric_val;
+                            return [(new QueryExpression($tocompute . ' = ?'))->setValues($values)];
                         }
-                        return [new QueryExpression($tocompute . ' <> ' . $numeric_val)];
+                        $values[] = $numeric_val;
+                        return [(new QueryExpression($tocompute . ' <> ?'))->setValues($values)];
                     }
 
                     if ($searchtype === 'empty') {
                         $l = $nott ? 'AND' : 'OR';
                         $operator = $nott ? '<>' : '=';
+                        $values[] = 0;
+                        if (strtolower($val) !== 'null' && !is_null($val)) {
+                            $values[] = $val;
+                        }
                         $criteria = [
                             $l => [
                                 [
-                                    new QueryExpression("$tocompute $operator 0"),
+                                    (new QueryExpression("$tocompute $operator ?"))->setValues(array_merge($values)),
                                 ],
                             ],
                         ];
@@ -2088,7 +2113,6 @@ final class SQLProvider implements SearchProviderInterface
 
                 case 'text':
                     if ($searchtype === 'empty') {
-                        /** @var string $tocompute */
                         $l = $nott ? 'AND' : 'OR';
                         $criteria = [
                             $l => [
@@ -2197,7 +2221,7 @@ final class SQLProvider implements SearchProviderInterface
                     $sub_query_criteria = [
                         'SELECT' => $fk,
                         'FROM'   => $link_table,
-                        'WHERE'  => [new QueryExpression('true')],
+                        'WHERE'  => [],
                     ];
                     if (!empty($addcondition)) {
                         $sub_query_criteria['WHERE'][] = $addcondition;
@@ -4045,7 +4069,7 @@ final class SQLProvider implements SearchProviderInterface
     /**
      * Generic Function to add GROUP BY to a request
      *
-     * @param string  $LINK           link to use
+     * @param Operator $LINK           link to use
      * @param bool    $NOT            is is a negative search?
      * @param class-string<CommonDBTM>  $itemtype       item type
      * @param int     $ID             ID of the item to search
@@ -4054,7 +4078,7 @@ final class SQLProvider implements SearchProviderInterface
      *
      * @return array HAVING criteria as an array
      **/
-    public static function getHavingCriteria(string $LINK, bool $NOT, string $itemtype, int $ID, string $searchtype, string $val): array
+    public static function getHavingCriteria(Operator $LINK, bool $NOT, string $itemtype, int $ID, string $searchtype, string $val): array
     {
         $searchopt  = SearchOption::getOptionsForItemtype($itemtype);
         if (!isset($searchopt[$ID]['table'])) {
@@ -4428,7 +4452,9 @@ final class SQLProvider implements SearchProviderInterface
 
         //// 1 - SELECT
         // request currentuser for SQL supervision, not displayed
-        $SELECT = self::buildSelect($data, $itemtable);
+        $main_select = self::buildSelect($data, $itemtable);
+        $SELECT = $main_select->getSQL();
+        $SELECT_VALUES = $main_select->getValues();
 
         //// 2 - FROM AND LEFT JOIN
         // Set reference table
@@ -4439,13 +4465,15 @@ final class SQLProvider implements SearchProviderInterface
         $already_link_tables = [$itemtable];
 
         // Add default join
-        $COMMONLEFTJOIN = Search::addDefaultJoin($data['itemtype'], $itemtable, $already_link_tables);
+        $default_ljoin = Search::addDefaultJoin($data['itemtype'], $itemtable, $already_link_tables);
+        $COMMONLEFTJOIN = $default_ljoin->getSQL() . ' ';
         $FROM          .= $COMMONLEFTJOIN;
+        $FROM_VALUES = $default_ljoin->getValues();
 
         // Add all table for toview items
         foreach ($data['tocompute'] as $val) {
             if (!in_array($searchopt[$val]["table"], $blacklist_tables)) {
-                $FROM .= Search::addLeftJoin(
+                $ljoin = Search::addLeftJoin(
                     $data['itemtype'],
                     $itemtable,
                     $already_link_tables,
@@ -4457,16 +4485,20 @@ final class SQLProvider implements SearchProviderInterface
                     $searchopt[$val]["field"],
                     ($searchopt[$val]['use_join_subquery'] ?? false)
                 );
+                $FROM .= $ljoin->getSQL() . ' ';
+                $FROM_VALUES = array_merge($FROM_VALUES, $ljoin->getValues());
             }
         }
 
+        $COMMONWHERE = '';
+        $COMMONVALUES = [];
         // Search all case:
         if ($data['search']['all_search']) {
             foreach ($searchopt as $key => $val) {
                 // Do not search on Group Name
                 if (is_array($val) && isset($val['table'])) {
                     if (!in_array($val["table"], $blacklist_tables)) {
-                        $FROM .= Search::addLeftJoin(
+                        $ljoin = Search::addLeftJoin(
                             $data['itemtype'],
                             $itemtable,
                             $already_link_tables,
@@ -4477,6 +4509,8 @@ final class SQLProvider implements SearchProviderInterface
                             $val["joinparams"],
                             $val["field"]
                         );
+                        $FROM .= $ljoin->getSQL() . ' ';
+                        $FROM_VALUES = array_merge($FROM_VALUES, $ljoin->getValues());
                     }
                 }
             }
@@ -4485,28 +4519,35 @@ final class SQLProvider implements SearchProviderInterface
         //// 3 - WHERE
 
         // default string
-        $COMMONWHERE = Search::addDefaultWhere($data['itemtype']);
-        $first       = empty($COMMONWHERE);
+        $where_criteria = SQLProvider::getDefaultWhereCriteria($data['itemtype']);
+        $first       = empty($where_criteria);
+        //$COMMONWHERE = Search::addDefaultWhere($data['itemtype']);
+        //$first       = empty($COMMONWHERE);
 
         // Add deleted if item have it
         if ($data['item'] && $data['item']->maybeDeleted()) {
-            $LINK = " AND ";
+            /*$LINK = " AND ";
             if ($first) {
                 $LINK  = " ";
                 $first = false;
             }
-            $COMMONWHERE .= $LINK . "`$itemtable`.`is_deleted` = " . (int) $data['search']['is_deleted'] . " ";
+            $COMMONWHERE .= $LINK . "`$itemtable`.`is_deleted` = " . (int) $data['search']['is_deleted'] . " ";*/
+            $where_criteria[$itemtable . '.is_deleted'] = (int) $data['search']['is_deleted'];
         }
 
         // Remove template items
         if ($data['item'] && $data['item']->maybeTemplate()) {
-            $LINK = " AND ";
+            /*$LINK = " AND ";
             if ($first) {
                 $LINK  = " ";
                 $first = false;
             }
-            $COMMONWHERE .= $LINK . "`$itemtable`.`is_template` = 0 ";
+            $COMMONWHERE .= $LINK . "`$itemtable`.`is_template` = 0 ";*/
+            $where_criteria[$itemtable . '.is_template'] = 0;
         }
+
+        $ADDDEFAULTWHERE = false;
+        $ENTITYRESTRICT = false;
 
         // Add Restrict to current entities
         if ($entity_restrict) {
@@ -4517,31 +4558,69 @@ final class SQLProvider implements SearchProviderInterface
             }
 
             if ($data['itemtype'] == Entity::class) {
-                $COMMONWHERE .= getEntitiesRestrictRequest($LINK, $itemtable);
+                //$COMMONWHERE .= getEntitiesRestrictRequest($LINK, $itemtable);
+                $where_criteria = array_merge($where_criteria, getEntitiesRestrictCriteria($itemtable));
             } elseif (isset($CFG_GLPI["union_search_type"][$data['itemtype']])) {
                 // Will be replaced below in Union/Recursivity Hack
-                $COMMONWHERE .= $LINK . " ADDDEFAULTWHERE ENTITYRESTRICT ";
+                $ADDDEFAULTWHERE = true;
+                $ENTITYRESTRICT = true;
             } else {
-                $COMMONWHERE .= getEntitiesRestrictRequest(
+                /*$COMMONWHERE .= getEntitiesRestrictRequest(
                     $LINK,
                     $itemtable,
                     '',
                     '',
                     $data['item']->maybeRecursive() && $data['item']->isField('is_recursive')
+                );*/
+                $where_criteria = array_merge(
+                    $where_criteria,
+                    getEntitiesRestrictCriteria(
+                        $itemtable,
+                        '',
+                        '',
+                        $data['item']->maybeRecursive() && $data['item']->isField('is_recursive')
+                    )
                 );
             }
         }
-        $WHERE  = "";
+        $where = new Where();
+        $where->withCriteria($where_criteria);
+
+        $WHERE  = $where->getSQL();
+        $WHERE_VALUES = $where->getValues();
+        $main_where = new Where();
         $HAVING = "";
+        $HAVING_VALUES = [];
+        $main_having = new Having();
 
         // Add search conditions
         // If there are search items
         if (count($data['search']['criteria'])) {
-            $WHERE  = self::constructCriteriaSQL($data['search']['criteria'], $data, $searchopt);
-            $HAVING = self::constructCriteriaSQL($data['search']['criteria'], $data, $searchopt, true);
+            $main_where = self::constructCriteriaSQL($data['search']['criteria'], $data, $searchopt);
+            if ($WHERE !== '' && $main_where->getSQL() !== '') {
+                $WHERE .= ' AND ';
+            }
+            $WHERE  .= $main_where->getSQL();
+            $WHERE_VALUES = array_merge($WHERE_VALUES, $main_where->getValues());
+            $main_having = self::constructCriteriaSQL($data['search']['criteria'], $data, $searchopt, true);
+            $HAVING = $main_having->getSQL();
+            $HAVING_VALUES = $main_having->getValues();
 
             // if criteria (with meta flag) need additional join/from SQL
-            self::constructAdditionalSqlForMetacriteria($data['search']['criteria'], $SELECT, $FROM, $already_link_tables, $data);
+            $adds = self::getAdditionalSqlForMetacriteria(
+                $data['search']['criteria'],
+                $already_link_tables,
+                $data
+            );
+            foreach ($adds['SELECT'] as $add_select) {
+                $SELECT .= $add_select->getSQL();
+                $SELECT_VALUES = array_merge($SELECT_VALUES, $add_select->getValues());
+            }
+            foreach ($adds['FROM'] as $add_from) {
+                $FROM .= $add_from->getSQL() . ' ';
+                $FROM_VALUES = array_merge($FROM_VALUES, $add_from->getValues());
+            }
+            $data['meta_toview'] = $adds['meta_toview'];
         }
 
         //// 4 - ORDER
@@ -4603,21 +4682,31 @@ final class SQLProvider implements SearchProviderInterface
             $query_num = "SELECT $count,
                               " . $DB->quote($_SESSION['glpiname']) . " AS currentuser
                        FROM `$itemtable`"
-                . $COMMONLEFTJOIN;
+                . $COMMONLEFTJOIN; //TODO: Make sure values are handled from COMMONLEFTJOIN (should be get from $default_ljoin->getValues())
 
             $first     = true;
 
-            if (!empty($COMMONWHERE)) {
+            $where = new Where();
+            $where->withCriteria($where_criteria);
+            $COMMONWHERE = $where->getSQL();
+            $COMMONVALUES = array_merge($where->getValues());
+
+            $COUNT_COMMONWHERE = $where->getSQL();
+            $COUNT_COMMONVALUES = array_merge($default_ljoin->getValues(), $where->getValues());
+
+            if (!empty($COUNT_COMMONWHERE)) {
                 $LINK = " AND ";
                 $LINK  = " WHERE ";
                 $first = false;
-                $query_num .= $LINK . $COMMONWHERE;
+                $query_num .= $LINK . $COUNT_COMMONWHERE;
+                //$data['sql']['values'] = array_merge($data['sql']['values'], $COMMONVALUES);  //TODO: maybe should wa have values specific for count query?
             }
             // Union Search :
             if (isset($CFG_GLPI["union_search_type"][$data['itemtype']])) {
                 $tmpquery = $query_num;
 
                 foreach ($CFG_GLPI[$CFG_GLPI["union_search_type"][$data['itemtype']]] as $ctype) {
+                    $tmp_where_criteria = $COMMONVALUES;
                     $ctable = $ctype::getTable();
                     if (
                         ($citem = getItemForItemtype($ctype))
@@ -4633,20 +4722,23 @@ final class SQLProvider implements SearchProviderInterface
                             $query_num  = str_replace($data['itemtype'], $DB->escape($ctype), $query_num);
 
                             $system_criteria_sql = self::getMainItemtypeSystemSQLCriteria($ctype);
-                            if ($system_criteria_sql !== '') {
-                                $query_num .= ' AND ' . $system_criteria_sql;
+                            if ($system_criteria_sql !== null) {
+                                $query_num .= ' AND ' . $system_criteria_sql->getSQL();
+                                $tmp_where_criteria = array_merge($tmp_where_criteria, $system_criteria_sql->getValues());
                             }
 
                             $query_num .= " AND `$ctable`.`id` IS NOT NULL ";
 
                             // Add deleted if item have it
                             if ($citem->maybeDeleted()) {
-                                $query_num .= " AND `$ctable`.`is_deleted` = 0 ";
+                                $query_num .= " AND `$ctable`.`is_deleted` = ? ";
+                                $tmp_where_criteria[] = 0;
                             }
 
                             // Remove template items
                             if ($citem->maybeTemplate()) {
-                                $query_num .= " AND `$ctable`.`is_template` = 0 ";
+                                $query_num .= " AND `$ctable`.`is_template` = ? ";
+                                $tmp_where_criteria[] = 0;
                             }
                         } else {// Ref table case
                             $reftable = $data['itemtype']::getTable();
@@ -4675,32 +4767,45 @@ final class SQLProvider implements SearchProviderInterface
                                 $query_num
                             );
                         }
-                        $query_num = str_replace(
-                            "ADDDEFAULTWHERE",
-                            Search::addDefaultWhere($ctype),
-                            $query_num
-                        );
-                        $query_num = str_replace(
-                            "ENTITYRESTRICT",
-                            getEntitiesRestrictRequest(
-                                ' AND ',
-                                $ctable,
-                                '',
-                                '',
-                                $citem->maybeRecursive()
-                            ),
-                            $query_num
-                        );
-                        $data['sql']['count'][] = $query_num;
+                        if (isset($CFG_GLPI["union_search_type"][$data['itemtype']])) {
+                            $tmpwhere = Search::addDefaultWhere($ctype);
+                            $query_num .= $where->getSql();
+                            $tmp_where_criteria = array_merge($tmp_where_criteria, $where->getValues());
+                        }
+                        if ($ADDDEFAULTWHERE) {
+                            $adddefaultwhere = Search::addDefaultWhere($ctype);
+                            $query_num .= ' AND ' . $adddefaultwhere->getSQL();
+                            $tmp_where_criteria = array_merge($tmp_where_criteria, $adddefaultwhere->getValues());
+                        }
+                        if ($ENTITYRESTRICT) {
+                            $it = new DBmysqlIterator($DB);
+                            $it->analyseCrit(
+                                getEntitiesRestrictCriteria(
+                                    $ctable,
+                                    '',
+                                    '',
+                                    $citem->maybeRecursive()
+                                )
+                            );
+                            $query_num .= $it->getSql();
+                            $tmp_where_criteria = array_merge($tmp_where_criteria, $it->getValues());
+                        }
+                        $data['sql']['count'][] = (new Select())
+                            ->setSQL($query_num)
+                            ->setValues($tmp_where_criteria);
                     }
                 }
             } else {
                 $system_criteria_sql = self::getMainItemtypeSystemSQLCriteria($data['itemtype']);
-                if ($system_criteria_sql !== '') {
-                    $query_num .= (!empty($COMMONWHERE) ? ' AND ' : ' WHERE ') . $system_criteria_sql;
+                $system_where_criteria = [];
+                if ($system_criteria_sql !== null) {
+                    $query_num .= (!empty($COUNT_COMMONWHERE) ? ' AND ' : ' WHERE ') . $system_criteria_sql->getSQL();
+                    $system_where_criteria = $system_criteria_sql->getValues();
                 }
 
-                $data['sql']['count'][] = $query_num;
+                $data['sql']['count'][] = (new Select())
+                    ->setSQL($query_num)
+                    ->setValues(array_merge($COUNT_COMMONVALUES, $system_where_criteria)); //FIXME: TBD
             }
         }
 
@@ -4712,6 +4817,7 @@ final class SQLProvider implements SearchProviderInterface
         if (!empty($WHERE) || !empty($COMMONWHERE)) {
             if (!empty($COMMONWHERE)) {
                 $WHERE = ' WHERE ' . $COMMONWHERE . (!empty($WHERE) ? ' AND ( ' . $WHERE . ' )' : '');
+                $WHERE_VALUES = array_merge($WHERE_VALUES, $COMMONVALUES);
             } else {
                 $WHERE = ' WHERE ' . $WHERE . ' ';
             }
@@ -4726,6 +4832,7 @@ final class SQLProvider implements SearchProviderInterface
         if (isset($CFG_GLPI["union_search_type"][$data['itemtype']])) {
             $first = true;
             $QUERY = "";
+            $UNION_VALUES = [];
             foreach ($CFG_GLPI[$CFG_GLPI["union_search_type"][$data['itemtype']]] as $ctype) {
                 $ctable = $ctype::getTable();
                 if (
@@ -4738,31 +4845,37 @@ final class SQLProvider implements SearchProviderInterface
                         $QUERY .= " UNION ALL ";
                     }
                     $tmpquery = "";
+                    $tmpvalues = [];
                     // AllAssets case
                     if ($data['itemtype'] == AllAssets::class) {
                         $tmpquery = $SELECT . ", '{$DB->escape($ctype)}' AS TYPE "
                             . $FROM
                             . $WHERE;
+                        $tmpvalues = array_merge($tmpvalues, $FROM_VALUES, $WHERE_VALUES);
 
                         $system_criteria_sql = self::getMainItemtypeSystemSQLCriteria($ctype);
-                        if ($system_criteria_sql !== '') {
-                            $tmpquery .= ' AND ' . $system_criteria_sql;
+                        if ($system_criteria_sql !== null) {
+                            $tmpquery .= ' AND ' . $system_criteria_sql->getSQL();
+                            $tmpvalues = array_merge($tmpvalues, $system_criteria_sql->getValues());
                         }
 
                         $tmpquery .= " AND `$ctable`.`id` IS NOT NULL ";
 
                         // Add deleted if item have it
                         if ($citem->maybeDeleted()) {
-                            $tmpquery .= " AND `$ctable`.`is_deleted` = 0 ";
+                            $tmpquery .= " AND `$ctable`.`is_deleted` = ? ";
+                            $tmpvalues[] = 0;
                         }
 
                         // Remove template items
                         if ($citem->maybeTemplate()) {
-                            $tmpquery .= " AND `$ctable`.`is_template` = 0 ";
+                            $tmpquery .= " AND `$ctable`.`is_template` = ? ";
+                            $tmpvalues[] = 0;
                         }
 
                         $tmpquery .= $GROUPBY
                             . $HAVING;
+                        $tmpvalues = array_merge($tmpvalues, $HAVING_VALUES);
 
                         // Replace 'asset_types' by itemtype table name
                         $tmpquery = str_replace(
@@ -4772,6 +4885,7 @@ final class SQLProvider implements SearchProviderInterface
                         );
                         // Replace 'AllAssets' by itemtype
                         // Use quoted value to prevent replacement of AllAssets in column identifiers
+                        //FIXME: probably to be done in the values array... Good luck.
                         $tmpquery = str_replace(
                             $DB->quoteValue(AllAssets::class),
                             $DB->quoteValue($ctype),
@@ -4785,6 +4899,7 @@ final class SQLProvider implements SearchProviderInterface
                                       `$ctable`.`entities_id` AS ENTITY "
                             . $FROM
                             . $WHERE;
+                        $tmpvalues = array_merge($tmpvalues, $FROM_VALUES, $main_where->getValues());
                         if ($data['item']->maybeDeleted()) {
                             $tmpquery = str_replace(
                                 "`" . $CFG_GLPI["union_search_type"][$data['itemtype']] . "`.
@@ -4817,22 +4932,25 @@ final class SQLProvider implements SearchProviderInterface
                         $name_field = $ctype::getNameField();
                         $tmpquery = str_replace("`$ctable`.`name`", "`$ctable`.`$name_field`", $tmpquery);
                     }
-                    $tmpquery = str_replace(
-                        "ADDDEFAULTWHERE",
-                        Search::addDefaultWhere($ctype),
-                        $tmpquery
-                    );
-                    $tmpquery = str_replace(
-                        "ENTITYRESTRICT",
-                        getEntitiesRestrictRequest(
-                            ' AND ',
-                            $ctable,
-                            '',
-                            '',
-                            $citem->maybeRecursive()
-                        ),
-                        $tmpquery
-                    );
+
+                    if ($ADDDEFAULTWHERE) {
+                        $adddefaultwhere = Search::addDefaultWhere($ctype);
+                        $tmpquery .= ' AND ' . $adddefaultwhere->getSQL();
+                        $tmpvalues = array_merge($tmpvalues, $adddefaultwhere->getValues());
+                    }
+
+                    if ($ENTITYRESTRICT) {
+                        $it = new DBmysqlIterator($DB);
+                        $tmpquery .= ' AND ' . $it->analyseCrit(
+                            getEntitiesRestrictCriteria(
+                                $ctable,
+                                '',
+                                '',
+                                $citem->maybeRecursive()
+                            )
+                        );
+                        $tmpvalues = array_merge($tmpvalues, $it->getValues());
+                    }
 
                     // SOFTWARE HACK
                     if ($ctype == 'Software') {
@@ -4856,6 +4974,7 @@ final class SQLProvider implements SearchProviderInterface
 
                     // Wrap inner union queries to support potential limit clause
                     $QUERY .= "(" . $tmpquery . ")";
+                    $UNION_VALUES = array_merge($UNION_VALUES, $tmpvalues);
                 }
             }
             if (empty($QUERY)) {
@@ -4863,12 +4982,13 @@ final class SQLProvider implements SearchProviderInterface
                 Profiler::getInstance()->stop('SQLProvider::constructSQL');
                 return;
             }
-            $QUERY .= str_replace($CFG_GLPI["union_search_type"][$data['itemtype']] . ".", "", $ORDER)
-                . $LIMIT;
+            $QUERY .= str_replace($CFG_GLPI["union_search_type"][$data['itemtype']] . ".", "", $ORDER) . $LIMIT;
+            $QUERY_VALUES = $UNION_VALUES;
         } else {
             $system_criteria_sql = self::getMainItemtypeSystemSQLCriteria($data['itemtype']);
-            if ($system_criteria_sql !== '') {
-                $WHERE .= (!empty($WHERE) ? ' AND ' : ' WHERE ') . $system_criteria_sql;
+            if ($system_criteria_sql !== null) {
+                $WHERE .= (!empty($WHERE) ? ' AND ' : ' WHERE ') . $system_criteria_sql->getSQL();
+                $WHERE_VALUES = array_merge($WHERE_VALUES, $system_criteria_sql->getValues());
             }
 
             $data['sql']['raw'] = [
@@ -4880,6 +5000,12 @@ final class SQLProvider implements SearchProviderInterface
                 'ORDER' => $ORDER,
                 'LIMIT' => $LIMIT,
             ];
+            $QUERY_VALUES = array_merge(
+                $SELECT_VALUES,
+                $FROM_VALUES,
+                $WHERE_VALUES,
+                $HAVING_VALUES
+            );
             $QUERY = $SELECT
                 . $FROM
                 . $WHERE
@@ -4888,7 +5014,9 @@ final class SQLProvider implements SearchProviderInterface
                 . $ORDER
                 . $LIMIT;
         }
-        $data['sql']['search'] = $QUERY;
+        $data['sql']['search'] = (new Select())
+            ->setSQL($QUERY)
+            ->setValues($QUERY_VALUES);
         Profiler::getInstance()->stop('SQLProvider::constructSQL');
     }
 
@@ -4906,11 +5034,12 @@ final class SQLProvider implements SearchProviderInterface
      * @param  array   $searchopt Search options for the current itemtype
      * @param  bool $is_having Do we construct SQL WHERE or HAVING part
      *
-     * @return string             the SQL sub string
+     * @return Where
      */
-    public static function constructCriteriaSQL($criteria = [], $data = [], $searchopt = [], $is_having = false): string
+    public static function constructCriteriaSQL($criteria = [], &$data = [], $searchopt = [], $is_having = false): Where
     {
         $sql = "";
+        $values = [];
 
         foreach ($criteria as $criterion) {
             if (
@@ -4942,37 +5071,40 @@ final class SQLProvider implements SearchProviderInterface
                 || ($criterion['field'] != "all"
                     && $criterion['field'] != "view")
             ) {
-                $LINK    = " ";
+                $LINK    = Operator::NONE;
                 $NOT     = false;
-                $tmplink = "";
+                $tmplink = Operator::AND;
 
                 if (
                     isset($criterion['link'])
                     && in_array($criterion['link'], array_keys(SearchEngine::getLogicalOperators()))
                 ) {
                     if (str_contains($criterion['link'], "NOT")) {
-                        $tmplink = " " . str_replace(" NOT", "", $criterion['link']);
+                        $tmplink = str_replace(" NOT", "", $criterion['link']);
                         $NOT     = true;
                     } else {
-                        $tmplink = " " . $criterion['link'];
+                        $tmplink = $criterion['link'];
                     }
-                } else {
-                    $tmplink = " AND ";
                 }
 
                 // Manage Link if not first item
-                if (!empty($sql)) {
+                if (!empty(trim($sql))) {
+                    if (!$tmplink instanceof Operator) {
+                        $tmplink = Operator::fromString($tmplink);
+                    }
                     $LINK = $tmplink;
                 }
 
                 if (isset($criterion['criteria']) && count($criterion['criteria'])) {
                     $sub_sql = self::constructCriteriaSQL($criterion['criteria'], $data, $meta_searchopt, $is_having);
-                    if (strlen($sub_sql)) {
-                        if ($NOT) {
-                            $sql .= "$LINK NOT($sub_sql)";
-                        } else {
-                            $sql .= "$LINK ($sub_sql)";
-                        }
+                    if (strlen($sub_sql->getSQL())) {
+                        $sql .= sprintf(
+                            ' %s %s(%s) ',
+                            $LINK->value,
+                            $NOT ? 'NOT' : '',
+                            $sub_sql->getSQL()
+                        );
+                        $values = array_merge($values, $sub_sql->getValues());
                     }
                 } elseif (
                     isset($meta_searchopt[$criterion['field']]["usehaving"])
@@ -4991,7 +5123,8 @@ final class SQLProvider implements SearchProviderInterface
                         $criterion['searchtype'],
                         $criterion['value']
                     );
-                    $sql .= $new_having;
+                    $sql .= ' ' . $new_having->getSQL();
+                    $values = array_merge($values, $new_having->getValues());
                 } else {
                     if ($is_having) {
                         // the having part has been already managed in the first pass
@@ -5007,40 +5140,39 @@ final class SQLProvider implements SearchProviderInterface
                         $criterion['value'],
                         $meta
                     );
-                    if ($new_where !== false) {
-                        $sql .= $new_where;
-                    }
+                    $sql .= ' ' . $new_where->getSQL();
+                    $values = array_merge($values, $new_where->getValues());
                 }
             } elseif (
                 isset($criterion['value'])
                 && ((string) $criterion['value']) !== ''
             ) { // view and all search
-                $LINK       = " OR ";
+                $LINK       = Operator::OR;
                 $NOT        = false;
-                $globallink = " AND ";
+                $globallink = Operator::AND;
                 if (isset($criterion['link'])) {
                     switch ($criterion['link']) {
                         case "AND":
-                            $LINK       = ($criterion['searchtype'] == 'notcontains') ? ' AND ' : ' OR ';
+                            $LINK       = ($criterion['searchtype'] == 'notcontains') ? Operator::AND : Operator::OR;
                             break;
                         case "AND NOT":
-                            $LINK       = ($criterion['searchtype'] == 'notcontains') ? ' OR ' : ' AND ';
+                            $LINK       = ($criterion['searchtype'] == 'notcontains') ? Operator::OR : Operator::AND;
                             $NOT        = true;
                             break;
                         case "OR":
-                            $LINK       = ($criterion['searchtype'] == 'notcontains') ? ' AND ' : ' OR ';
-                            $globallink = " OR ";
+                            $LINK       = ($criterion['searchtype'] == 'notcontains') ? Operator::AND : Operator::OR;
+                            $globallink = Operator::OR;
                             break;
                         case "OR NOT":
-                            $LINK       = ($criterion['searchtype'] == 'notcontains') ? ' OR ' : ' AND ';
+                            $LINK       = ($criterion['searchtype'] == 'notcontains') ? Operator::OR : Operator::AND;
                             $NOT        = true;
-                            $globallink = " OR ";
+                            $globallink = Operator::OR;
                             break;
                     }
                 }
                 // Manage Link if not first item
                 if (!empty($sql) && !$is_having) {
-                    $sql .= $globallink;
+                    $sql .= ' ' . $globallink->value . ' ';
                 }
                 $first2 = true;
                 $items = [];
@@ -5071,7 +5203,7 @@ final class SQLProvider implements SearchProviderInterface
                         if (!$is_having && !isset($val2["usehaving"])) {
                             $tmplink = $LINK;
                             if ($first2) {
-                                $tmplink = " ";
+                                $tmplink = Operator::NONE;
                             }
 
                             $new_where = Search::addWhere(
@@ -5083,10 +5215,10 @@ final class SQLProvider implements SearchProviderInterface
                                 $criterion['value'],
                                 $meta
                             );
-                            if ($new_where !== false && $new_where !== '') {
-                                $first2  = false;
-                                $view_sql .=  $new_where;
-                            }
+
+                            $first2  = false;
+                            $view_sql .= ' ' . $new_where->getSQL();
+                            $values = array_merge($values, $new_where->getValues());
                         }
                     }
                 }
@@ -5095,7 +5227,12 @@ final class SQLProvider implements SearchProviderInterface
                 }
             }
         }
-        return $sql;
+
+        $where = new Where();
+        return $where
+            ->setSQL($sql)
+            ->setValues($values)
+        ;
     }
 
     /**
@@ -5108,6 +5245,7 @@ final class SQLProvider implements SearchProviderInterface
      * @param  array  &$data                TODO: should be a class property (output parameter)
      *
      * @return void
+     * @deprecated 12
      */
     public static function constructAdditionalSqlForMetacriteria(
         $criteria = [],
@@ -5116,6 +5254,7 @@ final class SQLProvider implements SearchProviderInterface
         &$already_link_tables = [],
         &$data = []
     ) {
+        Toolbox::deprecated('Use getAdditionalSqlForMetacriteria instead', '12.0');
         $data['meta_toview'] = [];
         foreach ($criteria as $criterion) {
             // manage sub criteria
@@ -5155,15 +5294,17 @@ final class SQLProvider implements SearchProviderInterface
                 $m_itemtype
             );
 
-            $FROM .= Search::addMetaLeftJoin(
+            $ljoin = Search::addMetaLeftJoin(
                 $data['itemtype'],
                 $m_itemtype,
                 $already_link_tables,
                 $sopt["joinparams"]
             );
+            $FROM .= $ljoin->getSQL();
+            $data['sql']['values'] = array_merge($data['sql']['values'], $ljoin->getValues());
 
             $ref_table = $m_itemtype::getTable() . self::getMetaTableUniqueSuffix($m_itemtype::getTable(), $m_itemtype);
-            $FROM .= Search::addLeftJoin(
+            $ljoin = Search::addLeftJoin(
                 $m_itemtype,
                 $ref_table,
                 $already_link_tables,
@@ -5175,7 +5316,99 @@ final class SQLProvider implements SearchProviderInterface
                 $sopt["field"],
                 $sopt['use_join_subquery'] ?? false
             );
+            $FROM .= $ljoin->getSQL() . ' ';
+            $data['sql']['values'] = array_merge($data['sql']['values'], $ljoin->getValues());
         }
+    }
+
+    /**
+     * Construct additional SQL (select, joins, etc) for meta-criteria
+     **
+     * @param  array<int|string, mixed> $criteria             list of search criterion
+     * @param  array<int, string>       &$already_link_tables
+     * @param  array<int|string, mixed> &$data
+     *
+     * @return array{SELECT: Select[], FROM: LeftJoin[], meta_toview: array<class-string<CommonDBTM, string[]>>}
+     */
+    public static function getAdditionalSqlForMetacriteria(
+        array $criteria = [],
+        array &$already_link_tables = [],
+        array $data = []
+    ): array {
+        $result = [
+            'SELECT' => [],
+            'FROM' => [],
+            'meta_toview' => [],
+        ];
+
+        foreach ($criteria as $criterion) {
+            // manage sub criteria
+            if (isset($criterion['criteria'])) {
+                $sub_result = self::getAdditionalSqlForMetacriteria(
+                    $criterion['criteria'],
+                    $already_link_tables,
+                    $data
+                );
+                $result['SELECT'] = array_merge($result['SELECT'], $sub_result['SELECT']);
+                $result['FROM'] = array_merge($result['FROM'], $sub_result['FROM']);
+                $result['meta_toview'] = array_merge($result['meta_toview'], $sub_result['meta_toview']);
+                continue;
+            }
+
+            // parse only criterion with meta flag
+            if (
+                !isset($criterion['itemtype'])
+                || empty($criterion['itemtype'])
+                || !isset($criterion['meta'])
+                || !$criterion['meta']
+                || !isset($criterion['value'])
+                || strlen($criterion['value']) <= 0
+            ) {
+                continue;
+            }
+
+            $m_itemtype = $criterion['itemtype'];
+            $metaopt = SearchOption::getOptionsForItemtype($m_itemtype);
+            $sopt    = $metaopt[$criterion['field']];
+
+            //add toview for meta criterion
+            $result['meta_toview'][$m_itemtype][] = $criterion['field'];
+
+            $select = new Select();
+            $result['SELECT'][] = $select->setSQL(
+                Search::addSelect(
+                    $m_itemtype,
+                    $criterion['field'],
+                    true, // meta-criterion
+                    $m_itemtype
+                )
+            );
+
+            $ljoin = Search::addMetaLeftJoin(
+                $data['itemtype'],
+                $m_itemtype,
+                $already_link_tables,
+                $sopt["joinparams"]
+            );
+            $result['FROM'][] = $ljoin;
+
+            $ref_table = $m_itemtype::getTable() . self::getMetaTableUniqueSuffix($m_itemtype::getTable(), $m_itemtype);
+            $ljoin = Search::addLeftJoin(
+                $m_itemtype,
+                $ref_table,
+                $already_link_tables,
+                $sopt["table"],
+                $sopt["linkfield"],
+                true,
+                $m_itemtype,
+                $sopt["joinparams"],
+                $sopt["field"],
+                $sopt['use_join_subquery'] ?? false
+            );
+            $result['FROM'][] = $ljoin;
+        }
+
+        return $result;
     }
 
     #[Override]
@@ -5192,7 +5425,9 @@ final class SQLProvider implements SearchProviderInterface
         $DBread->doQuery("SET SESSION group_concat_max_len = 8194304;");
 
         $DBread->execution_time = true;
-        $result = $DBread->doQuery($data['sql']['search']);
+        $stmt = $DBread->prepare($data['sql']['search']->getSQL());
+        $DBread->executeStatement($stmt, $data['sql']['search']->getValues());
+        $result = $stmt->get_result();
 
         if ($result) {
             $data['data']['execution_time'] = $DBread->execution_time;
@@ -5218,9 +5453,9 @@ final class SQLProvider implements SearchProviderInterface
                     $data['data']['totalcount'] = $DBread->numrows($result);
                 } else {
                     foreach ($data['sql']['count'] as $sqlcount) {
-                        /** @var mysqli_result $result_num */
-                        $result_num = $DBread->doQuery($sqlcount);
-                        $data['data']['totalcount'] += $DBread->result($result_num, 0, 0);
+                        $stmt = $DBread->prepare($sqlcount->getSQL());
+                        $DBread->executeStatement($stmt, $sqlcount->getValues());
+                        $data['data']['totalcount'] += $DBread->result($stmt->get_result(), 0, 0);
                     }
                 }
             }
@@ -5511,7 +5746,9 @@ final class SQLProvider implements SearchProviderInterface
     {
         if (!is_string($field)) {
             //This case seems often not realistic; but let's keep for backward compatibility
-            return [new QueryExpression(self::makeTextCriteria($field, $val, $not, $link->value))];
+            $qexpr = (new QueryExpression(self::makeTextCriteria($field, $val, $not, $link->value)))->setValues($field->getValues());
+            $qexpr->setValues([$link->value]);
+            return [$qexpr];
         }
         $field = str_replace('`', '', $field);
         $search_val = self::makeTextSearchValue($val);
@@ -5586,9 +5823,9 @@ final class SQLProvider implements SearchProviderInterface
             // to ensure that the `''` value will not be stored in DB.
 
             if ($not) {
-                $sql .= " AND $field <> ''";
+                $sql .= " AND $field <> ?";
             } else {
-                $sql .= " OR $field = ''";
+                $sql .= " OR $field = ?";
             }
         }
 
@@ -5677,7 +5914,7 @@ final class SQLProvider implements SearchProviderInterface
         if ($search_val == null) {
             $SEARCH = " IS $NOT NULL ";
         } else {
-            $SEARCH = " $NOT LIKE " . DBmysql::quoteValue($search_val) . " ";
+            $SEARCH = " $NOT LIKE ? ";
         }
         return $SEARCH;
     }
@@ -7194,7 +7431,7 @@ final class SQLProvider implements SearchProviderInterface
     private static function getOptComputation(string|QueryExpression $opt_value, string $table): QueryExpression
     {
         global $DB;
-        return new QueryExpression(
+        $qexpr = new QueryExpression(
             str_replace(
                 "TABLE",
                 $DB::quoteName($table),
@@ -7205,5 +7442,9 @@ final class SQLProvider implements SearchProviderInterface
                 )
             )
         );
+        if ($opt_value instanceof QueryExpression) {
+            $qexpr->setValues($opt_value->getValues());
+        }
+        return $qexpr;
     }
 }

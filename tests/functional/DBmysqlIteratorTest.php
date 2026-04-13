@@ -1831,7 +1831,6 @@ class DBmysqlIteratorTest extends DbTestCase
         ];
     }
 
-
     #[DataProvider('resultProvider')]
     public function testAutoUnsanitize(array $db_data, array $result): void
     {
@@ -1861,7 +1860,7 @@ class DBmysqlIteratorTest extends DbTestCase
         $this->assertEquals($db_data, $iterator->current());
     }
 
-    public function testRawFKeyCondition()
+    public function testRawFKeyCondition(): void
     {
         $this->assertEquals(
             "glpi_tickets.id=(CASE WHEN glpi_tickets_tickets.tickets_id_1=103 THEN glpi_tickets_tickets.tickets_id_2 ELSE glpi_tickets_tickets.tickets_id_1 END)",
@@ -1869,5 +1868,32 @@ class DBmysqlIteratorTest extends DbTestCase
                 'ON' => new QueryExpression("glpi_tickets.id=(CASE WHEN glpi_tickets_tickets.tickets_id_1=103 THEN glpi_tickets_tickets.tickets_id_2 ELSE glpi_tickets_tickets.tickets_id_1 END)"),
             ])
         );
+    }
+
+    public function testOrAndNull(): void
+    {
+        $expected_sql = 'SELECT * FROM `my_table` WHERE `entities_id` = ? AND `name` = ? AND (((`app_token` = ?) OR (`app_token` IS NULL))) AND `app_token_date` IS NULL';
+        $expected_values = [
+            0,
+            'name of the object',
+            '',
+        ];
+
+        $it = $this->it->execute([
+            'FROM' => 'my_table',
+            'WHERE' => [
+                'entities_id' => 0,
+                'name' => 'name of the object',
+                [
+                    'OR' => [
+                        ['app_token' => ''],
+                        ['app_token' => null],
+                    ],
+                ],
+                'app_token_date' => null,
+            ],
+        ]);
+        $this->assertSame($expected_sql, $it->getSql());
+        $this->assertEquals($expected_values, $it->getValues());
     }
 }

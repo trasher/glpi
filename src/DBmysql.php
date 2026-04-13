@@ -33,13 +33,13 @@
  * ---------------------------------------------------------------------
  */
 
-use Glpi\DBAL\Delete;
-use Glpi\DBAL\Insert;
+use Glpi\DBAL\Parts\Delete;
+use Glpi\DBAL\Parts\Insert;
+use Glpi\DBAL\Parts\Update;
 use Glpi\DBAL\QueryExpression;
 use Glpi\DBAL\QueryParam;
 use Glpi\DBAL\QuerySubQuery;
 use Glpi\DBAL\QueryUnion;
-use Glpi\DBAL\Update;
 use Glpi\Debug\Profile;
 use Glpi\Exception\Database\StatementException;
 use Glpi\System\Requirement\DbTimezones;
@@ -1541,8 +1541,8 @@ class DBmysql
         $query  = "DELETE " . self::quoteName($table) . " FROM " . self::quoteName($table);
 
         $this->iterator = new DBmysqlIterator($this);
-        $query .= $this->iterator->analyseJoins($joins);
-        $query .= " WHERE " . $this->iterator->analyseCrit($where);
+        $query .= $this->iterator->analyseJoins($joins); //TODO: maybe rely on DBAL\LeftJoin
+        $query .= " WHERE " . $this->iterator->analyseCrit($where); //TODO: maybe rely on DBAL\Where
         $values = $this->iterator->getValues();
 
         $delete = new Delete();
@@ -2062,10 +2062,11 @@ class DBmysql
             $vcount = count($params);
             throw new StatementException(
                 sprintf(
-                    'Number of placeholders (%d) in SQL statement does not match number of values (%d). SQL: %s',
+                    "Number of placeholders (%d) in SQL statement does not match number of values (%d).\n     SQL query:\n%s\n    Parameters:\n%s",
                     $scount,
                     $vcount,
-                    $this->current_query
+                    $this->current_query,
+                    var_export($params, true)
                 ),
                 $e->getCode(),
                 $e

@@ -33,44 +33,53 @@
  * ---------------------------------------------------------------------
  */
 
-namespace Glpi\DBAL;
+namespace Glpi\DBAL\Parts;
 
-abstract class Prepared
+use Glpi\DBAL\Operator;
+
+class Where extends BasePart
 {
-    protected string $sql;
-    /** @var array<int, mixed> */
-    protected array $values;
+    protected Operator $operator = Operator::NONE;
+    protected string $clause = 'WHERE';
 
-    public function setSQL(string $sql): static
+    public function setOperator(Operator $operator): static
     {
-        $this->sql = $sql;
+        $this->operator = $operator;
         return $this;
+    }
+
+    public function getOperator(): Operator
+    {
+        return $this->operator;
+    }
+
+    /**
+     * @return array{FROM: string}
+     */
+    public function getFromClause(): array
+    {
+        return [
+            'FROM' => 'table',
+        ];
     }
 
     public function getSQL(): string
     {
-        return $this->sql;
+        $sql = parent::getSQL();
+        if ($this->operator !== Operator::NONE) {
+            $sql = $this->operator->value . ' ' . $sql;
+        }
+        return $sql;
     }
 
-    /**
-     * @param array<int, mixed> $values
-     */
-    public function setValues(array $values): static
+    public function setSQL(string $sql): static
     {
-        $this->values = $values;
+        parent::setSQL($sql);
+
+        //remove text clause from SQL
+        $this->sql = trim(str_replace('SELECT * FROM `table` ' . $this->clause, '', $this->sql));
+        //Handle case where clause is missing - which should not happen.
+        $this->sql = trim(str_replace('SELECT * FROM `table`', '', $this->sql));
         return $this;
-    }
-
-    /**
-     * @return array<int, mixed>
-     */
-    public function getValues(): array
-    {
-        return $this->values;
-    }
-
-    public function __toString()
-    {
-        return $this->getSQL();
     }
 }
