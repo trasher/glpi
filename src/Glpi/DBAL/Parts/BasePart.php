@@ -33,56 +33,61 @@
  * ---------------------------------------------------------------------
  */
 
-/**
- *  Sub query class
- **/
-abstract class AbstractQuery
+namespace Glpi\DBAL\Parts;
+
+use DBmysqlIterator;
+
+abstract class BasePart
 {
-    protected ?string $alias = null;
+    protected string $sql;
     /** @var array<int, mixed> */
-    protected array $values = [];
+    protected array $values;
 
     /**
-     * Create a query
-     *
-     * @param string $alias Alias for the whole subquery
+     * @param array<string|int, mixed> $criteria
      */
-    public function __construct($alias = null)
+    public function withCriteria(array $criteria): static
     {
-        $this->alias = $alias;
+        global $DB;
+
+        if (empty($criteria)) {
+            return $this;
+        }
+
+        $iterator = new DBmysqlIterator($DB);
+        $it_criteria = $this->getFromClause();
+        if (property_exists($this, 'clause')) {
+            $it_criteria += [$this->clause => $criteria];
+        } else {
+            $it_criteria += $criteria;
+        }
+        $iterator->buildQuery($it_criteria);
+
+        return $this
+            ->setSQL($iterator->getSql())
+            ->setValues($iterator->getValues())
+        ;
     }
 
     /**
-     * Get alias
-     *
-     * @return string|null
+     * @return array{FROM: string}
      */
-    public function getAlias()
+    public function getFromClause(): array
     {
-        return $this->alias;
+        return [
+            'FROM' => 'table',
+        ];
     }
 
-    /**
-     *
-     * Get SQL query
-     *
-     * @return string
-     *
-     * @psalm-taint-escape sql
-     */
-    abstract public function getQuery();
-
-    public function __toString()
+    public function setSQL(string $sql): static
     {
-        return $this->getQuery();
+        $this->sql = $sql;
+        return $this;
     }
 
-    /**
-    * @return array<int, mixed>
-    */
-    public function getValues(): array
+    public function getSQL(): string
     {
-        return $this->values;
+        return $this->sql ?? '';
     }
 
     /**
@@ -92,5 +97,18 @@ abstract class AbstractQuery
     {
         $this->values = $values;
         return $this;
+    }
+
+    /**
+     * @return array<int, mixed>
+     */
+    public function getValues(): array
+    {
+        return $this->values ?? [];
+    }
+
+    public function __toString()
+    {
+        return $this->getSQL();
     }
 }

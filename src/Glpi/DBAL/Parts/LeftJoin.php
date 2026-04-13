@@ -33,64 +33,16 @@
  * ---------------------------------------------------------------------
  */
 
-/**
- *  Sub query class
- **/
-abstract class AbstractQuery
+namespace Glpi\DBAL\Parts;
+
+class LeftJoin extends BasePart
 {
-    protected ?string $alias = null;
-    /** @var array<int, mixed> */
-    protected array $values = [];
-
-    /**
-     * Create a query
-     *
-     * @param string $alias Alias for the whole subquery
-     */
-    public function __construct($alias = null)
+    public function setSQL(string $sql): static
     {
-        $this->alias = $alias;
-    }
+        parent::setSQL($sql);
 
-    /**
-     * Get alias
-     *
-     * @return string|null
-     */
-    public function getAlias()
-    {
-        return $this->alias;
-    }
-
-    /**
-     *
-     * Get SQL query
-     *
-     * @return string
-     *
-     * @psalm-taint-escape sql
-     */
-    abstract public function getQuery();
-
-    public function __toString()
-    {
-        return $this->getQuery();
-    }
-
-    /**
-    * @return array<int, mixed>
-    */
-    public function getValues(): array
-    {
-        return $this->values;
-    }
-
-    /**
-     * @param array<int, mixed> $values
-     */
-    public function setValues(array $values): static
-    {
-        $this->values = $values;
+        //remove FROM clause from SQL
+        $this->sql = trim(str_replace('SELECT * FROM `table`', '', $this->sql));
         return $this;
     }
 }

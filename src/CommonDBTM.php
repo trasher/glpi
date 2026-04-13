@@ -425,10 +425,11 @@ class CommonDBTM extends CommonGLPI
         } elseif (count($iter) > 1) {
             throw new TooManyResultsException(
                 sprintf(
-                    '`%1$s::getFromDBByCrit()` expects to get one result, %2$s found in query "%3$s".',
+                    '`%1$s::getFromDBByCrit()` expects to get one result, %2$s found in query "%3$s" with values: %4$s.',
                     static::class,
                     count($iter),
-                    $iter->getSql()
+                    $iter->getSql(),
+                    var_export($iter->getValues(), true)
                 )
             );
         }
@@ -734,7 +735,7 @@ class CommonDBTM extends CommonGLPI
             $tobeupdated,
             ['id' => $this->fields['id']]
         );
-        $affected_rows = $DB->affectedRows();
+        $affected_rows = $DB->getAffectedRows();
 
         if (count($oldvalues) && $affected_rows > 0) {
             Log::constructHistory($this, $oldvalues, $this->fields);
@@ -801,9 +802,8 @@ class CommonDBTM extends CommonGLPI
                 $params['date_mod'] = $_SESSION["glpi_currenttime"];
             }
 
-            if ($DB->update(static::getTable(), $params, ['id' => $this->fields['id']])) {
-                return true;
-            }
+            $DB->update(static::getTable(), $params, ['id' => $this->fields['id']]);
+            return true;
         }
         return false;
     }
@@ -1901,7 +1901,15 @@ class CommonDBTM extends CommonGLPI
             );
             foreach ($fields as $field) {
                 try {
-                    $DB->executeStatement($stmt, [$field]);
+                    $DB->executeStatement(
+                        $stmt,
+                        [
+                            'itemtype'        => static::class,
+                            'items_id'        => $this->fields['id'],
+                            'date_creation'   => $_SESSION["glpi_currenttime"],
+                            'field'           => $field,
+                        ]
+                    );
                 } catch (StatementException $e) {
                     if ($e->getCode() != 1062) {
                         throw new RuntimeException('Unable to add locked field!', code: $e->getCode(), previous: $e);

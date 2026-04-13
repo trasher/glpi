@@ -33,11 +33,12 @@
  * ---------------------------------------------------------------------
  */
 
+use Glpi\DBAL\Parts\BasePart;
 use Glpi\DBAL\QueryExpression;
 use Glpi\DBAL\QueryFunction;
+use Glpi\Exception\Database\StatementException;
 use Glpi\Message\MessageType;
 use Glpi\Progress\AbstractProgressIndicator;
-
 use function Safe\preg_replace;
 
 /**
@@ -763,7 +764,12 @@ class Migration
     public function executeMigration()
     {
         foreach ($this->queries[self::PRE_QUERY] as $query) {
-            $this->db->doQuery($query['query']);
+            if ($query['query'] instanceof BasePart) {
+                $stmt = $this->db->prepare($query['query']->getSQL());
+                $this->db->executeStatement($stmt, $query['query']->getValues());
+            } else {
+                $this->db->doQuery($query['query']);
+            }
         }
         $this->queries[self::PRE_QUERY] = [];
 
@@ -777,7 +783,12 @@ class Migration
         }
 
         foreach ($this->queries[self::POST_QUERY] as $query) {
-            $this->db->doQuery($query['query']);
+            if ($query['query'] instanceof BasePart) {
+                $stmt = $this->db->prepare($query['query']->getSQL());
+                $this->db->executeStatement($stmt, $query['query']->getValues());
+            } else {
+                $this->db->doQuery($query['query']);
+            }
         }
         $this->queries[self::POST_QUERY] = [];
 
@@ -1090,14 +1101,20 @@ class Migration
                 }
                 if (count($config)) {
                     foreach ($config as $name => $value) {
-                        $this->db->insert(
-                            'glpi_configs',
-                            [
-                                'context' => $context,
-                                'name'    => $name,
-                                'value'   => $value,
-                            ]
-                        );
+                        try {
+                            $this->db->insert(
+                                'glpi_configs',
+                                [
+                                    'context' => $context,
+                                    'name' => $name,
+                                    'value' => $value,
+                                ]
+                            );
+                        } catch (StatementException $e) {
+                            if (!str_contains($e->getMessage(), 'Duplicate entry')) {
+                                throw $e;
+                            }
+                        }
                     }
                     $this->addDebugMessage(sprintf(
                         __('Configuration values added for %1$s (%2$s).'),
