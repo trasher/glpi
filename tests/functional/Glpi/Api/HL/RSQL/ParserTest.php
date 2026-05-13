@@ -212,7 +212,7 @@ class ParserTest extends GLPITestCase
             ],
             [
                 [[5, 'name'], [6, '=notempty='], [7, 'test']],
-                "(((`_`.`name` <> '') AND  NOT (`_`.`name` IS NULL)))",
+                "(((`_`.`name` <> ?) AND  NOT (`_`.`name` IS NULL)))",
                 [''],
             ],
             [
@@ -223,10 +223,12 @@ class ParserTest extends GLPITestCase
             [
                 [[5, 'name'], [6, '=notlike='], [7, 'test']],
                 "(`_`.`name` NOT LIKE CAST('test' AS BINARY))",
+                [],
             ],
             [
                 [[5, 'name'], [6, '=notilike='], [7, 'test']],
-                "(`_`.`name` NOT LIKE 'test')",
+                "(`_`.`name` NOT LIKE ?)",
+                ['test'],
             ],
         ];
     }
