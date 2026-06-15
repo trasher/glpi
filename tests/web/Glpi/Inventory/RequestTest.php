@@ -36,16 +36,20 @@ namespace tests\units\Glpi\Inventory;
 
 use Config;
 use Glpi\Inventory\Conf;
+use Glpi\Plugin\Hooks;
 use GLPIKey;
 use GuzzleHttp;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use SNMPCredential;
 
 class RequestTest extends TestCase
 {
-    private $http_client;
-    private $base_uri;
+    private GuzzleHttp\Client $http_client;
+    private string $base_uri;
+
+    private int $snmpcredentials_id = 0;
 
     public function setUp(): void
     {
@@ -75,7 +79,7 @@ class RequestTest extends TestCase
      *
      * @param Response $res   Request response
      * @param string   $reply Reply tag contents
-     * @param int  $reply Reply HTTP code
+     * @param int      $code  Reply HTTP code
      *
      * @return void
      */
@@ -97,7 +101,7 @@ class RequestTest extends TestCase
      *
      * @param Response $res   Request response
      * @param string   $reply Reply tag contents
-     * @param int  $reply Reply HTTP code
+     * @param int      $code  Reply HTTP code
      *
      * @return void
      */
@@ -287,6 +291,42 @@ class RequestTest extends TestCase
         $this->checkXmlResponse($res, '<PROLOG_FREQ>24</PROLOG_FREQ><RESPONSE>SEND</RESPONSE>', 200);
     }
 
+    public function testPrologRequestHtmlencodedContents()
+    {
+        global $PLUGIN_HOOKS;
+
+        $PLUGIN_HOOKS[Hooks::PROLOG_RESPONSE]['tester'] = [
+            'OPTION' => [
+                    'NAME' => 'SNMPQUERY',
+                    'PARAM' => [
+                        'content' => '',
+                        'attributes' => '',
+                    ],
+                    'DEVICE' => [
+                        'content' => '',
+                        'attributes' => '',
+                    ],
+                ],
+        ];
+
+        $res = $this->http_client->request(
+            'POST',
+            $this->base_uri . 'Inventory',
+            [
+                'headers' => [
+                    'Content-Type' => 'application/xml',
+                ],
+                'body'   => '<?xml version="1.0" encoding="UTF-8" ?>'
+                . '<REQUEST>'
+                  . '<DEVICEID>mydeviceuniqueid</DEVICEID>'
+                  . '<QUERY>PROLOG</QUERY>'
+                . '</REQUEST>',
+            ]
+        );
+        $this->checkXmlResponse($res, '<PROLOG_FREQ>24</PROLOG_FREQ><RESPONSE>SEND</RESPONSE>', 200);
+    }
+
+
     public function testAuthBasic()
     {
         $basic_auth_password = "a_password";
@@ -301,6 +341,7 @@ class RequestTest extends TestCase
         ]);
 
         //first call should be unauthorized and return 401
+        $exception_thrown = false;
         try {
             $this->http_client->request(
                 'POST',
@@ -320,7 +361,9 @@ class RequestTest extends TestCase
             $response = $e->getResponse();
             $this->assertInstanceOf(Response::class, $response);
             $this->checkJsonResponse($response, '{"status":"error","message":"Authorization header required to send an inventory","expiration":24}', 401);
+            $exception_thrown = true;
         }
+        $this->assertTrue($exception_thrown);
 
         //second attempt should be authorized
         $res = $this->http_client->request(
