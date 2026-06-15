@@ -46,7 +46,7 @@ class SNMPCredentialTest extends FrontBaseClass
         //load snmp credential form
         $crawler = $this->http_client->request('GET', $this->base_uri . 'front/snmpcredential.form.php');
 
-        $auth_passphrase = '¡<av€ry$3"cur€p@ssp\'hr@se>!';
+        $auth_passphrase = '¡<av€ry$3"cur€p@ssp\'hr@se>!&';
         $priv_passphrase = '>>P4ss"ph&ase<<';
         $crawler = $this->http_client->request(
             'POST',
