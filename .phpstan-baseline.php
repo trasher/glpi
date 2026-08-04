@@ -7568,424 +7568,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Glpi/Http/SessionManager.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$antivirus_version\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 3,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Antivirus.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$date_expiration\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Antivirus.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_active\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Antivirus.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_dynamic\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Antivirus.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_uptodate\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Antivirus.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$items_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Antivirus.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$itemtype\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Antivirus.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$manufacturers_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Antivirus.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$name\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Antivirus.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$signature_version\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Antivirus.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\Asset\\\\Antivirus\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns array\\<int, object\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Antivirus.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$value of method Glpi\\\\Inventory\\\\Asset\\\\InventoryAsset\\:\\:handleInput\\(\\) expects stdClass, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Antivirus.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$capacity\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Battery.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$designation\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Battery.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$devicebatterytypes_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Battery.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_dynamic\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Battery.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$manufacturers_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Battery.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$manufacturing_date\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Battery.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$serial\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Battery.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$voltage\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Battery.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\Asset\\\\Battery\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns array\\<int, object\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Battery.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$devicecameramodels_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Camera.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_dynamic\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Camera.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$manufacturers_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Camera.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$name\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Camera.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\Asset\\\\Camera\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns array\\<int, object\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Camera.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Argument of an invalid type object supplied for foreach, only iterables are supported\\.$#',
-	'identifier' => 'foreach.nonIterable',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Cartridge.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\Asset\\\\Cartridge\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns array\\<int, object\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Cartridge.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$designation\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Controller.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$devicecontrolmodels_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Controller.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$interfacetypes_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Controller.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_dynamic\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Controller.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$manufacturers_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Controller.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Cannot access offset mixed on object\\.$#',
 	'identifier' => 'offsetAccess.nonOffsetAccessible',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Controller.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\Asset\\\\Controller\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns array\\<int, object\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Controller.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$databaseinstancetypes_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/DatabaseInstance.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_dynamic\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/DatabaseInstance.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$manufacturers_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/DatabaseInstance.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\Asset\\\\DatabaseInstance\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns array\\<int, object\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/DatabaseInstance.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$value of method Glpi\\\\Inventory\\\\Asset\\\\InventoryAsset\\:\\:handleInput\\(\\) expects stdClass, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/DatabaseInstance.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$designation\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Device.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$value of method Glpi\\\\Inventory\\\\Asset\\\\InventoryAsset\\:\\:handleInput\\(\\) expects stdClass, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 3,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Device.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#2 \\$val of method Glpi\\\\Inventory\\\\Asset\\\\Device\\:\\:itemdeviceAdded\\(\\) expects stdClass, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Device.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$designation\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Drive.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$interfacetypes_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Drive.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_dynamic\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Drive.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$manufacturers_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Drive.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\Asset\\\\Drive\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns array\\<int, object\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Drive.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$data of method Glpi\\\\Inventory\\\\Asset\\\\Drive\\:\\:isDrive\\(\\) expects stdClass, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Drive.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_dynamic\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Environment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$val\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Environment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$value\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Environment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\Asset\\\\Environment\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns array\\<int, object\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Environment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$designation\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Firmware.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$devicefirmwaretypes_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Firmware.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_dynamic\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Firmware.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$manufacturers_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Firmware.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\Asset\\\\Firmware\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns array\\<int, object\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Firmware.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$designation\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/GraphicCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_dynamic\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/GraphicCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\Asset\\\\GraphicCard\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns array\\<int, object\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/GraphicCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$capacity\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/HardDrive.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$designation\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/HardDrive.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$deviceharddrivetypes_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/HardDrive.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$interfacetypes_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/HardDrive.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_dynamic\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/HardDrive.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$manufacturers_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/HardDrive.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\Asset\\\\HardDrive\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns array\\<int, object\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/HardDrive.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$autoupdatesystems_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/InventoryAsset.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Argument of an invalid type object supplied for foreach, only iterables are supported\\.$#',
-	'identifier' => 'foreach.nonIterable',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/InventoryAsset.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Cannot call method getFromDB\\(\\) on CommonDBTM\\|false\\.$#',
@@ -8054,144 +7640,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/InventoryAsset.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$busID\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Memory.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$designation\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Memory.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$devicememorymodels_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Memory.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$devicememorytypes_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Memory.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$frequence\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Memory.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_dynamic\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Memory.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$manufacturers_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Memory.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$serial\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Memory.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$size\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Memory.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\Asset\\\\Memory\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns array\\<int, object\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Memory.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$comment\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Monitor.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$entities_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Monitor.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_dynamic\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Monitor.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_recursive\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Monitor.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$manufacturers_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Monitor.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$monitormodels_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Monitor.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$name\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 4,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Monitor.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$serial\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 3,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Monitor.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\Asset\\\\Monitor\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns array\\<int, object\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Monitor.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$value of method Glpi\\\\Inventory\\\\Asset\\\\InventoryAsset\\:\\:handleInput\\(\\) expects stdClass, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Monitor.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$designation\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 3,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$dhcpserver\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$gateway\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkCard.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property object\\:\\:\\$ifinbytes\\.$#',
 	'identifier' => 'property.notFound',
 	'count' => 1,
@@ -8201,12 +7649,6 @@ $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property object\\:\\:\\$ifinerrors\\.$#',
 	'identifier' => 'property.notFound',
 	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$ifinternalstatus\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 3,
 	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkCard.php',
 ];
 $ignoreErrors[] = [
@@ -8228,93 +7670,9 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkCard.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$ifstatus\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkCard.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property object\\:\\:\\$instantiation_type\\.$#',
 	'identifier' => 'property.notFound',
-	'count' => 3,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$ip\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$ipaddress\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 7,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$logical_number\\.$#',
-	'identifier' => 'property.notFound',
 	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$mac\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$mac_default\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$manufacturers_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 3,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$name\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 5,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$netmask\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$speed\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$ssid\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$subnet\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$virtualdev\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$wwn\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
 	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkCard.php',
 ];
 $ignoreErrors[] = [
@@ -8366,69 +7724,9 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkCard.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\Asset\\\\NetworkCard\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns array\\<int, object\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$ifdescr\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkPort.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$ifinbytes\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkPort.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$ifnumber\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkPort.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$ifoutbytes\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkPort.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property object\\:\\:\\$instantiation_type\\.$#',
 	'identifier' => 'property.notFound',
-	'count' => 5,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkPort.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$ipaddress\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkPort.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$logical_number\\.$#',
-	'identifier' => 'property.notFound',
 	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkPort.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$name\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 4,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkPort.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$portduplex\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkPort.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$trunk\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
 	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkPort.php',
 ];
 $ignoreErrors[] = [
@@ -8522,12 +7820,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkPort.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\Asset\\\\NetworkPort\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns array\\<int, object\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkPort.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$ID of method CommonDBTM\\:\\:getFromDB\\(\\) expects int\\|string, int\\|false given\\.$#',
 	'identifier' => 'argument.type',
 	'count' => 1,
@@ -8535,12 +7827,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$items_id of method RuleMatchedLog\\:\\:cleanOlddata\\(\\) expects int, int\\|false given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkPort.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$port of method Glpi\\\\Inventory\\\\Asset\\\\NetworkPort\\:\\:prepareConnections\\(\\) expects stdClass, object given\\.$#',
 	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkPort.php',
@@ -8570,51 +7856,15 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkPort.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$operatingsystems_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/OperatingSystem.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Glpi\\\\Inventory\\\\Asset\\\\OperatingSystem\\:\\:getId\\(\\) should return int but returns int\\|string\\.$#',
 	'identifier' => 'return.type',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/OperatingSystem.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$value of method Glpi\\\\Inventory\\\\Asset\\\\InventoryAsset\\:\\:handleInput\\(\\) expects stdClass, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/OperatingSystem.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_dynamic\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Peripheral.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$manufacturers_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Peripheral.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$productname\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Peripheral.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Argument of an invalid type object supplied for foreach, only iterables are supported\\.$#',
 	'identifier' => 'foreach.nonIterable',
 	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Peripheral.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$value of method Glpi\\\\Inventory\\\\Asset\\\\InventoryAsset\\:\\:handleInput\\(\\) expects stdClass, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 2,
 	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Peripheral.php',
 ];
 $ignoreErrors[] = [
@@ -8624,405 +7874,15 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Peripheral.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$designation\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/PowerSupply.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_dynamic\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/PowerSupply.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$manufacturers_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/PowerSupply.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$power\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/PowerSupply.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$serial\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/PowerSupply.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\Asset\\\\PowerSupply\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns array\\<int, object\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/PowerSupply.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$autoupdatesystems_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Printer.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$entities_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Printer.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$have_usb\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Printer.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_deleted\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Printer.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_dynamic\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Printer.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_recursive\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Printer.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$last_inventory_update\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Printer.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$manufacturers_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Printer.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$name\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 3,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Printer.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\Asset\\\\Printer\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns array\\<int, object\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Printer.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$object_or_class of function is_a expects object\\|string, class\\-string\\|null given\\.$#',
 	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Printer.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$value of method Glpi\\\\Inventory\\\\Asset\\\\InventoryAsset\\:\\:handleInput\\(\\) expects stdClass, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Printer.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$cmd\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Process.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$cpuusage\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Process.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_dynamic\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Process.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$memusage\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Process.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$pid\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Process.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$started\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Process.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$tty\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Process.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$user\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Process.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$virtualmemory\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Process.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\Asset\\\\Process\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns array\\<int, object\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Process.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$designation\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Processor.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$frequence\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Processor.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$frequency\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Processor.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$frequency_default\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Processor.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$internalid\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Processor.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_dynamic\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Processor.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$manufacturers_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Processor.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$nbcores\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Processor.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$nbthreads\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Processor.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$serial\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Processor.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\Asset\\\\Processor\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns array\\<int, object\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Processor.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_dynamic\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/RemoteManagement.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$items_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/RemoteManagement.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$itemtype\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/RemoteManagement.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$remoteid\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/RemoteManagement.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$type\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/RemoteManagement.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\Asset\\\\RemoteManagement\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns array\\<int, object\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/RemoteManagement.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$designation\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Sensor.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$devicesensortypes_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Sensor.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_dynamic\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Sensor.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$manufacturers_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Sensor.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\Asset\\\\Sensor\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns array\\<int, object\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Sensor.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$msin\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Simcard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\Asset\\\\Simcard\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns array\\<int, object\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Simcard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$_system_category\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Software.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$arch\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Software.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$comment\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Software.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$date_install\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Software.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$entities_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Software.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_deleted_item\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Software.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_recursive\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Software.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_template_item\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Software.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$manufacturers_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 9,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Software.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$name\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 9,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Software.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$operatingsystems_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Software.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$softwarecategories_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 3,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Software.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$version\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 7,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Software.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Cannot call method fetch_object\\(\\) on mysqli_result\\|false\\.$#',
 	'identifier' => 'method.nonObject',
 	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Software.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\Asset\\\\Software\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns array\\<int, object\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
 	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Software.php',
 ];
 $ignoreErrors[] = [
@@ -9032,159 +7892,15 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Software.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$val of method Glpi\\\\Inventory\\\\Asset\\\\Software\\:\\:getFullCompareKey\\(\\) expects stdClass, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Software.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$val of method Glpi\\\\Inventory\\\\Asset\\\\Software\\:\\:getOsForKey\\(\\) expects stdClass, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Software.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$val of method Glpi\\\\Inventory\\\\Asset\\\\Software\\:\\:getSimpleCompareKey\\(\\) expects stdClass, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Software.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$val of method Glpi\\\\Inventory\\\\Asset\\\\Software\\:\\:getVersionKey\\(\\) expects stdClass, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 4,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Software.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Property Glpi\\\\Inventory\\\\Asset\\\\InventoryAsset\\:\\:\\$known_links \\(array\\<string, int\\>\\) does not accept array\\<string, bool\\|int\\>\\.$#',
 	'identifier' => 'assign.propertyType',
 	'count' => 3,
 	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Software.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$comment\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/SoundCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$designation\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/SoundCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_dynamic\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/SoundCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$manufacturers_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/SoundCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$name\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/SoundCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\Asset\\\\SoundCard\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns array\\<int, object\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/SoundCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$autoupdatesystems_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/VirtualMachine.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$computertypes_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/VirtualMachine.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$entities_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/VirtualMachine.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property object\\:\\:\\$instantiation_type\\.$#',
 	'identifier' => 'property.notFound',
 	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/VirtualMachine.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_deleted\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/VirtualMachine.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_dynamic\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/VirtualMachine.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$last_inventory_update\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/VirtualMachine.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$locations_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/VirtualMachine.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$logical_number\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/VirtualMachine.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$name\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 4,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/VirtualMachine.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$ram\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/VirtualMachine.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$uuid\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/VirtualMachine.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$virtualmachinestates_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/VirtualMachine.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$virtualmachinesystems_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/VirtualMachine.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$virtualmachinetypes_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
 	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/VirtualMachine.php',
 ];
 $ignoreErrors[] = [
@@ -9278,12 +7994,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/VirtualMachine.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\Asset\\\\VirtualMachine\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns array\\<int, object\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/VirtualMachine.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$ID of method CommonDBTM\\:\\:getFromDB\\(\\) expects int\\|string, int\\|false given\\.$#',
 	'identifier' => 'argument.type',
 	'count' => 1,
@@ -9302,112 +8012,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/VirtualMachine.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$value of method Glpi\\\\Inventory\\\\Asset\\\\InventoryAsset\\:\\:handleInput\\(\\) expects stdClass, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 3,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/VirtualMachine.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$vm of method Glpi\\\\Inventory\\\\Asset\\\\VirtualMachine\\:\\:getExistingVMAsComputer\\(\\) expects stdClass, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/VirtualMachine.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Parameter \\#2 \\$items_id of method Glpi\\\\Inventory\\\\Asset\\\\VirtualMachine\\:\\:handlePorts\\(\\) expects int\\|null, int\\|false given\\.$#',
 	'identifier' => 'argument.type',
 	'count' => 2,
 	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/VirtualMachine.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$device\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Volume.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$encryption_algorithm\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Volume.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$encryption_status\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Volume.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$encryption_tool\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Volume.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$encryption_type\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Volume.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$filesystems_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Volume.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$freesize\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Volume.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_dynamic\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Volume.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$mountpoint\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Volume.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$name\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 4,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Volume.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$totalsize\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Volume.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\Asset\\\\Volume\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns array\\<int, object\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Volume.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$raw_data of method Glpi\\\\Inventory\\\\Asset\\\\Volume\\:\\:isNetworkDrive\\(\\) expects stdClass, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Volume.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$raw_data of method Glpi\\\\Inventory\\\\Asset\\\\Volume\\:\\:isRemovableDrive\\(\\) expects stdClass, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Volume.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$value of method Glpi\\\\Inventory\\\\Asset\\\\InventoryAsset\\:\\:handleInput\\(\\) expects stdClass, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/Volume.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Glpi\\\\Inventory\\\\Conf\\:\\:defineTabs\\(\\) should return array\\<string, string\\> but returns array\\<string, bool\\|string\\>\\.$#',
@@ -9560,7 +8168,7 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Glpi/Inventory/Inventory.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Property Glpi\\\\Inventory\\\\Inventory\\:\\:\\$data \\(array\\<string, object\\>\\) does not accept array\\<string, array\\<object\\>\\|object\\>\\.$#',
+	'message' => '#^Property Glpi\\\\Inventory\\\\Inventory\\:\\:\\$data \\(array\\<string, object\\>\\) does not accept array\\<string, array\\<int\\|string, stdClass\\>\\|object\\>\\.$#',
 	'identifier' => 'assign.propertyType',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Glpi/Inventory/Inventory.php',
@@ -9570,12 +8178,6 @@ $ignoreErrors[] = [
 	'identifier' => 'assign.propertyType',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Glpi/Inventory/Inventory.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$val of method Glpi\\\\Inventory\\\\MainAsset\\\\MainAsset\\:\\:prepareAllRulesInput\\(\\) expects stdClass, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/Itemtype.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property object\\:\\:\\$comment\\.$#',
@@ -9596,27 +8198,9 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/MainAsset.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$entities_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/MainAsset.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/MainAsset.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property object\\:\\:\\$instantiation_type\\.$#',
 	'identifier' => 'property.notFound',
 	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/MainAsset.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_dynamic\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
 	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/MainAsset.php',
 ];
 $ignoreErrors[] = [
@@ -9632,27 +8216,15 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/MainAsset.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$logical_number\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/MainAsset.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property object\\:\\:\\$name\\.$#',
 	'identifier' => 'property.notFound',
-	'count' => 2,
+	'count' => 1,
 	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/MainAsset.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property object\\:\\:\\$owner\\.$#',
 	'identifier' => 'property.notFound',
 	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/MainAsset.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$states_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 4,
 	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/MainAsset.php',
 ];
 $ignoreErrors[] = [
@@ -9722,12 +8294,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/MainAsset.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\MainAsset\\\\MainAsset\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns array\\<int, object\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/MainAsset.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$agent of method Glpi\\\\Inventory\\\\Asset\\\\InventoryAsset\\:\\:setAgent\\(\\) expects Agent, Agent\\|null given\\.$#',
 	'identifier' => 'argument.type',
 	'count' => 1,
@@ -9740,37 +8306,7 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/MainAsset.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$object of method Glpi\\\\Inventory\\\\MainAsset\\\\MainAsset\\:\\:isAccessPoint\\(\\) expects stdClass, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 3,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/MainAsset.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$val of method Glpi\\\\Inventory\\\\MainAsset\\\\MainAsset\\:\\:prepareAllRulesInput\\(\\) expects stdClass, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/MainAsset.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$val of method Glpi\\\\Inventory\\\\MainAsset\\\\MainAsset\\:\\:prepareEntitiesRulesInput\\(\\) expects stdClass, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/MainAsset.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$value of function count expects array\\|Countable, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/MainAsset.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$value of method Glpi\\\\Inventory\\\\Asset\\\\InventoryAsset\\:\\:handleInput\\(\\) expects stdClass, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 3,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/MainAsset.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#2 \\$val of static method Glpi\\\\Inventory\\\\MainAsset\\\\NetworkEquipment\\:\\:needToBeUpdatedFromDiscovery\\(\\) expects stdClass, object given\\.$#',
 	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/MainAsset.php',
@@ -9788,55 +8324,7 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/MainAsset.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$ap_port\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/NetworkEquipment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$description\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/NetworkEquipment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$firmware\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/NetworkEquipment.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property object\\:\\:\\$index\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/NetworkEquipment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$ips\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/NetworkEquipment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_ap\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/NetworkEquipment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$mac\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/NetworkEquipment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$memory\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/NetworkEquipment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$model\\.$#',
 	'identifier' => 'property.notFound',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/NetworkEquipment.php',
@@ -9844,31 +8332,7 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property object\\:\\:\\$name\\.$#',
 	'identifier' => 'property.notFound',
-	'count' => 6,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/NetworkEquipment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$networkequipmentmodels_id\\.$#',
-	'identifier' => 'property.notFound',
 	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/NetworkEquipment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$ram\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/NetworkEquipment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$serial\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/NetworkEquipment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$stack_number\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
 	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/NetworkEquipment.php',
 ];
 $ignoreErrors[] = [
@@ -9885,12 +8349,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Glpi\\\\Inventory\\\\MainAsset\\\\NetworkEquipment\\:\\:getAccessPoints\\(\\) should return array\\<int, stdClass\\> but returns array\\<object\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/NetworkEquipment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\MainAsset\\\\NetworkEquipment\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns list\\<object\\>\\.$#',
 	'identifier' => 'return.type',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/NetworkEquipment.php',
@@ -9918,12 +8376,6 @@ $ignoreErrors[] = [
 	'identifier' => 'assign.propertyType',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/NetworkEquipment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$autoupdatesystems_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/Printer.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property object\\:\\:\\$bw_copies\\.$#',
@@ -9974,48 +8426,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/Printer.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$have_ethernet\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/Printer.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$have_usb\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/Printer.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$ipaddress\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/Printer.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$last_pages_counter\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/Printer.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$manufacturers_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/Printer.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$memory_size\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/Printer.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$name\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/Printer.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property object\\:\\:\\$prints\\.$#',
 	'identifier' => 'property.notFound',
 	'count' => 1,
@@ -10034,20 +8444,8 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/Printer.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$snmpcredentials_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/Printer.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property object\\:\\:\\$total_pages\\.$#',
 	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/Printer.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\MainAsset\\\\Printer\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns array\\<int, object\\>\\.$#',
-	'identifier' => 'return.type',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/Printer.php',
 ];
@@ -10058,25 +8456,7 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/Printer.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$entities_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/Unmanaged.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/Unmanaged.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property object\\:\\:\\$ips\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/Unmanaged.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$is_dynamic\\.$#',
 	'identifier' => 'property.notFound',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/Unmanaged.php',
@@ -10094,39 +8474,9 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/Unmanaged.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$states_id\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/Unmanaged.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Argument of an invalid type object supplied for foreach, only iterables are supported\\.$#',
 	'identifier' => 'foreach.nonIterable',
 	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/Unmanaged.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Glpi\\\\Inventory\\\\MainAsset\\\\Unmanaged\\:\\:prepare\\(\\) should return array\\<int, stdClass\\> but returns array\\<int, object\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/Unmanaged.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$object of method Glpi\\\\Inventory\\\\MainAsset\\\\MainAsset\\:\\:isAccessPoint\\(\\) expects stdClass, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/Unmanaged.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$val of method Glpi\\\\Inventory\\\\MainAsset\\\\Unmanaged\\:\\:prepareForNetworkDevice\\(\\) expects stdClass, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/Unmanaged.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$value of method Glpi\\\\Inventory\\\\Asset\\\\InventoryAsset\\:\\:handleInput\\(\\) expects stdClass, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 2,
 	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/Unmanaged.php',
 ];
 $ignoreErrors[] = [
@@ -16352,12 +14702,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/RuleDefineItemtype.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$val of method Glpi\\\\Inventory\\\\MainAsset\\\\MainAsset\\:\\:prepareAllRulesInput\\(\\) expects stdClass, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/RuleDefineItemtypeCollection.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method RuleDictionnaryDropdownCollection\\:\\:replayRulesOnExistingDB\\(\\) should return int\\|false but returns bool\\|int\\.$#',
 	'identifier' => 'return.type',
 	'count' => 1,
@@ -16428,12 +14772,6 @@ $ignoreErrors[] = [
 	'identifier' => 'offsetAccess.invalidOffset',
 	'count' => 1,
 	'path' => __DIR__ . '/src/RuleImportAsset.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$val of method Glpi\\\\Inventory\\\\MainAsset\\\\MainAsset\\:\\:prepareAllRulesInput\\(\\) expects stdClass, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/RuleImportAssetCollection.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Argument of an invalid type array\\|null supplied for foreach, only iterables are supported\\.$#',
