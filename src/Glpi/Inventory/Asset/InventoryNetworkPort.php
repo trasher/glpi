@@ -56,11 +56,11 @@ use Unmanaged;
 
 trait InventoryNetworkPort
 {
-    /** @var object[]  */
+    /** @var array<int|string,stdClass>  */
     protected array $ports = [];
     protected mysqli_stmt $ipnetwork_stmt;
     protected mysqli_stmt $idevice_stmt;
-    /** @var object[]  */
+    /** @var array<int|string,stdClass>  */
     protected array $networks = [];
     /** @var ?class-string<CommonDBTM> */
     protected ?string $port_itemtype;
@@ -75,7 +75,7 @@ trait InventoryNetworkPort
     /**
      * Get network ports
      *
-     * @return object[]
+     * @return array<int|string,stdClass>
      */
     public function getNetworkPorts(): array
     {
@@ -85,7 +85,7 @@ trait InventoryNetworkPort
     /**
      * Add network ports
      *
-     * @param object[] $ports
+     * @param array<int|string,stdClass> $ports
      *
      * @return $this
      */

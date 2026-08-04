@@ -232,7 +232,7 @@ class Cartridge extends InventoryAsset
         $db_cartridges = $this->getExisting();
 
         $value = $this->data[0];
-        foreach ($value as $k => $val) {
+        foreach (get_object_vars($value) as $k => $val) {
             foreach ($db_cartridges as $keydb => $arraydb) {
                 if ($k == $arraydb['property']) {
                     $input = [
@@ -253,7 +253,7 @@ class Cartridge extends InventoryAsset
             }
         }
 
-        foreach ($value as $property => $val) {
+        foreach (get_object_vars($value) as $property => $val) {
             $cartinfo->add(
                 [
                     'printers_id' => $this->item->fields['id'],

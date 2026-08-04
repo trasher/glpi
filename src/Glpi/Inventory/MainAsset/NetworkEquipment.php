@@ -50,7 +50,7 @@ use function Safe\preg_replace;
 
 class NetworkEquipment extends MainAsset
 {
-    /** @var array<string, object> */
+    /** @var array<string, stdClass> */
     private array $management_ports = [];
 
     protected array $extra_data = [
@@ -282,7 +282,7 @@ class NetworkEquipment extends MainAsset
     }
 
     /**
-     * @return array<string, object>
+     * @return array<string, stdClass>
      */
     public function getManagementPorts()
     {
@@ -290,7 +290,7 @@ class NetworkEquipment extends MainAsset
     }
 
     /**
-     * @param array<string, object> $ports
+     * @param array<string, stdClass> $ports
      */
     public function setManagementPorts(array $ports): NetworkEquipment
     {

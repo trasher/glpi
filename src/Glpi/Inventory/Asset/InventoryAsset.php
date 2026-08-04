@@ -56,7 +56,7 @@ use function Safe\preg_replace;
 
 abstract class InventoryAsset
 {
-    /** @var array<int,object> */
+    /** @var array<int|string,stdClass> */
     protected array $data = [];
     protected CommonDBTM $item;
     /** @var ?class-string<CommonDBTM> */
@@ -85,7 +85,7 @@ abstract class InventoryAsset
      * Constructor
      *
      * @param CommonDBTM $item Item instance
-     * @param ?object[] $data Data part, optional
+     * @param ?array<int|string,stdClass> $data Data part, optional
      */
     public function __construct(CommonDBTM $item, ?array $data = null)
     {
@@ -98,7 +98,7 @@ abstract class InventoryAsset
     /**
      * Set data from raw data part
      *
-     * @param object[] $data Data part
+     * @param array<int|string,stdClass> $data Data part
      *
      * @return InventoryAsset
      */
@@ -129,7 +129,7 @@ abstract class InventoryAsset
     /**
      * Get current data
      *
-     * @return object[]
+     * @return array<int|string,stdClass>
      */
     public function getData(): array
     {
@@ -139,7 +139,7 @@ abstract class InventoryAsset
     /**
      * Prepare data from raw data part
      *
-     * @return array<int,stdClass>
+     * @return array<int|string,stdClass>
      */
     abstract public function prepare(): array;
 
@@ -192,7 +192,7 @@ abstract class InventoryAsset
     /**
      * Handle links (manufacturers, models, users, ...), create items if needed
      *
-     * @return object[]
+     * @return array<int|string,stdClass>
      */
     public function handleLinks()
     {
@@ -240,7 +240,7 @@ abstract class InventoryAsset
                 }
             }
 
-            foreach ($value as $key => &$val) {
+            foreach (get_object_vars($value) as $key => $val) {
                 if ($val instanceof stdClass || is_array($val)) {
                     continue;
                 }
@@ -263,6 +263,7 @@ abstract class InventoryAsset
                     if ($val < 0) { //rule can return -1
                         $val = 0;
                     }
+                    $value->$key = $val;
                     $known_key = md5($key . $val);
                     //keep raw values...
                     $this->raw_links[$known_key] = $val;

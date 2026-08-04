@@ -48,7 +48,7 @@ use Transfer;
 
 class Unmanaged extends MainAsset
 {
-    /** @var array<string, object> */
+    /** @var array<string, stdClass> */
     private array $management_ports = [];
 
     protected array $extra_data = [
@@ -315,7 +315,7 @@ class Unmanaged extends MainAsset
     }
 
     /**
-     * @return array<string, object>
+     * @return array<string, stdClass>
      */
     public function getManagementPorts()
     {
@@ -323,7 +323,7 @@ class Unmanaged extends MainAsset
     }
 
     /**
-     * @param array<string, object> $ports
+     * @param array<string, stdClass> $ports
      */
     public function setManagementPorts(array $ports): Unmanaged
     {

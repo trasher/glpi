@@ -51,7 +51,7 @@ class VirtualMachine extends InventoryAsset
     use InventoryNetworkPort;
 
     private Conf $conf;
-    /** @var array<string, array<string, object>> */
+    /** @var array<string, array<string, stdClass>> */
     private array $allports = [];
 
     private const VMCOMPONENTS = [

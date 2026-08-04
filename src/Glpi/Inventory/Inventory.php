@@ -515,9 +515,9 @@ class Inventory
     /**
      * Get raw data
      *
-     * @return object|null
+     * @return stdClass|null
      */
-    public function getRawData(): ?object
+    public function getRawData(): ?stdClass
     {
         return $this->raw_data;
     }

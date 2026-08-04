@@ -92,7 +92,7 @@ abstract class MainAsset extends InventoryAsset
     protected array $inventoried = [];
     protected bool $partial = false;
     protected bool $is_discovery = false;
-    protected int $current_key;
+    protected int|string $current_key;
 
     /** @var array<string,mixed> */
     protected array $ruleentity_data = [];
