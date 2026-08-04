@@ -269,6 +269,10 @@ class DeviceFirmware extends CommonDevice
         ?HTMLTableCell $father = null,
         array $options = []
     ) {
+        if ($row === null) {
+            return null;
+        }
+
         global $CFG_GLPI;
         $column = parent::getHTMLTableCellForItem($row, $item, $father, $options);
 

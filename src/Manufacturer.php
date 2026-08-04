@@ -206,6 +206,9 @@ class Manufacturer extends CommonDropdown
         ?HTMLTableCell $father = null,
         array $options = []
     ) {
+        if ($row === null) {
+            return;
+        }
 
         $column_name = self::class;
 

@@ -1056,6 +1056,10 @@ class IPNetwork extends CommonImplicitTreeDropdown
         ?HTMLTableCell $father = null,
         array $options = []
     ) {
+        if ($row === null) {
+            return;
+        }
+
         if (empty($item)) {
             if (empty($father)) {
                 return;

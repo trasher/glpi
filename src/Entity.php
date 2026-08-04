@@ -213,7 +213,7 @@ class Entity extends CommonTreeDropdown implements
     {
         global $DB;
 
-        if (($key = array_search('name', $this->updates, true)) !== false) {
+        if (in_array('name', $this->updates, true)) {
             // Check if entity does not exist
             $iterator = $DB->request([
                 'FROM' => static::getTable(),
@@ -227,7 +227,8 @@ class Entity extends CommonTreeDropdown implements
             if (count($iterator)) {
                 //To display a message
                 $this->fields['name'] = $this->oldvalues['name'];
-                unset($this->updates[$key], $this->oldvalues['name']);
+                $this->removeFromUpdates('name');
+                unset($this->oldvalues['name']);
                 Session::addMessageAfterRedirect(
                     __s('An entity with that name already exists at the same level.'),
                     false,

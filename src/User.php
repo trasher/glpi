@@ -3161,7 +3161,7 @@ HTML;
         /** @var Kernel $kernel */
         global $DB, $kernel;
 
-        if (($key = array_search('name', $this->updates)) !== false) {
+        if (in_array('name', $this->updates, true)) {
             /// Check if user does not exists
             $iterator = $DB->request([
                 'FROM'   => $this->getTable(),
@@ -3174,7 +3174,7 @@ HTML;
             if (count($iterator)) {
                 //To display a message
                 $this->fields['name'] = $this->oldvalues['name'];
-                unset($this->updates[$key]);
+                $this->removeFromUpdates('name');
                 unset($this->oldvalues['name']);
                 Session::addMessageAfterRedirect(
                     __s('Unable to update login. A user already exists.'),
@@ -3185,7 +3185,7 @@ HTML;
 
             if (!Auth::isValidLogin($this->input['name'])) {
                 $this->fields['name'] = $this->oldvalues['name'];
-                unset($this->updates[$key]);
+                $this->removeFromUpdates('name');
                 unset($this->oldvalues['name']);
                 Session::addMessageAfterRedirect(
                     __s('The login is not valid. Unable to update login.'),
@@ -3222,22 +3222,22 @@ HTML;
                     foreach ($fields as $key => $val) {
                         if (
                             !empty($val)
-                            && (($key2 = array_search($key, $this->updates)) !== false)
+                            && in_array($key, $this->updates, true)
                         ) {
-                            unset($this->updates[$key2]);
+                            $this->removeFromUpdates($key);
                             unset($this->oldvalues[$key]);
                         }
                     }
                 }
             }
 
-            if (($key = array_search("is_active", $this->updates)) !== false) {
-                unset($this->updates[$key]);
+            if (in_array("is_active", $this->updates, true)) {
+                $this->removeFromUpdates('is_active');
                 unset($this->oldvalues['is_active']);
             }
 
-            if (($key = array_search("comment", $this->updates)) !== false) {
-                unset($this->updates[$key]);
+            if (in_array("comment", $this->updates, true)) {
+                $this->removeFromUpdates('comment');
                 unset($this->oldvalues['comment']);
             }
         }

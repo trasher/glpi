@@ -461,6 +461,9 @@ abstract class CommonDevice extends CommonDropdown
         ?HTMLTableCell $father = null,
         array $options = []
     ) {
+        if ($row === null) {
+            return null;
+        }
 
         if (isset($options['dont_display'][static::class])) {
             return $father;

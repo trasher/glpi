@@ -1690,7 +1690,6 @@ class CommonDBTM extends CommonGLPI
         if ($this->checkUnicity(false, $options)) {
             if ($this->input && is_array($this->input)) {
                 // Fill the update-array with changes
-                $x               = 0;
                 $this->updates   = [];
                 $this->oldvalues = [];
 
@@ -1744,8 +1743,7 @@ class CommonDBTM extends CommonGLPI
                                 }
 
                                 $this->fields[$key] = $this->input[$key];
-                                $this->updates[$x]  = $key;
-                                $x++;
+                                $this->updates[]    = $key;
                             }
                         }
                     }
@@ -1755,7 +1753,7 @@ class CommonDBTM extends CommonGLPI
                         // is a non blacklist field exists
                         if (count(array_diff($this->updates, $this->history_blacklist)) > 0) {
                             $this->fields['date_mod'] = $_SESSION["glpi_currenttime"];
-                            $this->updates[$x++]      = 'date_mod';
+                            $this->updates[]          = 'date_mod';
                         }
                     }
                     $this->pre_updateInDB();
@@ -1828,12 +1826,35 @@ class CommonDBTM extends CommonGLPI
 
 
     /**
+     * Remove a field from the list of fields that will be updated in DB.
+     *
+     * Does nothing if the field is not part of the update.
+     *
+     * @param string $field Field name
+     *
+     * @return void
+     */
+    protected function removeFromUpdates(string $field)
+    {
+        $key = array_search($field, $this->updates, true);
+        if ($key !== false) {
+            $updates = $this->updates;
+            unset($updates[$key]);
+            $this->updates = array_values($updates);
+        }
+    }
+
+    /**
      * Clean locked fields from update, if needed
      *
      * @return void
      */
     protected function cleanLockeds()
     {
+        if (!is_array($this->input)) {
+            return;
+        }
+
         if (
             ($this->input['_skip_locks'] ?? false) !== true
             && (
@@ -1850,10 +1871,10 @@ class CommonDBTM extends CommonGLPI
         ) {
             $lockedfield = new Lockedfield();
             $locks = $lockedfield->getFullLockedFields(static::class, $this->fields['id']);
+            $locked_fields = [];
             foreach ($locks as $lock) {
                 $lock_field = $lock['field'];
-                $idx = array_search($lock_field, $this->updates);
-                if ($idx !== false) {
+                if (in_array($lock_field, $this->updates, true)) {
                     //do not update global lock value
                     if (!$lock['is_global']) {
                         $lockedfield->setLastValue(
@@ -1863,13 +1884,13 @@ class CommonDBTM extends CommonGLPI
                             $this->input['_raw' . $lock_field] ?? $this->input[$lock_field]
                         );
                     }
-                    unset($this->updates[$idx]);
+                    $locked_fields[] = $lock_field;
                     unset($this->input[$lock_field]);
                     $this->fields[$lock_field] = $this->oldvalues[$lock_field];
                     unset($this->oldvalues[$lock_field]);
                 }
             }
-            $this->updates = array_values($this->updates);
+            $this->updates = array_values(array_diff($this->updates, $locked_fields));
         }
     }
 

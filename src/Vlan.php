@@ -131,6 +131,10 @@ class Vlan extends CommonDropdown
         ?HTMLTableCell $father = null,
         array $options = []
     ) {
+        if ($row === null) {
+            return;
+        }
+
         $column_name = self::class;
 
         if (isset($options['dont_display'][$column_name])) {

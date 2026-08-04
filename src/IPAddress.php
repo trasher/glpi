@@ -1311,6 +1311,10 @@ class IPAddress extends CommonDBChild
         ?HTMLTableCell $father = null,
         array $options = []
     ) {
+        if ($row === null) {
+            return;
+        }
+
         global $DB;
 
         if ($item instanceof IPNetwork) {

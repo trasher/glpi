@@ -909,6 +909,9 @@ class Socket extends CommonDBChild
         ?HTMLTableCell $father = null,
         $options = []
     ) {
+        if ($row === null) {
+            return;
+        }
 
         $column_name = self::class;
 

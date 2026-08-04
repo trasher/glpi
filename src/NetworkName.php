@@ -489,6 +489,10 @@ TWIG, ['alert' => __("Several network names available! Go to the tab 'Network Na
         ?HTMLTableCell $father = null,
         array $options = []
     ) {
+        if ($row === null) {
+            return;
+        }
+
         global $DB;
 
         $column_name = self::class;

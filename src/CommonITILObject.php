@@ -2485,40 +2485,40 @@ abstract class CommonITILObject extends CommonDBTM implements KanbanInterface, T
 
         // Check dates change interval because seconds are not displayed in form
         if (
-            (($key = array_search('date', $this->updates)) !== false)
+            in_array('date', $this->updates, true)
             && (substr($this->fields["date"], 0, 16) === substr($this->oldvalues['date'], 0, 16))
         ) {
-            unset($this->updates[$key]);
+            $this->removeFromUpdates('date');
             unset($this->oldvalues['date']);
         }
 
         // do not update closedate fields if not changed
         if (
-            (($key = array_search('closedate', $this->updates)) !== false)
+            in_array('closedate', $this->updates, true)
             && isset($this->oldvalues['closedate'])
             && (substr($this->fields["closedate"], 0, 16) === substr($this->oldvalues['closedate'], 0, 16))
         ) {
-            unset($this->updates[$key]);
+            $this->removeFromUpdates('closedate');
             unset($this->oldvalues['closedate']);
         }
 
         // do not update time_to_resolve if date is not changed
         if (
-            (($key = array_search('time_to_resolve', $this->updates)) !== false)
+            in_array('time_to_resolve', $this->updates, true)
             && isset($this->oldvalues['time_to_resolve'])
             && (substr($this->fields["time_to_resolve"], 0, 16) === substr($this->oldvalues['time_to_resolve'], 0, 16))
         ) {
-            unset($this->updates[$key]);
+            $this->removeFromUpdates('time_to_resolve');
             unset($this->oldvalues['time_to_resolve']);
         }
 
         // do not update solvedate if date is not changed
         if (
-            (($key = array_search('solvedate', $this->updates)) !== false)
+            in_array('solvedate', $this->updates, true)
             && isset($this->oldvalues['solvedate'])
             && (substr($this->fields["solvedate"], 0, 16) === substr($this->oldvalues['solvedate'], 0, 16))
         ) {
-            unset($this->updates[$key]);
+            $this->removeFromUpdates('solvedate');
             unset($this->oldvalues['solvedate']);
         }
 
@@ -2569,12 +2569,12 @@ abstract class CommonITILObject extends CommonDBTM implements KanbanInterface, T
             if ($this->fields["time_to_resolve"] < $this->fields["date"]) {
                 Session::addMessageAfterRedirect(__s('Invalid dates. Update cancelled.'), false, ERROR);
 
-                if (($key = array_search('date', $this->updates)) !== false) {
-                    unset($this->updates[$key]);
+                if (in_array('date', $this->updates, true)) {
+                    $this->removeFromUpdates('date');
                     unset($this->oldvalues['date']);
                 }
-                if (($key = array_search('time_to_resolve', $this->updates)) !== false) {
-                    unset($this->updates[$key]);
+                if (in_array('time_to_resolve', $this->updates, true)) {
+                    $this->removeFromUpdates('time_to_resolve');
                     unset($this->oldvalues['time_to_resolve']);
                 }
             }
@@ -2590,8 +2590,8 @@ abstract class CommonITILObject extends CommonDBTM implements KanbanInterface, T
             if ($this->fields["closedate"] < $this->fields["solvedate"]) {
                 Session::addMessageAfterRedirect(__s('Invalid dates. Update cancelled.'), false, ERROR);
 
-                if (($key = array_search('closedate', $this->updates)) !== false) {
-                    unset($this->updates[$key]);
+                if (in_array('closedate', $this->updates, true)) {
+                    $this->removeFromUpdates('closedate');
                     unset($this->oldvalues['closedate']);
                 }
             }
@@ -2599,12 +2599,12 @@ abstract class CommonITILObject extends CommonDBTM implements KanbanInterface, T
             // unset 'date' and unset 'closedate' if closedate is before 'date'
             if ($this->fields["closedate"] < $this->fields["date"]) {
                 Session::addMessageAfterRedirect(__s('Invalid dates. Update cancelled.'), false, ERROR);
-                if (($key = array_search('date', $this->updates)) !== false) {
-                    unset($this->updates[$key]);
+                if (in_array('date', $this->updates, true)) {
+                    $this->removeFromUpdates('date');
                     unset($this->oldvalues['date']);
                 }
-                if (($key = array_search('closedate', $this->updates)) !== false) {
-                    unset($this->updates[$key]);
+                if (in_array('closedate', $this->updates, true)) {
+                    $this->removeFromUpdates('closedate');
                     unset($this->oldvalues['closedate']);
                 }
             }
@@ -2612,10 +2612,10 @@ abstract class CommonITILObject extends CommonDBTM implements KanbanInterface, T
 
         // unset 'status' if unchanged
         if (
-            (($key = array_search('status', $this->updates)) !== false)
+            in_array('status', $this->updates, true)
             && $this->oldvalues['status'] == $this->fields['status']
         ) {
-            unset($this->updates[$key]);
+            $this->removeFromUpdates('status');
             unset($this->oldvalues['status']);
         }
 
@@ -2629,12 +2629,12 @@ abstract class CommonITILObject extends CommonDBTM implements KanbanInterface, T
             if ($this->fields["solvedate"] < $this->fields["date"]) {
                 Session::addMessageAfterRedirect(__s('Invalid dates. Update cancelled.'), false, ERROR);
 
-                if (($key = array_search('date', $this->updates)) !== false) {
-                    unset($this->updates[$key]);
+                if (in_array('date', $this->updates, true)) {
+                    $this->removeFromUpdates('date');
                     unset($this->oldvalues['date']);
                 }
-                if (($key = array_search('solvedate', $this->updates)) !== false) {
-                    unset($this->updates[$key]);
+                if (in_array('solvedate', $this->updates, true)) {
+                    $this->removeFromUpdates('solvedate');
                     unset($this->oldvalues['solvedate']);
                 }
             }
@@ -2650,7 +2650,7 @@ abstract class CommonITILObject extends CommonDBTM implements KanbanInterface, T
         //      - or status is switching from any 'closed' status to any 'not solved' status
         if (
             !is_null($this->fields['begin_waiting_date'])
-            && ($key = array_search('status', $this->updates)) !== false
+            && in_array('status', $this->updates, true)
             && (
                 $this->oldvalues['status'] == self::WAITING
             // From solved to another state than closed
@@ -2748,7 +2748,7 @@ abstract class CommonITILObject extends CommonDBTM implements KanbanInterface, T
         // Set begin waiting date if needed
         // handle levels
         if (
-            (($key = array_search('status', $this->updates)) !== false)
+            in_array('status', $this->updates, true)
             && (($this->fields['status'] == self::WAITING)
               || in_array($this->fields["status"], static::getSolvedStatusArray()))
         ) {
@@ -2782,7 +2782,7 @@ abstract class CommonITILObject extends CommonDBTM implements KanbanInterface, T
             static::getClosedStatusArray()
         );
         if (
-            ($key = array_search('status', $this->updates)) !== false
+            in_array('status', $this->updates, true)
             && in_array($this->oldvalues['status'], $statuses)
             && !in_array($this->fields['status'], $statuses)
         ) {
@@ -2844,9 +2844,9 @@ abstract class CommonITILObject extends CommonDBTM implements KanbanInterface, T
         // Do not take into account date_mod if no update is done
         if (
             (count($this->updates) == 1)
-            && (($key = array_search('date_mod', $this->updates)) !== false)
+            && in_array('date_mod', $this->updates, true)
         ) {
-            unset($this->updates[$key]);
+            $this->removeFromUpdates('date_mod');
         }
     }
 

@@ -166,6 +166,10 @@ class NetworkAlias extends FQDNLabel
         ?HTMLTableCell $father = null,
         array $options = []
     ) {
+        if ($row === null) {
+            return;
+        }
+
         global $DB;
 
         if (empty($item)) {
