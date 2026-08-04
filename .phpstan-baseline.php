@@ -1682,12 +1682,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/CommonDBTM.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Cannot access offset mixed on array\\<string, mixed\\>\\|false\\.$#',
-	'identifier' => 'offsetAccess.nonOffsetAccessible',
-	'count' => 1,
-	'path' => __DIR__ . '/src/CommonDBTM.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Cannot access offset string on array\\<string, mixed\\>\\|false\\.$#',
 	'identifier' => 'offsetAccess.nonOffsetAccessible',
 	'count' => 1,
@@ -1820,18 +1814,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/CommonDBTM.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Property CommonDBTM\\:\\:\\$updates \\(list\\<string\\>\\) does not accept array\\<int\\<0, max\\>, string\\>\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 1,
-	'path' => __DIR__ . '/src/CommonDBTM.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property CommonDBTM\\:\\:\\$updates \\(list\\<string\\>\\) does not accept non\\-empty\\-array\\<int\\<0, max\\>, string\\>\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 2,
-	'path' => __DIR__ . '/src/CommonDBTM.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method CommonDCModelDropdown\\:\\:prepareInputForClone\\(\\) should return array but returns array\\|false\\.$#',
 	'identifier' => 'return.type',
 	'count' => 1,
@@ -1858,18 +1840,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Cannot access offset \'plugin\' on non\\-empty\\-array\\|true\\.$#',
 	'identifier' => 'offsetAccess.nonOffsetAccessible',
-	'count' => 1,
-	'path' => __DIR__ . '/src/CommonDevice.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method addCell\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/src/CommonDevice.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method getHeaderByName\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
 	'count' => 1,
 	'path' => __DIR__ . '/src/CommonDevice.php',
 ];
@@ -2351,18 +2321,6 @@ $ignoreErrors[] = [
 	'message' => '#^Parameter \\#2 \\$users_id of method CommonITILObject\\:\\:isUser\\(\\) expects int, int\\|string\\|false given\\.$#',
 	'identifier' => 'argument.type',
 	'count' => 11,
-	'path' => __DIR__ . '/src/CommonITILObject.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property CommonDBTM\\:\\:\\$updates \\(list\\<string\\>\\) does not accept array\\<int\\<0, max\\>, string\\>\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 12,
-	'path' => __DIR__ . '/src/CommonITILObject.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property CommonDBTM\\:\\:\\$updates \\(list\\<string\\>\\) does not accept array\\{\\}\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 1,
 	'path' => __DIR__ . '/src/CommonITILObject.php',
 ];
 $ignoreErrors[] = [
@@ -3458,30 +3416,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/DbUtils.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Cannot call method addCell\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 3,
-	'path' => __DIR__ . '/src/DeviceBattery.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method getHeaderByName\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 3,
-	'path' => __DIR__ . '/src/DeviceBattery.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method addCell\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 3,
-	'path' => __DIR__ . '/src/DeviceCamera.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method getHeaderByName\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 3,
-	'path' => __DIR__ . '/src/DeviceCamera.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Cannot access constant class on CommonDBTM\\|null\\.$#',
 	'identifier' => 'classConstant.nonObject',
 	'count' => 1,
@@ -3500,50 +3434,14 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/DeviceDrive.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Cannot call method addCell\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 2,
-	'path' => __DIR__ . '/src/DeviceDrive.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method getHeaderByName\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 2,
-	'path' => __DIR__ . '/src/DeviceDrive.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Cannot access constant class on CommonDBTM\\|null\\.$#',
 	'identifier' => 'classConstant.nonObject',
 	'count' => 1,
 	'path' => __DIR__ . '/src/DeviceFirmware.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Cannot call method addCell\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 3,
-	'path' => __DIR__ . '/src/DeviceFirmware.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method getHeaderByName\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 3,
-	'path' => __DIR__ . '/src/DeviceFirmware.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Cannot access constant class on CommonDBTM\\|null\\.$#',
 	'identifier' => 'classConstant.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/src/DeviceGeneric.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method addCell\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/src/DeviceGeneric.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method getHeaderByName\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
 	'count' => 1,
 	'path' => __DIR__ . '/src/DeviceGeneric.php',
 ];
@@ -3554,51 +3452,15 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/DeviceGraphicCard.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Cannot call method addCell\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/src/DeviceGraphicCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method getHeaderByName\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/src/DeviceGraphicCard.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Cannot access constant class on CommonDBTM\\|null\\.$#',
 	'identifier' => 'classConstant.nonObject',
 	'count' => 1,
 	'path' => __DIR__ . '/src/DeviceHardDrive.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Cannot call method addCell\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 3,
-	'path' => __DIR__ . '/src/DeviceHardDrive.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method getHeaderByName\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 3,
-	'path' => __DIR__ . '/src/DeviceHardDrive.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Cannot access constant class on CommonDBTM\\|null\\.$#',
 	'identifier' => 'classConstant.nonObject',
 	'count' => 1,
-	'path' => __DIR__ . '/src/DeviceMemory.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method addCell\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 2,
-	'path' => __DIR__ . '/src/DeviceMemory.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method getHeaderByName\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 2,
 	'path' => __DIR__ . '/src/DeviceMemory.php',
 ];
 $ignoreErrors[] = [
@@ -3614,32 +3476,8 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/DeviceNetworkCard.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Cannot call method addCell\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 2,
-	'path' => __DIR__ . '/src/DeviceNetworkCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method getHeaderByName\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 2,
-	'path' => __DIR__ . '/src/DeviceNetworkCard.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Cannot access constant class on CommonDBTM\\|null\\.$#',
 	'identifier' => 'classConstant.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/src/DevicePowerSupply.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method addCell\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/src/DevicePowerSupply.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method getHeaderByName\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
 	'count' => 1,
 	'path' => __DIR__ . '/src/DevicePowerSupply.php',
 ];
@@ -3658,18 +3496,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Cannot access constant class on CommonDBTM\\|null\\.$#',
 	'identifier' => 'classConstant.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/src/DeviceSoundCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method addCell\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/src/DeviceSoundCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method getHeaderByName\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
 	'count' => 1,
 	'path' => __DIR__ . '/src/DeviceSoundCard.php',
 ];
@@ -4060,12 +3886,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Parameter \\#2 \\$replace of function str_replace expects array\\<string\\>\\|string, int\\|string given\\.$#',
 	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Entity.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property CommonDBTM\\:\\:\\$updates \\(list\\<string\\>\\) does not accept array\\<int\\<0, max\\>, string\\>\\.$#',
-	'identifier' => 'assign.propertyType',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Entity.php',
 ];
@@ -7640,36 +7460,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/InventoryAsset.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$ifinbytes\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$ifinerrors\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$ifmtu\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$ifoutbytes\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkCard.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$ifouterrors\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/Asset/NetworkCard.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property object\\:\\:\\$instantiation_type\\.$#',
 	'identifier' => 'property.notFound',
 	'count' => 2,
@@ -9314,18 +9104,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Glpi/Socket.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Cannot call method addCell\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Socket.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method getHeaderByName\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Socket.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Glpi\\\\Socket\\:\\:dropdownWiringSide\\(\\) should return string but returns int\\|string\\.$#',
 	'identifier' => 'return.type',
 	'count' => 1,
@@ -9848,12 +9626,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/IPAddress.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Cannot call method getGroup\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/src/IPAddress.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Cannot call method getID\\(\\) on CommonDBTM\\|false\\.$#',
 	'identifier' => 'method.nonObject',
 	'count' => 1,
@@ -9989,12 +9761,6 @@ $ignoreErrors[] = [
 	'message' => '#^Cannot access offset int\\<0, 3\\> on array\\|string\\|false\\.$#',
 	'identifier' => 'offsetAccess.nonOffsetAccessible',
 	'count' => 4,
-	'path' => __DIR__ . '/src/IPNetwork.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method getGroup\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 1,
 	'path' => __DIR__ . '/src/IPNetwork.php',
 ];
 $ignoreErrors[] = [
@@ -10421,18 +10187,6 @@ $ignoreErrors[] = [
 	'message' => '#^Cannot access property \\$fields on CommonDBTM\\|null\\.$#',
 	'identifier' => 'property.nonObject',
 	'count' => 2,
-	'path' => __DIR__ . '/src/InterfaceType.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method addCell\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/src/InterfaceType.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method getHeaderByName\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 1,
 	'path' => __DIR__ . '/src/InterfaceType.php',
 ];
 $ignoreErrors[] = [
@@ -11348,18 +11102,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/MailCollector.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Cannot call method addCell\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Manufacturer.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method getHeaderByName\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Manufacturer.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Manufacturer\\:\\:prepareInputForClone\\(\\) should return array but returns array\\|false\\.$#',
 	'identifier' => 'return.type',
 	'count' => 1,
@@ -11522,12 +11264,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Monitor.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Cannot call method getGroup\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/src/NetworkAlias.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$itemtype of static method Dropdown\\:\\:show\\(\\) expects string, class\\-string\\<CommonDBTM\\>\\|null given\\.$#',
 	'identifier' => 'argument.type',
 	'count' => 1,
@@ -11570,27 +11306,9 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/NetworkEquipmentModelStencil.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Cannot call method addCell\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 3,
-	'path' => __DIR__ . '/src/NetworkName.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method createAnotherRow\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/src/NetworkName.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Cannot call method createRow\\(\\) on bool\\|HTMLTableGroup\\.$#',
 	'identifier' => 'method.nonObject',
 	'count' => 1,
-	'path' => __DIR__ . '/src/NetworkName.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method getGroup\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 3,
 	'path' => __DIR__ . '/src/NetworkName.php',
 ];
 $ignoreErrors[] = [
@@ -15980,12 +15698,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/User.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Property CommonDBTM\\:\\:\\$updates \\(list\\<string\\>\\) does not accept array\\<int\\<0, max\\>, string\\>\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 5,
-	'path' => __DIR__ . '/src/User.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Cannot access offset \'is_default\' on array\\<string, mixed\\>\\|false\\.$#',
 	'identifier' => 'offsetAccess.nonOffsetAccessible',
 	'count' => 1,
@@ -15996,18 +15708,6 @@ $ignoreErrors[] = [
 	'identifier' => 'argument.type',
 	'count' => 2,
 	'path' => __DIR__ . '/src/ValidatorSubstitute.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method addCell\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Vlan.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method getHeaderByName\\(\\) on HTMLTableRow\\|null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Vlan.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Cannot access constant class on CommonITILValidation\\|null\\.$#',
