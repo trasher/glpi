@@ -663,6 +663,14 @@ class Infocom extends CommonDBChild
         foreach (Entity::getEntitiesToNotify('use_infocoms_alert') as $entity => $value) {
             $before    = Entity::getUsedConfig('send_infocoms_alert_before_delay', $entity);
             $table = self::getTable();
+            $warranty_end_diff = QueryFunction::dateDiff(
+                expression1: QueryFunction::dateAdd(
+                    date: new QueryIdentifier('glpi_infocoms.warranty_date'),
+                    interval: new QueryIdentifier('glpi_infocoms.warranty_duration'),
+                    interval_unit: 'MONTH'
+                ),
+                expression2: QueryFunction::curdate()
+            );
             $iterator = $DB->request([
                 'SELECT'    => "$table.*",
                 'FROM'      => $table,
@@ -686,14 +694,10 @@ class Infocom extends CommonDBChild
                     "$table.entities_id"       => $entity,
                     "$table.warranty_duration" => ['>', 0],
                     'NOT'                      => ["$table.warranty_date" => null],
-                    new QueryExpression(QueryFunction::dateDiff(
-                        expression1: QueryFunction::dateAdd(
-                            date: new QueryIdentifier('glpi_infocoms.warranty_date'),
-                            interval: new QueryExpression($DB::quoteName('glpi_infocoms.warranty_duration')),
-                            interval_unit: 'MONTH'
-                        ),
-                        expression2: QueryFunction::curdate()
-                    ) . ' <= ' . $DB::quoteValue($before)),
+                    new QueryExpression(
+                        $warranty_end_diff->getValue() . ' <= ?',
+                        values: [...$warranty_end_diff->getParams(), $before]
+                    ),
                     'glpi_alerts.date'         => null,
                 ],
             ]);

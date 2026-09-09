@@ -789,7 +789,8 @@ class IPNetwork extends CommonImplicitTreeDropdown
         $result = [];
         for ($i = ($version == 4 ? 3 : 0); $i < 4; ++$i) {
             $result[] = new QueryExpression(
-                "({$DB->quoteName($tableName . '.' . $binaryFieldPrefix . '_' . $i)} & " . $this->fields["netmask_$i"] . ") = ({$start[$i]})"
+                '(' . $DB->quoteName($tableName . '.' . $binaryFieldPrefix . '_' . $i) . ' & ?) = (?)',
+                values: [$this->fields["netmask_$i"], $start[$i]]
             );
         }
         $result["$tableName.version"] = $version;

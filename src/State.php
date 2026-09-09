@@ -967,7 +967,7 @@ class State extends CommonTreeDropdown
         // Apply collate
         if (isset($where['name'])) {
             $collate = $DB->use_utf8mb4 ? "utf8mb4_bin" : "utf8_bin";
-            $where['name'] = new QueryExpression($DB->quote($where['name']) . " COLLATE $collate");
+            $where['name'] = new QueryExpression("? COLLATE $collate", values: [$where['name']]);
         }
 
         $query = [

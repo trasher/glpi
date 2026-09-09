@@ -1363,7 +1363,6 @@ TWIG, $twig_params);
      **/
     public static function processImportRules()
     {
-        global $DB;
         $ruleCriteria = new RuleCriteria();
         $ruleAction   = new RuleAction();
         $entity       = new Entity();
@@ -1405,7 +1404,7 @@ TWIG, $twig_params);
             if (!$item->isEntityAssign()) {
                 $params['entities_id'] = 0;
             } else {
-                $entities_found = $entity->find(['completename' => $DB->escape($current_rule['entities_id'])]);
+                $entities_found = $entity->find(['completename' => $current_rule['entities_id']]);
                 if (!empty($entities_found)) {
                     $entity_found          = array_shift($entities_found);
                     $params['entities_id'] = $entity_found['id'];

@@ -250,7 +250,10 @@ JAVASCRIPT;
                 // Remove GROUP BY and ORDER BY clauses
                 $sql_cat = str_replace([$data['sql']['raw']['GROUPBY'], $data['sql']['raw']['ORDER']], '', $sql_cat);
 
-                $cat_criteria = new QueryExpression($cat_join::getTableField($cat_fk) . ' IN ( SELECT * FROM (' . $sql_cat . ') AS cat_criteria )');
+                $cat_criteria = new QueryExpression(
+                    $cat_join::getTableField($cat_fk) . ' IN ( SELECT * FROM (' . $sql_cat . ') AS cat_criteria )',
+                    values: $data['sql']['search']->getParams()
+                );
             }
 
             $join = [

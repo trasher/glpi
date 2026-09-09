@@ -4136,10 +4136,9 @@ TWIG, $twig_params);
      */
     public function getLdapExistingUser($name, $authldaps_id, $sync = null)
     {
-        global $DB;
         $user = new User();
 
-        if ($sync !== null && $user->getFromDBbySyncField($DB->escape($sync))) {
+        if ($sync !== null && $user->getFromDBbySyncField($sync)) {
             return $user;
         }
 
