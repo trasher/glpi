@@ -1016,10 +1016,18 @@ TWIG, $twig_params);
             ];
             $criteria['WHERE'] += getEntitiesRestrictCriteria($itemtable);
 
+            $buy_year   = QueryFunction::year(new QueryIdentifier('glpi_infocoms.buy_date'));
+            $begin_year = QueryFunction::year(new QueryIdentifier('glpi_contracts.begin_date'));
             $ors = [];
             foreach ($years as $val2) {
-                $ors[] = new QueryExpression(QueryFunction::year(new QueryIdentifier('glpi_infocoms.buy_date')) . " = " . $DB->quote($val2));
-                $ors[] = new QueryExpression(QueryFunction::year(new QueryIdentifier('glpi_contracts.begin_date')) . " = " . $DB->quote($val2));
+                $ors[] = new QueryExpression(
+                    $buy_year->getValue() . ' = ?',
+                    values: [...$buy_year->getParams(), $val2]
+                );
+                $ors[] = new QueryExpression(
+                    $begin_year->getValue() . ' = ?',
+                    values: [...$begin_year->getParams(), $val2]
+                );
             }
             if (count($ors)) {
                 $criteria['WHERE'][] = [
@@ -1245,11 +1253,19 @@ TWIG, $twig_params);
                 }
 
                 if (isset($_POST["year"][0]) && ($_POST["year"][0] != 0)) {
+                    $begin_year = QueryFunction::year(new QueryIdentifier('glpi_contracts.begin_date'));
+                    $buy_year   = QueryFunction::year(new QueryIdentifier('glpi_infocoms.buy_date'));
                     $ors = [];
                     foreach ($_POST["year"] as $val2) {
-                        $ors[] = new QueryExpression(QueryFunction::year(new QueryIdentifier('glpi_contracts.begin_date')) . ' = ' . $DB->quote($val2));
+                        $ors[] = new QueryExpression(
+                            $begin_year->getValue() . ' = ?',
+                            values: [...$begin_year->getParams(), $val2]
+                        );
                         if ($itemtype === SoftwareLicense::class) {
-                            $ors[] = new QueryExpression(QueryFunction::year(new QueryIdentifier('glpi_infocoms.buy_date')) . ' = ' . $DB->quote($val2));
+                            $ors[] = new QueryExpression(
+                                $buy_year->getValue() . ' = ?',
+                                values: [...$buy_year->getParams(), $val2]
+                            );
                         }
                     }
                     if (count($ors)) {

@@ -40,6 +40,7 @@ use Glpi\DBAL\QueryExpression;
 use Glpi\DBAL\QueryFunction;
 use Glpi\DBAL\QueryIdentifier;
 use Glpi\DBAL\QuerySubQuery;
+use Glpi\DBAL\QueryValue;
 use Glpi\Exception\ForgetPasswordException;
 use Glpi\Exception\PasswordTooWeakException;
 use Glpi\Features\Clonable;
@@ -4378,10 +4379,14 @@ HTML;
                 $firstname_field = new QueryIdentifier(self::getTableField('firstname'));
                 $realname_field = new QueryIdentifier(self::getTableField('realname'));
                 $fields = $_SESSION["glpinames_format"] == self::FIRSTNAME_BEFORE
-                ? [$firstname_field, new QueryExpression($DB::quoteValue(' ')), $realname_field]
-                : [$realname_field, new QueryExpression($DB::quoteValue(' ')), $firstname_field];
+                ? [$firstname_field, new QueryValue(' '), $realname_field]
+                : [$realname_field, new QueryValue(' '), $firstname_field];
 
-                $concat = new QueryExpression(QueryFunction::concat($fields) . ' LIKE ' . $DB::quoteValue($txt_search));
+                $concat_names = QueryFunction::concat($fields);
+                $concat = new QueryExpression(
+                    $concat_names->getValue() . ' LIKE ?',
+                    values: [...$concat_names->getParams(), $txt_search]
+                );
                 $WHERE[] = [
                     'OR' => [
                         'glpi_users.name'                => ['LIKE', $txt_search],
@@ -6575,8 +6580,6 @@ HTML;
 
     public static function getFriendlyNameSearchCriteria(string $filter): array
     {
-        global $DB;
-
         $table     = self::getTable();
 
         $filter = strtolower($filter);
@@ -6584,23 +6587,34 @@ HTML;
         $concat_names_first_last = QueryFunction::lower(
             QueryFunction::replace(
                 expression: QueryFunction::concat([new QueryIdentifier("$table.firstname"), new QueryIdentifier("$table.realname")]),
-                search: new QueryExpression($DB::quoteValue(' ')),
-                replace: new QueryExpression($DB::quoteValue(''))
+                search: new QueryValue(' '),
+                replace: new QueryValue('')
             )
         );
         $concat_names_last_first = QueryFunction::lower(
             QueryFunction::replace(
                 expression: QueryFunction::concat([new QueryIdentifier("$table.realname"), new QueryIdentifier("$table.firstname")]),
-                search: new QueryExpression($DB::quoteValue(' ')),
-                replace: new QueryExpression($DB::quoteValue(''))
+                search: new QueryValue(' '),
+                replace: new QueryValue('')
             )
         );
+        $lower_name = QueryFunction::lower(new QueryIdentifier("$table.name"));
 
+        // The parameters of the compared expression come first, as they appear first in the SQL.
         return [
             'OR' => [
-                new QueryExpression(QueryFunction::lower(new QueryIdentifier("$table.name")) . ' LIKE ' . $DB::quoteValue("%$filter%")),
-                new QueryExpression($concat_names_first_last . ' LIKE ' . $DB::quoteValue("%$filter_no_spaces%")),
-                new QueryExpression($concat_names_last_first . ' LIKE ' . $DB::quoteValue("%$filter_no_spaces%")),
+                new QueryExpression(
+                    $lower_name->getValue() . ' LIKE ?',
+                    values: [...$lower_name->getParams(), "%$filter%"]
+                ),
+                new QueryExpression(
+                    $concat_names_first_last->getValue() . ' LIKE ?',
+                    values: [...$concat_names_first_last->getParams(), "%$filter_no_spaces%"]
+                ),
+                new QueryExpression(
+                    $concat_names_last_first->getValue() . ' LIKE ?',
+                    values: [...$concat_names_last_first->getParams(), "%$filter_no_spaces%"]
+                ),
             ],
         ];
     }

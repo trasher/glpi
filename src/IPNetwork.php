@@ -654,21 +654,31 @@ class IPNetwork extends CommonImplicitTreeDropdown
             if ($relation == "equals") {
                 for ($i = $startIndex; $i < 4; ++$i) {
                     $WHERE[] = [
-                        new QueryExpression("(" . $DB->quoteName($addressDB[$i]) . " & " . $DB->quoteValue($netmaskPa[$i]) . ") = (" . $DB->quoteValue($addressPa[$i]) . " & " . $DB->quoteValue($netmaskPa[$i]) . ")"),
+                        new QueryExpression(
+                            '(' . $DB->quoteName($addressDB[$i]) . ' & ?) = (? & ?)',
+                            values: [$netmaskPa[$i], $addressPa[$i], $netmaskPa[$i]]
+                        ),
                         $netmaskDB[$i]  => $netmaskPa[$i],
                     ];
                 }
             } else {
                 for ($i = $startIndex; $i < 4; ++$i) {
-                    if ($relation == "is contained by") {
-                        $globalNetmask = $DB->quoteValue($netmaskPa[$i]);
-                    } else {
-                        $globalNetmask = $DB->quoteName($netmaskDB[$i]);
-                    }
+                    // The "global" netmask is either the searched netmask, bound as a value,
+                    // or the netmask column of the row being tested, which is an identifier.
+                    $netmask_is_value = $relation == "is contained by";
+                    $global_netmask = $netmask_is_value ? '?' : $DB->quoteName($netmaskDB[$i]);
+                    // Repeated for each occurrence of the placeholder, in the order they appear.
+                    $global_netmask_values = $netmask_is_value ? [$netmaskPa[$i]] : [];
 
                     $WHERE[] = [
-                        new QueryExpression("(" . $DB->quoteName($addressDB[$i]) . " & $globalNetmask) = (" . $DB->quoteValue($addressPa[$i]) . " & $globalNetmask)"),
-                        new QueryExpression("(" . $DB->quoteValue($netmaskPa[$i]) . " & " . $DB->quoteName($netmaskDB[$i]) . ")=$globalNetmask"),
+                        new QueryExpression(
+                            '(' . $DB->quoteName($addressDB[$i]) . ' & ' . $global_netmask . ') = (? & ' . $global_netmask . ')',
+                            values: [...$global_netmask_values, $addressPa[$i], ...$global_netmask_values]
+                        ),
+                        new QueryExpression(
+                            '(? & ' . $DB->quoteName($netmaskDB[$i]) . ') = ' . $global_netmask,
+                            values: [$netmaskPa[$i], ...$global_netmask_values]
+                        ),
                     ];
                 }
             }

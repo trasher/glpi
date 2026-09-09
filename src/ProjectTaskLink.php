@@ -33,6 +33,8 @@
  * ---------------------------------------------------------------------
  */
 
+use Glpi\DBAL\QueryExpression;
+
 /**
  * Represents a dependency relation between project tasks
  * Possible link types are "finish_to_start":"0", "start_to_start":"1", "finish_to_finish":"2", "start_to_finish":"3"
@@ -58,17 +60,18 @@ class ProjectTaskLink extends CommonDBRelation
     {
         global $DB;
 
-        $iterator = $DB->request([
-            'FROM' => self::getTable(),
-            'WHERE' => [
-                'AND' => [
-                    'projecttasks_id_source' => $projecttaskIds,
-                    'projecttasks_id_target' => $projecttaskIds,
-                ],
-            ],
-        ]);
+        $ids = array_values(array_unique(array_map('intval', $projecttaskIds)));
 
-        return $iterator;
+        return $DB->request([
+            'SELECT' => ['glpi_projecttasklinks.*'],
+            'FROM' => 'glpi_projecttasklinks',
+            'WHERE' => $ids === []
+                ? [new QueryExpression('0 = 1')]
+                : [
+                    'projecttasks_id_source' => $ids,
+                    'projecttasks_id_target' => $ids,
+                ],
+        ]);
     }
 
     /**
