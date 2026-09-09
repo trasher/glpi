@@ -151,7 +151,7 @@ TWIG;
                             'OR' => [
                                 [
                                     $lockedfield_table . '.itemtype'  => $lockable_itemtype,
-                                $lockedfield_table . '.items_id'  => new QueryIdentifier($lockable_itemtype_table . '.id'),
+                                    $lockedfield_table . '.items_id'  => new QueryIdentifier($lockable_itemtype_table . '.id'),
                                 ], [
                                     $lockedfield_table . '.itemtype'  => $lockable_itemtype,
                                     $lockedfield_table . '.is_global' => 1,
