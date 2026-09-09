@@ -91,7 +91,7 @@ class QueryFunction
         }
 
         //TODO: deprecate 13.0.0. Passing raw string is still possible but should be removed in a future version
-        //Toolbox::deprecate('Passing a bare string as a function argument is deprecated, use any QueryElementInterface instead', '13.0.0');
+        //Toolbox::deprecated('Passing a bare string as a function argument is deprecated, use any QueryElementInterface instead', version: '13.0.0');
         return DBmysql::quoteName($arg);
     }
 

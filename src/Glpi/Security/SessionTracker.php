@@ -43,6 +43,7 @@ use Glpi\DBAL\QueryExpression;
 use Glpi\DBAL\QueryFunction;
 use Glpi\DBAL\QueryIdentifier;
 use Glpi\DBAL\QueryUnion;
+use Glpi\DBAL\QueryValue;
 use Glpi\Debug\Profiler;
 use Glpi\Error\ErrorHandler;
 use Glpi\Exception\Http\AccessDeniedHttpException;
@@ -306,11 +307,10 @@ final class SessionTracker
                         'RAW' => [
                             (string) QueryFunction::inet6Aton(new QueryIdentifier('ip_address')) => [
                                 'BETWEEN',
-                                new QueryExpression(
-                                    QueryFunction::inet6Aton(new QueryExpression($DB::quoteValue($start_ip)))
-                                    . ' AND '
-                                    . QueryFunction::inet6Aton(new QueryExpression($DB::quoteValue($end_ip)))
-                                ),
+                                [
+                                    QueryFunction::inet6Aton(new QueryValue($start_ip)),
+                                    QueryFunction::inet6Aton(new QueryValue($end_ip)),
+                                ],
                             ],
                         ],
                     ];

@@ -33,6 +33,8 @@
  * ---------------------------------------------------------------------
  */
 
+use Glpi\DBAL\QueryExpression;
+
 /**
  * Represents a dependency relation between project tasks
  * Possible link types are "finish_to_start":"0", "start_to_start":"1", "finish_to_finish":"2", "start_to_finish":"3"
@@ -50,7 +52,8 @@ class ProjectTaskLink extends CommonDBRelation
     public static ?string $items_id_2 = 'projecttasks_id_target';
 
     /**
-     * @param string $projecttaskIds Comma-separated list of project task IDs
+     * @param int[]|string $projecttaskIds List of project task IDs. Passing a comma-separated
+     *                                     string is deprecated, pass an array of integers.
      * @return DBmysqlIterator
      * @used-by gantt plugin
      */
@@ -58,13 +61,23 @@ class ProjectTaskLink extends CommonDBRelation
     {
         global $DB;
 
-        $iterator = $DB->request([
+        if (!is_array($projecttaskIds)) {
+            Toolbox::deprecated('Passing a comma separated list of IDs is deprecated, pass an array of integers instead.');
+            $projecttaskIds = explode(',', (string) $projecttaskIds);
+        }
+
+        $ids = array_values(array_unique(array_map('intval', $projecttaskIds)));
+
+        return $DB->request([
             'SELECT' => ['glpi_projecttasklinks.*'],
             'FROM' => 'glpi_projecttasklinks',
-            'WHERE' => "projecttasks_id_source IN (" . $projecttaskIds . ") AND projecttasks_id_target IN (" . $projecttaskIds . ")",
+            'WHERE' => $ids === []
+                ? [new QueryExpression('0 = 1')]
+                : [
+                    'projecttasks_id_source' => $ids,
+                    'projecttasks_id_target' => $ids,
+                ],
         ]);
-
-        return $iterator;
     }
 
     /**

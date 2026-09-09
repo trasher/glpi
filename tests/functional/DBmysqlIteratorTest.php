@@ -985,6 +985,19 @@ class DBmysqlIteratorTest extends DbTestCase
         $this->assertSame('SELECT * FROM `foo` LIMIT 10 OFFSET 5', $it->getSql());
     }
 
+    /**
+     * `is_numeric()` accepts values that are not valid SQL integers, and LIMIT/OFFSET cannot
+     * be bound as parameters: they must be cast.
+     */
+    public function testRangeWithNonIntegerValues()
+    {
+        $it = $this->it->execute(['FROM' => 'foo', 'LIMIT' => '1e3']);
+        $this->assertSame('SELECT * FROM `foo` LIMIT 1000', $it->getSql());
+
+        $it = $this->it->execute(['FROM' => 'foo', 'START' => ' 5', 'LIMIT' => 10.9]);
+        $this->assertSame('SELECT * FROM `foo` LIMIT 10 OFFSET 5', $it->getSql());
+    }
+
 
     public function testLogical()
     {
