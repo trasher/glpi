@@ -457,9 +457,11 @@ class DBmysqlIterator implements SeekableIterator, Countable
     {
         $limits = '';
         if (is_numeric($limit) && ($limit > 0)) {
-            $limits = " LIMIT $limit";
+            // Cast to int: `is_numeric()` also accepts values that are not valid SQL integers
+            // (`'1e3'`, `' 5'`, `'+5'`, `1.5`, ...), and LIMIT/OFFSET cannot be bound as parameters.
+            $limits = ' LIMIT ' . (int) $limit;
             if (is_numeric($offset) && ($offset > 0)) {
-                $limits .= " OFFSET $offset";
+                $limits .= ' OFFSET ' . (int) $offset;
             }
         }
         return $limits;

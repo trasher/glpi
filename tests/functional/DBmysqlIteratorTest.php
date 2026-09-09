@@ -794,6 +794,22 @@ class DBmysqlIteratorTest extends DbTestCase
         $it = $this->it->execute(['FROM' => 'foo', 'WHERE' => ['a' => ['|', 1]]]);
         $this->assertSame('SELECT * FROM `foo` WHERE `a` | ?', $this->cleanSQL($it->getSql()));
         $this->assertEquals([1], $it->getValues());
+
+        $it = $this->it->execute(['FROM' => 'foo', 'WHERE' => ['a' => ['REGEXP', '^bar']]]);
+        $this->assertSame('SELECT * FROM `foo` WHERE `a` REGEXP ?', $this->cleanSQL($it->getSql()));
+        $this->assertEquals(['^bar'], $it->getValues());
+
+        $it = $this->it->execute(['FROM' => 'foo', 'WHERE' => ['a' => ['NOT REGEXP', '^bar']]]);
+        $this->assertSame('SELECT * FROM `foo` WHERE `a` NOT REGEXP ?', $this->cleanSQL($it->getSql()));
+        $this->assertEquals(['^bar'], $it->getValues());
+    }
+
+    }
+
+    public function testBetweenWithWrongBoundsCount()
+    {
+        $this->expectExceptionObject(new \RuntimeException('BETWEEN requires exactly 2 values, 3 given.'));
+        $this->it->execute(['FROM' => 'foo', 'WHERE' => ['a' => ['BETWEEN', [1, 2, 3]]]]);
     }
 
 
@@ -855,6 +871,12 @@ class DBmysqlIteratorTest extends DbTestCase
     {
         $this->expectExceptionObject(new \RuntimeException('Empty IN are not allowed'));
         $this->it->execute(['FROM' => 'foo', 'bar' => []]);
+    }
+
+    public function testEmptyInOperator(): void
+    {
+        $this->expectExceptionObject(new \RuntimeException('Empty IN are not allowed'));
+        $this->it->execute(['FROM' => 'foo', 'WHERE' => ['bar' => ['IN', []]]]);
     }
 
     public function testFkey()

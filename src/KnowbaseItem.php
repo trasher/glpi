@@ -2192,22 +2192,25 @@ TWIG, $twig_params);
                     }
 
                     $expr = "(MATCH(" . $DB->quoteName('glpi_knowbaseitems.name') . ", " . $DB->quoteName('glpi_knowbaseitems.answer') . ")
-                           AGAINST(" . $DB->quote($search_wilcard) . " IN BOOLEAN MODE)";
+                           AGAINST(? IN BOOLEAN MODE)";
+                    $expr_values = [$search_wilcard];
 
                     if ($addscore !== []) {
                         foreach ($addscore as $addscore_field) {
                             $expr .= " + MATCH(" . $DB->quoteName($addscore_field) . ")
-                                        AGAINST(" . $DB->quote($search_wilcard) . " IN BOOLEAN MODE)";
+                                        AGAINST(? IN BOOLEAN MODE)";
+                            $expr_values[] = $search_wilcard;
                         }
                     }
                     $expr .= " ) AS SCORE ";
-                    $criteria['SELECT'][] = new QueryExpression($expr);
+                    $criteria['SELECT'][] = new QueryExpression($expr, values: $expr_values);
 
                     $ors = [
                         new QueryExpression(
                             "MATCH(" . $DB->quoteName('glpi_knowbaseitems.name') . ",
                         " . $DB->quoteName('glpi_knowbaseitems.answer') . ")
-                        AGAINST(" . $DB->quote($search_wilcard) . " IN BOOLEAN MODE)"
+                        AGAINST(? IN BOOLEAN MODE)",
+                            values: [$search_wilcard]
                         ),
                     ];
 
@@ -2217,7 +2220,8 @@ TWIG, $twig_params);
                                 'NOT' => [$addscore_field => null],
                                 new QueryExpression(
                                     "MATCH(" . $DB->quoteName($addscore_field) . ")
-                              AGAINST(" . $DB->quote($search_wilcard) . " IN BOOLEAN MODE)"
+                              AGAINST(? IN BOOLEAN MODE)",
+                                    values: [$search_wilcard]
                                 ),
                             ];
                         }
