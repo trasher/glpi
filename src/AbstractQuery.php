@@ -69,12 +69,13 @@ abstract class AbstractQuery implements QueryElementInterface
      * Get SQL query
      *
      * @return string
-     *
-     * @psalm-taint-escape sql
      */
     abstract public function getQuery();
 
     /**
+     * Identifiers are quoted and values are bound as statement parameters by
+     * `DBmysqlIterator::buildQuery()`, which builds the wrapped query.
+     *
      * @psalm-taint-escape sql
      */
     public function getValue(): string

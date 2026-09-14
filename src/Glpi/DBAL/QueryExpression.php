@@ -56,6 +56,13 @@ class QueryExpression implements QueryElementInterface, QueryAliasInterface
      * @param string|QueryElementInterface $expression The query expression
      * @param ?string $alias     The query expression alias
      * @param array<int, mixed> $values    The query expression values
+     *
+     * The expression is injected verbatim into the query, so it is a SQL sink handled here,
+     * at construction time, rather than in self::getValue(). Dynamic parts must be passed
+     * through `$values` and are bound as statement parameters.
+     *
+     * @psalm-taint-specialize (to report each unsafe usage as a distinct error)
+     * @psalm-taint-sink sql $expression
      */
     public function __construct(string|QueryElementInterface $expression, ?string $alias = null, array $values = [])
     {
@@ -77,6 +84,9 @@ class QueryExpression implements QueryElementInterface, QueryAliasInterface
      * Query expression value
      *
      * @return string
+     *
+     * The raw SQL carried by this object is a sink handled at construction time
+     * (see the `@psalm-taint-sink sql` annotation on self::__construct()).
      *
      * @psalm-taint-escape sql
      */

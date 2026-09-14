@@ -4065,7 +4065,9 @@ final class SQLProvider implements SearchProviderInterface
                 // part of the returned SQL clause. They must still be taken into account to
                 // distinguish joins that only differ by their condition values (e.g. the
                 // requester/observer/assign actor `type` on ITIL group joins).
-                $complexjoin .= ' AND ' . $sql_clause . implode('', $dbi->getValues()); //TODO: and should came from conf
+                // A separator is required: without it, `[1, 23]` and `[12, 3]` would produce the
+                // same ID, and two different joins would end up sharing the same table alias.
+                $complexjoin .= ' AND ' . $sql_clause . implode("\x1f", $dbi->getValues()); //TODO: and should came from conf
             }
         }
 
@@ -4093,7 +4095,7 @@ final class SQLProvider implements SearchProviderInterface
                         $dbi = new DBmysqlIterator($DB);
                         $sql_clause = $dbi->analyseCrit($tab['joinparams']['condition']);
                         // See note above: bound values must be part of the computed ID.
-                        $complexjoin .= ' AND ' . $sql_clause . implode('', $dbi->getValues()); //TODO: and should came from conf
+                        $complexjoin .= ' AND ' . $sql_clause . implode("\x1f", $dbi->getValues()); //TODO: and should came from conf
                     }
                 }
             }

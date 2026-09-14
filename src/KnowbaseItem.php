@@ -2191,6 +2191,8 @@ TWIG, $twig_params);
                         ];
                     }
 
+                    // The searched terms are bound as statement parameters: one for each
+                    // `AGAINST()` call, in the order the calls appear in the fragment.
                     $expr = "(MATCH(" . $DB->quoteName('glpi_knowbaseitems.name') . ", " . $DB->quoteName('glpi_knowbaseitems.answer') . ")
                            AGAINST(? IN BOOLEAN MODE)";
                     $expr_values = [$search_wilcard];

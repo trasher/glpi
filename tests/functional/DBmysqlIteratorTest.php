@@ -35,9 +35,11 @@
 namespace tests\units;
 
 use Glpi\DBAL\QueryExpression;
+use Glpi\DBAL\QueryFunction;
 use Glpi\DBAL\QueryParam;
 use Glpi\DBAL\QuerySubQuery;
 use Glpi\DBAL\QueryUnion;
+use Glpi\DBAL\QueryValue;
 use Glpi\Tests\DbTestCase;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -804,6 +806,34 @@ class DBmysqlIteratorTest extends DbTestCase
         $this->assertEquals(['^bar'], $it->getValues());
     }
 
+    public function testBetween()
+    {
+        $it = $this->it->execute(['FROM' => 'foo', 'WHERE' => ['a' => ['BETWEEN', [1, 5]]]]);
+        $this->assertSame('SELECT * FROM `foo` WHERE `a` BETWEEN ? AND ?', $this->cleanSQL($it->getSql()));
+        $this->assertEquals([1, 5], $it->getValues());
+
+        $it = $this->it->execute(['FROM' => 'foo', 'WHERE' => ['a' => ['NOT BETWEEN', [1, 5]]]]);
+        $this->assertSame('SELECT * FROM `foo` WHERE `a` NOT BETWEEN ? AND ?', $this->cleanSQL($it->getSql()));
+        $this->assertEquals([1, 5], $it->getValues());
+
+        // bounds may be any query element, and their own parameters are collected in order
+        $it = $this->it->execute([
+            'FROM'  => 'foo',
+            'WHERE' => [
+                'a' => [
+                    'BETWEEN',
+                    [
+                        QueryFunction::inet6Aton(new QueryValue('192.0.2.1')),
+                        QueryFunction::inet6Aton(new QueryValue('192.0.2.254')),
+                    ],
+                ],
+            ],
+        ]);
+        $this->assertSame(
+            'SELECT * FROM `foo` WHERE `a` BETWEEN INET6_ATON(?) AND INET6_ATON(?)',
+            $this->cleanSQL($it->getSql())
+        );
+        $this->assertEquals(['192.0.2.1', '192.0.2.254'], $it->getValues());
     }
 
     public function testBetweenWithWrongBoundsCount()

@@ -358,18 +358,24 @@ final class Parser
                     }
                 }
                 $buffer = [];
-            } elseif ($sql_where_string !== '' && ($type === Lexer::T_AND || $type === Lexer::T_OR)) {
-                $sql_where_string .= $type === Lexer::T_AND ? ' AND ' : ' OR ';
+            } elseif ($type === Lexer::T_AND || $type === Lexer::T_OR) {
+                // Boolean operators and groups must be applied to both clauses: a filter on a
+                // `computation` property lands in HAVING, and the other filters in WHERE.
+                $operator = $type === Lexer::T_AND ? ' AND ' : ' OR ';
+                $sql_where_string = self::appendBooleanOperator($sql_where_string, $operator);
+                $sql_having_string = self::appendBooleanOperator($sql_having_string, $operator);
             } elseif ($type === Lexer::T_GROUP_OPEN) {
                 $sql_where_string .= '(';
+                $sql_having_string .= '(';
             } elseif ($type === Lexer::T_GROUP_CLOSE) {
                 $sql_where_string .= ')';
+                $sql_having_string .= ')';
             }
             $position++;
         }
 
-        // Remove any trailing ANDs and ORs (may be multiple in a row)
-        $sql_where_string = preg_replace('/(\sAND\s|\sOR\s)*$/', '', $sql_where_string);
+        $sql_where_string = self::cleanupClause($sql_where_string);
+        $sql_having_string = self::cleanupClause($sql_having_string);
 
         // If the string is empty, return a criteria array that will return all results
         if ($sql_where_string === '') {
@@ -383,5 +389,40 @@ final class Parser
         $sql_having = new QueryExpression($sql_having_string, values: $sql_having_values);
 
         return new Result($sql_where, $sql_having, $invalid_filters);
+    }
+
+    /**
+     * Append a boolean operator to a clause, unless the clause has nothing to combine it with
+     * yet (the previous predicate went to the other clause).
+     */
+    private static function appendBooleanOperator(string $clause, string $operator): string
+    {
+        $trimmed = rtrim($clause);
+        if ($trimmed === '' || str_ends_with($trimmed, '(')) {
+            return $clause;
+        }
+
+        return $clause . $operator;
+    }
+
+    /**
+     * Remove the leftovers of predicates that ended up in the other clause: dangling boolean
+     * operators, and groups that ended up empty.
+     *
+     * Values are bound as `?` placeholders and identifiers are quoted, so the clause never
+     * contains user-provided text: it can safely be cleaned up textually.
+     */
+    private static function cleanupClause(string $clause): string
+    {
+        do {
+            $before = $clause;
+            $clause = preg_replace('/\((?:\s+(?:AND|OR)\s+)+/', '(', $clause);
+            $clause = preg_replace('/(?:\s+(?:AND|OR)\s+)+\)/', ')', $clause);
+            $clause = preg_replace('/^(?:\s*(?:AND|OR)\s+)+/', '', $clause);
+            $clause = preg_replace('/(?:\s+(?:AND|OR)\s*)+$/', '', $clause);
+            $clause = trim(str_replace('()', '', $clause));
+        } while ($clause !== $before);
+
+        return $clause;
     }
 }

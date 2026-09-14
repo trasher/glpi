@@ -1276,6 +1276,9 @@ class DBmysql
      *
      * @return mixed
      *
+     * Escaping relies on the connection charset, so this method throws rather than returning
+     * an unescaped value when no connection is available.
+     *
      * @psalm-taint-escape sql
      */
     public static function quoteValue($value)
@@ -1292,8 +1295,14 @@ class DBmysql
             $value = "'$value'";
         } else {
             global $DB;
-            $value = DBConnection::isDbAvailable() ? $DB->escape($value) : $value;
-            $value = "'$value'";
+            if (!DBConnection::isDbAvailable()) {
+                // Escaping relies on the connection charset, so it cannot be done without a
+                // connection. Returning the raw value would silently produce unescaped SQL.
+                throw new QueryException(
+                    'Unable to quote a value without an established database connection.'
+                );
+            }
+            $value = "'" . $DB->escape($value) . "'";
         }
         return $value;
     }
@@ -2074,30 +2083,54 @@ class DBmysql
      *
      * @param mysqli_stmt $stmt   Statement to bind parameters to
      * @param array<int|string, mixed> $params Parameters to bind
-     * @param list<'i'|'d'|'s'>|null $types  Types array (e.g. ['i', 's', 's', 'd']), or null for all types as string
+     * @param list<'i'|'d'|'s'>|null $types  Types array (e.g. ['i', 's', 's', 'd']), or null to derive them from the PHP values
      *
      * @return void
      */
     private function bindStatementParams(mysqli_stmt $stmt, array $params, string|array|null $types = null): void
     {
+        $query = $this->getStatementQuery($stmt);
+
+        // Statements prepared outside of self::prepare() are not tracked, so their query
+        // string is unknown and the placeholders cannot be counted.
+        if ($query !== '' && ($scount = substr_count($query, '?')) !== ($vcount = count($params))) {
+            throw new StatementException(
+                sprintf(
+                    'Number of placeholders (%d) in SQL statement does not match number of values (%d). SQL: %s',
+                    $scount,
+                    $vcount,
+                    $query
+                )
+            );
+        }
+
         if (count($params) === 0) {
             return;
         }
         $params = array_values($params); //no need for the keys
         foreach ($params as &$param) {
-            if ($param === false) {
-                $param = 0;
+            if (is_bool($param)) {
+                // transform boolean as int (prevent `false` to be bound as an empty string)
+                $param = (int) $param;
             }
         }
+        unset($param);
 
         if ($types === null) {
-            //no types specified, assume all strings
-            $types = str_pad('', count($params), 's');
+            // Derive the bind types from the PHP values: binding everything as a string forces
+            // the server to do an implicit conversion, which can also prevent index usage.
+            $types = '';
+            foreach ($params as $param) {
+                $types .= match (true) {
+                    is_int($param) => 'i',
+                    is_float($param) => 'd',
+                    default => 's',
+                };
+            }
         } elseif (is_array($types)) {
             $types = implode('', $types);
         }
 
-        $query = $this->getStatementQuery($stmt);
         try {
             if (false === $stmt->bind_param($types, ...$params)) {
                 throw new StatementException(
@@ -2132,7 +2165,7 @@ class DBmysql
      *
      * @param mysqli_stmt $stmt Statement to execute
      * @param ?array<int|string, mixed> $params Parameters to bind
-     * @param list<'i'|'d'|'s'>|null $types Types array (e.g. ['i', 's', 's', 'd']), or null for all types as string
+     * @param list<'i'|'d'|'s'>|null $types Types array (e.g. ['i', 's', 's', 'd']), or null to derive them from the PHP values
      *
      * @return void
      */

@@ -91,12 +91,13 @@ class DBmysqlIterator implements SeekableIterator, Countable
         'REGEXP',
         'NOT LIKE',
         'NOT LIKE BINARY',
-        'NOT REGEX',
+        'NOT REGEXP',
         '&',
         '|',
         'IN',
         'NOT IN',
         'BETWEEN',
+        'NOT BETWEEN',
     ];
 
     /**
@@ -661,9 +662,6 @@ class DBmysqlIterator implements SeekableIterator, Countable
 
                     $criterion_value = $value[1];
                 } else {
-                    if (!count($value)) {
-                        throw new RuntimeException('Empty IN are not allowed');
-                    }
                     // Array of Values
                     return "IN " . $this->analyseCriterionValue($value);
                 }
@@ -671,10 +669,42 @@ class DBmysqlIterator implements SeekableIterator, Countable
                 $comparison = ($value instanceof AbstractQuery ? 'IN' : '=');
                 $criterion_value = $value;
             }
+
+            if (is_array($criterion_value) && in_array($comparison, ['BETWEEN', 'NOT BETWEEN'], true)) {
+                // `BETWEEN` expects two operands separated by `AND`, not a parenthesized list
+                return $this->analyseBetweenCriterion($comparison, $criterion_value);
+            }
+
             $criterion = "$comparison " . $this->getCriterionValue($criterion_value);
         }
 
         return $criterion;
+    }
+
+    /**
+     * Handle a `BETWEEN` / `NOT BETWEEN` criterion bounds
+     *
+     * @param string $comparison `BETWEEN` or `NOT BETWEEN`
+     * @param array<mixed> $bounds Lower and upper bounds
+     *
+     * @return string
+     */
+    private function analyseBetweenCriterion(string $comparison, array $bounds): string
+    {
+        if (count($bounds) !== 2) {
+            throw new RuntimeException(
+                sprintf('%s requires exactly 2 values, %d given.', $comparison, count($bounds))
+            );
+        }
+
+        [$lower, $upper] = array_values($bounds);
+
+        return sprintf(
+            '%s %s AND %s',
+            $comparison,
+            $this->getCriterionValue($lower),
+            $this->getCriterionValue($upper)
+        );
     }
 
     /**
@@ -715,6 +745,9 @@ class DBmysqlIterator implements SeekableIterator, Countable
     private function analyseCriterionValue($value)
     {
         if (is_array($value)) {
+            if ($value === []) {
+                throw new RuntimeException('Empty IN are not allowed');
+            }
             $crit_value = '(' . str_repeat('?, ', count($value) - 1) . '?)';
             foreach ($value as $v) {
                 if (!($v instanceof QueryParam)) {

@@ -122,7 +122,7 @@ function update941to942()
                     'FROM'      => $itil_element_table,
                     'WHERE'     => [
                         'itemtype' => $itil_type,
-                        'content'  => ['REGEXP', $DB->escape($missing_param_pattern)],
+                        'content'  => ['REGEXP', $missing_param_pattern],
                     ],
                 ]
             );
@@ -138,7 +138,7 @@ function update941to942()
                 'SELECT'    => ['id', $itil_fkey, 'content'],
                 'FROM'      => $task_table,
                 'WHERE'     => [
-                    'content'  => ['REGEXP', $DB->escape($missing_param_pattern)],
+                    'content'  => ['REGEXP', $missing_param_pattern],
                 ],
             ]
         );
