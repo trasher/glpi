@@ -2025,10 +2025,7 @@ class CommonDBTM extends CommonGLPI
         }
 
         if ($addMessAfterRedirect) {
-            // Do not display quotes
-            if (isset($this->fields['name'])) {
-                $this->fields['name'] = $this->fields['name'];
-            } else {
+            if (!isset($this->fields['name'])) {
                 //TRANS: %1$s is the itemtype, %2$d is the id of the item
                 $this->fields['name'] = sprintf(
                     __('%1$s - ID %2$d'),
@@ -2468,6 +2465,13 @@ class CommonDBTM extends CommonGLPI
      */
     public function canAddItem(string $type): bool
     {
+        if ($type === Document::class) {
+            // "One write is enough". Stricter itemtypes (e.g. no document on a closed
+            // ticket) override this method and keep their own rule.
+            return $this->can($this->getID(), UPDATE)
+                || (Session::haveRight(Document::$rightname, CREATE) && $this->can($this->getID(), READ));
+        }
+
         return $this->can($this->getID(), UPDATE);
     }
 

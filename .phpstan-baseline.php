@@ -5300,19 +5300,13 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Glpi/Api/HL/Controller/AbstractController.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Binary operation "\\.\\=" between 0\\|0\\.0\\|array\\{\\}\\|string\\|false and non\\-falsy\\-string results in an error\\.$#',
-	'identifier' => 'assignOp.invalid',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Api/HL/Controller/AdministrationController.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Glpi\\\\Api\\\\HL\\\\Controller\\\\AdministrationController\\:\\:getEmailDataForUser\\(\\) should return array\\<array\\{id\\: int, email\\: string, is_default\\: int, _links\\: array\\{self\\: array\\{href\\: non\\-empty\\-string\\}\\}\\}\\> but returns list\\<array\\{id\\: int, email\\: string, is_default\\: int, _links\\: array\\{self\\: array\\{href\\: string\\}\\}\\}\\>\\.$#',
 	'identifier' => 'return.type',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Glpi/Api/HL/Controller/AdministrationController.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$users_id of method Glpi\\\\Api\\\\HL\\\\Controller\\\\AdministrationController\\:\\:getUsedOrManagedItems\\(\\) expects int, int\\|null given\\.$#',
+	'message' => '#^Parameter \\#2 \\$users_id of method Glpi\\\\Api\\\\HL\\\\Controller\\\\AdministrationController\\:\\:getUsedOrManagedItems\\(\\) expects int, int\\|null given\\.$#',
 	'identifier' => 'argument.type',
 	'count' => 2,
 	'path' => __DIR__ . '/src/Glpi/Api/HL/Controller/AdministrationController.php',
@@ -16054,7 +16048,7 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Property NotificationTarget\\<Project\\>\\:\\:\\$data \\(array\\<string, array\\<string\\>\\|string\\>\\) does not accept array\\<string, array\\<array\\<string, mixed\\>\\|string\\>\\|string\\>\\.$#',
 	'identifier' => 'assign.propertyType',
-	'count' => 3,
+	'count' => 4,
 	'path' => __DIR__ . '/src/NotificationTargetProject.php',
 ];
 $ignoreErrors[] = [
@@ -16108,7 +16102,7 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Property NotificationTarget\\<ProjectTask\\>\\:\\:\\$data \\(array\\<string, array\\<string\\>\\|string\\>\\) does not accept array\\<string, array\\<array\\<string, mixed\\>\\|string\\>\\|string\\>\\.$#',
 	'identifier' => 'assign.propertyType',
-	'count' => 2,
+	'count' => 3,
 	'path' => __DIR__ . '/src/NotificationTargetProjectTask.php',
 ];
 $ignoreErrors[] = [
@@ -16448,38 +16442,8 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/PendingReason.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$fields\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/PendingReasonCron.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method object\\:\\:getID\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/PendingReasonCron.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined static method object\\:\\:getType\\(\\)\\.$#',
-	'identifier' => 'staticMethod.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/src/PendingReasonCron.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Cannot access property \\$fields on PendingReason_Item\\|false\\.$#',
 	'identifier' => 'property.nonObject',
-	'count' => 2,
-	'path' => __DIR__ . '/src/PendingReasonCron.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$itil_item of method AbstractITILChildTemplate\\:\\:getRenderedContent\\(\\) expects CommonITILObject, object given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 2,
-	'path' => __DIR__ . '/src/PendingReasonCron.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#2 \\$item of static method NotificationEvent\\:\\:raiseEvent\\(\\) expects CommonGLPI, object given\\.$#',
-	'identifier' => 'argument.type',
 	'count' => 2,
 	'path' => __DIR__ . '/src/PendingReasonCron.php',
 ];
@@ -17542,12 +17506,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Reminder\\:\\:getSpecificValueToSelect\\(\\) should return string but returns int\\|string\\.$#',
 	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Reminder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Offset \'OR\' might not exist on non\\-empty\\-array\\{0\\?\\: 0, OR\\?\\: array\\{\'glpi_reminders\\.users_id\'\\: int\\<min, \\-1\\>\\|int\\<1, max\\>\\|non\\-falsy\\-string, \'glpi_reminders_users\\.users_id\'\\: int\\<min, \\-1\\>\\|int\\<1, max\\>\\|non\\-falsy\\-string, 0\\?\\: array\\{\'glpi_groups_reminders\\.groups_id\'\\: mixed, OR\\: non\\-empty\\-array\\<mixed\\>\\}\\|array\\{\'glpi_profiles_reminders\\.profiles_id\'\\: mixed, OR\\: non\\-empty\\-array\\<mixed\\>\\}, 1\\?\\: array\\{\'glpi_profiles_reminders\\.profiles_id\'\\: mixed, OR\\: non\\-empty\\-array\\<mixed\\>\\}\\}\\|array\\{0\\: array\\{\'glpi_groups_reminders\\.groups_id\'\\: mixed, OR\\: non\\-empty\\-array\\<mixed\\>\\}, 1\\?\\: array\\{\'glpi_profiles_reminders\\.profiles_id\'\\: mixed, OR\\: non\\-empty\\-array\\<mixed\\>\\}\\}\\|array\\{array\\{\'glpi_profiles_reminders\\.profiles_id\'\\: mixed, OR\\: non\\-empty\\-array\\<mixed\\>\\}\\}\\}\\.$#',
-	'identifier' => 'offsetAccess.notFound',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Reminder.php',
 ];

@@ -751,18 +751,19 @@ class MailCollector extends CommonDBTM
                         }
                     } catch (Throwable $e) {
                         $error++;
-                        ErrorHandler::logCaughtException($e);
-                        ErrorHandler::displayCaughtExceptionMessage($e);
-                        Toolbox::logInFile(
-                            'mailgate',
+                        $this->reportMailCollectError(
+                            $e,
+                            $rejinput,
+                            $rejected,
                             sprintf(
-                                __('Error during message parsing (%s). Check in "%s" for more details') . "\n",
+                                __('Error during message parsing (%s). Check in "%s" for more details'),
                                 $e->getMessage(),
                                 GLPI_LOG_DIR . '/php-errors.log'
                             )
                         );
-                        $rejinput['reason'] = NotImportedEmail::FAILED_OPERATION;
-                        $rejected->add($rejinput);
+                        // Move the message out of the inbox, otherwise it would be fetched again,
+                        // and would fail again, on every collect.
+                        $delete[$uid] = self::REFUSED_FOLDER;
                         continue;
                     }
 
@@ -787,7 +788,22 @@ class MailCollector extends CommonDBTM
                     } elseif (isset($tkt['_refuse_email_with_response'])) {
                         $delete[$uid] =  self::REFUSED_FOLDER;
                         $refused++;
-                        $this->sendMailRefusedResponse($requester, $tkt['name']);
+                        try {
+                            $this->sendMailRefusedResponse($requester, $tkt['name']);
+                        } catch (Throwable $e) {
+                            // The message was already correctly classified as refused above ;
+                            // a failure to notify the sender must not be reported as a failed import.
+                            ErrorHandler::logCaughtException($e);
+                            Toolbox::logInFile(
+                                'mailgate',
+                                sprintf(
+                                    __('Unable to send refused response for message from collector "%s" (%s) (%s)'),
+                                    $this->fields['name'],
+                                    $this->fields['host'],
+                                    $e->getMessage()
+                                ) . "\n"
+                            );
+                        }
                     } elseif (isset($tkt['_refuse_email_no_response'])) {
                         $delete[$uid] =  self::REFUSED_FOLDER;
                         $refused++;
@@ -814,12 +830,15 @@ class MailCollector extends CommonDBTM
                             $refused++;
                             $rejinput['reason'] = NotImportedEmail::NOT_ENOUGH_RIGHTS;
                             $rejected->add($rejinput);
-                        } elseif ($ticket->add($tkt)) {
+                        } elseif ($this->addItemFromMessage($ticket, $tkt)) {
                             $delete[$uid] =  self::ACCEPTED_FOLDER;
                         } else {
                             $error++;
                             $rejinput['reason'] = NotImportedEmail::FAILED_OPERATION;
                             $rejected->add($rejinput);
+                            // Move the message out of the inbox, otherwise it would be fetched again,
+                            // and would fail again, on every collect.
+                            $delete[$uid] = self::REFUSED_FOLDER;
                         }
                     } elseif (
                         isset($tkt['tickets_id'])
@@ -865,6 +884,9 @@ class MailCollector extends CommonDBTM
                             $error++;
                             $rejinput['reason'] = NotImportedEmail::FAILED_OPERATION;
                             $rejected->add($rejinput);
+                            // Move the message out of the inbox, otherwise it would be fetched again,
+                            // and would fail again, on every collect.
+                            $delete[$uid] = self::REFUSED_FOLDER;
                         } elseif (
                             !$CFG_GLPI['use_anonymous_followups']
                              && !$ticket->canUserAddFollowups($tkt['_users_id_requester'])
@@ -874,12 +896,15 @@ class MailCollector extends CommonDBTM
                             $refused++;
                             $rejinput['reason'] = NotImportedEmail::NOT_ENOUGH_RIGHTS;
                             $rejected->add($rejinput);
-                        } elseif ($fup->add($fup_input)) {
+                        } elseif ($this->addItemFromMessage($fup, $fup_input)) {
                             $delete[$uid] =  self::ACCEPTED_FOLDER;
                         } else {
                             $error++;
                             $rejinput['reason'] = NotImportedEmail::FAILED_OPERATION;
                             $rejected->add($rejinput);
+                            // Move the message out of the inbox, otherwise it would be fetched again,
+                            // and would fail again, on every collect.
+                            $delete[$uid] = self::REFUSED_FOLDER;
                         }
                     } else {
                         if ($is_user_anonymous && !$CFG_GLPI["use_anonymous_helpdesk"]) {
@@ -939,6 +964,66 @@ class MailCollector extends CommonDBTM
             } else {
                 return $msg;
             }
+        }
+    }
+
+    /**
+     * Logs an exception caught during collect() and reports the corresponding message as rejected.
+     *
+     * @param Throwable        $e           Caught exception
+     * @param array<string, mixed> $rejinput    Input used to build the NotImportedEmail entry
+     * @param NotImportedEmail $rejected    NotImportedEmail instance to add the entry to
+     * @param string           $log_message Message to write to the mailgate log file
+     */
+    private function reportMailCollectError(Throwable $e, array $rejinput, NotImportedEmail $rejected, string $log_message): void
+    {
+        ErrorHandler::logCaughtException($e);
+        ErrorHandler::displayCaughtExceptionMessage($e);
+        Toolbox::logInFile('mailgate', $log_message . "\n");
+
+        $rejinput['reason'] = NotImportedEmail::FAILED_OPERATION;
+        try {
+            $rejected->add($rejinput);
+        } catch (Throwable $inner_e) {
+            // Reporting itself failed (e.g. same malformed content) ; log-only to avoid letting
+            // the exception escape the caller's catch block and abort the whole collect batch.
+            ErrorHandler::logCaughtException($inner_e);
+            Toolbox::logInFile(
+                'mailgate',
+                sprintf(__('Unable to report rejected email (%s)'), $inner_e->getMessage()) . "\n"
+            );
+        }
+    }
+
+
+    /**
+     * Add the item (ticket or followup) corresponding to a collected message.
+     *
+     * Errors are caught here to prevent a single faulty message (e.g. containing a value that is
+     * rejected by the DB server) to stop the whole collect process, and therefore the whole
+     * mailgate crontask.
+     *
+     * @param CommonDBTM $item   Item to add
+     * @param array<string, mixed> $input  Item fields
+     *
+     * @return bool
+     */
+    private function addItemFromMessage(CommonDBTM $item, array $input): bool
+    {
+        try {
+            return (bool) $item->add($input);
+        } catch (Throwable $e) {
+            ErrorHandler::logCaughtException($e);
+            ErrorHandler::displayCaughtExceptionMessage($e);
+            Toolbox::logInFile(
+                'mailgate',
+                sprintf(
+                    __('Error during message import (%s). Check in "%s" for more details') . "\n",
+                    $e->getMessage(),
+                    GLPI_LOG_DIR . '/php-errors.log'
+                )
+            );
+            return false;
         }
     }
 
@@ -1292,6 +1377,13 @@ class MailCollector extends CommonDBTM
     public function cleanSubject($text)
     {
         $text = str_replace("=20", "\n", $text);
+
+        if (!mb_check_encoding($text, 'UTF-8')) {
+            // Subject may contain invalid UTF-8 sequences, that would be rejected by the DB server.
+            // See https://github.com/glpi-project/glpi/issues/25325
+            $text = iconv($this->detectCharset($text), 'UTF-8', $text);
+        }
+
         return mb_substr($text, 0, 255, 'UTF-8');
     }
 
@@ -1913,7 +2005,25 @@ class MailCollector extends CommonDBTM
                 $mc->maxfetch_emails = $max;
 
                 $task->log("Collect mails from " . $data["name"] . " (" . $data["host"] . ")\n");
-                $message = $mc->collect($data["id"]);
+                try {
+                    $message = $mc->collect($data["id"]);
+                } catch (Throwable $e) {
+                    ErrorHandler::logCaughtException($e);
+
+                    // Update last collect date even if an error occurs.
+                    // This will prevent collectors that are constantly errored to be stuck at the begin of the
+                    // crontask process queue, and therefore to prevent other collectors to be processed.
+                    $mc->update([
+                        'id'                => $data['id'],
+                        'last_collect_date' => $_SESSION["glpi_currenttime"],
+                    ]);
+
+                    $message = sprintf(
+                        __('Error during mails collect (%s). Check in "%s" for more details'),
+                        $e->getMessage(),
+                        GLPI_LOG_DIR . '/php-errors.log'
+                    );
+                }
 
                 $task->addVolume($mc->fetch_emails);
                 $task->log("$message\n");
@@ -2497,6 +2607,14 @@ class MailCollector extends CommonDBTM
 
         // If charset is not specified, fallback on detected encoding
         if ($charset === null) {
+            $charset = $this->detectCharset($contents);
+        }
+
+        if (strtoupper($charset) === 'UTF-8' && !mb_check_encoding($contents, 'UTF-8')) {
+            // The sender declared the `UTF-8` charset, but did not honor it.
+            // Invalid UTF-8 sequences would be rejected by the DB server, so contents encoding
+            // has to be detected, to be able to convert them.
+            // See https://github.com/glpi-project/glpi/issues/25325
             $charset = $this->detectCharset($contents);
         }
 

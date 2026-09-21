@@ -778,7 +778,8 @@ class KnowbaseItem extends CommonDBVisible implements ExtraVisibilityCriteria, S
      */
     private static function getVisibilityCriteriaKB_Group(): array
     {
-        $groups = $_SESSION["glpigroups"] ?? [-1];
+        // A user member of a sub-group must also see FAQ made visible to a parent group
+        $groups = Group::getGroupsAncestorsIds($_SESSION["glpigroups"] ?? [-1]);
         $entity_restriction = getEntitiesRestrictCriteria(
             Group_KnowbaseItem::getTable(),
             '',
@@ -1066,7 +1067,7 @@ class KnowbaseItem extends CommonDBVisible implements ExtraVisibilityCriteria, S
                 $attachments[] = [
                     'row_class' => $data['is_deleted'] ? 'table-danger' : '',
                     'filename' => $downloadlink,
-                    'heading' => $heading_names[$data["documentcategories_id"]],
+                    'headings' => $heading_names[$data["documentcategories_id"]],
                     'assocdate' => $data["assocdate"],
                 ];
             }

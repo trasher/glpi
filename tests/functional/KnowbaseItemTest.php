@@ -335,6 +335,52 @@ HTML,
         $this->assertEquals(2, $count);
     }
 
+    /**
+     * The attached documents table must render the Heading cell for each row.
+     */
+    public function testShowFullAttachmentsColumnsAlignment(): void
+    {
+        $this->login();
+        $entity_id = (int) getItemByTypeName('Entity', '_test_root_entity', true);
+        $this->setEntity('_test_root_entity', true);
+
+        $category = $this->createItem(\DocumentCategory::class, [
+            'name' => __FUNCTION__ . ' heading',
+        ]);
+
+        $kbitem = $this->createItem(\KnowbaseItem::class, [
+            'name'   => __FUNCTION__,
+            'answer' => __FUNCTION__,
+        ]);
+        $this->createItem(\Entity_KnowbaseItem::class, [
+            'knowbaseitems_id' => $kbitem->getID(),
+            'entities_id'      => $entity_id,
+            'is_recursive'     => 1,
+        ]);
+
+        $document = $this->createItem(\Document::class, [
+            'name'                  => __FUNCTION__ . ' document',
+            'entities_id'           => $entity_id,
+            'documentcategories_id' => $category->getID(),
+        ]);
+        $this->createItem(\Document_Item::class, [
+            'documents_id' => $document->getID(),
+            'itemtype'     => \KnowbaseItem::class,
+            'items_id'     => $kbitem->getID(),
+        ]);
+
+        $this->assertTrue($kbitem->getFromDB($kbitem->getID()));
+        $html = $kbitem->showFull(['display' => false]);
+
+        $this->assertSame(
+            1,
+            preg_match_all(
+                '#<td[^>]*>(?:(?!</td>).)*?' . preg_quote(__FUNCTION__ . ' heading', '#') . '(?:(?!</td>).)*?</td>#s',
+                $html
+            )
+        );
+    }
+
     public function testGetForCategory()
     {
         global $DB;
@@ -1635,6 +1681,37 @@ HTML,
             $this->assertCount(count($value['articles']), $names);
             $this->assertEqualsCanonicalizing($value['articles'], $names);
         }
+    }
+
+    public function testChildGroupInheritsParentGroupVisibility(): void
+    {
+        $this->login();
+
+        $parent_group = $this->createItem("Group", ['name' => 'KB parent group']);
+        $child_group = $this->createItem("Group", [
+            'name' => 'KB child group',
+            'groups_id' => $parent_group->getID(),
+        ]);
+
+        $tech_user = getItemByTypeName("User", "tech", true);
+        $this->createItem("Group_User", ['users_id' => $tech_user, 'groups_id' => $child_group->getID()]);
+
+        $kb = $this->createItem("KnowbaseItem", [
+            'name'         => 'KB visible to parent group',
+            'answer'       => 'KB visible to parent group',
+            'is_faq'       => false,
+            'entities_id'  => 0,
+            'is_recursive' => 1,
+            '_visibility'  => [
+                'entities_id'  => -1,
+                'is_recursive' => 1,
+                '_type'        => \Group::class,
+                'groups_id'    => $parent_group->getID(),
+            ],
+        ]);
+
+        $this->login('tech', 'tech');
+        $this->assertTrue((new \KnowbaseItem())->can($kb->getID(), READ));
     }
 
     public function testClone()
