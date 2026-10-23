@@ -38,6 +38,7 @@ use ArrayIterator;
 use Computer;
 use CronTask;
 use DBmysql;
+use Doctrine\DBAL\Connection;
 use Glpi\DBAL\Parts\BasePart;
 use Glpi\DBAL\QuerySubQuery;
 use Glpi\DBAL\Result;
@@ -1586,6 +1587,13 @@ class MigrationTest extends DbTestCase
                 // Proxy quote to the real DB instance since the mock has no mysqli handler
                 global $DB;
                 return $DB->quote($value, $type);
+            }
+
+            public function getConnection(): Connection
+            {
+                // Proxy connection to the real DB instance since the mock is not connected
+                global $DB;
+                return $DB->getConnection();
             }
 
             public function prepare($query)

@@ -1921,8 +1921,10 @@ class DBmysqlIteratorTest extends DbTestCase
     public function testAutoUnsanitize(array $db_data, array $result): void
     {
         $db = $this->getMockBuilder(\DBMysql::class)
-            ->onlyMethods(['connect', 'prepare', 'executeStatement'])
+            ->onlyMethods(['connect', 'getConnection', 'prepare', 'executeStatement'])
             ->getMock();
+        // Connection is only used to build the query
+        $db->method('getConnection')->willReturn($this->getDbConnection());
         $db->method('prepare')->willReturnCallback(
             fn(string $query) => new Statement($this->createStub(\Doctrine\DBAL\Statement::class), $query)
         );
