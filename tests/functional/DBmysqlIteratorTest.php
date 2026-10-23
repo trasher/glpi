@@ -1924,7 +1924,7 @@ class DBmysqlIteratorTest extends DbTestCase
             ->onlyMethods(['connect', 'prepare', 'executeStatement'])
             ->getMock();
         $db->method('prepare')->willReturnCallback(
-            fn(string $query) => new Statement($this->createStub(\mysqli_stmt::class), $query)
+            fn(string $query) => new Statement($this->createStub(\Doctrine\DBAL\Statement::class), $query)
         );
         $db->method('executeStatement')->willReturnCallback(
             static function (Statement $stmt) use ($db_data): void {

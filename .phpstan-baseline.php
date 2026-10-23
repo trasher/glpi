@@ -3392,12 +3392,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/DBmysql.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$rows of class Glpi\\\\DBAL\\\\Result constructor expects list\\<list\\<mixed\\>\\>, list\\<array\\> given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/src/DBmysql.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Cannot call method dataSeek\\(\\) on DBmysql\\|null\\.$#',
 	'identifier' => 'method.nonObject',
 	'count' => 1,

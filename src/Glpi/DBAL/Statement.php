@@ -35,7 +35,7 @@
 namespace Glpi\DBAL;
 
 use DBmysql;
-use mysqli_stmt;
+use Doctrine\DBAL\Statement as DoctrineStatement;
 use Toolbox;
 
 /**
@@ -54,7 +54,7 @@ final class Statement
      * @internal Statements are created by {@link DBmysql::prepare()}.
      */
     public function __construct(
-        private readonly mysqli_stmt $handle,
+        private readonly DoctrineStatement $handle,
         private readonly string $query
     ) {}
 
@@ -88,14 +88,14 @@ final class Statement
      */
     public function close(): void
     {
+        // Doctrine DBAL statements are released once they are not referenced anymore.
         $this->result = null;
-        $this->handle->close();
     }
 
     /**
      * @internal
      */
-    public function getHandle(): mysqli_stmt
+    public function getHandle(): DoctrineStatement
     {
         return $this->handle;
     }

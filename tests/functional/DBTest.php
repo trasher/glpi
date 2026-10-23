@@ -1177,4 +1177,18 @@ SQL,
         $this->expectExceptionMessage('Number of placeholders (1) in SQL statement does not match number of values (2).');
         $instance->executeStatement($stmt, [1, 2]);
     }
+
+    public function testExecuteStatementIgnoresQuotedQuestionMarks(): void
+    {
+        $instance = new \DB();
+        $stmt = $instance->prepare(
+            "SELECT ? AS `a?`, 'x?y' AS `b`, 'it''s?' AS `c`, 'back\\'slash?' AS `d`, \"double?\" AS `e`, ? AS `f`"
+        );
+        $instance->executeStatement($stmt, ['first', 'last']);
+
+        $this->assertSame(
+            ['a?' => 'first', 'b' => 'x?y', 'c' => "it's?", 'd' => "back'slash?", 'e' => 'double?', 'f' => 'last'],
+            $stmt->getResult()?->fetchAssoc()
+        );
+    }
 }

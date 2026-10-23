@@ -46,6 +46,7 @@ use DateTimeImmutable;
 use DBmysql;
 use DCRoom;
 use DeviceSimcard;
+use Doctrine\DBAL\Connection;
 use Domain;
 use DomainRecord;
 use Dropdown;
@@ -66,7 +67,6 @@ use Log;
 use Monolog\Level;
 use Monolog\Logger;
 use Monolog\LogRecord;
-use mysqli;
 use org\bovigo\vfs\vfsStreamWrapper;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
@@ -488,21 +488,17 @@ class GLPITestCase extends TestCase
     }
 
     /**
-     * Get the raw database handle object.
+     * Get the Doctrine DBAL connection.
      *
      * Useful when you need to run some queries that may not be allowed by
      * the DBMysql object.
-     *
-     * @return mysqli
      */
-    protected function getDbHandle(): mysqli
+    protected function getDbConnection(): Connection
     {
-        /** @var DBmysql $db */
+        /** @var DBmysql $DB */
         global $DB;
 
-        $reflection = new ReflectionClass(DBmysql::class);
-        $property = $reflection->getProperty("dbh");
-        return $property->getValue($DB);
+        return $DB->getConnection();
     }
 
     /**

@@ -33,6 +33,7 @@
  * ---------------------------------------------------------------------
  */
 
+use Doctrine\DBAL\Connection;
 use Glpi\DBAL\Result;
 use Safe\Exceptions\FilesystemException;
 
@@ -438,15 +439,17 @@ class DBConnection extends CommonGLPI
     /**
      * Switch database connection to replica
      *
+     * @param ?Connection $connection Replica connection provided by the services container, if available
+     *
      * @return bool
      */
-    public static function switchToReplica(): bool
+    public static function switchToReplica(?Connection $connection = null): bool
     {
         global $DB;
 
         if (self::isDBReplicaActive()) {
             include_once(GLPI_CONFIG_DIR . "/" . self::DBREPLICA_FILE);
-            $DB = new DBReplica();
+            $DB = new DBReplica(null, $connection);
             return $DB->connected;
         }
         return false;
@@ -466,12 +469,14 @@ class DBConnection extends CommonGLPI
 
     /**
      * Switch database connection to main
+     *
+     * @param ?Connection $connection Main connection provided by the services container, if available
      */
-    public static function switchToMain(): bool
+    public static function switchToMain(?Connection $connection = null): bool
     {
         global $DB;
 
-        $DB = new DB();
+        $DB = new DB(null, $connection);
         return $DB->connected;
     }
 
@@ -558,13 +563,19 @@ class DBConnection extends CommonGLPI
      * @param bool $use_replica try to connect to replica server first not to main server
      * @param bool $required  connection to the specified server is required
      *                           (if connection failed, do not try to connect to the other server)
+     * @param ?Connection $main_connection    Main connection provided by the services container, if available
+     * @param ?Connection $replica_connection Replica connection provided by the services container, if available
      *
      * @return bool
      *
      * @since 11.0.0 The `$display` parameter has been removed.
      */
-    public static function establishDBConnection($use_replica, $required)
-    {
+    public static function establishDBConnection(
+        $use_replica,
+        $required,
+        ?Connection $main_connection = null,
+        ?Connection $replica_connection = null
+    ) {
         global $DB;
 
         $DB  = null;
@@ -572,7 +583,7 @@ class DBConnection extends CommonGLPI
 
         // First standard config : no use replica : try to connect to master
         if (!$use_replica) {
-            $res = self::switchToMain();
+            $res = self::switchToMain($main_connection);
         }
 
         // If not already connected to master due to config or error
@@ -582,21 +593,21 @@ class DBConnection extends CommonGLPI
                 // replica wanted but not defined -> use master
                 // Ignore $required when no replica configured
                 if ($use_replica) {
-                    $res = self::switchToMain();
+                    $res = self::switchToMain($main_connection);
                 }
             } else { // replica DB configured
                 // Try to connect to replica if wanted
                 if ($use_replica) {
-                    $res = self::switchToReplica();
+                    $res = self::switchToReplica($replica_connection);
                 }
 
                 // No connection to 'mandatory' server
                 if (!$res && !$required) {
                     //Try to establish the connection to the other mysql server
                     if ($use_replica) {
-                        $res = self::switchToMain();
+                        $res = self::switchToMain($main_connection);
                     } else {
-                        $res = self::switchToReplica();
+                        $res = self::switchToReplica($replica_connection);
                     }
                     if ($res) {
                         $DB->first_connection = false; // @phpstan-ignore property.nonObject (DB is a global var, phpstan doesnt see that it is an object here)
