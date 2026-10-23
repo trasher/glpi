@@ -93,8 +93,8 @@ final class Result
     /**
      * Columns metadata, indexed by column position.
      *
-     * `table` is the table name or alias the column comes from, or an empty string
-     * for computed columns.
+     * `table` is the table name or alias the column comes from. It is not provided by
+     * Doctrine DBAL and is therefore always an empty string.
      *
      * @return list<array{name: string, table: string}>
      */
