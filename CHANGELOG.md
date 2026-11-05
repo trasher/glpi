@@ -22,19 +22,25 @@ The present file will list all changes made to the project; according to the
 #### Added
 - `Glpi\DBAL\Result` class, returned by `DBmysql::doQuery()` for queries that produce a result set. Its rows are buffered, it can be counted and sought.
 - `Glpi\DBAL\Statement` class, returned by `DBmysql::prepare()`. Once executed with `DBmysql::executeStatement()`, its result set is available through `Statement::getResult()`.
+- `Doctrine\DBAL\Connection` service, provided by DoctrineBundle. The `default` connection uses the `config_db.php` settings and the `replica` connection uses the `config_db_replica.php` settings. Both can be injected in services.
+- `DBmysql::getConnection()` method, that returns the Doctrine DBAL connection used by the database instance.
 
 #### Changes
 - `DBmysql::doQuery()` returns a `Glpi\DBAL\Result` instead of a `mysqli_result`.
 - `DBmysql::prepare()` returns a `Glpi\DBAL\Statement` instead of a `mysqli_stmt`, and `DBmysql::executeStatement()` expects a `Glpi\DBAL\Statement`.
 - `DBmysql::result()`, `DBmysql::numrows()`, `DBmysql::fetchArray()`, `DBmysql::fetchRow()`, `DBmysql::fetchAssoc()`, `DBmysql::fetchObject()`, `DBmysql::dataSeek()`, `DBmysql::numFields()`, `DBmysql::fieldName()` and `DBmysql::freeResult()` expect a `Glpi\DBAL\Result`.
 - `DBmysql::getStatementResult()` expects a `Glpi\DBAL\Statement` and returns a `Glpi\DBAL\Result`.
-- `DBmysqlIterator::fetchFields()` returns a list of `['name' => ..., 'table' => ...]` arrays instead of a list of objects.
+- `DBmysqlIterator::fetchFields()` returns a list of `['name' => ..., 'table' => ...]` arrays instead of a list of objects. The `table` value is always empty, as it is not provided by Doctrine DBAL.
+- `DBmysql` relies on a Doctrine DBAL connection (with the `mysqli` driver) instead of a `mysqli` object. When the kernel is booted, it uses the connection provided by DoctrineBundle.
+- `DBmysql::__construct()` accepts a Doctrine DBAL connection as second parameter.
+- `DBmysqlIterator` builds its queries using the Doctrine DBAL query builder.
 
 #### Deprecated
 - Usage of `mysqli_result` methods and properties on `Glpi\DBAL\Result` (`fetch_assoc()`, `fetch_row()`, `fetch_array()`, `fetch_object()`, `fetch_all()`, `data_seek()`, `fetch_fields()`, `close()`, `num_rows`, `field_count`). Use their `Glpi\DBAL\Result` counterparts.
 - Usage of `mysqli_stmt` methods and properties on `Glpi\DBAL\Statement` (`get_result()`, `execute()`, `affected_rows`). Use `Statement::getResult()`, `DBmysql::executeStatement()` and `Statement::getAffectedRows()`.
 
 #### Removed
+- `DBmysql::$dbh` property. Use `DBmysql::getConnection()`.
 - `Session::getNewCSRFToken()`
 - `Session::validateCSRF()`
 - `Session::checkCSRF()`
