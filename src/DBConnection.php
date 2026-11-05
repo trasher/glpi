@@ -33,6 +33,7 @@
  * ---------------------------------------------------------------------
  */
 
+use Glpi\DBAL\Result;
 use Safe\Exceptions\FilesystemException;
 
 use function Safe\file_get_contents;
@@ -647,7 +648,7 @@ class DBConnection extends CommonGLPI
             }
 
             try {
-                /** @var mysqli_result $result */
+                /** @var Result $result */
                 $result = $db_main->doQuery($db_main->getBinaryLogStatusQuery());
 
                 if ($result && $db_main->numrows($result)) {
@@ -688,7 +689,7 @@ class DBConnection extends CommonGLPI
                 }
 
                 try {
-                    /** @var mysqli_result $result */
+                    /** @var Result $result */
                     $result = $db_replica->doQuery($db_replica->getReplicaStatusQuery());
                     if ($result && $db_replica->numrows($result)) {
                         $replica_vars = $db_replica->getReplicaStatusVars();
@@ -726,7 +727,7 @@ class DBConnection extends CommonGLPI
     {
 
         if ($DBconnection->connected) {
-            /** @var mysqli_result $result */
+            /** @var Result $result */
             $result = $DBconnection->doQuery("SELECT UNIX_TIMESTAMP(MAX(`date_mod`)) AS max_date FROM `glpi_logs`");
             if ($DBconnection->numrows($result) > 0) {
                 return $DBconnection->result($result, 0, "max_date");

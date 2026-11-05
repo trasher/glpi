@@ -648,9 +648,9 @@ class Software extends InventoryAsset
                     $input['manufacturers_id'],
                 ]
             );
-            $results = $DB->getStatementResult($stmt);
+            $results = $stmt->getResult();
 
-            if ($row = $results->fetch_object()) {
+            if ($row = $results->fetchObject()) {
                 $this->softwares[$key] = $row->id;
             }
         }
@@ -728,9 +728,9 @@ class Software extends InventoryAsset
                     $input['osid'],
                 ]
             );
-            $results = $DB->getStatementResult($stmt);
+            $results = $stmt->getResult();
 
-            while ($row = $results->fetch_object()) {
+            while ($row = $results->fetchObject()) {
                 $this->versions[$key] = $row->id;
             }
         }

@@ -54,6 +54,7 @@ use Glpi\Asset\AssetDefinitionManager;
 use Glpi\Config\ConfigContainer;
 use Glpi\Dashboard\Dashboard;
 use Glpi\Dashboard\Grid;
+use Glpi\DBAL\Result;
 use Glpi\Dropdown\DropdownDefinitionManager;
 use Glpi\Search\SearchOption;
 use Glpi\Tests\Log\TestHandler;
@@ -468,6 +469,22 @@ class GLPITestCase extends TestCase
     protected function getTestRootEntity(bool $only_id = false)
     {
         return getItemByTypeName('Entity', '_test_root_entity', $only_id);
+    }
+
+    /**
+     * Build a database query result containing the given rows.
+     *
+     * @param list<array<string, mixed>> $rows
+     */
+    protected function buildDbResult(array $rows): Result
+    {
+        return new Result(
+            array_map(static fn(array $row) => array_values($row), $rows),
+            array_map(
+                static fn(string $name) => ['name' => $name, 'table' => ''],
+                array_keys($rows[0] ?? [])
+            )
+        );
     }
 
     /**

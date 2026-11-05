@@ -20,10 +20,19 @@ The present file will list all changes made to the project; according to the
 ### API changes
 
 #### Added
+- `Glpi\DBAL\Result` class, returned by `DBmysql::doQuery()` for queries that produce a result set. Its rows are buffered, it can be counted and sought.
+- `Glpi\DBAL\Statement` class, returned by `DBmysql::prepare()`. Once executed with `DBmysql::executeStatement()`, its result set is available through `Statement::getResult()`.
 
 #### Changes
+- `DBmysql::doQuery()` returns a `Glpi\DBAL\Result` instead of a `mysqli_result`.
+- `DBmysql::prepare()` returns a `Glpi\DBAL\Statement` instead of a `mysqli_stmt`, and `DBmysql::executeStatement()` expects a `Glpi\DBAL\Statement`.
+- `DBmysql::result()`, `DBmysql::numrows()`, `DBmysql::fetchArray()`, `DBmysql::fetchRow()`, `DBmysql::fetchAssoc()`, `DBmysql::fetchObject()`, `DBmysql::dataSeek()`, `DBmysql::numFields()`, `DBmysql::fieldName()` and `DBmysql::freeResult()` expect a `Glpi\DBAL\Result`.
+- `DBmysql::getStatementResult()` expects a `Glpi\DBAL\Statement` and returns a `Glpi\DBAL\Result`.
+- `DBmysqlIterator::fetchFields()` returns a list of `['name' => ..., 'table' => ...]` arrays instead of a list of objects.
 
 #### Deprecated
+- Usage of `mysqli_result` methods and properties on `Glpi\DBAL\Result` (`fetch_assoc()`, `fetch_row()`, `fetch_array()`, `fetch_object()`, `fetch_all()`, `data_seek()`, `fetch_fields()`, `close()`, `num_rows`, `field_count`). Use their `Glpi\DBAL\Result` counterparts.
+- Usage of `mysqli_stmt` methods and properties on `Glpi\DBAL\Statement` (`get_result()`, `execute()`, `affected_rows`). Use `Statement::getResult()`, `DBmysql::executeStatement()` and `Statement::getAffectedRows()`.
 
 #### Removed
 - `Session::getNewCSRFToken()`

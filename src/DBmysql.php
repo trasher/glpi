@@ -42,6 +42,8 @@ use Glpi\DBAL\QueryExpression;
 use Glpi\DBAL\QueryParam;
 use Glpi\DBAL\QuerySubQuery;
 use Glpi\DBAL\QueryUnion;
+use Glpi\DBAL\Result;
+use Glpi\DBAL\Statement;
 use Glpi\Debug\Profile;
 use Glpi\Exception\Database\QueryException;
 use Glpi\Exception\Database\StatementException;
@@ -203,26 +205,6 @@ class DBmysql
 
     private bool $cache_disabled = false;
 
-    /**
-     * Maps prepared statements to their original SQL query string.
-     *
-     * Keyed by the mysqli_stmt object so each statement carries its own query
-     * (no shared connection-level state), with automatic cleanup once the
-     * statement is garbage collected.
-     *
-     * @var ?WeakMap<mysqli_stmt, string>
-     */
-    private ?WeakMap $statement_queries = null;
-
-    /**
-     * Number of the debug profile SQL query data registered on the last execution of each prepared statement.
-     *
-     * Used to add the warnings that are only known once the statement result set has been read.
-     *
-     * @var ?WeakMap<mysqli_stmt, int>
-     */
-    private ?WeakMap $statement_profile_queries = null;
-
     private DBmysqlIterator $iterator;
 
     /**
@@ -256,8 +238,6 @@ class DBmysql
      */
     public function __construct($choice = null)
     {
-        $this->statement_queries = new WeakMap();
-
         // Handle separate DB instances per worker for unit tests (when enabled)
         // First runner will use the existing `glpi` database
         // Second runner will use `glpi_2`
@@ -358,9 +338,9 @@ class DBmysql
      *
      * @param string|BasePart $query Query to execute
      *
-     * @return mysqli_result|true Returns true for add/delete/update; and mysqli_result for select
+     * @return Result|true Returns true for add/delete/update; and Result for select
      */
-    public function doQuery(BasePart|string $query): true|mysqli_result
+    public function doQuery(BasePart|string $query): true|Result
     {
         $is_stmt = false;
         if ($query instanceof BasePart) {
@@ -384,14 +364,10 @@ class DBmysql
         if ($is_stmt) {
             $stmt = $this->prepare($query);
             $this->executeStatement($stmt, $params);
-            $this->affected_rows = (int) $stmt->affected_rows;
+            $this->affected_rows = $stmt->getAffectedRows();
 
-            // getStatementResult() returns a mysqli_result for SELECT queries, and
-            // false for queries that do not produce a result set (add/delete/update).
-            $res = $this->getStatementResult($stmt);
-            if ($res === false) {
-                $res = true;
-            }
+            // There is no result set for queries like add/delete/update.
+            $res = $stmt->getResult() ?? true;
         } else {
             $res = $this->dbh->query($query);
             if (!$res) {
@@ -405,6 +381,9 @@ class DBmysql
                 );
             }
             $this->affected_rows = (int) $this->dbh->affected_rows;
+            if ($res instanceof mysqli_result) {
+                $res = $this->buildResult($res);
+            }
         }
 
         $duration = (microtime(true) - $start_time) * 1000;
@@ -413,7 +392,7 @@ class DBmysql
         $debug_data['rows'] = $this->getAffectedRows();
 
         // Trigger warning errors if any SQL warnings was produced by the query
-        // (prepared statements warnings are checked by executeStatement() and getStatementResult() methods)
+        // (prepared statements warnings are checked by executeStatement() method, once rows have been read)
         if (!$is_stmt) {
             $debug_data['warnings'] = $this->getSQLWarnings($query);
         }
@@ -465,7 +444,7 @@ class DBmysql
      *
      * @param string $query Query to prepare
      *
-     * @return mysqli_stmt
+     * @return Statement
      */
     public function prepare($query)
     {
@@ -480,17 +459,28 @@ class DBmysql
                 )
             );
         }
-        // Some subclasses wrap an existing mysqli handle without calling
-        // parent::__construct(), so the WeakMap may not be initialized yet.
-        $this->statement_queries ??= new WeakMap();
-        $this->statement_queries[$res] = $query;
-        return $res;
+        return new Statement($res, $query);
+    }
+
+    /**
+     * Buffer a mysqli result into a driver independent result.
+     */
+    private function buildResult(mysqli_result $res): Result
+    {
+        $columns = array_map(
+            static fn(object $field) => ['name' => $field->name, 'table' => $field->table],
+            $res->fetch_fields()
+        );
+        $rows = $res->fetch_all(MYSQLI_NUM);
+        $res->free();
+
+        return new Result($rows, $columns);
     }
 
     /**
      * Give result from a SQL result
      *
-     * @param mysqli_result $result MySQL result handler
+     * @param Result $result Query result
      * @param int           $i      Row offset to give
      * @param string|int    $field  Field to give
      *
@@ -499,7 +489,7 @@ class DBmysql
     public function result($result, $i, $field)
     {
         if (
-            $result && ($result->data_seek($i))
+            $result && ($result->seek($i))
             && ($data = $this->fetchArray($result))
             && isset($data[$field])
         ) {
@@ -511,75 +501,75 @@ class DBmysql
     /**
      * Number of rows
      *
-     * @param mysqli_result $result MySQL result handler
+     * @param Result $result Query result
      *
      * @return int number of rows
      */
     public function numrows($result)
     {
-        return (int) $result->num_rows;
+        return $result->numRows();
     }
 
     /**
      * Fetch array of the next row of a Mysql query
      * Please prefer fetchRow or fetchAssoc
      *
-     * @param mysqli_result $result MySQL result handler
+     * @param Result $result Query result
      *
      * @return string[]|null array results
      */
     public function fetchArray($result)
     {
-        return $this->decodeFetchResult($result->fetch_array());
+        return $this->decodeFetchResult($result->fetchArray());
     }
 
     /**
      * Fetch row of the next row of a Mysql query
      *
-     * @param mysqli_result $result MySQL result handler
+     * @param Result $result Query result
      *
      * @return mixed|null result row
      */
     public function fetchRow($result)
     {
-        return $this->decodeFetchResult($result->fetch_row());
+        return $this->decodeFetchResult($result->fetchRow());
     }
 
     /**
      * Fetch assoc of the next row of a Mysql query
      *
-     * @param mysqli_result $result MySQL result handler
+     * @param Result $result Query result
      *
      * @return string[]|null result associative array
      */
     public function fetchAssoc($result)
     {
-        return $this->decodeFetchResult($result->fetch_assoc());
+        return $this->decodeFetchResult($result->fetchAssoc());
     }
 
     /**
      * Fetch object of the next row of an SQL query
      *
-     * @param mysqli_result $result MySQL result handler
+     * @param Result $result Query result
      *
      * @return object|null
      */
     public function fetchObject($result)
     {
-        return $this->decodeFetchResult($result->fetch_object());
+        return $this->decodeFetchResult($result->fetchObject());
     }
 
     /**
      * Move current pointer of a Mysql result to the specific row
      *
-     * @param mysqli_result $result MySQL result handler
+     * @param Result $result Query result
      * @param int       $num    Row to move current pointer
      *
      * @return bool
      */
     public function dataSeek($result, $num)
     {
-        return $result->data_seek($num);
+        return $result->seek($num);
     }
 
     /**
@@ -607,27 +597,26 @@ class DBmysql
     /**
      * Give number of fields of a Mysql result
      *
-     * @param mysqli_result $result MySQL result handler
+     * @param Result $result Query result
      *
      * @return int number of fields
      */
     public function numFields($result)
     {
-        return $result->field_count;
+        return $result->numFields();
     }
 
     /**
      * Give name of a field of a Mysql result
      *
-     * @param mysqli_result $result MySQL result handler
+     * @param Result $result Query result
      * @param int       $nb     ID of the field
      *
      * @return string name of the field
      */
     public function fieldName($result, $nb)
     {
-        $finfo = $result->fetch_fields();
-        return $finfo[$nb]->name;
+        return $result->getColumns()[$nb]['name'];
     }
 
 
@@ -899,7 +888,7 @@ class DBmysql
         if (!$this->cache_disabled && $usecache && isset($this->field_cache[$table])) {
             return $this->field_cache[$table];
         }
-        /** @var mysqli_result $result */
+        /** @var Result $result */
         $result = $this->doQuery(sprintf("SHOW COLUMNS FROM %s", self::quoteName($table)));
         if ($this->numrows($result) > 0) {
             $this->field_cache[$table] = [];
@@ -953,7 +942,7 @@ class DBmysql
     /**
      * Free result memory
      *
-     * @param mysqli_result $result MySQL result handler
+     * @param Result $result Query result
      *
      * @return bool
      */
@@ -1091,10 +1080,10 @@ class DBmysql
     {
         // No translation, used in sysinfo
         $ret = [];
-        /** @var mysqli_result $req */
+        /** @var Result $req */
         $req = $this->doQuery("SELECT @@sql_mode as mode, @@version AS vers, @@version_comment AS stype");
 
-        if (($data = $req->fetch_array())) {
+        if (($data = $req->fetchArray())) {
             if ($data['stype']) {
                 $ret['Server Software'] = $data['stype'];
             }
@@ -1128,7 +1117,7 @@ class DBmysql
     {
         $name          = $this->quote($this->dbdefault . '.' . $name);
         $query         = "SELECT GET_LOCK($name, 0)";
-        /** @var mysqli_result $result */
+        /** @var Result $result */
         $result        = $this->doQuery($query);
         [$lock_ok] = $this->fetchRow($result);
 
@@ -1148,7 +1137,7 @@ class DBmysql
     {
         $name          = $this->quote($this->dbdefault . '.' . $name);
         $query         = "SELECT RELEASE_LOCK($name)";
-        /** @var mysqli_result $result */
+        /** @var Result $result */
         $result        = $this->doQuery($query);
         [$lock_ok] = $this->fetchRow($result);
 
@@ -1372,7 +1361,7 @@ class DBmysql
         $query = $this->buildInsert($table, $params);
         $stmt = $this->prepare($query->getQuery());
         $this->executeStatement($stmt, $query->getParams());
-        $this->affected_rows = (int) $stmt->affected_rows;
+        $this->affected_rows = $stmt->getAffectedRows();
         return true;
     }
 
@@ -1494,7 +1483,7 @@ class DBmysql
         $query = $this->buildUpdate($table, $params, $where, $joins);
         $stmt = $this->prepare($query->getQuery());
         $this->executeStatement($stmt, $query->getParams());
-        $this->affected_rows = (int) $stmt->affected_rows;
+        $this->affected_rows = $stmt->getAffectedRows();
         return true;
     }
 
@@ -1515,7 +1504,7 @@ class DBmysql
         $query = $this->buildUpdateOrInsert($table, $params, $where, $onlyone);
         $stmt = $this->prepare($query->getQuery());
         $this->executeStatement($stmt, $query->getParams());
-        $this->affected_rows = (int) $stmt->affected_rows;
+        $this->affected_rows = $stmt->getAffectedRows();
         return true;
     }
 
@@ -1587,7 +1576,7 @@ class DBmysql
         $query = $this->buildDelete($table, $where, $joins);
         $stmt = $this->prepare($query->getQuery());
         $this->executeStatement($stmt, $query->getParams());
-        $this->affected_rows = (int) $stmt->affected_rows;
+        $this->affected_rows = $stmt->getAffectedRows();
         return true;
     }
 
@@ -1672,10 +1661,10 @@ class DBmysql
      */
     public function getVersion()
     {
-        /** @var mysqli_result $res */
+        /** @var Result $res */
         $res = $this->doQuery('SELECT version()');
         /** @var array<string,mixed> $req */
-        $req = $res->fetch_array();
+        $req = $res->fetchArray();
         $raw = $req['version()'];
         return $raw;
     }
@@ -2067,27 +2056,16 @@ class DBmysql
     }
 
     /**
-     * Returns the original SQL query string associated with a prepared statement.
-     *
-     * @param mysqli_stmt $stmt Statement prepared through self::prepare()
-     *
-     * @return string The query string, or an empty string if the statement was not tracked.
-     */
-    private function getStatementQuery(mysqli_stmt $stmt): string
-    {
-        return $this->statement_queries[$stmt] ?? '';
-    }
-
-    /**
      * Binds parameters to a prepared statement
      *
      * @param mysqli_stmt $stmt   Statement to bind parameters to
+     * @param string $query  SQL query of the statement
      * @param array<int|string, mixed> $params Parameters to bind
      * @param list<'i'|'d'|'s'>|null $types  Types array (e.g. ['i', 's', 's', 'd']), or null for all types as string
      *
      * @return void
      */
-    private function bindStatementParams(mysqli_stmt $stmt, array $params, string|array|null $types = null): void
+    private function bindStatementParams(mysqli_stmt $stmt, string $query, array $params, string|array|null $types = null): void
     {
         // Rely on the server count: a "?" inside a quoted literal is not a placeholder.
         if ($stmt->param_count !== count($params)) {
@@ -2096,7 +2074,7 @@ class DBmysql
                     'Number of placeholders (%d) in SQL statement does not match number of values (%d). SQL: %s',
                     $stmt->param_count,
                     count($params),
-                    $this->getStatementQuery($stmt)
+                    $query
                 )
             );
         }
@@ -2118,7 +2096,6 @@ class DBmysql
             $types = implode('', $types);
         }
 
-        $query = $this->getStatementQuery($stmt);
         try {
             if (false === $stmt->bind_param($types, ...$params)) {
                 throw new StatementException(
@@ -2151,18 +2128,18 @@ class DBmysql
     /**
      * Executes a prepared statement
      *
-     * Warnings raised while the rows are read (e.g. implicit casts in WHERE clauses) are not known yet
-     * when the statement is executed, so the result set must be retrieved using self::getStatementResult().
+     * Its result set, if any, is then available through {@link Statement::getResult()}.
      *
-     * @param mysqli_stmt $stmt Statement to execute
+     * @param Statement $stmt Statement to execute
      * @param ?array<int|string, mixed> $params Parameters to bind
      * @param list<'i'|'d'|'s'>|null $types Types array (e.g. ['i', 's', 's', 'd']), or null for all types as string
      *
      * @return void
      */
-    public function executeStatement(mysqli_stmt $stmt, ?array $params = null, ?array $types = null): void
+    public function executeStatement(Statement $stmt, ?array $params = null, ?array $types = null): void
     {
-        $query = $this->getStatementQuery($stmt);
+        $query = $stmt->getQuery();
+        $handle = $stmt->getHandle();
         $debug_data = [
             'query' => $query,
             'time' => 0,
@@ -2174,27 +2151,35 @@ class DBmysql
         $start_time = microtime(true);
 
         if ($params !== null) {
-            $this->bindStatementParams($stmt, $params, $types);
+            $this->bindStatementParams($handle, $query, $params, $types);
         }
-        if (!$stmt->execute()) {
+        if (!$handle->execute()) {
             throw new StatementException(
                 sprintf(
                     'MySQL statement error: %s (%d) in SQL query "%s".',
-                    $stmt->error,
-                    $stmt->errno,
+                    $handle->error,
+                    $handle->errno,
                     $query
                 ),
-                $stmt->errno
+                $handle->errno
             );
         }
 
+        $affected_rows = (int) $handle->affected_rows;
+        // get_result() returns false for queries that do not produce a result set (add/delete/update).
+        $res = $handle->get_result();
+        $stmt->setExecutionState(
+            $res instanceof mysqli_result ? $this->buildResult($res) : null,
+            $affected_rows
+        );
+
         $duration = (microtime(true) - $start_time) * 1000;
         $debug_data['time'] = $duration;
-        $debug_data['rows'] = (int) $stmt->affected_rows;
+        $debug_data['rows'] = $affected_rows;
         $debug_data['warnings'] = $this->getSQLWarnings($query);
 
         if (isset($_SESSION['glpi_use_mode']) && ($_SESSION['glpi_use_mode'] == Session::DEBUG_MODE)) {
-            $profile_query_num = Profile::getCurrent()->addSQLQueryData(
+            Profile::getCurrent()->addSQLQueryData(
                 $debug_data['query'],
                 $params,
                 $debug_data['time'],
@@ -2202,36 +2187,22 @@ class DBmysql
                 $debug_data['errors'],
                 $debug_data['warnings']
             );
-            if ($profile_query_num !== null) {
-                $this->statement_profile_queries ??= new WeakMap();
-                $this->statement_profile_queries[$stmt] = $profile_query_num;
-            }
         }
     }
 
     /**
-     * Get the result set of an executed prepared statement, and check the SQL warnings it produced.
+     * Get the result set of an executed prepared statement.
      *
-     * @param mysqli_stmt $stmt Executed statement
+     * Rows are buffered when the statement is executed, and SQL warnings they produced
+     * are checked at that time.
      *
-     * @return mysqli_result|false A result for queries that produce a result set (e.g. SELECT), false otherwise
+     * @param Statement $stmt Executed statement
+     *
+     * @return Result|false A result for queries that produce a result set (e.g. SELECT), false otherwise
      */
-    public function getStatementResult(mysqli_stmt $stmt): mysqli_result|false
+    public function getStatementResult(Statement $stmt): Result|false
     {
-        $res = $stmt->get_result();
-        if ($res !== false) {
-            // Warnings are sent by the server after the rows, they are only available once the result set has been read
-            $warnings = $this->getSQLWarnings($this->getStatementQuery($stmt));
-
-            $profile_query_num = $this->statement_profile_queries[$stmt] ?? null;
-            if ($profile_query_num !== null) {
-                unset($this->statement_profile_queries[$stmt]);
-                if ($warnings !== '') {
-                    Profile::getCurrent()->addSQLQueryWarnings($profile_query_num, $warnings);
-                }
-            }
-        }
-        return $res;
+        return $stmt->getResult() ?? false;
     }
 
     /**
@@ -2462,10 +2433,10 @@ class DBmysql
             static::quoteName('Variable_name'),
             implode(', ', array_map([$this, 'quote'], $variables))
         );
-        /** @var mysqli_result $result */
+        /** @var Result $result */
         $result = $this->doQuery($query);
         $values = [];
-        while ($row = $result->fetch_assoc()) {
+        while ($row = $result->fetchAssoc()) {
             $values[$row['Variable_name']] = $row['Value'];
         }
         return $values;
