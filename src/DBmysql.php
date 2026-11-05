@@ -496,10 +496,7 @@ class DBmysql
             $statement = $this->connection->prepare($query);
         } catch (DBALException $e) {
             [$message, $code] = self::getDriverError($e);
-            throw new StatementException(
-                sprintf('MySQL prepare error: %s (%d) in SQL query "%s".', $message, $code, $query),
-                previous: $e
-            );
+            throw new StatementException(sprintf('MySQL prepare error: %s (%d) in SQL query "%s".', $message, $code, $query), $e->getCode(), previous: $e);
         }
         return new Statement($statement, $query);
     }
