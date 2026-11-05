@@ -38,6 +38,7 @@ use Glpi\DBAL\QueryElementInterface;
 use Glpi\DBAL\QueryExpression;
 use Glpi\DBAL\QueryParam;
 use Glpi\DBAL\QuerySubQuery;
+use Glpi\DBAL\Result;
 
 use function Safe\preg_split;
 
@@ -56,7 +57,7 @@ class DBmysqlIterator implements SeekableIterator, Countable
     /** @var array<int, mixed> */
     private array $values = [];
     // Current result
-    private mysqli_result|bool $res = false;
+    private ?Result $res = null;
 
     /**
      * Total number of rows.
@@ -147,13 +148,13 @@ class DBmysqlIterator implements SeekableIterator, Countable
     {
         $this->values = []; //reset values
         $this->buildQuery($criteria);
-        $this->res = false;
+        $this->res = null;
         if ($this->conn) {
             $stmt = $this->conn->prepare($this->sql ?? '');
             $this->conn->executeStatement($stmt, $this->values);
-            $this->res = $this->conn->getStatementResult($stmt);
+            $this->res = $stmt->getResult();
         }
-        $this->count = $this->res instanceof mysqli_result ? $this->conn->numrows($this->res) : 0;
+        $this->count = $this->res !== null ? $this->conn->numrows($this->res) : 0;
         $this->setPosition(0);
         return $this;
     }
@@ -170,7 +171,7 @@ class DBmysqlIterator implements SeekableIterator, Countable
     public function buildQuery(array $criteria): void
     {
         $this->sql = null;
-        $this->res = false;
+        $this->res = null;
 
         $table = $criteria['FROM'] ?? null;
         unset($criteria['FROM']);
@@ -572,7 +573,7 @@ class DBmysqlIterator implements SeekableIterator, Countable
      */
     public function __destruct()
     {
-        if ($this->res instanceof mysqli_result) {
+        if ($this->res !== null) {
             $this->conn->freeResult($this->res);
         }
     }
@@ -881,12 +882,12 @@ class DBmysqlIterator implements SeekableIterator, Countable
     }
 
     /**
-     * Check if the current result is not a {@link \mysqli_result}, indicating a failure.
+     * Check if there is no current result, indicating a failure.
      * @return bool
      */
     public function isFailed(): bool
     {
-        return !($this->res instanceof mysqli_result);
+        return $this->res === null;
     }
 
     /**
@@ -928,7 +929,7 @@ class DBmysqlIterator implements SeekableIterator, Countable
      */
     private function setPosition(int $position): void
     {
-        if (!($this->res instanceof mysqli_result)) {
+        if ($this->res === null) {
             // Result is not valid, nothing to do.
             return;
         }
@@ -964,8 +965,13 @@ class DBmysqlIterator implements SeekableIterator, Countable
         return in_array($value, $this->allowed_operators, true);
     }
 
+    /**
+     * Columns metadata of the result.
+     *
+     * @return list<array{name: string, table: string}>
+     */
     public function fetchFields(): array
     {
-        return $this->res->fetch_fields();
+        return $this->res?->getColumns() ?? [];
     }
 }
