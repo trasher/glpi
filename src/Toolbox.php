@@ -36,6 +36,7 @@
 use Glpi\Api\Deprecated\DeprecatedInterface;
 use Glpi\Console\Application;
 use Glpi\DBAL\QueryParam;
+use Glpi\DBAL\Result;
 use Glpi\Error\ErrorUtils;
 use Glpi\Event;
 use Glpi\Exception\Database\StatementException;
@@ -1922,11 +1923,11 @@ class Toolbox
             // Enable NO_AUTO_VALUE_ON_ZERO for glpi_entities insertion (needed for id=0 root entity)
             $original_sql_mode = null;
             if ($table === 'glpi_entities') {
-                /** @var mysqli_result $request */
+                /** @var Result $request */
                 $request = $database->doQuery(
                     sprintf('SELECT @@sql_mode as %s', $database->quoteName('sql_mode'))
                 );
-                $original_sql_mode = $request->fetch_assoc()['sql_mode'] ?? '';
+                $original_sql_mode = $request->fetchAssoc()['sql_mode'] ?? '';
                 $new_sql_mode = $original_sql_mode !== ''
                     ? $original_sql_mode . ',NO_AUTO_VALUE_ON_ZERO'
                     : 'NO_AUTO_VALUE_ON_ZERO';
@@ -1950,7 +1951,7 @@ class Toolbox
                     try {
                         $database->executeStatement($stmt, $row);
                     } catch (StatementException $e) {
-                        $msg = $stmt->error;
+                        $msg = $e->getMessage();
                         $msg .= "\nError execution statement in table $table\n";
                         $msg .= json_encode($row);
                         throw new RuntimeException($msg, 0, $e);
