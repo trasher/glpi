@@ -1176,6 +1176,69 @@ class MigrationTest extends DbTestCase
         ], $migration->getMockedQueries());
     }
 
+    public static function searchOptionInSortProvider(): iterable
+    {
+        // Multiple columns sort
+        yield [
+            'query'         => 'sort%5B0%5D=1&sort%5B1%5D=40&order%5B0%5D=ASC&order%5B1%5D=DESC&itemtype=Computer',
+            'new_opt'       => 100,
+            'expected'      => 'sort%5B0%5D=1&sort%5B1%5D=100&order%5B0%5D=ASC&order%5B1%5D=DESC&itemtype=Computer',
+        ];
+        yield [
+            'query'         => 'sort%5B0%5D=40&sort%5B1%5D=1&order%5B0%5D=ASC&order%5B1%5D=DESC&itemtype=Computer',
+            'new_opt'       => null,
+            'expected'      => 'sort%5B0%5D=1&order%5B0%5D=DESC&itemtype=Computer',
+        ];
+
+        // Legacy single column sort
+        yield [
+            'query'         => 'sort=40&order=ASC&itemtype=Computer',
+            'new_opt'       => 100,
+            'expected'      => 'sort=100&order=ASC&itemtype=Computer',
+        ];
+        yield [
+            'query'         => 'sort=40&order=ASC&itemtype=Computer',
+            'new_opt'       => null,
+            'expected'      => 'order=ASC&itemtype=Computer',
+        ];
+    }
+
+    #[DataProvider('searchOptionInSortProvider')]
+    public function testSearchOptionInSortIsMigrated(string $query, ?int $new_opt, string $expected): void
+    {
+        $migration = $this->getMigrationMock(db_options: [
+            '_mock_tableExists' => true,
+            '_mock_request' => function ($request) use ($query) {
+                if (($request['FROM'] ?? null) === \SavedSearch::getTable()) {
+                    return new ArrayIterator([
+                        [
+                            'id'        => 1,
+                            'itemtype'  => 'Computer',
+                            'query'     => $query,
+                        ],
+                    ]);
+                }
+                return new ArrayIterator([]);
+            },
+        ]);
+
+        if ($new_opt === null) {
+            $migration->removeSearchOption('Computer', 40);
+        } else {
+            $migration->changeSearchOption('Computer', 40, $new_opt);
+        }
+        $migration->executeMigration();
+
+        $queries = $migration->getMockedQueries();
+        $this->assertEquals(
+            [
+                'sql' => "UPDATE `glpi_savedsearches` SET `query` = ? WHERE `id` = ?",
+                'values' => [$expected, 1],
+            ],
+            end($queries)
+        );
+    }
+
     public function testRemoveSearchOption()
     {
         $migration = $this->getMigrationMock(db_options: [
