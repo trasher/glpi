@@ -113,11 +113,6 @@ class Printer extends NetworkEquipment
                 $val->serial = preg_replace('/\/$/', '', $val->serial);
             }
 
-            if (property_exists($val, 'ram')) {
-                $val->memory_size = $val->ram;
-                unset($val->ram);
-            }
-
             if (property_exists($val, 'credentials')) {
                 $val->snmpcredentials_id = $val->credentials;
                 unset($val->credentials);

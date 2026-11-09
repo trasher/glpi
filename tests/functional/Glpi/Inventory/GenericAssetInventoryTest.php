@@ -1838,7 +1838,7 @@ class GenericAssetInventoryTest extends InventoryTestCase
             'have_wifi' => 0,
             'have_ethernet' => 0,
             'comment' => null,
-            'memory_size' => null,
+            'ram' => null,
             'locations_id' => 0,
             'networks_id' => 0,
             'printertypes_id' => 0,

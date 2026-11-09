@@ -36,9 +36,9 @@
 
 {% block more_fields %}
     {{ fields.numberField(
-        'memory_size',
-        item.fields['memory_size'],
-        _n('Memory', 'Memories', 1),
+        'ram',
+        item.fields['ram'],
+        __('%1$s (%2$s)')|format(_n('Memory', 'Memories', 1), __('Mio')),
         field_options
     ) }}
 

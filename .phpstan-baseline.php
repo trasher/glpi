@@ -10358,12 +10358,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/Printer.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$memory_size\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Glpi/Inventory/MainAsset/Printer.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property object\\:\\:\\$name\\.$#',
 	'identifier' => 'property.notFound',
 	'count' => 2,

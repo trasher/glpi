@@ -553,11 +553,11 @@ class Printer extends CommonDBTM implements AssignableItemInterface, StateInterf
         ];
 
         $tab[] = [
-            'id'                 => '13',
+            'id'                 => '15',
             'table'              => $this->getTable(),
-            'field'              => 'memory_size',
-            'name'               => _n('Memory', 'Memories', 1),
-            'datatype'           => 'integer',
+            'field'              => 'ram',
+            'name'               => sprintf(__('%1$s (%2$s)'), _n('Memory', 'Memories', 1), __('Mio')),
+            'datatype'           => 'number',
         ];
 
         $tab[] = [

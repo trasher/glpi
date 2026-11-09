@@ -5743,7 +5743,7 @@ CREATE TABLE `glpi_printers` (
   `have_wifi` tinyint NOT NULL DEFAULT '0',
   `have_ethernet` tinyint NOT NULL DEFAULT '0',
   `comment` text,
-  `memory_size` varchar(255) DEFAULT NULL,
+  `ram` int unsigned DEFAULT NULL,
   `locations_id` int unsigned NOT NULL DEFAULT '0',
   `networks_id` int unsigned NOT NULL DEFAULT '0',
   `printertypes_id` int unsigned NOT NULL DEFAULT '0',
