@@ -458,7 +458,7 @@ class NetworkEquipment extends CommonDBTM implements AssignableItemInterface, DC
         ];
 
         $tab[] = [
-            'id'                 => '14',
+            'id'                 => '15',
             'table'              => $this->getTable(),
             'field'              => 'ram',
             'name'               => sprintf(__('%1$s (%2$s)'), _n('Memory', 'Memories', 1), __('Mio')),

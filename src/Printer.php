@@ -570,7 +570,7 @@ class Printer extends CommonDBTM implements AssignableItemInterface, StateInterf
         ];
 
         $tab[] = [
-            'id'                 => '12',
+            'id'                 => '33',
             'table'              => $this->getTable(),
             'field'              => 'last_pages_counter',
             'name'               => __('Current counter of pages'),
