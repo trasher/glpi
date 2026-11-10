@@ -35,7 +35,10 @@
 namespace tests\units;
 
 use AuthLDAP;
+use FieldUnicity;
 use Glpi\DBAL\QueryExpression;
+use Glpi\OAuth\Client;
+use Glpi\OAuth\UserRepository;
 use Glpi\Tests\DbTestCase;
 use Glpi\Tests\RuleBuilder;
 use GLPIKey;
@@ -73,9 +76,6 @@ class AuthLdapTest extends DbTestCase
     {
         parent::setUp();
         $this->ldap = getItemByTypeName('AuthLDAP', '_local_ldap');
-
-        // remove the `_e2e_ldap` server
-        $this->deleteItem(AuthLDAP::class, getItemByTypeName(AuthLDAP::class, '_e2e_ldap', true));
 
         //make sure bootstrapped ldap is active and is default
         $this->assertTrue(
@@ -901,6 +901,186 @@ class AuthLdapTest extends DbTestCase
         $this->assertGreaterThan(0, (int) $user->fields['usercategories_id']);
     }
 
+    #[RequiresPhpExtension('ldap')]
+    public function testRefusedImportIsNotReportedAsImported(): void
+    {
+        $this->login();
+
+        // Make the import fail on a unicity check against an existing local user
+        $this->createItem(FieldUnicity::class, [
+            'name'          => 'User login uniqueness',
+            'itemtype'      => \User::class,
+            '_fields'       => ['name'],
+            'entities_id'   => 0,
+            'is_recursive'  => 1,
+            'is_active'     => 1,
+            'action_refuse' => 1,
+        ], ['_fields']);
+        $users_id = $this->createItem(\User::class, ['name' => 'ecuador0'])->getID();
+
+        // Same call as the CLI synchronization command (ldap:synchronize_users)
+        $import = AuthLDAP::ldapImportUserByServerId(
+            [
+                'method' => AuthLDAP::IDENTIFIER_LOGIN,
+                'value'  => 'ecuador0',
+            ],
+            AuthLDAP::ACTION_IMPORT,
+            $this->ldap->getID(),
+            false,
+            true
+        );
+        $this->assertFalse($import);
+        $this->hasSessionMessageThatContains('Impossible record for Login = ecuador0', ERROR);
+
+        // No user has been created, the existing one is untouched
+        $this->assertSame(1, countElementsInTable(\User::getTable(), ['name' => 'ecuador0']));
+        $user = new \User();
+        $this->assertTrue($user->getFromDB($users_id));
+        $this->assertEmpty($user->fields['user_dn']);
+    }
+
+    #[RequiresPhpExtension('ldap')]
+    public function testRefusedSynchronizationIsNotReportedAsSynchronized(): void
+    {
+        $this->login();
+
+        $import = AuthLDAP::ldapImportUserByServerId(
+            [
+                'method' => AuthLDAP::IDENTIFIER_LOGIN,
+                'value'  => 'ecuador0',
+            ],
+            AuthLDAP::ACTION_IMPORT,
+            $this->ldap->getID()
+        );
+        $this->assertSame(AuthLDAP::USER_IMPORTED, $import['action']);
+
+        // Make the synchronization fail on a unicity check against an existing local user
+        $this->createItem(FieldUnicity::class, [
+            'name'          => 'User phone uniqueness',
+            'itemtype'      => \User::class,
+            '_fields'       => ['phone'],
+            'entities_id'   => 0,
+            'is_recursive'  => 1,
+            'is_active'     => 1,
+            'action_refuse' => 1,
+        ], ['_fields']);
+        $this->createItem(\User::class, ['name' => 'ecuador0_local', 'phone' => '+33101010101']);
+
+        $this->assertTrue(
+            ldap_modify(
+                $this->ldap->connect(),
+                'uid=ecuador0,ou=people,ou=R&D,dc=glpi,dc=org',
+                ['telephoneNumber' => '+33101010101']
+            )
+        );
+
+        // Same call as the CLI synchronization command (ldap:synchronize_users)
+        $refused = false;
+        $synchro = AuthLDAP::ldapImportUserByServerId(
+            [
+                'method' => AuthLDAP::IDENTIFIER_LOGIN,
+                'value'  => 'ecuador0',
+            ],
+            AuthLDAP::ACTION_SYNCHRONIZE,
+            $this->ldap->getID(),
+            false,
+            true,
+            $refused
+        );
+
+        //reset entry before any test can fail
+        $this->assertTrue(
+            ldap_modify(
+                $this->ldap->connect(),
+                'uid=ecuador0,ou=people,ou=R&D,dc=glpi,dc=org',
+                ['telephoneNumber' => '034596780']
+            )
+        );
+
+        $this->assertFalse($synchro);
+        $this->assertTrue($refused);
+        $this->hasSessionMessageThatContains('Impossible record for Phone = +33101010101', ERROR);
+
+        // The user has not been updated
+        $user = new \User();
+        $this->assertTrue($user->getFromDB($import['id']));
+        $this->assertSame('034596780', $user->fields['phone']);
+    }
+
+    #[RequiresPhpExtension('ldap')]
+    public function testImportUserFromServersStopsOnRefusedImport(): void
+    {
+        $this->login();
+
+        $this->createItem(FieldUnicity::class, [
+            'name'          => 'User phone uniqueness',
+            'itemtype'      => \User::class,
+            '_fields'       => ['phone'],
+            'entities_id'   => 0,
+            'is_recursive'  => 1,
+            'is_active'     => 1,
+            'action_refuse' => 1,
+        ], ['_fields']);
+        $this->createItem(\User::class, ['name' => 'ecuador0_local', 'phone' => '034596780']);
+
+        // Second active directory, holding the same users as the first one
+        $this->createItem(AuthLDAP::class, [
+            'name'            => 'Copy of ' . $this->ldap->fields['name'],
+            'host'            => $this->ldap->fields['host'],
+            'port'            => $this->ldap->fields['port'],
+            'basedn'          => $this->ldap->fields['basedn'],
+            'rootdn'          => $this->ldap->fields['rootdn'],
+            'rootdn_passwd'   => (new GLPIKey())->decrypt($this->ldap->fields['rootdn_passwd']),
+            'condition'       => $this->ldap->fields['condition'],
+            'login_field'     => $this->ldap->fields['login_field'],
+            'email1_field'    => $this->ldap->fields['email1_field'],
+            'realname_field'  => $this->ldap->fields['realname_field'],
+            'firstname_field' => $this->ldap->fields['firstname_field'],
+            'phone_field'     => $this->ldap->fields['phone_field'],
+            'is_active'       => 1,
+            'is_default'      => 0,
+        ], ['rootdn_passwd']);
+
+        // Same call as the user form "Import from directories"
+        $this->assertFalse(AuthLDAP::importUserFromServers(['name' => 'ecuador0']));
+
+        // The import stops on the first refusal: the unicity error is displayed only once,
+        // without retrying on the second directory nor a misleading "User not found"
+        $this->assertCount(1, $_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR] ?? []);
+        $this->hasSessionMessageThatContains('Impossible record for Phone = 034596780', ERROR);
+        $this->hasNoSessionMessage(ERROR);
+        $this->assertSame(0, countElementsInTable(\User::getTable(), ['name' => 'ecuador0']));
+    }
+
+    #[RequiresPhpExtension('ldap')]
+    public function testGetOrImportByEmailDoesNotCreateUserOnRefusedImport(): void
+    {
+        global $CFG_GLPI;
+
+        $this->login();
+
+        $this->createItem(FieldUnicity::class, [
+            'name'          => 'User phone uniqueness',
+            'itemtype'      => \User::class,
+            '_fields'       => ['phone'],
+            'entities_id'   => 0,
+            'is_recursive'  => 1,
+            'is_active'     => 1,
+            'action_refuse' => 1,
+        ], ['_fields']);
+        $this->createItem(\User::class, ['name' => 'remi_local', 'phone' => '0234596798']);
+
+        $cfg_backup = $CFG_GLPI;
+        $CFG_GLPI['is_users_auto_add'] = 1;
+        $users_id = \User::getOrImportByEmail('remi@mail.com', true);
+        $CFG_GLPI = $cfg_backup;
+
+        // The import has been refused, the user must not be created from its email either
+        $this->assertSame(0, $users_id);
+        $this->hasSessionMessageThatContains('Impossible record for Phone = 0234596798', ERROR);
+        $this->assertSame(0, countElementsInTable(\User::getTable(), ['name' => ['remi', 'remi@mail.com']]));
+    }
+
     /**
      * `AuthLDAP::processMassiveActionsForOneItemtype()` must resolve `mode` and `authldaps_id`
      * from the massive action input (`$ma->getInput()`), not from the `$_REQUEST` superglobal,
@@ -1451,6 +1631,77 @@ class AuthLdapTest extends DbTestCase
             ['sync_field' => null],
             ['id' => $ldap->getID()]
         );
+    }
+
+    /**
+     * A LDAP user that is not known by GLPI yet must be imported when logging in through the
+     * OAuth password grant, exactly like it is when logging in through the login form.
+     *
+     * The OAuth server only calls `Auth::validateLogin()`, which validates the credentials but
+     * does not write anything to the database, so it has to call `Auth::applyValidatedLogin()`
+     * too. Otherwise the user entity is built with an empty identifier.
+     *
+     * @return void
+     */
+    #[RequiresPhpExtension('ldap')]
+    public function testOAuthPasswordGrantImportsUnknownLdapUser()
+    {
+        global $CFG_GLPI;
+
+        $user = new \User();
+        $this->assertFalse($user->getFromDBbyName('brazil9'));
+
+        $cfg_backup = $CFG_GLPI;
+        $CFG_GLPI['is_users_auto_add'] = 1;
+
+        $user_entity = (new UserRepository())->getUserEntityByUserCredentials(
+            'brazil9',
+            'password',
+            'password',
+            new Client()
+        );
+
+        $CFG_GLPI = $cfg_backup;
+
+        $this->assertNotNull($user_entity);
+        $this->assertGreaterThan(0, $user_entity->getIdentifier());
+
+        // The user must now exist in GLPI, with the LDAP data.
+        $this->assertTrue($user->getFromDB($user_entity->getIdentifier()));
+        $this->assertSame('brazil9', $user->fields['name']);
+        $this->assertSame('uid=brazil9,ou=people,ou=R&D,dc=glpi,dc=org', $user->fields['user_dn']);
+        $this->assertEquals(\Auth::LDAP, $user->fields['authtype']);
+        $this->assertEquals($this->ldap->getID(), $user->fields['auths_id']);
+    }
+
+    /**
+     * When the auto add feature is disabled, the OAuth password grant must reject a LDAP user
+     * that is unknown to GLPI instead of issuing a token with an empty subject.
+     *
+     * @return void
+     */
+    #[RequiresPhpExtension('ldap')]
+    public function testOAuthPasswordGrantRejectsUnknownLdapUserWhenAutoAddIsDisabled()
+    {
+        global $CFG_GLPI;
+
+        $user = new \User();
+        $this->assertFalse($user->getFromDBbyName('brazil10'));
+
+        $cfg_backup = $CFG_GLPI;
+        $CFG_GLPI['is_users_auto_add'] = 0;
+
+        $user_entity = (new UserRepository())->getUserEntityByUserCredentials(
+            'brazil10',
+            'password',
+            'password',
+            new Client()
+        );
+
+        $CFG_GLPI = $cfg_backup;
+
+        $this->assertNull($user_entity);
+        $this->assertFalse($user->getFromDBbyName('brazil10'));
     }
 
     /**
@@ -2517,6 +2768,40 @@ class AuthLdapTest extends DbTestCase
             Group_User::isUserInGroup($users_id, $group_id),
             'Dynamic group synced from the LDAP directory was purged on Auth::EXTERNAL reapplyRightRules()'
         );
+    }
+
+    #[RequiresPhpExtension('ldap')]
+    public function testGetFromLDAPGroupDiscretCachedCollectsMembers(): void
+    {
+        $auth = $this->createItem(AuthLDAP::class, [
+            'name'   => $this->getUniqueString(),
+            'host'   => 'openldap',
+            'basedn' => 'dc=glpi,dc=org',
+        ]);
+        $group_id = $this->createItem(Group::class, [
+            'name'          => __FUNCTION__,
+            'ldap_group_dn' => 'inetOrgPerson',
+        ])->getID();
+
+        $ldap_method = [
+            'id'                 => $auth->getID(),
+            'basedn'             => 'dc=glpi,dc=org',
+            'condition'          => '(uid=brazil10*)',
+            'group_field'        => 'objectClass',
+            'group_member_field' => 'objectClass',
+        ];
+
+        $user = new \User();
+        $result = $this->callPrivateMethod(
+            $user,
+            'getFromLDAPGroupDiscretCached',
+            $this->ldap->connect(),
+            $ldap_method,
+            'uid=brazil109,ou=people,ou=R&D,dc=glpi,dc=org'
+        );
+
+        $this->assertTrue($result);
+        $this->assertContains($group_id, $user->fields['_groups'] ?? []);
     }
 
 

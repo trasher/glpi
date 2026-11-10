@@ -1132,17 +1132,21 @@ class MassiveAction
                     }
                     switch ($item->getType()) {
                         case Change::class:
-                            $search['condition'][] = 'is_change';
+                            if ($DB->fieldExists($search['table'], 'is_change')) {
+                                $search['condition'][] = ['is_change' => 1];
+                            }
                             break;
                         case Problem::class:
-                            $search['condition'][] = 'is_problem';
+                            if ($DB->fieldExists($search['table'], 'is_problem')) {
+                                $search['condition'][] = ['is_problem' => 1];
+                            }
                             break;
                         case Ticket::class:
                             if ($DB->fieldExists($search['table'], 'is_incident') || $DB->fieldExists($search['table'], 'is_request')) {
                                 $search['condition'][] = [
                                     'OR' => [
-                                        'is_incident',
-                                        'is_request',
+                                        'is_incident' => 1,
+                                        'is_request'  => 1,
                                     ],
                                 ];
                             }
@@ -1680,6 +1684,12 @@ class MassiveAction
                     $_SESSION['glpitransfer_list'][$itemtype] = [];
                 }
                 foreach ($ids as $id) {
+                    if (!$item->can($id, UPDATE)) {
+                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_NORIGHT);
+                        $ma->addMessage($item->getErrorMessage(ERROR_RIGHT));
+                        continue;
+                    }
+
                     $_SESSION['glpitransfer_list'][$itemtype][$id] = $id;
                     $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
                 }
@@ -1703,7 +1713,7 @@ class MassiveAction
                     $item->getFromDB($id);
 
                     // Check rights
-                    if (!$item->canUpdateItem()) {
+                    if (!$item->can($id, UPDATE)) {
                         $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
                         $ma->addMessage($item->getErrorMessage(ERROR_RIGHT));
                         continue;
@@ -1748,13 +1758,21 @@ class MassiveAction
                 $em = new Notepad();
 
                 foreach ($ids as $id) {
-                    $success = $em->add([
+                    $add_input = [
                         'itemtype'             => $item::getType(),
                         'items_id'             => $id,
                         'content'              => $content,
                         'users_id'             => Session::getLoginUserID(),
                         'users_id_lastupdater' => Session::getLoginUserID(),
-                    ]);
+                    ];
+
+                    if (!$em->can(-1, CREATE, $add_input)) {
+                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_NORIGHT);
+                        $ma->addMessage($item->getErrorMessage(ERROR_RIGHT));
+                        continue;
+                    }
+
+                    $success = $em->add($add_input);
 
                     if (!$success) {
                         $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);

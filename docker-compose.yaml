@@ -5,6 +5,8 @@ services:
       context: ".docker/app"
       args:
         PHP_VERSION: "8.4"
+        HOST_USER_ID: "${HOST_USER_ID:-1000}"
+        HOST_GROUP_ID: "${HOST_GROUP_ID:-1000}"
     restart: "unless-stopped"
     volumes:
       - ".:/var/www/glpi:rw"
@@ -15,9 +17,6 @@ services:
       - "9637:9637"
     depends_on:
       - db
-    environment:
-      # By default the testing env is exposed under the 8080 internal port
-      CYPRESS_BASE_URL: http://localhost:8080
     extra_hosts:
       - "host.docker.internal:host-gateway"
 

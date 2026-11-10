@@ -280,6 +280,41 @@ abstract class CommonITILTask extends CommonDBTM implements CalDAVCompatibleItem
         return false;
     }
 
+    /**
+     * Does current user have right to change the state (todo/done) of the current task?
+     *
+     * @return bool
+     **/
+    public function canChangeState(): bool
+    {
+        if ($this->canUpdateItem()) {
+            return true;
+        }
+
+        $is_assigned_user = (int) $this->fields['users_id_tech'] === Session::getLoginUserID();
+        $is_assigned_group = (int) $this->fields['groups_id_tech'] > 0
+            && in_array((int) $this->fields['groups_id_tech'], $_SESSION['glpigroups'] ?? []);
+
+        if (
+            !$this->canReadITILItem()
+            || (!$is_assigned_user && !$is_assigned_group)
+        ) {
+            return false;
+        }
+
+        $parent_loaded = $this->isParentAlreadyLoaded();
+        $item = $parent_loaded ? $this->item : static::getItilObjectItemInstance();
+        if (
+            (!$parent_loaded && !$item->getFromDB($this->fields[$item::getForeignKeyField()]))
+            || $item->isDeleted()
+            || in_array($item->fields['status'], $item->getClosedStatusArray())
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
 
     /**
      * Does current user have right to purge the current task?
@@ -688,7 +723,17 @@ abstract class CommonITILTask extends CommonDBTM implements CalDAVCompatibleItem
                     return;
                 }
 
-                $this->updateParentStatus($this->input['_job'], $this->input);
+                // Editing a task must not reopen its parent, as in 10.0, unless the pending toggle
+                // is unchecked on a waiting parent.
+                $parent_status_input = $this->input;
+                if (
+                    !($parent_status_input['pending'] ?? 0)
+                    && $this->input['_job']->fields['status'] != CommonITILObject::WAITING
+                ) {
+                    unset($parent_status_input['pending']);
+                    $parent_status_input['_no_reopen'] = true;
+                }
+                $this->updateParentStatus($this->input['_job'], $parent_status_input);
 
                 if (!isset($this->input['_disablenotif']) && $CFG_GLPI["use_notifications"]) {
                     $options = ['task_id'    => $this->fields["id"],
@@ -1434,8 +1479,8 @@ abstract class CommonITILTask extends CommonDBTM implements CalDAVCompatibleItem
                 $item->getTable() . '.begin'   => null,
                 $item->getTable() . '.actiontime' => ['>', 0],
                 //begin is replaced with creation tim minus duration
-                new QueryExpression($edate . " >= '" . $begin . "'"),
-                new QueryExpression($bdate . " <= '" . $end . "'"),
+                new QueryExpression($edate . " >= " . $DB::quoteValue($begin)),
+                new QueryExpression($bdate . " <= " . $DB::quoteValue($end)),
             ];
         } else {
             //std case: get tasks for current view dates

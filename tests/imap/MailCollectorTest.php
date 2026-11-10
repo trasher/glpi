@@ -420,6 +420,7 @@ class MailCollectorTest extends DbTestCase
         $root_ent_id = getItemByTypeName('Entity', '_test_root_entity', true);
 
         $ticket_id = getItemByTypeName('Ticket', '_ticket01', true);
+        $padded_ticket_id = sprintf('%07d', $ticket_id);
         $ticket_notif = new NotificationTargetTicket($root_ent_id, 'test_event', getItemByTypeName('Ticket', '_ticket01'));
 
         $soft_id   = getItemByTypeName('SoftwareLicense', '_test_softlic_1', true);
@@ -632,6 +633,42 @@ class MailCollectorTest extends DbTestCase
                 'expected_itemtype' => null,
                 'expected_items_id' => null,
                 'accepted'          => false,
+            ],
+            // Subject fallback - single GLPI tag, foreign `[Ticket#...]` (no space) ignored
+            [
+                'headers'           => [
+                    'subject' => "Re: [GLPI #{$padded_ticket_id}] [Ticket#2026072803024161] Foo",
+                ],
+                'expected_itemtype' => Ticket::class,
+                'expected_items_id' => $ticket_id,
+                'accepted'          => true,
+            ],
+            // Subject fallback - a too-short foreign `[Case #4711]` reference is ignored (< 7 digits)
+            [
+                'headers'           => [
+                    'subject' => "[Case #4711] Re: [GLPI #{$padded_ticket_id}] Foo",
+                ],
+                'expected_itemtype' => Ticket::class,
+                'expected_items_id' => $ticket_id,
+                'accepted'          => true,
+            ],
+            // Subject fallback - multiple matches: the configured tag (GLPI) wins over a foreign one
+            [
+                'headers'           => [
+                    'subject' => "[Foreign #1234567] Re: [GLPI #{$padded_ticket_id}] Foo",
+                ],
+                'expected_itemtype' => Ticket::class,
+                'expected_items_id' => $ticket_id,
+                'accepted'          => true,
+            ],
+            // Subject fallback - multiple matches, none with a known tag: falls back to the last one
+            [
+                'headers'           => [
+                    'subject' => "[Foreign #7777777] Re: [Unknown #{$padded_ticket_id}] Foo",
+                ],
+                'expected_itemtype' => Ticket::class,
+                'expected_items_id' => $ticket_id,
+                'accepted'          => true,
             ],
         ];
     }
@@ -1267,6 +1304,23 @@ HTML,
         }
     }
 
+    public function testAddItemFromMessageCatchesInsertFailure(): void
+    {
+        $collector = new \MailCollector();
+
+        $item = new class extends \CommonDBTM {
+            public function add(array $input, $options = [], $history = true)
+            {
+                throw new \RuntimeException('Simulated DB insert failure');
+            }
+        };
+
+        $result = $this->callPrivateMethod($collector, 'addItemFromMessage', $item, []);
+
+        $this->assertFalse($result);
+        $this->hasPhpLogRecordThatContains('Simulated DB insert failure', LogLevel::ERROR);
+    }
+
     public static function mailServerProtocolsProvider()
     {
         return [
@@ -1747,6 +1801,37 @@ HTML,
             "\r\n",
             $extracted_content,
             'Extracted EML attachment must use CRLF line endings as required by RFC 2822'
+        );
+    }
+
+    /**
+     * See https://github.com/glpi-project/glpi/issues/20892
+     * The "To" header value used for rule criteria matching must contain every
+     * recipient, not just the first one, otherwise a "contains" criterion fails
+     * to match when the targeted address is not listed first.
+     */
+    public function testGetHeadersToContainsAllRecipients()
+    {
+        $raw = implode("\r\n", [
+            'From: sender@example.com',
+            'To: First Recipient <first@glpi-project.org>, Second Recipient <second@glpi-project.org>',
+            'Subject: Multiple recipients',
+            'Date: ' . date('r'),
+            'Message-ID: <multi-to-test@glpi-project.org>',
+            '',
+            'Body',
+            '',
+        ]);
+
+        $message = new Message(['raw' => $raw]);
+        $collector = new \MailCollector();
+        $headers = $collector->getHeaders($message);
+
+        $this->assertStringContainsString('first@glpi-project.org', $headers['to']);
+        $this->assertStringContainsString('second@glpi-project.org', $headers['to']);
+        $this->assertSame(
+            ['first@glpi-project.org', 'second@glpi-project.org'],
+            $headers['tos']
         );
     }
 

@@ -39,6 +39,7 @@ use Glpi\Dashboard\Filter;
 use Glpi\DBAL\QueryExpression;
 use Glpi\DBAL\QueryFunction;
 use Glpi\DBAL\QuerySubQuery;
+use Glpi\Exception\AuthenticationFailedException;
 use Glpi\Exception\ForgetPasswordException;
 use Glpi\Exception\PasswordTooWeakException;
 use Glpi\Features\Clonable;
@@ -92,6 +93,8 @@ class User extends CommonDBTM implements TreeBrowseInterface
     public const UPDATEAUTHENT       = 4096;
     public const IMPERSONATE         = 8192;
 
+    private const DB_KEEPALIVE_INTERVAL = 30;
+
     public static $rightname = 'user';
 
     public static $undisclosedFields = [
@@ -108,8 +111,6 @@ class User extends CommonDBTM implements TreeBrowseInterface
     public function getCloneRelations(): array
     {
         return [
-            Profile_User::class,
-            Group_User::class,
             Certificate_Item::class,
             ManualLink::class,
         ];
@@ -145,7 +146,27 @@ class User extends CommonDBTM implements TreeBrowseInterface
      */
     public function post_clone($source, $history)
     {
-        //FIXME? clone config
+        // Only copy the profiles the current session user could grant directly
+        $profile_user = new Profile_User();
+        foreach ($profile_user->find(['users_id' => $source->getID()]) as $data) {
+            unset($data['id']);
+            $data['users_id'] = $this->getID();
+            if (!$profile_user->can(-1, CREATE, $data)) {
+                continue;
+            }
+            $profile_user->add($data, [], $history);
+        }
+
+        // Only copy the group memberships the current session user could grant directly
+        $group_user = new Group_User();
+        foreach ($group_user->find(['users_id' => $source->getID()]) as $data) {
+            unset($data['id']);
+            $data['users_id'] = $this->getID();
+            if (!$group_user->can(-1, CREATE, $data)) {
+                continue;
+            }
+            $group_user->add($data, [], $history);
+        }
     }
 
     public static function getTypeName($nb = 0)
@@ -260,6 +281,11 @@ class User extends CommonDBTM implements TreeBrowseInterface
         //prevent delete / purge from API
         global $CFG_GLPI;
         if ($this->fields['id'] == $CFG_GLPI['system_user']) {
+            return false;
+        }
+
+        // Prevent deleting a user that has more rights than the current user
+        if (!$this->currentUserHaveMoreRightThan($this->fields['id'])) {
             return false;
         }
 
@@ -1244,8 +1270,16 @@ class User extends CommonDBTM implements TreeBrowseInterface
 
                 // Prevent disabling another user account
                 'is_active',
+                'is_deleted',
                 'begin_date',
                 'end_date',
+
+                // Prevent changing the login, that is used to match the user with an external authentication source
+                'name',
+
+                // Prevent changing 2fa settings
+                '2fa',
+                '2fa_unenforced',
             ];
             if (
                 count(array_intersect($protected_input_keys, array_keys($input))) > 0
@@ -1274,6 +1308,21 @@ class User extends CommonDBTM implements TreeBrowseInterface
                     return false;
                 }
             }
+
+            foreach (['2fa', '2fa_unenforced'] as $mfa_field) {
+                if (array_key_exists($mfa_field, $input) && !Session::haveRight('user', User::UPDATEAUTHENT)) {
+                    // similar check than the `disable_2fa` form action
+                    Session::addMessageAfterRedirect(
+                        sprintf(
+                            __s('You are not allowed to update the following fields: %s'),
+                            $mfa_field
+                        ),
+                        false,
+                        ERROR
+                    );
+                    return false;
+                }
+            }
         }
 
         if (isset($input['authtype'])) {
@@ -1287,6 +1336,14 @@ class User extends CommonDBTM implements TreeBrowseInterface
                 // blank password when authtype changes
                 $input['password'] = '';
             }
+        }
+
+        if (
+            Session::getLoginUserID() !== false // always allow update from backend routines
+            && !Session::haveRight(self::$rightname, self::UPDATEAUTHENT)
+        ) {
+            // prevent unexpected change of the authentication source and of the link with the directory entry
+            unset($input['auths_id'], $input['sync_field'], $input['user_dn'], $input['user_dn_hash']);
         }
 
         // Update User in the database
@@ -2325,6 +2382,7 @@ class User extends CommonDBTM implements TreeBrowseInterface
             ]);
 
             $ldap_error = false;
+            $last_db_activity = time();
 
             foreach ($groups_iterator as $group_row) {
                 $group_id = (int) $group_row['id'];
@@ -2334,6 +2392,7 @@ class User extends CommonDBTM implements TreeBrowseInterface
                 $cookie   = '';
 
                 do {
+                    $last_db_activity = self::keepDbConnectionAlive($last_db_activity);
                     if (!empty($ldap_method['pagesize'])) {
                         $controls = [[
                             'oid'        => LDAP_CONTROL_PAGEDRESULTS,
@@ -2393,6 +2452,19 @@ class User extends CommonDBTM implements TreeBrowseInterface
         }
 
         return true;
+    }
+
+    // Long LDAP-only phases would otherwise exceed the DB server wait_timeout.
+    private static function keepDbConnectionAlive(int $last_db_activity): int
+    {
+        global $DB;
+
+        if (time() - $last_db_activity < self::DB_KEEPALIVE_INTERVAL) {
+            return $last_db_activity;
+        }
+
+        $DB->getVersion();
+        return time();
     }
 
 
@@ -3413,8 +3485,12 @@ HTML;
                         $ma->addMessage($item->getErrorMessage(ERROR_RIGHT));
                         continue;
                     }
-                    $totp->disable2FAForUser($id);
-                    $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
+                    if ($totp->disable2FAForUser($id)) {
+                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
+                    } else {
+                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
+                        $ma->addMessage($item->getErrorMessage(ERROR_ON_ACTION));
+                    }
                 }
                 break;
             case 'send_pw_reset':
@@ -3444,6 +3520,12 @@ HTML;
             case 'reapply_rights':
                 $user = new self();
                 foreach ($ids as $id) {
+                    if (!$user->can($id, UPDATE)) {
+                        $ma->itemDone(self::class, $id, MassiveAction::ACTION_NORIGHT);
+                        $ma->addMessage($user->getErrorMessage(ERROR_RIGHT));
+                        continue;
+                    }
+
                     if ($user->getFromDB($id)) {
                         $user->reapplyRightRules();
                         $ma->itemDone(self::class, $id, MassiveAction::ACTION_OK);
@@ -4930,6 +5012,9 @@ HTML;
         $ID = $this->getField('id');
         $start       = intval($_GET["start"] ?? 0);
         $get_filters   = $_GET["filters"] ?? [];
+        if (!is_array($get_filters)) {
+            $get_filters = [];
+        }
 
         $sortable_columns = ['type', 'entity', 'name', 'serial', 'otherserial', 'states', 'group', 'users'];
         $sort = $_GET['sort'] ?? 'name';
@@ -5028,28 +5113,38 @@ HTML;
             ];
         }
 
-        $group_choices = [];
-        foreach (getAllDataFromTable('glpi_groups') as $g_id => $row) {
-            $group_choices[$g_id] = $row['completename'];
-        }
-        asort($group_choices);
+        $is_filtered = count($get_filters) > 0;
 
+        // Names caches for displayed rows; groups and users filters use AJAX dropdowns as these tables can be huge
+        $group_choices = [];
         $user_choices = [];
-        foreach (self::getSqlSearchResult(false, 'all') as $row) {
-            $user_choices[$row['id']] = formatUserName($row['id'], $row['name'], $row['realname'], $row['firstname']);
-        }
 
         $array_filters_choices = [
             'type'     => $type_choices,
             'entity'   => $entity_choices,
             'states'   => $state_choices,
-            'group'    => $group_choices,
-            'users'    => $user_choices,
         ];
 
         foreach ($get_filters as $f => $value) {
             if (!empty($value)) {
-                if (isset($array_filters_choices[$f])) {
+                if (in_array($f, ['group', 'users'], true)) {
+                    foreach ((array) $value as $v) {
+                        if (!is_numeric($v) || (int) $v <= 0) {
+                            continue;
+                        }
+                        // Selected users names are displayed in the dropdown, do not disclose users the viewer cannot see
+                        if ($f === 'users') {
+                            $selected_user = new self();
+                            if (
+                                !$selected_user->getFromDB((int) $v)
+                                || !Session::haveAccessToOneOfEntities($selected_user->getEntities())
+                            ) {
+                                continue;
+                            }
+                        }
+                        $filters[$f][] = (int) $v;
+                    }
+                } elseif (isset($array_filters_choices[$f])) {
                     foreach ((array) $value as $v) {
                         if (isset($array_filters_choices[$f][$v])) {
                             $filters[$f][] = $v;
@@ -5158,7 +5253,7 @@ HTML;
                         if ($_SESSION["glpiis_ids_visible"] || empty($link)) {
                             $link = sprintf(__('%1$s (%2$s)'), $link, $data["id"]);
                         }
-                        $link = "<a href='" . $link_item . "'>" . $link . "</a>";
+                        $link = "<a href='" . htmlescape($link_item) . "'>" . htmlescape($link) . "</a>";
                     }
 
                     $group_names = [];
@@ -5229,22 +5324,24 @@ HTML;
                 ],
                 'group'         => [
                     'label'            => Group::getTypeName(Session::getPluralNumber()),
-                    'filter_formatter' => 'array',
+                    'filter_formatter' => 'dropdown',
+                    'filter_itemtype'  => Group::class,
+                    'filter_params'    => ['addicon' => false, 'comments' => false],
                 ],
                 'users'         => [
                     'label'            => self::getTypeName(Session::getPluralNumber()),
-                    'filter_formatter' => 'array',
+                    'filter_formatter' => 'dropdown',
+                    'filter_itemtype'  => self::class,
+                    'filter_params'    => ['right' => 'all'],
                 ],
             ],
             'columns_values'        => [
                 'type'      => $type_choices,
                 'entity'    => $entity_choices,
                 'states'    => $state_choices,
-                'group'     => $group_choices,
-                'users'     => $user_choices,
             ],
-            'filters' => $filters,
-            'additional_params'     => http_build_query(['filters' => $filters]),
+            'filters' => $is_filtered ? $filters : [],
+            'additional_params'     => $is_filtered ? http_build_query(['filters' => $filters]) : '',
             'formatters' => [
                 'name'   => 'raw_html',
                 'group'  => 'raw_html',
@@ -5308,14 +5405,23 @@ HTML;
                         'method' => AuthLDAP::IDENTIFIER_EMAIL,
                         'value'  => $email,
                     ];
+                    $refused = false;
                     $res = AuthLDAP::ldapImportUserByServerId(
                         $params,
                         AuthLDAP::ACTION_IMPORT,
-                        $ldap
+                        $ldap,
+                        false,
+                        false,
+                        $refused
                     );
 
                     if (isset($res['id'])) {
                         return $res['id'];
+                    }
+                    if ($refused) {
+                        // The user exists in LDAP but its import has been refused,
+                        // do not try other servers nor create it from its email.
+                        return 0;
                     }
                 }
             }
@@ -5533,9 +5639,11 @@ HTML;
      */
     public static function showPasswordForgetChangeForm($token)
     {
+        $user = User::getUserByForgottenPasswordToken($token);
         TemplateRenderer::getInstance()->display('forgotpassword.html.twig', [
-            'token'    => $token,
-            'token_ok' => User::getUserByForgottenPasswordToken($token) !== null,
+            'token'         => $token,
+            'token_ok'      => $user !== null,
+            'requires_totp' => $user !== null && (new TOTPManager())->is2FAEnabled($user->fields['id']),
         ]);
     }
 
@@ -5633,6 +5741,26 @@ HTML;
             );
         }
 
+        $totp = new TOTPManager();
+        if ($totp->is2FAEnabled($user->fields['id'])) {
+            try {
+                $totp->checkMFARateLimit($user->fields['id']);
+            } catch (AuthenticationFailedException $e) {
+                throw new ForgetPasswordException(implode(' ', $e->getAuthenticationErrors()), $e->getCode(), $e);
+            }
+
+            $totp_code = $input['totp_code'] ?? '';
+            $backup_code = $input['backup_code'] ?? '';
+            $totp_ok = $totp_code !== '' && $totp->verifyCodeForUser($totp_code, $user->fields['id']);
+            $backup_ok = !$totp_ok && $backup_code !== '' && $totp->verifyBackupCodeForUser($backup_code, $user->fields['id']);
+
+            if (!$totp_ok && !$backup_ok) {
+                throw new ForgetPasswordException(__('Invalid or missing authentication code.'));
+            }
+
+            $totp->clearMFAFailures($user->fields['id']);
+        }
+
         $input['id'] = $user->fields['id'];
 
         // Check new password validity, throws exception on failure
@@ -5645,8 +5773,15 @@ HTML;
             throw $expection;
         }
 
+        $update_input = [
+            'id'                    => $input['id'],
+            'password'              => $input['password'],
+            'password2'             => $input['password2'] ?? $input['password'],
+            'password_forget_token' => $input['password_forget_token'],
+        ];
+
         // Try to set new password
-        if (!$user->update($input)) {
+        if (!$user->update($update_input)) {
             return false;
         }
 
@@ -6824,7 +6959,7 @@ HTML;
             && ($anon = $this->getAnonymizedName()) !== null
         ) {
             // if anonymized name active, return only the anonymized name
-            return $anon;
+            return htmlescape($anon);
         }
 
         return $this->getLink($options);

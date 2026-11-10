@@ -1038,7 +1038,7 @@ TWIG,
         global $CFG_GLPI;
 
         // complete title with id if exist
-        if ($add_id && isset($_GET['id']) && $_GET['id']) {
+        if ($add_id && isset($_GET['id']) && is_scalar($_GET['id']) && $_GET['id']) {
             $title = sprintf(__('%1$s - %2$s'), $title, $_GET['id']);
         }
 
@@ -1702,7 +1702,7 @@ TWIG,
         }
         $FOOTER_LOADED = true;
 
-        if (isset($CFG_GLPI['notifications_ajax']) && $CFG_GLPI['notifications_ajax'] && !Session::isImpersonateActive()) {
+        if (isset($CFG_GLPI['notifications_ajax']) && $CFG_GLPI['notifications_ajax'] && Session::getLoginUserID() !== false && !Session::isImpersonateActive()) {
             $options = [
                 'interval'  => ($CFG_GLPI['notifications_ajax_check_interval'] ?: 5) * 1000,
                 'sound'     => $CFG_GLPI['notifications_ajax_sound'] ?: false,
@@ -3515,37 +3515,6 @@ JS;
     ) {
         global $CFG_GLPI, $DB;
 
-        $language = $_SESSION['glpilanguage'];
-        if (!file_exists(GLPI_ROOT . "/public/lib/tinymce-i18n/langs7/$language.js")) {
-            // Some GLPI language codes don't match tinymce-i18n file names.
-            // Use a dedicated mapping to find the correct tinymce language file.
-            $tinymce_lang_map = [
-                'fr_FR'  => 'fr_FR',
-                'fr_CA'  => 'fr_FR',
-                'fr_BE'  => 'fr_FR',
-                'he_IL'  => 'he_IL',
-                'nb_NO'  => 'nb_NO',
-                'nn_NO'  => 'nb_NO',
-                'pt_BR'  => 'pt_BR',
-                'pt_PT'  => 'pt_PT',
-                'ro_RO'  => 'ro',
-                'uk_UA'  => 'uk',
-                'zh_CN'  => 'zh_CN',
-                'zh_TW'  => 'zh_TW',
-                'zh_HK'  => 'zh_HK',
-                'is_IS'  => 'is_IS',
-            ];
-            if (isset($tinymce_lang_map[$_SESSION['glpilanguage']])) {
-                $language = $tinymce_lang_map[$_SESSION['glpilanguage']];
-            } else {
-                $language = $CFG_GLPI["languages"][$_SESSION['glpilanguage']][2];
-            }
-            if (!file_exists(GLPI_ROOT . "/public/lib/tinymce-i18n/langs7/$language.js")) {
-                $language = "en_GB";
-            }
-        }
-        $language_url = $CFG_GLPI['root_doc'] . '/lib/tinymce-i18n/langs7/' . $language . '.js';
-
         // Apply all GLPI styles to editor content
         $theme = ThemeManager::getInstance()->getCurrentTheme();
         $content_css_paths = [
@@ -3600,12 +3569,26 @@ JS;
 
         $pluginsjs = json_encode(array_values($plugins));
 
+        $language_RFC5646    = str_replace('_', '-', $_SESSION['glpilanguage']);      // convert to RFC5646 format (fr_FR -> fr-FR)
+        $language_regionless = preg_replace('/_.*$/', '', $_SESSION['glpilanguage']); // fallback to regionless locale (fr_FR -> fr)
+        $expected_languages  = [$language_RFC5646, $language_regionless];
+        if (array_key_exists($language_regionless, $CFG_GLPI['main_languages'])) {
+            $expected_languages[] = str_replace('_', '-', $CFG_GLPI['main_languages'][$language_regionless]); // fallback to main language (fr_CA -> fr_FR)
+        }
         $language_opts = '';
-        if ($language !== 'en_GB') {
-            $language_opts = json_encode([
-                'language' => $language,
-                'language_url' => $language_url,
-            ]);
+        foreach ($expected_languages as $language) {
+            if (str_starts_with($language, 'en')) {
+                // No need to hit filesystem for english, this is the default language and there is no translation files
+                // for it.
+                continue;
+            }
+            if (file_exists(GLPI_ROOT . "/public/lib/tinymce-i18n/langs8/$language.js")) {
+                $language_opts = json_encode([
+                    'language' => $language,
+                    'language_url' => $CFG_GLPI['root_doc'] . '/lib/tinymce-i18n/langs8/' . $language . '.js',
+                ]);
+                break;
+            }
         }
 
         $mandatory_field_msg = jsescape(__('The %s field is mandatory'));
@@ -3787,7 +3770,9 @@ JS;
 
                         editor.on('input', function (e) {
                             // Propagate event to allow other components to listen to it
-                            const textarea = $('#' + e.target.dataset.id);
+                            const target = e.target;
+                            const textarea_id = target instanceof tinymce.Editor ? target.id : target.dataset.id;
+                            const textarea = $('#' + textarea_id);
                             textarea.trigger('tinyMCEInput', [e]);
                         });
 
@@ -5407,6 +5392,22 @@ HTML;
             // manage file upload without tinymce editor
             $display .= "<span class='b'>" . __s('Drag and drop your file here, or') . '</span><br>';
         }
+
+        if ($p['onlyimages']) {
+            $accept = sprintf(
+                ' accept="%s"',
+                implode(
+                    ',',
+                    array_map(
+                        fn($ext) => '.' . $ext,
+                        Document::ALLOWED_IMAGE_EXTENSIONS
+                    )
+                )
+            );
+        } else {
+            $accept = ''; // no accept attribute when all types are allowed
+        }
+
         $display .= "<input id='fileupload{$rand_id}' type='file' name='_uploader_{$name}[]'
                       class='form-control'
                       $required
@@ -5415,7 +5416,7 @@ HTML;
                       data-url='" . htmlescape($CFG_GLPI["root_doc"]) . "/ajax/fileupload.php'
                       data-form-data='{\"name\": \"_uploader_{$name}\", \"showfilesize\": " . ($p['showfilesize'] ? 'true' : 'false') . "}'"
                       . ($p['multiple'] ? " multiple='multiple'" : "")
-                      . ($p['onlyimages'] ? " accept='.gif,.png,.jpg,.jpeg,.bmp,.webp'" : "") . ">";
+                      . $accept . ">";
 
         $display .= "<div id='progress{$rand_id}' style='display:none'>"
                 . "<div role='progressbar' class='uploadbar' style='width: 0%;'></div></div>";
@@ -5427,7 +5428,7 @@ HTML;
             ? "$('#" . jsescape($p['dropZone']) . "')"
             : "false";
         $acceptFileTypes = $p['onlyimages']
-            ? "/(\.|\/)(gif|jpe?g|png|bmp|webp)$/i"
+            ? "/(\.|\/)(" . implode('|', Document::ALLOWED_IMAGE_EXTENSIONS) . ")$/i"
             : DocumentType::getUploadableFilePattern();
         $messages = json_encode([
             'acceptFileTypes' => __('Filetype not allowed'),
@@ -6153,7 +6154,7 @@ JS);
         self::redefineAlert();
         self::redefineConfirm();
 
-        if (isset($CFG_GLPI['notifications_ajax']) && $CFG_GLPI['notifications_ajax'] && !Session::isImpersonateActive()) {
+        if (isset($CFG_GLPI['notifications_ajax']) && $CFG_GLPI['notifications_ajax'] && Session::getLoginUserID() !== false && !Session::isImpersonateActive()) {
             $options = [
                 'interval'  => ($CFG_GLPI['notifications_ajax_check_interval'] ?: 5) * 1000,
                 'sound'     => $CFG_GLPI['notifications_ajax_sound'] ?: false,

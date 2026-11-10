@@ -42,6 +42,7 @@ use Glpi\Form\Migration\FormMigration;
 use Glpi\Marketplace\Controller;
 use Glpi\Migration\GenericobjectPluginMigration;
 use Glpi\Plugin\Hooks;
+use Glpi\System\HousekeepingCron;
 use Glpi\System\Requirement\PhpSupportedVersion;
 use Glpi\System\Requirement\SessionsSecurityConfiguration;
 
@@ -74,14 +75,27 @@ class Central extends CommonGLPI
         if ($item->getType() == self::class) {
             $tabs = [
                 1 => self::createTabEntry(__('Personal View'), 0, null, User::getIcon()),
-                2 => self::createTabEntry(__('Group View'), 0, null, Group::getIcon()),
                 3 => self::createTabEntry(__('Global View'), 0, null, 'ti ti-world'),
-                4 => self::createTabEntry(_n('RSS feed', 'RSS feeds', Session::getPluralNumber()), 0, null, RSSFeed::getIcon()),
             ];
 
-            if (Grid::canViewOneDashboard()) {
-                array_unshift($tabs, self::createTabEntry(__('Dashboard'), 0, null, Dashboard::getIcon()));
+            if (self::canViewGroupView()) {
+                $tabs[2] = self::createTabEntry(__('Group View'), 0, null, Group::getIcon());
             }
+
+            if (RSSFeed::canView()) {
+                $tabs[4] = self::createTabEntry(
+                    _n('RSS feed', 'RSS feeds', Session::getPluralNumber()),
+                    0,
+                    null,
+                    RSSFeed::getIcon(),
+                );
+            }
+
+            if (Grid::canViewOneDashboard()) {
+                $tabs[0] = self::createTabEntry(__('Dashboard'), 0, null, Dashboard::getIcon());
+            }
+
+            ksort($tabs);
 
             return $tabs;
         }
@@ -314,14 +328,16 @@ class Central extends CommonGLPI
             ],
         ];
 
-        $idor = Session::getNewIDORToken(Reminder::class);
-        $twig_params['cards'][] = [
-            'itemtype'  => Reminder::class,
-            'widget'    => 'central_list',
-            'params'    => [
-                '_idor_token'  => $idor,
-            ],
-        ];
+        if (Reminder::canView()) {
+            $idor = Session::getNewIDORToken(Reminder::class);
+            $twig_params['cards'][] = [
+                'itemtype'  => Reminder::class,
+                'widget'    => 'central_list',
+                'params'    => [
+                    '_idor_token'  => $idor,
+                ],
+            ];
+        }
 
         if (Session::haveRight("reminder_public", READ)) {
             $idor = Session::getNewIDORToken(Reminder::class, [
@@ -417,6 +433,9 @@ class Central extends CommonGLPI
      */
     public static function showGroupView()
     {
+        if (!self::canViewGroupView()) {
+            return;
+        }
 
         $showticket = Session::haveRightsOr("ticket", [Ticket::READALL, Ticket::READASSIGN]);
 
@@ -529,6 +548,19 @@ class Central extends CommonGLPI
         TemplateRenderer::getInstance()->display('central/widget_tab.html.twig', $twig_params);
     }
 
+    private static function canViewGroupView(): bool
+    {
+        if (empty($_SESSION['glpigroups'])) {
+            return false;
+        }
+
+        return Session::haveRightsOr(Ticket::$rightname, [Ticket::READALL, Ticket::READASSIGN, Ticket::READGROUP])
+            || Session::haveRightsOr(Problem::$rightname, [Problem::READALL, Problem::READMY])
+            || Session::haveRightsOr(Change::$rightname, [Change::READALL, Change::READMY])
+            || Session::haveRight(Project::$rightname, Project::READMY)
+            || Session::haveRight(ProjectTask::$rightname, ProjectTask::READMY);
+    }
+
     private static function getMessages(): array
     {
         global $CFG_GLPI, $DB;
@@ -559,6 +591,23 @@ class Central extends CommonGLPI
                     __s('For security reasons, please change the password for the default users: %s'),
                     implode(" ", $accounts)
                 );
+            }
+
+            if (
+                $CFG_GLPI['ssovariables_id'] > 0
+                && ($sso_variable = SsoVariable::getById($CFG_GLPI['ssovariables_id'])) !== false
+                && $sso_variable->isSafe() === false
+            ) {
+                $messages['warnings'][] = sprintf(
+                    __s('The %s variable is unsafe. It should not be used for authentication.'),
+                    htmlescape($sso_variable->getName()),
+                )
+                    . ' '
+                    . sprintf(
+                        '<a href="%s">%s</a>',
+                        htmlescape($CFG_GLPI['root_doc'] . '/front/auth.others.php'),
+                        __s('See configuration')
+                    );
             }
 
             if (($myisam_count = $DB->getMyIsamTables()->count()) > 0) {
@@ -635,6 +684,24 @@ class Central extends CommonGLPI
                     __s('You have defined pending reasons without any respective active %s.'),
                     $link
                 );
+            }
+
+            // Obsolete data is removed by the housekeeping automatic action, warn if it is disabled
+            $housekeeping = new CronTask();
+            if (
+                $housekeeping->getFromDBbyName(HousekeepingCron::class, HousekeepingCron::TASK_NAME)
+                && (int) $housekeeping->fields['state'] === CronTask::STATE_DISABLE
+                && HousekeepingCron::hasPendingWork()
+            ) {
+                $warning = __s('Some obsolete data should be removed, but the related automatic action is disabled.');
+                if (CronTask::canView()) {
+                    $warning .= ' ' . sprintf(
+                        '<a href="%s">%s</a>',
+                        htmlescape($housekeeping->getLinkURL()),
+                        __s('See automatic action')
+                    );
+                }
+                $messages['warnings'][] = $warning;
             }
 
             // encrypt/decrypt key problems

@@ -269,6 +269,113 @@ class RuleTicketTest extends RuleCommonITILObjectTest
     }
 
     /**
+     * "To email header" business rule "is" condition must match a recipient
+     * even when it is not the only (nor the first) one, since the criterion is
+     * evaluated against every recipient individually rather than against the
+     * flattened, comma-joined "to" string.
+     */
+    public function testMailToHeaderCriteriaIsWithMultipleRecipients()
+    {
+        // clean right singleton
+        \SingletonRuleList::getInstance("RuleTicket", 0)->load = 0;
+        \SingletonRuleList::getInstance("RuleTicket", 0)->list = [];
+
+        $this->login();
+
+        $ruleticket = $this->getRuleInstance();
+
+        $rule = $this->createItem(get_class($ruleticket), [
+            'name'         => __FUNCTION__,
+            'match'        => 'AND',
+            'is_active'    => 1,
+            'sub_type'     => $ruleticket::getType(),
+            'condition'    => \RuleCommonITILObject::ONADD,
+            'is_recursive' => 1,
+        ]);
+
+        $this->createItem(RuleCriteria::class, [
+            'rules_id'  => $rule->getID(),
+            'criteria'  => '_to',
+            'condition' => Rule::PATTERN_IS,
+            'pattern'   => 'support@glpi-project.org',
+        ]);
+
+        $this->createItem(RuleAction::class, [
+            'rules_id'    => $rule->getID(),
+            'action_type' => 'assign',
+            'field'       => 'priority',
+            'value'       => 5,
+        ]);
+
+        $itil = $this->getITILObjectInstance();
+        $itil_id = $itil->add([
+            'name'              => __FUNCTION__,
+            'content'           => __FUNCTION__,
+            '_head'             => [
+                'to'  => 'jane.roe@glpi-project.org, support@glpi-project.org',
+                'tos' => ['jane.roe@glpi-project.org', 'support@glpi-project.org'],
+            ],
+        ]);
+
+        $this->assertTrue($itil->getFromDB($itil_id));
+        $this->assertEquals(5, $itil->fields['priority']);
+    }
+
+    /**
+     * "To email header" business rule "is not" condition must NOT match as
+     * soon as the pattern equals any recipient, even when other recipients
+     * are also present. Regression test: matching against the flattened "to"
+     * string made this condition always true (false positive) once there was
+     * more than one recipient.
+     */
+    public function testMailToHeaderCriteriaIsNotWithMultipleRecipients()
+    {
+        // clean right singleton
+        \SingletonRuleList::getInstance("RuleTicket", 0)->load = 0;
+        \SingletonRuleList::getInstance("RuleTicket", 0)->list = [];
+
+        $this->login();
+
+        $ruleticket = $this->getRuleInstance();
+
+        $rule = $this->createItem(get_class($ruleticket), [
+            'name'         => __FUNCTION__,
+            'match'        => 'AND',
+            'is_active'    => 1,
+            'sub_type'     => $ruleticket::getType(),
+            'condition'    => \RuleCommonITILObject::ONADD,
+            'is_recursive' => 1,
+        ]);
+
+        $this->createItem(RuleCriteria::class, [
+            'rules_id'  => $rule->getID(),
+            'criteria'  => '_to',
+            'condition' => Rule::PATTERN_IS_NOT,
+            'pattern'   => 'support@glpi-project.org',
+        ]);
+
+        $this->createItem(RuleAction::class, [
+            'rules_id'    => $rule->getID(),
+            'action_type' => 'assign',
+            'field'       => 'priority',
+            'value'       => 5,
+        ]);
+
+        $itil = $this->getITILObjectInstance();
+        $itil_id = $itil->add([
+            'name'              => __FUNCTION__,
+            'content'           => __FUNCTION__,
+            '_head'             => [
+                'to'  => 'jane.roe@glpi-project.org, support@glpi-project.org',
+                'tos' => ['jane.roe@glpi-project.org', 'support@glpi-project.org'],
+            ],
+        ]);
+
+        $this->assertTrue($itil->getFromDB($itil_id));
+        $this->assertNotEquals(5, $itil->fields['priority']);
+    }
+
+    /**
      * Test contract type criteria
      */
     public function testContractType()
@@ -1707,5 +1814,110 @@ class RuleTicketTest extends RuleCommonITILObjectTest
 
         // --- assert rule action applied ---
         $this->assertNull($ticket->fields[$field]);
+    }
+
+    public static function isCriteriaADropdownWithImportedConditionProvider(): iterable
+    {
+        yield 'integer condition from database' => [
+            'condition' => Rule::PATTERN_IS,
+            'expected'  => true,
+        ];
+
+        yield '"is" condition from XML' => [
+            'condition' => (string) Rule::PATTERN_IS,
+            'expected'  => true,
+        ];
+        yield '"is not" condition from XML' => [
+            'condition' => (string) Rule::PATTERN_IS_NOT,
+            'expected'  => true,
+        ];
+        yield '"under" condition from XML' => [
+            'condition' => (string) Rule::PATTERN_UNDER,
+            'expected'  => true,
+        ];
+        yield '"contains" condition from XML' => [
+            'condition' => (string) Rule::PATTERN_CONTAIN,
+            'expected'  => false,
+        ];
+        yield 'non numeric condition from XML' => [
+            'condition' => 'abc',
+            'expected'  => false,
+        ];
+    }
+
+    #[DataProvider('isCriteriaADropdownWithImportedConditionProvider')]
+    public function testIsCriteriaADropdownWithImportedCondition(int|string $condition, bool $expected): void
+    {
+        $rule = new \RuleTicket();
+
+        $this->assertSame(
+            $expected,
+            \RuleCollection::isCriteraADropdown($rule->getCriterias(), $condition, 'itilcategories_id')
+        );
+    }
+
+    public function testPreviewImportRefusedDropdownCriterionLabel(): void
+    {
+        $this->login();
+
+        $xml = <<<XML
+<?xml version="1.0"?>
+<rules>
+  <rule>
+    <entities_id>Root entity</entities_id>
+    <sub_type>RuleTicket</sub_type>
+    <ranking>1</ranking>
+    <name>Rule with unknown group criterion</name>
+    <description></description>
+    <match>AND</match>
+    <is_active>1</is_active>
+    <comment></comment>
+    <is_recursive>1</is_recursive>
+    <uuid>test-unknown-group-criterion</uuid>
+    <condition>1</condition>
+    <rulecriteria>
+      <criteria>_groups_id_requester</criteria>
+      <condition>0</condition>
+      <pattern>Unknown group</pattern>
+    </rulecriteria>
+    <ruleaction>
+      <action_type>assign</action_type>
+      <field>urgency</field>
+      <value>4</value>
+    </ruleaction>
+  </rule>
+</rules>
+XML;
+
+        $tmp_file = tempnam(GLPI_TMP_DIR, 'rules_import_');
+        file_put_contents($tmp_file, $xml);
+
+        $_FILES['xml_file'] = [
+            'name'     => 'rules.xml',
+            'type'     => 'text/xml',
+            'tmp_name' => $tmp_file,
+            'error'    => UPLOAD_ERR_OK,
+            'size'     => filesize($tmp_file),
+        ];
+
+        ob_start();
+        $result = \RuleCollection::previewImportRules();
+        $output = ob_get_clean();
+
+        unset($_FILES['xml_file']);
+        unlink($tmp_file);
+
+        $this->assertTrue($result);
+
+        // The rule must be refused because of its criterion referencing an unknown group
+        $this->assertSame(
+            [0 => ['criterias' => [0]]],
+            $_SESSION['glpi_import_rules_refused']
+        );
+
+        // The refused criterion must be displayed with its condition label
+        $rule = new \RuleTicket();
+        $this->assertStringContainsString($rule->getCriteriaName('_groups_id_requester'), $output);
+        $this->assertStringContainsString('Unknown group', $output);
     }
 }

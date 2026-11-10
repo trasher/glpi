@@ -1880,12 +1880,23 @@ abstract class CommonITILObject extends CommonDBTM implements KanbanInterface, T
                     $allowed_fields[] = 'global_validation';
                     $allowed_fields[] = '_validationsteps_id';
                 }
-                // Manage assign and steal right
-                if (static::getType() === Ticket::getType() && Session::haveRightsOr(static::$rightname, [Ticket::ASSIGN, Ticket::STEAL])) {
-                    $allowed_fields[] = '_itil_assign';
-                    $allowed_fields[] = '_users_id_assign';
-                    $allowed_fields[] = '_groups_id_assign';
-                    $allowed_fields[] = '_suppliers_id_assign';
+                // Manage assign, steal and own rights
+                if (static::getType() === Ticket::getType()) {
+                    if ($this->canAssign()) {
+                        $allowed_fields[] = '_itil_assign';
+                        $allowed_fields[] = '_users_id_assign';
+                        $allowed_fields[] = '_groups_id_assign';
+                        $allowed_fields[] = '_suppliers_id_assign';
+                    } elseif ($this->canAssignToMe()) {
+                        // '_itil_assign' is restricted to self-assignment later; '_users_id_assign' is added without rights check
+                        $allowed_fields[] = '_itil_assign';
+                        if (
+                            is_numeric($input['_users_id_assign'] ?? null)
+                            && (int) $input['_users_id_assign'] === Session::getLoginUserID()
+                        ) {
+                            $allowed_fields[] = '_users_id_assign';
+                        }
+                    }
                 }
 
                 // Can only update initial fields if no followup or task already added
@@ -1926,15 +1937,6 @@ abstract class CommonITILObject extends CommonDBTM implements KanbanInterface, T
             }
         }
 
-        // If category, entity, or type fields are not updated, the template is not changed.
-        if (
-            (empty($input['itilcategories_id']) || $this->fields['itilcategories_id'] == $input['itilcategories_id'])
-            && (empty($input['entities_id']) || $this->fields['entities_id'] == $input['entities_id'])
-            && (empty($input['type']) || $this->fields['type'] == $input['type'])
-        ) {
-            return $input;
-        }
-
         // First get ticket template associated: entity and type/category
         $tt = $this->getITILTemplateFromInput($input);
 
@@ -1943,9 +1945,19 @@ abstract class CommonITILObject extends CommonDBTM implements KanbanInterface, T
             return $input;
         }
 
-        $tpl_class = static::getTemplateClass();
-        $input[$tpl_class::getForeignKeyField()] = $tt->getID();
-        $input[static::getTemplateFormFieldName()] = $tt->getID();
+        // If category, entity, or type fields are updated, the template used by the
+        // item may have changed
+        $update_template = !(
+            (empty($input['itilcategories_id']) || $this->fields['itilcategories_id'] == $input['itilcategories_id'])
+            && (empty($input['entities_id']) || $this->fields['entities_id'] == $input['entities_id'])
+            && (empty($input['type']) || $this->fields['type'] == $input['type'])
+        );
+
+        if ($update_template) {
+            $tpl_class = static::getTemplateClass();
+            $input[$tpl_class::getForeignKeyField()] = $tt->getID();
+            $input[static::getTemplateFormFieldName()] = $tt->getID();
+        }
 
         if (count($tt->mandatory)) {
             $mandatory_missing = [];
@@ -2293,6 +2305,13 @@ abstract class CommonITILObject extends CommonDBTM implements KanbanInterface, T
                             $useractors = $this->getActorObjectForItem(User::class);
                             if (
                                 isset($input['_auto_update'])
+                                // Assign right does not require the right to update the item
+                                || $this->canAssign()
+                                // Self-assignment ("Associate myself") does not require the right to update the item
+                                || (
+                                    $this->canAssignToMe()
+                                    && (int) ($input['_itil_assign']['users_id'] ?? 0) === Session::getLoginUserID()
+                                )
                                 || $useractors->can(-1, CREATE, $input['_itil_assign'])
                             ) {
                                 $useractors->add($input['_itil_assign']);
@@ -2321,6 +2340,7 @@ abstract class CommonITILObject extends CommonDBTM implements KanbanInterface, T
 
                             if (
                                 isset($input['_auto_update'])
+                                || $this->canAssign()
                                 || $groupactors->can(-1, CREATE, $input['_itil_assign'])
                             ) {
                                 $groupactors->add($input['_itil_assign']);
@@ -2350,6 +2370,7 @@ abstract class CommonITILObject extends CommonDBTM implements KanbanInterface, T
                             $supplieractors = $this->getActorObjectForItem(Supplier::class);
                             if (
                                 isset($input['_auto_update'])
+                                || $this->canAssign()
                                 || $supplieractors->can(-1, CREATE, $input['_itil_assign'])
                             ) {
                                 $supplieractors->add($input['_itil_assign']);
@@ -7787,6 +7808,7 @@ abstract class CommonITILObject extends CommonDBTM implements KanbanInterface, T
 
                 if (!$params['check_view_rights'] || $tltask->canViewItem()) {
                     $task_row['can_edit'] = $tltask->canUpdateItem();
+                    $task_row['can_change_state'] = $tltask->canChangeState();
                     $task_row['can_promote']
                         = Session::getCurrentInterface() === 'central'
                         && $this instanceof Ticket
@@ -9267,19 +9289,22 @@ abstract class CommonITILObject extends CommonDBTM implements KanbanInterface, T
                         }
                         break;
 
+                        // send approval request to the supervisor of each requester user (User::users_id_supervisor),
+                        // not to requester group managers (see 'requester_supervisor')
                     case 'requester_responsible':
-                        if (isset($input['_users_id_requester'])) {
-                            $requesters = is_array($input['_users_id_requester'])
-                                ? $input['_users_id_requester']
-                                : [$input['_users_id_requester']];
-                            foreach ($requesters as $users_id) {
-                                $user = new User();
-                                if ($user->getFromDB($users_id)) {
-                                    $validations_to_send[] = [
-                                        'itemtype_target' => User::class,
-                                        'items_id_target' => $user->fields['users_id_supervisor'],
-                                    ];
-                                }
+                        // requesters set by input/rule + already set ones (not in input on update)
+                        $requesters = (array) ($input['_users_id_requester'] ?? []);
+                        foreach ($this->getUsers(CommonITILActor::REQUESTER) as $d) {
+                            $requesters[] = $d['users_id'];
+                        }
+                        foreach (array_unique($requesters) as $users_id) {
+                            $user = new User();
+                            // skip requesters without supervisor; a supervisor shared by several requesters is deduplicated below
+                            if ($user->getFromDB($users_id) && $user->fields['users_id_supervisor'] > 0) {
+                                $validations_to_send[] = [
+                                    'itemtype_target' => User::class,
+                                    'items_id_target' => $user->fields['users_id_supervisor'],
+                                ];
                             }
                         }
                         break;
@@ -9458,9 +9483,8 @@ abstract class CommonITILObject extends CommonDBTM implements KanbanInterface, T
             '_do_not_compute_takeintoaccount' => $this->isTakeIntoAccountComputationBlocked($this->input),
             '_from_object'                    => true,
         ];
-        if ($disable_notifications) {
-            $common_actor_input['_disablenotif'] = true;
-        }
+        // Notifications for added actors are raised once removed actors are deleted
+        $common_actor_input['_disablenotif'] = true;
 
         $actor_itemtypes = [
             User::class,
@@ -9473,6 +9497,7 @@ abstract class CommonITILObject extends CommonDBTM implements KanbanInterface, T
             'observer',
         ];
 
+        $added_events = [];
         foreach ($actor_types as $actor_type) {
             $actor_type_value = constant(CommonITILActor::class . '::' . strtoupper($actor_type));
 
@@ -9716,10 +9741,13 @@ abstract class CommonITILObject extends CommonDBTM implements KanbanInterface, T
             // Add new actors
             foreach ($added as $actor) {
                 $actor_obj = $this->getActorObjectForItem($actor['itemtype']);
-                $actor_obj->add($common_actor_input + $actor + [
+                $actor_added = $actor_obj->add($common_actor_input + $actor + [
                     $actor_obj->getItilObjectForeignKey() => $this->fields['id'],
                     $actor_obj->getActorForeignKey()      => $actor['items_id'],
                 ]);
+                if ($actor_added) {
+                    $added_events[$actor_type . '_' . strtolower($actor['itemtype'])] = true;
+                }
                 if (
                     $actor['type'] === CommonITILActor::ASSIGN
                     && (
@@ -9766,6 +9794,13 @@ abstract class CommonITILObject extends CommonDBTM implements KanbanInterface, T
 
         // We just updated actors, clear any cached data
         $this->clearLazyLoadedActors();
+
+        $item = new static();
+        if (!$disable_notifications && $added_events !== [] && $item->getFromDB($this->getID())) {
+            foreach (array_keys($added_events) as $event) {
+                NotificationEvent::raiseEvent($event, $item);
+            }
+        }
     }
 
 
@@ -10913,6 +10948,12 @@ abstract class CommonITILObject extends CommonDBTM implements KanbanInterface, T
         // Clean new lines before passing to rules
         if (isset($input["content"])) {
             $input["content"] = str_replace("\r\n", "\n", $input['content']);
+        }
+
+        // Keep category in sync on update, so rules relying only on other
+        // changed fields (e.g. validation acceptance) still see it
+        if (!$this->isNewItem() && !isset($input['itilcategories_id'])) {
+            $input['itilcategories_id'] = $this->fields['itilcategories_id'];
         }
 
         // Set itil category code

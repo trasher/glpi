@@ -353,4 +353,89 @@ class AssignableItemTest extends DbTestCase
             array_values($class::getAssignableVisiblityCriteria())
         );
     }
+
+    /**
+     * canViewItem()/canUpdateItem() must not trigger a PHP warning when called
+     * outside of a classic user login, e.g. during agent inventory processing,
+     * where only `glpiinventoryuserrunning` is set in the session (`glpiID` is not).
+     *
+     * @param class-string<AssignableItem> $class
+     */
+    #[DataProvider('itemtypeProvider')]
+    public function testCanViewUpdateItemDuringInventory(string $class): void
+    {
+        $this->login();
+        $input = $this->getMinimalCreationInput($class);
+        $item = $this->createItem(
+            $class,
+            $input + [$class::getNameField() => __FUNCTION__]
+        );
+        $entities_id = $item->fields['entities_id'];
+
+        // Simulate the session state set during an agent inventory request:
+        // no classic user login, only the inventory pseudo-user and the
+        // item's entity are set. `glpiID` is deliberately left unset.
+        $this->logOut();
+        $_SESSION['glpiinventoryuserrunning'] = 'inventory';
+        $_SESSION['glpiactiveentities'] = [$entities_id];
+
+        // No explicit assertion is needed here: GLPITestCase::tearDown() fails
+        // the test if any PHP warning/notice was logged while calling these.
+        $item->canViewItem();
+        $item->canUpdateItem();
+    }
+
+    /**
+     * Items owned by one of the user groups must remain visible in lists
+     * when the profile has both READ_ASSIGNED and READ_OWNED rights.
+     *
+     * @param class-string<AssignableItem> $class
+     */
+    #[DataProvider('itemtypeProvider')]
+    public function testGetAssignableVisiblityCriteriaWithAssignedAndOwnedRights(string $class): void
+    {
+        global $DB;
+
+        $this->login();
+
+        $group = $this->createItem(\Group::class, [
+            'name'        => __FUNCTION__,
+            'entities_id' => $this->getTestRootEntity(true),
+        ]);
+        $this->createItem(\Group_User::class, [
+            'users_id'  => \Session::getLoginUserID(),
+            'groups_id' => $group->getID(),
+        ]);
+
+        $input = $this->getMinimalCreationInput($class);
+        $owned_item = $this->createItem(
+            $class,
+            $input + [$class::getNameField() => __FUNCTION__ . ' owned', 'groups_id' => [$group->getID()]]
+        );
+        $assigned_item = $this->createItem(
+            $class,
+            $input + [$class::getNameField() => __FUNCTION__ . ' assigned', 'groups_id_tech' => [$group->getID()]]
+        );
+        $other_item = $this->createItem(
+            $class,
+            $input + [$class::getNameField() => __FUNCTION__ . ' other']
+        );
+
+        $_SESSION['glpigroups'] = [$group->getID()];
+        $_SESSION['glpiactiveprofile'][$class::$rightname] = READ_ASSIGNED | READ_OWNED;
+
+        $visible_ids = array_column(
+            iterator_to_array($DB->request([
+                'SELECT' => ['id'],
+                'FROM'   => $class::getTable(),
+                'WHERE'  => [
+                    'id' => [$owned_item->getID(), $assigned_item->getID(), $other_item->getID()],
+                ] + $class::getAssignableVisiblityCriteria(),
+            ])),
+            'id'
+        );
+        sort($visible_ids);
+
+        $this->assertEquals([$owned_item->getID(), $assigned_item->getID()], $visible_ids);
+    }
 }

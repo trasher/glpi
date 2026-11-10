@@ -2041,7 +2041,9 @@ TWIG, $twig_params);
                         }
                         $glpi_users[] = ['id'         => $user['id'],
                             'user'       => $userfound['name'],
-                            $field_for_sync => ($userfound[$config_ldap->fields['sync_field']] ?? 'NULL'),
+                            $field_for_sync => $config_ldap->isSyncFieldEnabled()
+                                ? ($userfound[$config_ldap->fields['sync_field']] ?? 'NULL')
+                                : 'NULL',
                             'timestamp'  => $user_infos[$userfound[$field_for_sync]]['timestamp'],
                             'date_sync'  => $tmpuser->fields['date_sync'],
                             'dn'         => $user['user_dn'],
@@ -2646,6 +2648,8 @@ TWIG, $twig_params);
      * @param bool $display display message information on redirect (false by default)
      * @param bool $batch_mode True when called from a loop importing/syncing many users
      *                         (massive action or CLI sync), enabling the per-group query cache.
+     * @param bool $refused    Set to true when the user has been found in the directory
+     *                         but GLPI refused to add or update it.
      *
      * @return array|bool  with state, else false
      * @throws SodiumException
@@ -2655,9 +2659,12 @@ TWIG, $twig_params);
         $action,
         $ldap_server,
         $display = false,
-        bool $batch_mode = false
+        bool $batch_mode = false,
+        bool &$refused = false
     ) {
         global $DB;
+
+        $refused = false;
 
         $config_ldap = new self();
         $res         = $config_ldap->getFromDB($ldap_server);
@@ -2763,7 +2770,12 @@ TWIG, $twig_params);
                                 $input['add'] = 1;
                             }
 
-                            $user->fields["id"] = $user->add($input);
+                            $new_id = $user->add($input);
+                            if ($new_id === false) {
+                                $refused = true;
+                                return false;
+                            }
+                            $user->fields["id"] = $new_id;
                             return ['action' => self::USER_IMPORTED,
                                 'id'     => $user->fields["id"],
                             ];
@@ -2778,7 +2790,10 @@ TWIG, $twig_params);
                         if ($display) {
                             $input['update'] = 1;
                         }
-                        $user->update($input);
+                        if (!$user->update($input)) {
+                            $refused = true;
+                            return false;
+                        }
                         return ['action' => self::USER_SYNCHRONIZED,
                             'id'     => $input['id'],
                         ];
@@ -3223,9 +3238,15 @@ TWIG, $twig_params);
                     //we're looking for a user login
                     $params['identifier_field']   = $ldap_method['login_field'];
                     $params['user_field']         = 'name';
-                    $result = self::ldapImportUserByServerId($params, 0, $ldap_method["id"], true);
+                    $refused = false;
+                    $result = self::ldapImportUserByServerId($params, 0, $ldap_method["id"], true, false, $refused);
                     if ($result !== false) {
                         return $result;
+                    }
+                    if ($refused) {
+                        // The user exists in this directory but has been refused,
+                        // the reason has already been displayed.
+                        return false;
                     }
                 }
             }
